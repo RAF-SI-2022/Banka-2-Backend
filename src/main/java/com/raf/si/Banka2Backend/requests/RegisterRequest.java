@@ -1,2 +1,4 @@
-package com.raf.si.Banka2Backend.requests;public class RegisterRequest {
+package com.raf.si.Banka2Backend.requests;
+
+public class RegisterRequest {
 }
