@@ -4,6 +4,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity
 @Table(
@@ -39,6 +40,14 @@ public class User {
     private String pozicija;
 
     private boolean aktivan;
+
+    @ManyToMany
+    @JoinTable(
+            name = "users_permissions",
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "permission_id", referencedColumnName = "id")}
+    )
+    private List<Permission> permissions;
 
     //TODO: add all user attributes, add jpa annotations
 }
