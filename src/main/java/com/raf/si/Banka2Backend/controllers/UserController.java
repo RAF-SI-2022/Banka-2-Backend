@@ -51,6 +51,9 @@ public class UserController {
                 .permissions(user.getPermissions())
                 .build();
 
+        if(!authorisationService.isAuthorised()){
+            return ResponseEntity.status(401).build();
+        }
         userService.save(newUser);
 
         RegisterResponse response = RegisterResponse.builder()
@@ -68,24 +71,38 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> findAll(){
-        return userService.findAll();
+    public ResponseEntity<List<User>> findAll(){
+        if(!authorisationService.isAuthorised()){
+            return ResponseEntity.status(401).build();
+        }
+        return ResponseEntity.ok().body(userService.findAll());
     }
     @PostMapping
-    public User save(@RequestBody User user){
-        return userService.save(user);
+    public ResponseEntity<User> save(@RequestBody User user){
+        if(!authorisationService.isAuthorised()){
+            return ResponseEntity.status(401).build();
+        }
+            return ResponseEntity.ok().body(userService.save(user));
+
     }
     @GetMapping("/{id}")
-    public Optional<User> findById(@PathVariable(name = "id") Long id){
-        return Optional.ofNullable(userService.findById(id)).orElse(null);
+    public ResponseEntity<Optional<User>> findById(@PathVariable(name = "id") Long id){
+        if(!authorisationService.isAuthorised()){
+            return ResponseEntity.status(401).build();
+        }
+        return ResponseEntity.ok().body(Optional.ofNullable(userService.findById(id)).orElse(null));
     }
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable(name = "id") Long id){
-        userService.deleteById(id);
+    public ResponseEntity<?> deleteById(@PathVariable(name = "id") Long id){
+        if(!authorisationService.isAuthorised()){
+            return ResponseEntity.status(401).build();
+        }
+        return ResponseEntity.ok().body(Optional.ofNullable(userService.findById(id)).orElse(null));
     }
     @PutMapping
-    public User updateUser(@RequestBody User user){
-        Optional<User> updatedUser = findById(user.getId());
+    public ResponseEntity<User> updateUser(@RequestBody User user){
+
+        Optional<User> updatedUser = userService.findById(user.getId());
         if(updatedUser.isEmpty()){
             // logger goes here instead of sout and exception goes instead of null value
             System.out.println("Wrong id!");
@@ -104,7 +121,9 @@ public class UserController {
                 .permissions(user.getPermissions())
                 .build());
 
-
-        return save(updatedUser.get());
+        if(!authorisationService.isAuthorised()){
+            return ResponseEntity.status(401).build();
+        }
+        return ResponseEntity.ok().body(userService.save(updatedUser.get()));
     }
 }

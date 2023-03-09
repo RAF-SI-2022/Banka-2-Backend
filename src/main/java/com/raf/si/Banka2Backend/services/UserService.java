@@ -1,6 +1,8 @@
 package com.raf.si.Banka2Backend.services;
 
 import com.raf.si.Banka2Backend.models.User;
+import com.raf.si.Banka2Backend.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,6 +15,14 @@ import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService, UserServiceInteface {
+
+
+    @Autowired
+    private final UserRepository userRepository;
+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> myUser = this.findByEmail(username);
@@ -22,34 +32,25 @@ public class UserService implements UserDetailsService, UserServiceInteface {
 
         return new org.springframework.security.core.userdetails.User(myUser.get().getEmail(), myUser.get().getPassword(), new ArrayList<>());
     }
-
     public Optional<User> findByEmail(String email) {
-        //TODO
-        return Optional.empty();
+       return userRepository.findByEmail(email);
     }
-
     @Override
     public List<User> findAll() {
-        return Collections.emptyList();
+        return userRepository.findAll();
     }
-
     @Override
     public User save(User user) {
-        return null;
+        return userRepository.save(user);
     }
 
     @Override
     public Optional<User> findById(Long id) {
-        return Optional.empty();
+        return userRepository.findById(id);
     }
-
-//    @Override
-//    public User updateUser(User user) {
-//        return null;
-//    }
 
     @Override
     public void deleteById(Long id) {
-
+        userRepository.deleteById(id);
     }
 }
