@@ -33,7 +33,7 @@ public class UserService implements UserDetailsService, UserServiceInteface {
         return new org.springframework.security.core.userdetails.User(myUser.get().getEmail(), myUser.get().getPassword(), new ArrayList<>());
     }
     public Optional<User> findByEmail(String email) {
-       return userRepository.findByEmail(email);
+       return userRepository.findUserByEmail(email);
     }
     @Override
     public List<User> findAll() {

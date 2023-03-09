@@ -13,9 +13,12 @@ import java.util.List;
 
 @Data
 @Builder
+@AllArgsConstructor
+@RequiredArgsConstructor
 @Entity
 @Table(
-        name = "users")
+        name = "users",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"email", "jmbg"})})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +30,7 @@ public class User {
     private String email;
 
     @NotNull
-    @Size(max = 20)
+    @Size(min = 10)
     private String password;
 
     @NotNull
@@ -44,9 +47,13 @@ public class User {
 
     @NotNull
     @Size(max = 20)
-    private String pozicija;
+    private String phone;
 
-    private boolean aktivan;
+    @NotNull
+    @Size(max = 20)
+    private String jobPosition;
+
+    private boolean active;
 
     @ManyToMany
     @JoinTable(
@@ -55,8 +62,4 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "permission_id", referencedColumnName = "id")}
     )
     private List<Permission> permissions;
-
-
-
-    //TODO: add all user attributes, add jpa annotations
 }
