@@ -1,11 +1,18 @@
 package com.raf.si.Banka2Backend.models;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
+@Data
+@Builder
 @Entity
 @Table(
         name = "users")
@@ -48,6 +55,8 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "permission_id", referencedColumnName = "id")}
     )
     private List<Permission> permissions;
+
+
 
     //TODO: add all user attributes, add jpa annotations
 }
