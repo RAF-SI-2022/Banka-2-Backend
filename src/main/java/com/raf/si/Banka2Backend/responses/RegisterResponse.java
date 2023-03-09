@@ -14,8 +14,10 @@ public class RegisterResponse {
     private String email;
     private String password;
     private List<Permission> permissions;
-    private String pozicija;
-    private boolean aktivan;
+    private String jobPosition;
+    private boolean active;
     private String jmbg;
+
+    private String phone;
 
 }

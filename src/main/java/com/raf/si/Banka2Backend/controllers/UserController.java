@@ -1,5 +1,6 @@
 package com.raf.si.Banka2Backend.controllers;
 
+import com.raf.si.Banka2Backend.models.PermissionName;
 import com.raf.si.Banka2Backend.models.User;
 import com.raf.si.Banka2Backend.requests.RegisterRequest;
 import com.raf.si.Banka2Backend.responses.RegisterResponse;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+
+import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 @RestController
 @CrossOrigin
@@ -30,7 +33,7 @@ public class UserController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value="/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createUser(@RequestBody RegisterRequest user) {
 
 
@@ -39,6 +42,10 @@ public class UserController {
         if (existingUser.isPresent()) {
             return ResponseEntity.status(400).body("User with that email already exists");
         }
+        String signedInUserEmail = getContext().getAuthentication().getName();
+        if(!authorisationService.isAuthorised(PermissionName.CREATE_USERS, signedInUserEmail)){
+            return ResponseEntity.status(401).build();
+        }
 
         User newUser = User.builder()
                 .email(user.getEmail())
@@ -46,14 +53,12 @@ public class UserController {
                 .lastName(user.getLastName())
                 .password( this.passwordEncoder.encode(user.getPassword()))
                 .jmbg(user.getJmbg())
-                .pozicija(user.getPozicija())
-                .aktivan(user.isAktivan())
+                .phone(user.getPhone())
+                .jobPosition(user.getJobPosition())
+                .active(user.isActive())
                 .permissions(user.getPermissions())
                 .build();
 
-        if(!authorisationService.isAuthorised()){
-            return ResponseEntity.status(401).build();
-        }
         userService.save(newUser);
 
         RegisterResponse response = RegisterResponse.builder()
@@ -62,51 +67,49 @@ public class UserController {
                 .lastName(user.getLastName())
                 .password( this.passwordEncoder.encode(user.getPassword()))
                 .jmbg(user.getJmbg())
-                .pozicija(user.getPozicija())
-                .aktivan(user.isAktivan())
+                .phone(user.getPhone())
+                .jobPosition(user.getJobPosition())
+                .active(user.isActive())
                 .permissions(user.getPermissions())
                 .build();
 
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
+    @GetMapping()
     public ResponseEntity<List<User>> findAll(){
-        if(!authorisationService.isAuthorised()){
+        String signedInUserEmail = getContext().getAuthentication().getName();
+        if(!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)){
             return ResponseEntity.status(401).build();
         }
         return ResponseEntity.ok().body(userService.findAll());
     }
-    @PostMapping
-    public ResponseEntity<User> save(@RequestBody User user){
-        if(!authorisationService.isAuthorised()){
-            return ResponseEntity.status(401).build();
-        }
-            return ResponseEntity.ok().body(userService.save(user));
-
-    }
     @GetMapping("/{id}")
     public ResponseEntity<Optional<User>> findById(@PathVariable(name = "id") Long id){
-        if(!authorisationService.isAuthorised()){
+        String signedInUserEmail = getContext().getAuthentication().getName();
+        if(!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)){
             return ResponseEntity.status(401).build();
         }
         return ResponseEntity.ok().body(Optional.ofNullable(userService.findById(id)).orElse(null));
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteById(@PathVariable(name = "id") Long id){
-        if(!authorisationService.isAuthorised()){
+        String signedInUserEmail = getContext().getAuthentication().getName();
+        if(!authorisationService.isAuthorised(PermissionName.DELETE_USERS, signedInUserEmail)){
             return ResponseEntity.status(401).build();
         }
         return ResponseEntity.ok().body(Optional.ofNullable(userService.findById(id)).orElse(null));
     }
-    @PutMapping
+    @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@RequestBody User user){
 
         Optional<User> updatedUser = userService.findById(user.getId());
         if(updatedUser.isEmpty()){
-            // logger goes here instead of sout and exception goes instead of null value
-            System.out.println("Wrong id!");
-            return null;
+            return ResponseEntity.badRequest().build();
+        }
+        String signedInUserEmail = getContext().getAuthentication().getName();
+        if(!authorisationService.isAuthorised(PermissionName.UPDATE_USERS, signedInUserEmail)){
+            return ResponseEntity.status(401).build();
         }
         updatedUser = Optional.ofNullable(User.builder()
 
@@ -116,14 +119,11 @@ public class UserController {
                 .lastName(user.getLastName())
                 .password(this.passwordEncoder.encode(user.getPassword()))
                 .jmbg(user.getJmbg())
-                .pozicija(user.getPozicija())
-                .aktivan(user.isAktivan())
+                .jobPosition(user.getJobPosition())
+                .active(user.isActive())
                 .permissions(user.getPermissions())
                 .build());
 
-        if(!authorisationService.isAuthorised()){
-            return ResponseEntity.status(401).build();
-        }
         return ResponseEntity.ok().body(userService.save(updatedUser.get()));
     }
 }
