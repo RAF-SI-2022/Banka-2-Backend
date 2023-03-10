@@ -14,14 +14,12 @@ import org.springframework.web.bind.annotation.*;
 public class AuthetificationController {
 
     private final AuthenticationManager authenticationManager;
-    private final UserService userService;
     private final JwtUtil jwtUtil;
 
 
 
-    public AuthetificationController(AuthenticationManager authenticationManager, UserService userService, JwtUtil jwtUtil) {
+    public AuthetificationController(AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
         this.authenticationManager = authenticationManager;
-        this.userService = userService;
         this.jwtUtil = jwtUtil;
     }
 
@@ -31,7 +29,7 @@ public class AuthetificationController {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         } catch (Exception e){
             e.printStackTrace();
-            return ResponseEntity.status(401).build();
+            return ResponseEntity.status(401).body("Bad credentials.");
         }
         return ResponseEntity.ok(new LoginResponse(jwtUtil.generateToken(loginRequest.getEmail())));
     }
