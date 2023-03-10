@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -24,33 +25,39 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    @Size(max = 50)
+    @NotNull(message="This field is required.")
+    @Size(max = 50, message = "Input too long, cannot contain more than 50 characters.")
+    @Pattern(regexp = "^(?=.{1,50}@)[A-Za-z0-9_-]+(\\\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\\\.[A-Za-z0-9-]+)*(\\\\.[A-Za-z]{2,})$",
+            message = "Must enter a valid email.")
     @Email
     private String email;
 
-    @NotNull
-    @Size(min = 10)
+    //@JsonIgnore
+    @NotNull(message="This field is required.")
+    @Pattern(regexp = "^.*(?=.{10,})(?=..*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$",
+            message = "Make sure the password has at least 10 characters, one digit, one lowercase and one uppercase letter and at least one special character.")
     private String password;
 
-    @NotNull
-    @Size(max = 20)
+    @NotNull(message="This field is required.")
+    @Size(max = 20, message = "Input too long, cannot contain more than 20 characters.")
     private String firstName;
 
-    @NotNull
-    @Size(max = 20)
+    @NotNull(message="This field is required.")
+    @Size(max = 20, message = "Input too long, cannot contain more than 20 characters.")
     private String lastName;
 
-    @NotNull
-    @Size(max = 13)
+    @NotNull(message="This field is required.")
+    @Size(max = 13, message = "Input too long, cannot contain more than 13 characters.")
+    @Pattern(regexp = "^\\\\d+$",
+            message = "Invalid input.")
     private String jmbg;
 
-    @NotNull
-    @Size(max = 20)
+    @NotNull(message="This field is required.")
+    @Size(max = 20, message = "Input too long, cannot contain more than 20 characters.")
     private String phone;
 
-    @NotNull
-    @Size(max = 20)
+    @NotNull(message="This field is required.")
+    @Size(max = 20, message = "Input too long, cannot contain more than 20 characters.")
     private String jobPosition;
 
     private boolean active;
