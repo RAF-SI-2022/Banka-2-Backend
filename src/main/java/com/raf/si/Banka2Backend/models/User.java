@@ -26,38 +26,37 @@ public class User {
     private Long id;
 
     @NotNull(message="This field is required.")
-    @Size(max = 50)
-    @Pattern(regexp = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\\\.[A-Za-z0-9-]+)*(\\\\.[A-Za-z]{2,})$",
+    @Size(max = 50, message = "Input too long, cannot contain more than 50 characters.")
+    @Pattern(regexp = "^(?=.{1,50}@)[A-Za-z0-9_-]+(\\\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\\\.[A-Za-z0-9-]+)*(\\\\.[A-Za-z]{2,})$",
             message = "Must enter a valid email.")
     @Email
     private String email;
 
     @NotNull(message="This field is required.")
-    @Size(min = 10)
     @Pattern(regexp = "^.*(?=.{10,})(?=..*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$",
             message = "Make sure the password has at least 10 characters, one digit, one lowercase and one uppercase letter and at least one special character.")
     private String password;
 
     @NotNull(message="This field is required.")
-    @Size(max = 20)
+    @Size(max = 20, message = "Input too long, cannot contain more than 20 characters.")
     private String firstName;
 
     @NotNull(message="This field is required.")
-    @Size(max = 20)
+    @Size(max = 20, message = "Input too long, cannot contain more than 20 characters.")
     private String lastName;
 
     @NotNull(message="This field is required.")
-    @Size(max = 13)
+    @Size(max = 13, message = "Input too long, cannot contain more than 13 characters.")
     @Pattern(regexp = "^\\\\d+$",
             message = "Invalid input.")
     private String jmbg;
 
     @NotNull(message="This field is required.")
-    @Size(max = 20)
+    @Size(max = 20, message = "Input too long, cannot contain more than 20 characters.")
     private String phone;
 
     @NotNull(message="This field is required.")
-    @Size(max = 20)
+    @Size(max = 20, message = "Input too long, cannot contain more than 20 characters.")
     private String jobPosition;
 
     private boolean active;
