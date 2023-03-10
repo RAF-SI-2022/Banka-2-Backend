@@ -32,6 +32,7 @@ public class User {
     @Email
     private String email;
 
+    @JsonIgnore
     @NotNull(message="This field is required.")
     @Pattern(regexp = "^.*(?=.{10,})(?=..*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$",
             message = "Make sure the password has at least 10 characters, one digit, one lowercase and one uppercase letter and at least one special character.")
