@@ -1,0 +1,87 @@
+version: '3.3'
+
+services:
+
+  redis:
+    image: redis:7.0.1-alpine
+    ports:
+      - "6379:6379"
+
+#docker exec -it $db_container_id /bin/sh
+#mysql -uroot -pmypass
+#create database emails;
+#grant all on emails.* to 'testUser'@'%' identified by '123456'; mozda ce ti ovo pomoci da allowujes sve na svojoj bazi(na stacku sam ovo nasao ali meni ne radi)
+  db-users:
+    image: mariadb
+    container_name: db-users
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_ROOT_USER: root
+      MARIADB_ROOT_PASSWORD: root123
+      MARIADB_DATABASE: banka2db
+      MYSQL_USER: raf1
+      MYSQL_USER_PASSWORD: raf123
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - db-users:/var/lib/mariadb/data
+
+
+  db-mongo:
+    image: mongo:4.2.21
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mong
+      MONGO_INITDB_ROOT_PASSWORD: mong
+      MONGO_INITDB_DATABASE: initial
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+#generalno svi kontejneri se prepoznaju, flyway i database, phpmyadmin sadrzi ovu bazu banka2db,
+#jedino je problem sto kad se pokrene ovaj nas servis on ne moze da pronadje bazu,
+#tako da je u ovom servisu problem, u application.propertiesu ne bi trebalo,
+#tamo sam sve zivo promenio, jedino sto ostaje je dockerfile, ne znam...
+  banka2backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      spring.datasource.jdbcUrl: jdbc:mariadb://db-users:3306/banka2db
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db-users
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - "8089:80"
+    environment:
+      - PMA_HOST=db-users
+      - MYSQL_ROOT_PASSWORD=root123
+      - MYSQL_USER=raf1
+      - MYSQL_PASSWORD=raf123
+    depends_on:
+      - db-users
+
+
+  flyway:
+    image: flyway/flyway
+    command: -url=jdbc:mariadb://db-users:3306/banka2db -schemas=myschema -user=root -password=root123 -connectRetries=60 migrate
+    volumes:
+      - .:/flyway/sql
+    depends_on:
+      - db-users
+
+
+volumes:
+  db-users:
+  mongo-data:
