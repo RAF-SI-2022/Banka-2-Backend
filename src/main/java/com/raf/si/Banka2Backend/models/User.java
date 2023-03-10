@@ -19,7 +19,7 @@ import java.util.List;
 @Entity
 @Table(
         name = "users",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"email", "password", "jmbg"})})
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"email", "jmbg"})})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
