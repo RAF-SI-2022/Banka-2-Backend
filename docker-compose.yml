@@ -2,8 +2,9 @@ version: "3"
 
 services:
 
-  db-users:
+  dbusers:
     image: mariadb:10.6
+    container_name: dbusers
     restart: on-failure
     expose:
       - "3306"
@@ -20,34 +21,30 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - db-users:/var/lib/mysql
+      - dbusers:/var/lib/mysql
     networks:
       db:
 
   flyway:
     image: flyway/flyway:9
-    restart: on-failure
-    command: -url=jdbc:mariadb://db-users:3306/users -schemas=users -user=root -password=root -connectRetries=60 migrate
+    command: -url=jdbc:mariadb://dbusers:3306/users -schemas=users -user=root -password=root -connectRetries=60 migrate
     volumes:
       - .:/flyway/sql
     depends_on:
-      - db-users
+      - dbusers
     networks:
       - db
 
   banka2backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: on-failure
-    environment:
-      spring.datasource.jdbcUrl: jdbc:mariadb://db-users:3306/users
+    container_name: banka2backend
+    image: banka2backend
+    expose:
+      - "8080"
     ports:
       - "8080:8080"
     depends_on:
-      - db-users
-    networks:
-      - db
+      - dbusers
+    network_mode: "host"
 
   phpmyadmin:
     image: phpmyadmin
@@ -57,19 +54,19 @@ services:
     ports:
       - "8081:80"
     environment:
-      PMA_HOST: db-users
+      PMA_HOST: dbusers
       PMA_PORT: 3306
       MYSQL_ROOT_USER: root
       MYSQL_USER: root
       MYSQL_PASSWORD: root
     depends_on:
-      - db-users
+      - dbusers
     networks:
       - db
 
 
 volumes:
-  db-users:
+  dbusers:
   #mongodb:
 
 networks:
