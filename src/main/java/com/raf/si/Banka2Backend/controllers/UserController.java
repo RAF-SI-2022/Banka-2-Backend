@@ -104,6 +104,7 @@ public class UserController {
         }
         return ResponseEntity.ok().body(userService.findAll());
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable(name = "id") Long id){
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -112,6 +113,17 @@ public class UserController {
         }
         return ResponseEntity.ok().body(userService.findById(id));
     }
+
+    @GetMapping("/email")
+    public ResponseEntity<?> findByEmail(){
+        String signedInUserEmail = getContext().getAuthentication().getName();
+        if(!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)){
+            return ResponseEntity.status(401).body("You don't have permission to read users.");
+        }
+        return ResponseEntity.ok().body(userService.findByEmail(signedInUserEmail));
+    }
+
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteById(@PathVariable(name = "id") Long id){
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -146,6 +158,26 @@ public class UserController {
         user.setActive(true);
         return ResponseEntity.ok().body(this.userService.save(user));
     }
+
+    @PostMapping("/deactivate/{id}")//todo ovo je postavljeno jer je trebalo frontu, mozda se koristi vas soft delete umesto
+    public ResponseEntity<?> deactivateUser(@PathVariable(name="id") Long id) {
+        String signedInUserEmail = getContext().getAuthentication().getName();
+        if(!authorisationService.isAuthorised(PermissionName.ADMIN_USER, signedInUserEmail)){
+            return ResponseEntity.status(401).body("You don't have permission to deactivate users.");
+        }
+        Optional<User> userOptional = this.userService.findById(id);
+        if(userOptional.isEmpty()) {
+            return ResponseEntity.status(400).body("Can't deactivate user with id " + id + ", because it doesn't exist");
+        }
+        if(!userOptional.get().isActive()) {
+            return ResponseEntity.status(400).body("Can't deactivate user with id " + id + ", because it is already active");
+        }
+        User user = userOptional.get();
+        user.setActive(false);
+        return ResponseEntity.ok().body(this.userService.save(user));
+    }
+
+
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable(name="id") Long id, @RequestBody RegisterRequest user){
