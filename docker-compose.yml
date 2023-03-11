@@ -35,6 +35,15 @@ services:
     networks:
       - db
 
+  banka2backend-test:
+    container_name: banka2backend-test
+    image: banka2backend
+    entrypoint: ["mvn", "test"]
+    depends_on:
+      - dbusers
+    networks:
+      - db
+
   banka2backend:
     container_name: banka2backend
     image: banka2backend
@@ -44,7 +53,8 @@ services:
       - "8080:8080"
     depends_on:
       - dbusers
-    network_mode: "host"
+    networks:
+      - db
 
   phpmyadmin:
     image: phpmyadmin
