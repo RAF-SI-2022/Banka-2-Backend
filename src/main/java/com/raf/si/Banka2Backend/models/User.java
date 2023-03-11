@@ -29,7 +29,7 @@ public class User {
     @NotNull(message="This field is required.")
     @Size(max = 50, message = "Input too long, cannot contain more than 50 characters.")
 //    @Pattern(regexp = "^(?=.{1,50}@)[A-Za-z0-9_-]+(\\\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\\\.[A-Za-z0-9-]+)*(\\\\.[A-Za-z]{2,})$",
-//            message = "Must enter a valid email.")
+//            message = "Must enter a valid email.")//todo popravi regex, ubija front requestove
     @Email
     private String email;
 
@@ -50,7 +50,7 @@ public class User {
     @NotNull(message="This field is required.")
     @Size(max = 13, message = "Input too long, cannot contain more than 13 characters.")
 //    @Pattern(regexp = "^\\\\d+$",
-//            message = "Invalid input.")
+//            message = "Invalid input.")//todo popravi regex, ubija front requestove
     private String jmbg;
 
     @NotNull(message="This field is required.")
