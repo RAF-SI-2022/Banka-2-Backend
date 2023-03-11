@@ -28,25 +28,32 @@ public class BootstrapData implements CommandLineRunner {
     }
     @Override
     public void run(String... args) throws Exception { // Run only once-first time, after that comment content of this method
-//        List<User> users = new ArrayList<>();
-//
-//        User admin = User.builder()
-//                .email("admin@gmail.com")
-//                .firstName("Admin")
-//                .lastName("Adminic")
-//                .password( this.passwordEncoder.encode("admin"))
-//                .jmbg("2902968000000")
-//                .phone("0657817522")
-//                .jobPosition("administrator")
-//                .active(true)
-//                .build();
-//
-//        List<Permission> permissions = new ArrayList<>();
-//        Permission adminPermission = new Permission(PermissionName.ADMIN_USER);
-//        permissions.add(adminPermission);
-//        this.permissionRepository.save(adminPermission);
-//
-//        admin.setPermissions(permissions);
-//        this.userRepository.save(admin);
+
+        User admin = User.builder()
+                .email("admin@gmail.com")
+                .firstName("Admin")
+                .lastName("Adminic")
+                .password( this.passwordEncoder.encode("admin"))
+                .jmbg("2902968000000")
+                .phone("0657817522")
+                .jobPosition("administrator")
+                .active(true)
+                .build();
+
+        List<Permission> permissions = new ArrayList<>();
+        Permission adminPermission = new Permission(PermissionName.ADMIN_USER);
+        Permission readPermission = new Permission(PermissionName.READ_USERS);
+        Permission createPermission = new Permission(PermissionName.CREATE_USERS);
+        Permission updatePermission = new Permission(PermissionName.UPDATE_USERS);
+        Permission deletePermission = new Permission(PermissionName.DELETE_USERS);
+        permissions.add(adminPermission);
+        this.permissionRepository.save(adminPermission);
+        this.permissionRepository.save(readPermission);
+        this.permissionRepository.save(createPermission);
+        this.permissionRepository.save(updatePermission);
+        this.permissionRepository.save(deletePermission);
+
+        admin.setPermissions(permissions);
+        this.userRepository.save(admin);
     }
 }

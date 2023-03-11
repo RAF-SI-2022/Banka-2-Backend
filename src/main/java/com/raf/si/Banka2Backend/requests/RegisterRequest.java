@@ -1,6 +1,5 @@
 package com.raf.si.Banka2Backend.requests;
-
-import com.raf.si.Banka2Backend.models.Permission;
+import com.raf.si.Banka2Backend.models.PermissionName;
 import lombok.Data;
 
 import java.util.List;
@@ -11,7 +10,7 @@ public class RegisterRequest {
     private String lastName;
     private String email;
     private String password;
-    private List<Permission> permissions;
+    private List<PermissionName> permissions;
     private String jobPosition;
     private boolean active;
     private String jmbg;
