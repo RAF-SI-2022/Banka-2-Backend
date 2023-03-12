@@ -29,7 +29,7 @@ services:
     image: flyway/flyway:9
     command: -url=jdbc:mariadb://dbusers:3306/users -schemas=users -user=root -password=root -connectRetries=60 migrate
     volumes:
-      - .:/flyway/sql
+      - ./src/main/resources/db/migration:/flyway/sql
     depends_on:
       - dbusers
     networks:
