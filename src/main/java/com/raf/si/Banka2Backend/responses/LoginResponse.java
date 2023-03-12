@@ -10,6 +10,10 @@ public class LoginResponse {
     private String token;
     private List<Permission> permissions;
 
+//    public LoginResponse(String token) {
+//        this.token = token;
+//    }
+
     public LoginResponse(String token, List<Permission> permissions) {
         this.token = token;
         this.permissions = permissions;
