@@ -30,6 +30,7 @@ services:
     command: -url=jdbc:mariadb://dbusers:3306/users -schemas=users -user=root -password=root -connectRetries=60 migrate
     volumes:
       - ./src/main/resources/db/migration:/flyway/sql
+      - ./flywayConfig:/flyway/conf
     depends_on:
       - dbusers
     networks:
