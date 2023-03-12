@@ -11,7 +11,7 @@
 	<groupId>com.raf.si</groupId>
 	<artifactId>Banka2Backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>Banka2Backend</name>
 	<description>Backend projekat za tim Banka2</description>
 	<properties>
