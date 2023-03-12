@@ -1,5 +1,6 @@
 package com.raf.si.Banka2Backend.services;
 
+import com.raf.si.Banka2Backend.models.Permission;
 import com.raf.si.Banka2Backend.models.User;
 import com.raf.si.Banka2Backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,12 @@ public class UserService implements UserDetailsService, UserServiceInteface {
     @Override
     public User save(User user) {
         return userRepository.save(user);
+    }
+
+    @Override
+    public List<Permission> getUserPermissions(String email) {
+        List<Permission> permissions = new ArrayList<>(userRepository.findUserByEmail(email).get().getPermissions());
+        return permissions;
     }
 
     @Override

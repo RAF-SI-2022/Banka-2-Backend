@@ -55,5 +55,6 @@ public class BootstrapData implements CommandLineRunner {
 //
 //        admin.setPermissions(permissions);
 //        this.userRepository.save(admin);
+
     }
 }
