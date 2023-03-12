@@ -16,6 +16,9 @@ public interface UserServiceInteface {
 
     List<Permission> getUserPermissions(String email);
 
+    void deleteUser(Long id);
+
+
 
 //    User updateUser(User user);
 

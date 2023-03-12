@@ -12,6 +12,7 @@ import com.raf.si.Banka2Backend.services.AuthorisationService;
 import com.raf.si.Banka2Backend.services.PermissionService;
 import com.raf.si.Banka2Backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -142,9 +143,12 @@ public class UserController {
             return ResponseEntity.status(400).body("Can't delete user with id " + id + ", because it doesn't exist");
         }
         //Soft delete - setting active to false, not really deleting user from data base
-        User user = userOptional.get();
-        user.setActive(false);
-        return ResponseEntity.ok().body(this.userService.save(user));
+//        User user = userOptional.get();
+//        user.setActive(false);
+//        return ResponseEntity.ok().body(this.userService.save(user));
+
+        userService.deleteUser(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/reactivate/{id}")

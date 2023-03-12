@@ -57,6 +57,11 @@ public class UserService implements UserDetailsService, UserServiceInteface {
     }
 
     @Override
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
+    }
+
+    @Override
     public void deleteById(Long id) {
         userRepository.deleteById(id);
     }
