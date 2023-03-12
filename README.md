@@ -2,4 +2,4 @@
 
 ## How to start
 
-Run `./Makefile dev` (or `./make.bat dev` on Windows) to start the service in development mode.
+Run `./Makefile` (or `./make.bat` on Windows) to start the service in development mode.
