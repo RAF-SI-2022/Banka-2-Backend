@@ -39,11 +39,6 @@ public class AuthetificationController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
-
-        System.out.println("kurac");
-
-        System.out.println(loginRequest);
-
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         } catch (Exception e){
