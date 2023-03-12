@@ -66,6 +66,7 @@ public class UserController {
         if (existingUser.isPresent()) {
             return ResponseEntity.status(400).body("User with that email already exists.");
         }
+
         List<Permission> permissions = this.permissionService.findByPermissionNames(user.getPermissions());
         User newUser = User.builder()
                 .email(user.getEmail())
