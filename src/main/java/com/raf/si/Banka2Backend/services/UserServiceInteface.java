@@ -1,5 +1,6 @@
 package com.raf.si.Banka2Backend.services;
 
+import com.raf.si.Banka2Backend.models.Permission;
 import com.raf.si.Banka2Backend.models.User;
 
 import java.util.List;
@@ -12,6 +13,12 @@ public interface UserServiceInteface {
     User save(User user);
 
     Optional<User> findById(Long id);
+
+    List<Permission> getUserPermissions(String email);
+
+    void deleteUser(Long id);
+
+
 
 //    User updateUser(User user);
 

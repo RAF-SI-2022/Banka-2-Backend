@@ -83,7 +83,7 @@ public class BootstrapData implements CommandLineRunner {
         this.permissionRepository.save(updatePermission);
         this.permissionRepository.save(deletePermission);
 
-        // Add admin perms
+//         Add admin perms
         admin.setPermissions(permissions);
         this.userRepository.save(admin);
     }
