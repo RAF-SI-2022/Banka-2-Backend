@@ -200,6 +200,9 @@ public class UserController {
                 return ResponseEntity.status(401).body("You don't have permission to update this user.");
             }
         }
+        else {
+            return ResponseEntity.status(401).body("Internal error");
+        }
         Optional<User> updatedUser = userService.findById(id);
         if(updatedUser.isEmpty()){
             return ResponseEntity.status(400).body("Can't find user with id " + id);
