@@ -1,6 +1,6 @@
 @echo off
 
-if "%1" == "" goto test
+if "%1" == "" goto dev
 
 if "%1" == "build" (
     :build

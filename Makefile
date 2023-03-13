@@ -1,4 +1,4 @@
-.DEFAULT_GOAL := build
+.DEFAULT_GOAL := dev
 
 build:
 	docker build -t banka2backend .

@@ -29,7 +29,7 @@ class Banka2BackendUserServiceUnitTests {
     @Test
     void testSave() {
 
-        String password = BCrypt.hashpw("Admin_1234", BCrypt.gensalt());
+        String password = BCrypt.hashpw("Admin1234", BCrypt.gensalt());
 
         User test = new User().builder()
                 .email("admin@gmail.com")
