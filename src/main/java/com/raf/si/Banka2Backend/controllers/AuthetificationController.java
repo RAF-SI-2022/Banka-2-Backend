@@ -22,19 +22,12 @@ public class AuthetificationController {
     private final JwtUtil jwtUtil;
     private final UserService userService;
 
-    List<Permission> permissions = new ArrayList<>();
-
 
     public AuthetificationController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, UserService userService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.userService = userService;
-
-        permissions.add(new Permission(PermissionName.ADMIN_USER));
-        permissions.add(new Permission(PermissionName.READ_USERS));
     }
-
-
 
 
     @PostMapping("/login")

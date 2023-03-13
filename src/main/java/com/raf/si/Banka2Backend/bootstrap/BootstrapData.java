@@ -52,39 +52,39 @@ public class BootstrapData implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        // Do this only on the first ever run of the app.
-        // Includes both initial admin run and permissions run.
-        Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
-        if (adminUser.isPresent()) return;
-
-        // Add admin
-        User admin = User.builder()
-                .email(ADMIN_EMAIL)
-                .firstName(ADMIN_FNAME)
-                .lastName(ADMIN_LNAME)
-                .password(this.passwordEncoder.encode(ADMIN_PASS))
-                .jmbg(ADMIN_JMBG)
-                .phone(ADMIN_PHONE)
-                .jobPosition(ADMIN_JOB)
-                .active(ADMIN_ACTIVE)
-                .build();
-
-        // Add initial perms
-        List<Permission> permissions = new ArrayList<>();
-        Permission adminPermission = new Permission(PermissionName.ADMIN_USER);
-        Permission readPermission = new Permission(PermissionName.READ_USERS);
-        Permission createPermission = new Permission(PermissionName.CREATE_USERS);
-        Permission updatePermission = new Permission(PermissionName.UPDATE_USERS);
-        Permission deletePermission = new Permission(PermissionName.DELETE_USERS);
-        permissions.add(adminPermission);
-        this.permissionRepository.save(adminPermission);
-        this.permissionRepository.save(readPermission);
-        this.permissionRepository.save(createPermission);
-        this.permissionRepository.save(updatePermission);
-        this.permissionRepository.save(deletePermission);
-
-        // Add admin perms
-        admin.setPermissions(permissions);
-        this.userRepository.save(admin);
+//        // Do this only on the first ever run of the app.
+//        // Includes both initial admin run and permissions run.
+//        Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
+//        if (adminUser.isPresent()) return;
+//
+//        // Add admin
+//        User admin = User.builder()
+//                .email(ADMIN_EMAIL)
+//                .firstName(ADMIN_FNAME)
+//                .lastName(ADMIN_LNAME)
+//                .password(this.passwordEncoder.encode(ADMIN_PASS))
+//                .jmbg(ADMIN_JMBG)
+//                .phone(ADMIN_PHONE)
+//                .jobPosition(ADMIN_JOB)
+//                .active(ADMIN_ACTIVE)
+//                .build();
+//
+//        // Add initial perms
+//        List<Permission> permissions = new ArrayList<>();
+//        Permission adminPermission = new Permission(PermissionName.ADMIN_USER);
+//        Permission readPermission = new Permission(PermissionName.READ_USERS);
+//        Permission createPermission = new Permission(PermissionName.CREATE_USERS);
+//        Permission updatePermission = new Permission(PermissionName.UPDATE_USERS);
+//        Permission deletePermission = new Permission(PermissionName.DELETE_USERS);
+//        permissions.add(adminPermission);
+//        this.permissionRepository.save(adminPermission);
+//        this.permissionRepository.save(readPermission);
+//        this.permissionRepository.save(createPermission);
+//        this.permissionRepository.save(updatePermission);
+//        this.permissionRepository.save(deletePermission);
+//
+////         Add admin perms
+//        admin.setPermissions(permissions);
+//        this.userRepository.save(admin);
     }
 }
