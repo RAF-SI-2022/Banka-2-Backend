@@ -1,4 +1,4 @@
-package com.raf.si.Banka2Backend.services;
+package com.raf.si.Banka2Backend.services.interfaces;
 
 import com.raf.si.Banka2Backend.models.Permission;
 import com.raf.si.Banka2Backend.models.PermissionName;

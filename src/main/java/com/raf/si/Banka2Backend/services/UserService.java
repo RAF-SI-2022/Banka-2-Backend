@@ -1,7 +1,10 @@
 package com.raf.si.Banka2Backend.services;
 
+import com.raf.si.Banka2Backend.models.PasswordResetToken;
 import com.raf.si.Banka2Backend.models.User;
+import com.raf.si.Banka2Backend.repositories.PasswordResetTokenRepository;
 import com.raf.si.Banka2Backend.repositories.UserRepository;
+import com.raf.si.Banka2Backend.services.interfaces.UserServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -9,19 +12,18 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserService implements UserDetailsService, UserServiceInteface {
-
+public class UserService implements UserDetailsService, UserServiceInterface {
+    private final UserRepository userRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Autowired
-    private final UserRepository userRepository;
-
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository) {
         this.userRepository = userRepository;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -52,5 +54,18 @@ public class UserService implements UserDetailsService, UserServiceInteface {
     @Override
     public void deleteById(Long id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<User> getUserByPasswordResetToken(String token) {
+        Optional<PasswordResetToken>  passwordResetToken = this.passwordResetTokenRepository.findPasswordResetTokenByToken(token);
+        if(passwordResetToken.isEmpty()) return null;
+        return this.userRepository.findById(passwordResetToken.get().getId());
+    }
+
+    @Override
+    public void changePassword(User user, String newPassword) {
+        user.setPassword(newPassword);
+        userRepository.save(user);
     }
 }
