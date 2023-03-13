@@ -69,7 +69,7 @@ public class BootstrapData implements CommandLineRunner {
                 .active(ADMIN_ACTIVE)
                 .build();
 
-        // Add initial permissions
+        // Add initial perms
         List<Permission> permissions = new ArrayList<>();
         Permission adminPermission = new Permission(PermissionName.ADMIN_USER);
         Permission readPermission = new Permission(PermissionName.READ_USERS);
