@@ -1,6 +1,7 @@
 package com.raf.si.Banka2Backend.services;
 
 import com.raf.si.Banka2Backend.models.PasswordResetToken;
+import com.raf.si.Banka2Backend.models.Permission;
 import com.raf.si.Banka2Backend.models.User;
 import com.raf.si.Banka2Backend.repositories.PasswordResetTokenRepository;
 import com.raf.si.Banka2Backend.repositories.UserRepository;
@@ -47,8 +48,19 @@ public class UserService implements UserDetailsService, UserServiceInterface {
     }
 
     @Override
+    public List<Permission> getUserPermissions(String email) {
+        List<Permission> permissions = new ArrayList<>(userRepository.findUserByEmail(email).get().getPermissions());
+        return permissions;
+    }
+
+    @Override
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
     }
 
     @Override
@@ -60,12 +72,13 @@ public class UserService implements UserDetailsService, UserServiceInterface {
     public Optional<User> getUserByPasswordResetToken(String token) {
         Optional<PasswordResetToken>  passwordResetToken = this.passwordResetTokenRepository.findPasswordResetTokenByToken(token);
         if(passwordResetToken.isEmpty()) return null;
-        return this.userRepository.findById(passwordResetToken.get().getId());
+        return this.userRepository.findById(passwordResetToken.get().getUser().getId());
     }
 
     @Override
-    public void changePassword(User user, String newPassword) {
+    public void changePassword(User user, String newPassword, String passwordResetToken) {
         user.setPassword(newPassword);
         userRepository.save(user);
+        this.passwordResetTokenRepository.deleteByToken(passwordResetToken);
     }
 }

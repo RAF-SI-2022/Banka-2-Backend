@@ -54,7 +54,10 @@ public class AuthenticationController {
             e.printStackTrace();
             return ResponseEntity.status(401).body("Bad credentials.");
         }
-        return ResponseEntity.ok(new LoginResponse(jwtUtil.generateToken(loginRequest.getEmail())));
+        LoginResponse responseDto = new LoginResponse(jwtUtil.generateToken(loginRequest.getEmail()), userService.getUserPermissions(loginRequest.getEmail()));
+        // TokenResponseDto responseDto = new TokenResponseDto(jwtUtil.generateToken(tokenRequestDto.getEmail()), userService.getUserPermissions(tokenRequestDto.getEmail()));
+        return ResponseEntity.ok(responseDto);
+
     }
 
     @PostMapping("/reset-password")
@@ -86,7 +89,7 @@ public class AuthenticationController {
         if(user.isEmpty())
             return ResponseEntity.status(405).body("Could not change user password");
 
-        this.userService.changePassword(user.get(), this.passwordEncoder.encode(passwordRecoveryDto.getNewPassword()));
+        this.userService.changePassword(user.get(), this.passwordEncoder.encode(passwordRecoveryDto.getNewPassword()), passwordRecoveryDto.getToken());
 
         return ResponseEntity.ok().build();
     }

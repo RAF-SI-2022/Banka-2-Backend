@@ -51,8 +51,10 @@ public class AuthorisationService{
             return "Token not found";
 
         Calendar cal = Calendar.getInstance();
-        if(passwordResetToken.get().getExpirationDate().before(cal.getTime()))
+        if(passwordResetToken.get().getExpirationDate().before(cal.getTime())){
+            this.passwordResetTokenRepository.delete(passwordResetToken.get());
             return "Token expired";
+        }
 
         return "";
     }
