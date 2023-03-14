@@ -1,4 +1,4 @@
-ackage com.raf.si.Banka2Backend.services;
+package com.raf.si.Banka2Backend.services;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;

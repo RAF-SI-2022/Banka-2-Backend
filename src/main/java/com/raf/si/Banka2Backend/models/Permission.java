@@ -1,6 +1,7 @@
 package com.raf.si.Banka2Backend.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import javax.persistence.*;
@@ -8,6 +9,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
 @Data
+@Builder
+@AllArgsConstructor
 @RequiredArgsConstructor
 @Entity
 @Table(
