@@ -33,7 +33,12 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserController(UserService userService, PermissionService permissionService, AuthorisationService authorisationService, PasswordEncoder passwordEncoder) {
+    public UserController(
+            UserService userService,
+            PermissionService permissionService,
+            AuthorisationService authorisationService,
+            PasswordEncoder passwordEncoder
+    ) {
         this.userService = userService;
         this.permissionService = permissionService;
         this.authorisationService = authorisationService;

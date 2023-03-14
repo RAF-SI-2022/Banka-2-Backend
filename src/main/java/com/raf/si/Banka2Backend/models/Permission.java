@@ -24,7 +24,6 @@ public class Permission {
     @ManyToMany(mappedBy = "permissions")
     @JsonIgnore
     private Collection<User> users;
-
     public Permission(PermissionName permissionName) {
         this.permissionName = permissionName;
     }

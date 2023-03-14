@@ -1,4 +1,4 @@
-package com.raf.si.Banka2Backend.services;
+package com.raf.si.Banka2Backend.services.interfaces;
 
 import com.raf.si.Banka2Backend.models.Permission;
 import com.raf.si.Banka2Backend.models.User;
@@ -6,7 +6,7 @@ import com.raf.si.Banka2Backend.models.User;
 import java.util.List;
 import java.util.Optional;
 
-public interface UserServiceInteface {
+public interface UserServiceInterface {
 
     List<User> findAll();
 
@@ -18,9 +18,11 @@ public interface UserServiceInteface {
 
     void deleteUser(Long id);
 
-
-
 //    User updateUser(User user);
 
     void deleteById(Long id);
+
+    Optional<User> getUserByPasswordResetToken(String token);
+
+    void changePassword(User user, String newPassword, String token);
 }
