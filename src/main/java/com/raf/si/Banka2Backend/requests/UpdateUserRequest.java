@@ -5,15 +5,13 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class RegisterRequest {
+public class UpdateUserRequest {
+
+    private String email;
     private String firstName;
     private String lastName;
-    private String email;
-    private String password;
     private List<PermissionName> permissions;
     private String jobPosition;
     private boolean active;
-    private String jmbg;
-
     private String phone;
 }
