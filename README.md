@@ -1,5 +1,17 @@
 # Backend Documentation
 
+## Setup
+
+Start by forking the latest sprint branch into your GitHub account.
+
+Once you clone the project to your computer, run the following command:
+
+```shell
+    ./init
+```
+
+This will set up the required Git scripts to help keep your workflow smooth.
+
 ## Building
 
 The service can be deployed using locally-installed Maven, Java and other services (MariaDB and Flyway), or can be run using Docker.
