@@ -36,18 +36,30 @@ services:
     networks:
       - db
 
+  banka2backend-dev:
+    container_name: banka2backend-dev
+    image: banka2backend-dev
+    expose:
+      - "8080"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - dbusers
+    networks:
+      - db
+
   banka2backend-test:
     container_name: banka2backend-test
-    image: banka2backend
+    image: banka2backend-dev
     entrypoint: ["mvn", "test"]
     depends_on:
       - dbusers
     networks:
       - db
 
-  banka2backend:
-    container_name: banka2backend
-    image: banka2backend
+  banka2backend-prod:
+    container_name: banka2backend-prod
+    image: banka2backend-prod
     expose:
       - "8080"
     ports:
