@@ -54,7 +54,10 @@ public class BootstrapData implements CommandLineRunner {
     // Do this only on the first ever run of the app.
     // Includes both initial admin run and permissions run.
     Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
-    if (adminUser.isPresent()) return;
+    if (adminUser.isPresent()) {
+      System.out.println("Started!");
+      return;
+    }
 
     // Add admin
     User admin =
@@ -86,5 +89,7 @@ public class BootstrapData implements CommandLineRunner {
     // Add admin perms
     admin.setPermissions(permissions);
     this.userRepository.save(admin);
+
+    System.out.println("Loaded!");
   }
 }

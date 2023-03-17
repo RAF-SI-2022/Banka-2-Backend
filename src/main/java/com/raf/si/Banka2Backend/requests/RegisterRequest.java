@@ -14,6 +14,5 @@ public class RegisterRequest {
   private String jobPosition;
   private boolean active;
   private String jmbg;
-
   private String phone;
 }
