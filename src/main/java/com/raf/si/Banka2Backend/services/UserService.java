@@ -6,79 +6,86 @@ import com.raf.si.Banka2Backend.models.User;
 import com.raf.si.Banka2Backend.repositories.PasswordResetTokenRepository;
 import com.raf.si.Banka2Backend.repositories.UserRepository;
 import com.raf.si.Banka2Backend.services.interfaces.UserServiceInterface;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 @Service
 public class UserService implements UserDetailsService, UserServiceInterface {
-    private final UserRepository userRepository;
-    private final PasswordResetTokenRepository passwordResetTokenRepository;
+  private final UserRepository userRepository;
+  private final PasswordResetTokenRepository passwordResetTokenRepository;
 
-    @Autowired
-    public UserService(UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository) {
-        this.userRepository = userRepository;
-        this.passwordResetTokenRepository = passwordResetTokenRepository;
-    }
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> myUser = this.findByEmail(username);
-        if(myUser.isEmpty()) {
-            throw new UsernameNotFoundException("User with email: " + username + " not found");
-        }
+  @Autowired
+  public UserService(
+      UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository) {
+    this.userRepository = userRepository;
+    this.passwordResetTokenRepository = passwordResetTokenRepository;
+  }
 
-        return new org.springframework.security.core.userdetails.User(myUser.get().getEmail(), myUser.get().getPassword(), new ArrayList<>());
-    }
-    public Optional<User> findByEmail(String email) {
-       return userRepository.findUserByEmail(email);
-    }
-    @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
-    }
-    @Override
-    public User save(User user) {
-        return userRepository.save(user);
+  @Override
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    Optional<User> myUser = this.findByEmail(username);
+    if (myUser.isEmpty()) {
+      throw new UsernameNotFoundException("User with email: " + username + " not found");
     }
 
-    @Override
-    public List<Permission> getUserPermissions(String email) {
-        List<Permission> permissions = new ArrayList<>(userRepository.findUserByEmail(email).get().getPermissions());
-        return permissions;
-    }
+    return new org.springframework.security.core.userdetails.User(
+        myUser.get().getEmail(), myUser.get().getPassword(), new ArrayList<>());
+  }
 
-    @Override
-    public Optional<User> findById(Long id) {
-        return userRepository.findById(id);
-    }
+  public Optional<User> findByEmail(String email) {
+    return userRepository.findUserByEmail(email);
+  }
 
-    @Override
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
-    }
+  @Override
+  public List<User> findAll() {
+    return userRepository.findAll();
+  }
 
-    @Override
-    public void deleteById(Long id) {
-        userRepository.deleteById(id);
-    }
+  @Override
+  public User save(User user) {
+    return userRepository.save(user);
+  }
 
-    @Override
-    public Optional<User> getUserByPasswordResetToken(String token) {
-        Optional<PasswordResetToken>  passwordResetToken = this.passwordResetTokenRepository.findPasswordResetTokenByToken(token);
-        if(passwordResetToken.isEmpty()) return null;
-        return this.userRepository.findById(passwordResetToken.get().getUser().getId());
-    }
+  @Override
+  public List<Permission> getUserPermissions(String email) {
+    List<Permission> permissions =
+        new ArrayList<>(userRepository.findUserByEmail(email).get().getPermissions());
+    return permissions;
+  }
 
-    @Override
-    public void changePassword(User user, String newPassword, String passwordResetToken) {
-        user.setPassword(newPassword);
-        userRepository.save(user);
-        this.passwordResetTokenRepository.deleteByToken(passwordResetToken);
-    }
+  @Override
+  public Optional<User> findById(Long id) {
+    return userRepository.findById(id);
+  }
+
+  @Override
+  public void deleteUser(Long id) {
+    userRepository.deleteById(id);
+  }
+
+  @Override
+  public void deleteById(Long id) {
+    userRepository.deleteById(id);
+  }
+
+  @Override
+  public Optional<User> getUserByPasswordResetToken(String token) {
+    Optional<PasswordResetToken> passwordResetToken =
+        this.passwordResetTokenRepository.findPasswordResetTokenByToken(token);
+    if (passwordResetToken.isEmpty()) return null;
+    return this.userRepository.findById(passwordResetToken.get().getUser().getId());
+  }
+
+  @Override
+  public void changePassword(User user, String newPassword, String passwordResetToken) {
+    user.setPassword(newPassword);
+    userRepository.save(user);
+    this.passwordResetTokenRepository.deleteByToken(passwordResetToken);
+  }
 }
