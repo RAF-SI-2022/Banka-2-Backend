@@ -5,7 +5,10 @@ import static org.springframework.security.core.context.SecurityContextHolder.ge
 import com.raf.si.Banka2Backend.models.Permission;
 import com.raf.si.Banka2Backend.models.PermissionName;
 import com.raf.si.Banka2Backend.models.User;
+import com.raf.si.Banka2Backend.requests.ChangePasswordRequest;
 import com.raf.si.Banka2Backend.requests.RegisterRequest;
+import com.raf.si.Banka2Backend.requests.UpdateProfileRequest;
+import com.raf.si.Banka2Backend.requests.UpdateUserRequest;
 import com.raf.si.Banka2Backend.responses.RegisterResponse;
 import com.raf.si.Banka2Backend.services.AuthorisationService;
 import com.raf.si.Banka2Backend.services.PermissionService;
@@ -13,6 +16,7 @@ import com.raf.si.Banka2Backend.services.UserService;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -66,6 +70,7 @@ public class UserController {
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> createUser(@RequestBody RegisterRequest user) {
+
     String signedInUserEmail = getContext().getAuthentication().getName();
     if (!authorisationService.isAuthorised(PermissionName.CREATE_USERS, signedInUserEmail)) {
       return ResponseEntity.status(401).body("You don't have permission to create users.");
@@ -77,6 +82,7 @@ public class UserController {
 
     List<Permission> permissions =
         this.permissionService.findByPermissionNames(user.getPermissions());
+
     User newUser =
         User.builder()
             .email(user.getEmail())
@@ -89,7 +95,6 @@ public class UserController {
             .active(user.isActive())
             .permissions(permissions)
             .build();
-
     userService.save(newUser);
 
     RegisterResponse response =
@@ -147,9 +152,12 @@ public class UserController {
           .body("Can't delete user with id " + id + ", because it doesn't exist");
     }
     // Soft delete - setting active to false, not really deleting user from data base
-    User user = userOptional.get();
-    user.setActive(false);
-    return ResponseEntity.ok().body(this.userService.save(user));
+    //        User user = userOptional.get();
+    //        user.setActive(false);
+    //        return ResponseEntity.ok().body(this.userService.save(user));
+
+    userService.deleteUser(id);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @PostMapping("/reactivate/{id}")
@@ -173,9 +181,7 @@ public class UserController {
     return ResponseEntity.ok().body(this.userService.save(user));
   }
 
-  @PostMapping(
-      "/deactivate/{id}") // todo ovo je postavljeno jer je trebalo frontu, mozda se koristi vas
-  // soft delete umesto
+  @PostMapping("/deactivate/{id}")
   public ResponseEntity<?> deactivateUser(@PathVariable(name = "id") Long id) {
     String signedInUserEmail = getContext().getAuthentication().getName();
     if (!authorisationService.isAuthorised(PermissionName.ADMIN_USER, signedInUserEmail)) {
@@ -195,9 +201,85 @@ public class UserController {
     return ResponseEntity.ok().body(this.userService.save(user));
   }
 
+  @PutMapping("/edit-profile/{id}")
+  public ResponseEntity<?> updateProfile(
+      @PathVariable(name = "id") Long id, @RequestBody UpdateProfileRequest user) {
+    String signedInUserEmail = getContext().getAuthentication().getName();
+    //        if(!authorisationService.isAuthorised(PermissionName.UPDATE_USERS,
+    // signedInUserEmail)){
+    //            return ResponseEntity.status(401).body("You don't have permission to update
+    // users.");
+    //        }
+    Optional<User> logovan = userService.findByEmail(signedInUserEmail);
+    if (logovan.isPresent()) {
+      if (!logovan.get().getId().equals(id)) {
+        return ResponseEntity.status(401).body("You don't have permission to update this user.");
+      }
+    } else {
+      return ResponseEntity.status(401).body("Internal error");
+    }
+    Optional<User> updatedUser = userService.findById(id);
+    if (updatedUser.isEmpty()) {
+      return ResponseEntity.status(400).body("Can't find user with id " + id);
+    }
+
+    updatedUser =
+        Optional.ofNullable(
+            User.builder()
+                .id(updatedUser.get().getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .active(updatedUser.get().isActive())
+                .lastName(user.getLastName())
+                .phone(user.getPhone())
+                .password(updatedUser.get().getPassword())
+                .jmbg(updatedUser.get().getJmbg())
+                .jobPosition(updatedUser.get().getJobPosition())
+                .permissions(updatedUser.get().getPermissions())
+                .build());
+    return ResponseEntity.ok().body(userService.save(updatedUser.get()));
+  }
+
+  @PutMapping("/password/{id}")
+  public ResponseEntity<?> changePassword(
+      @PathVariable(name = "id") Long id, @RequestBody ChangePasswordRequest user) {
+    String signedInUserEmail = getContext().getAuthentication().getName();
+    //        if(!authorisationService.isAuthorised(PermissionName.UPDATE_USERS,
+    // signedInUserEmail)){
+    //            return ResponseEntity.status(401).body("You don't have permission to update
+    // users.");
+    //        }
+    Optional<User> logovan = userService.findByEmail(signedInUserEmail);
+    if (logovan.isPresent()) {
+      if (!logovan.get().getId().equals(id)) {
+        return ResponseEntity.status(401).body("You don't have permission to update this user.");
+      }
+    }
+    Optional<User> updatedUser = userService.findById(id);
+    if (updatedUser.isEmpty()) {
+      return ResponseEntity.status(400).body("Can't find user with id " + id);
+    }
+
+    updatedUser =
+        Optional.ofNullable(
+            User.builder()
+                .id(updatedUser.get().getId())
+                .firstName(updatedUser.get().getFirstName())
+                .lastName(updatedUser.get().getLastName())
+                .password(this.passwordEncoder.encode(user.getPassword()))
+                .email(updatedUser.get().getEmail())
+                .jmbg(updatedUser.get().getJmbg())
+                .active(updatedUser.get().isActive())
+                .jobPosition(updatedUser.get().getJobPosition())
+                .permissions(updatedUser.get().getPermissions())
+                .phone(updatedUser.get().getPhone())
+                .build());
+    return ResponseEntity.ok().body(userService.save(updatedUser.get()));
+  }
+
   @PutMapping("/{id}")
   public ResponseEntity<?> updateUser(
-      @PathVariable(name = "id") Long id, @RequestBody RegisterRequest user) {
+      @PathVariable(name = "id") Long id, @RequestBody UpdateUserRequest user) {
     String signedInUserEmail = getContext().getAuthentication().getName();
     if (!authorisationService.isAuthorised(PermissionName.UPDATE_USERS, signedInUserEmail)) {
       return ResponseEntity.status(401).body("You don't have permission to update users.");
@@ -206,8 +288,10 @@ public class UserController {
     if (updatedUser.isEmpty()) {
       return ResponseEntity.status(400).body("Can't find user with id " + id);
     }
+
     List<Permission> permissions =
         this.permissionService.findByPermissionNames(user.getPermissions());
+
     updatedUser =
         Optional.ofNullable(
             User.builder()
@@ -215,8 +299,8 @@ public class UserController {
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
-                .password(this.passwordEncoder.encode(user.getPassword()))
-                .jmbg(user.getJmbg())
+                .password(updatedUser.get().getPassword())
+                .jmbg(updatedUser.get().getJmbg())
                 .phone(user.getPhone())
                 .jobPosition(user.getJobPosition())
                 .active(user.isActive())
