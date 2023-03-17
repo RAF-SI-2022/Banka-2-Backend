@@ -21,8 +21,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
   private final PasswordResetTokenRepository passwordResetTokenRepository;
 
   @Autowired
-  public UserService(
-      UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository) {
+  public UserService(UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository) {
     this.userRepository = userRepository;
     this.passwordResetTokenRepository = passwordResetTokenRepository;
   }
@@ -38,6 +37,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
         myUser.get().getEmail(), myUser.get().getPassword(), new ArrayList<>());
   }
 
+  @Override
   public Optional<User> findByEmail(String email) {
     return userRepository.findUserByEmail(email);
   }
@@ -54,19 +54,13 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 
   @Override
   public List<Permission> getUserPermissions(String email) {
-    List<Permission> permissions =
-        new ArrayList<>(userRepository.findUserByEmail(email).get().getPermissions());
+    List<Permission> permissions = new ArrayList<>(userRepository.findUserByEmail(email).get().getPermissions());
     return permissions;
   }
 
   @Override
   public Optional<User> findById(Long id) {
     return userRepository.findById(id);
-  }
-
-  @Override
-  public void deleteUser(Long id) {
-    userRepository.deleteById(id);
   }
 
   @Override

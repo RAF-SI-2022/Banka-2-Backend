@@ -156,7 +156,7 @@ public class UserController {
     //        user.setActive(false);
     //        return ResponseEntity.ok().body(this.userService.save(user));
 
-    userService.deleteUser(id);
+    userService.deleteById(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

@@ -7,15 +7,15 @@ import java.util.Optional;
 
 public interface UserServiceInterface {
 
-  List<User> findAll();
+  List<User> findAll();//<---
 
   User save(User user);
 
-  Optional<User> findById(Long id);
+  Optional<User> findById(Long id);//<---
 
-  List<Permission> getUserPermissions(String email);
+  Optional<User> findByEmail(String email);
 
-  void deleteUser(Long id);
+  List<Permission> getUserPermissions(String email);//<---
 
   //    User updateUser(User user);
 
