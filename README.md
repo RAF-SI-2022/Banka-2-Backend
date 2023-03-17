@@ -14,8 +14,9 @@ The `Makefile` (or `make.bat` for Windows) is the central tool for building the 
 - `./Makefile dev` (`./make.bat dev`) - compiles the Java code locally, and creates a "development" version of the Docker image. Starts other necessary services. **This command is recommended for development.** NOTE: in order to run this command successfully, you'll need to install the Java version found in `pom.xml` on your local computer, and set the `JAVA_HOME` path variable to its location. 
 - `./Makefile test` (`./make.bat test`) - compiles the Java code inside the Docker container, runs all required services, and runs tests. **This command is the recommended command before opening a pull request.**
 - `./Makefile prod` (`./make.bat prod`) - compiles the Java code inside the Docker container and runs all required services. **This command is the recommended production command.**
-Run `./Makefile` (or `./make.bat` on Windows) to start the service in development mode.
+
+**It is strongly recommended to test the application before committing.** However, if you're unable to do so, please run the following command:
 
 ```shell
-    mvn spotless:apply clean test
+    ./mvnw spotless:apply clean test
 ```
