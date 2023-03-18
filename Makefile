@@ -19,7 +19,7 @@ test:
     docker compose up -d flyway
     docker compose up -d dbexchange
     docker run --rm --network container:dbusers banka2backend-test
-    docker compose down
+    docker compose rm -s -f banka2backend-test
 
 prod:
     mvnw spotless:apply
@@ -32,4 +32,11 @@ prod:
 
 restart-services:
     docker compose restart dbusers
+    docker compose restart dbexchange
     docker compose restart flyway
+
+reset-all:
+    docker compose down -v
+    docker compose up -d dbusers
+    docker compose up -d flyway
+    docker compose up -d dbexchange
