@@ -7,4 +7,4 @@ RUN mvn verify --fail-never
 
 FROM base AS stage1
 ADD . /usr/src/app
-ENTRYPOINT ["mvn", "spotless:apply", "clean", "test", "-Dspring.profiles.active=remote"]
+ENTRYPOINT ["mvn", "spotless:apply", "clean", "test", "-Dspring.profiles.active=test"]
