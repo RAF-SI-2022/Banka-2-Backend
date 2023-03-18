@@ -8,6 +8,7 @@ import com.raf.si.Banka2Backend.repositories.UserRepository;
 import com.raf.si.Banka2Backend.services.interfaces.UserServiceInterface;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -59,7 +60,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
   }
 
   @Override
-  public Optional<User> findById(Long id) {
+  public Optional<User> findById(Long id) throws NoSuchElementException {
     return userRepository.findById(id);
   }
 

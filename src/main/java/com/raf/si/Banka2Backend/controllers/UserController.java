@@ -151,10 +151,6 @@ public class UserController {
       return ResponseEntity.status(400)
           .body("Can't delete user with id " + id + ", because it doesn't exist");
     }
-    // Soft delete - setting active to false, not really deleting user from data base
-    //        User user = userOptional.get();
-    //        user.setActive(false);
-    //        return ResponseEntity.ok().body(this.userService.save(user));
 
     userService.deleteById(id);
     return new ResponseEntity<>(HttpStatus.OK);
@@ -205,12 +201,8 @@ public class UserController {
   public ResponseEntity<?> updateProfile(
       @PathVariable(name = "id") Long id, @RequestBody UpdateProfileRequest user) {
     String signedInUserEmail = getContext().getAuthentication().getName();
-    //        if(!authorisationService.isAuthorised(PermissionName.UPDATE_USERS,
-    // signedInUserEmail)){
-    //            return ResponseEntity.status(401).body("You don't have permission to update
-    // users.");
-    //        }
     Optional<User> logovan = userService.findByEmail(signedInUserEmail);
+
     if (logovan.isPresent()) {
       if (!logovan.get().getId().equals(id)) {
         return ResponseEntity.status(401).body("You don't have permission to update this user.");
@@ -244,12 +236,8 @@ public class UserController {
   public ResponseEntity<?> changePassword(
       @PathVariable(name = "id") Long id, @RequestBody ChangePasswordRequest user) {
     String signedInUserEmail = getContext().getAuthentication().getName();
-    //        if(!authorisationService.isAuthorised(PermissionName.UPDATE_USERS,
-    // signedInUserEmail)){
-    //            return ResponseEntity.status(401).body("You don't have permission to update
-    // users.");
-    //        }
     Optional<User> logovan = userService.findByEmail(signedInUserEmail);
+
     if (logovan.isPresent()) {
       if (!logovan.get().getId().equals(id)) {
         return ResponseEntity.status(401).body("You don't have permission to update this user.");
@@ -308,4 +296,9 @@ public class UserController {
                 .build());
     return ResponseEntity.ok().body(userService.save(updatedUser.get()));
   }
+
+
+
+
+
 }
