@@ -50,7 +50,7 @@ services:
 
   banka2backend-test:
     container_name: banka2backend-test
-    image: banka2backend-dev
+    image: banka2backend-prod
     entrypoint: ["mvn", "test"]
     depends_on:
       - dbusers
