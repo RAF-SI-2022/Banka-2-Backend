@@ -6,6 +6,7 @@ import com.raf.si.Banka2Backend.models.User;
 import com.raf.si.Banka2Backend.services.UserService;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -32,6 +33,8 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
   //Test logging in by admin
   @When("user can login")
   public void user_can_login() {
+
+    //todo ne mogu da se gettuju permisije jer baca error "failed to lazily initialize a collection of role"
     Optional<User> user = userService.findByEmail("anesic3119rn+banka2backend+admin@raf.rs");
 
     try {
@@ -69,7 +72,11 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
   public void admin_logged_in() {
     try {
       assertNotEquals(token, null);
-      assertNotEquals(token, "");//todo proveri permisije kad uspes da ih gettujes
+      assertNotEquals(token, "");
+
+      /*
+      user.getPerms contains "ADMIN_ROLE" //todo stavi kada se resi error sa gettovanjem permisija
+       */
 
     } catch (Exception e) {
       fail(e.getMessage());
@@ -193,7 +200,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
   //Test deactivate user
   @When("user exists in database")
   public void user_exists_in_database() {
-    Optional<User> user = userService.findByEmail("testUser@gmail.com");//todo proveri mozda ga ne deaktivira pravilno
+    Optional<User> user = userService.findByEmail("testUser@gmail.com");
     try {
       assertNotNull(user);
       assertEquals("testUser@gmail.com", user.get().getEmail());
@@ -240,15 +247,53 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
   //Test edit user by admin
   @When("admin logged in and user exists in database")
   public void admin_logged_in_and_user_exists_in_database() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+    try{
+      assertNotEquals(token, null);
+      assertNotEquals(token, "");
+
+      //user.getPerms contains "ADMIN_ROLE" //todo stavi kada se resi error sa gettovanjem permisija
+
+    } catch (Exception e){
+      fail("Admin not logged in");
+    }
   }
   @Then("update user in database")
   public void update_user_in_database() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+    try {
+      mockMvc.perform(post("/api/users/reactivate/" + testUser.get().getId())
+                      .contentType("application/json")
+                      .content("""
+                                {
+                                  "firstName": "ChangedName",
+                                  "lastName": "ChangedLastname",
+                                  "permissions": [
+                                    "ADMIN_USER"
+                                  ],
+                                  "jobPosition": "string",
+                                  "active": true,
+                                  "phone": "string"
+                                }
+                              """)
+                      .header("Content-Type", "application/json")
+                      .header("Access-Control-Allow-Origin", "*")
+                      .header("Authorization", "Bearer " + token)
+              )
+              .andExpect(status().isOk())
+              .andReturn();
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
   }
 
+  /*
+      email: email,
+        firstName: firstName,
+        lastName: lastName,
+        permissions: permissions,
+        jobPosition: jobPosition,
+        active: active,
+        phone: phone
+   */
 
 
 //  //Test find by email
