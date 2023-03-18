@@ -49,3 +49,7 @@ This project is configured to use several hooks via the `init` file which copies
 
 - **Pre-commit hook:** formats the code before committing.
 - **Pre-push hook:** runs all the required services and tests the application. If testing fails, the push is aborted.
+
+## Resources
+
+- [Spring Data MongoDB - Reference Documentation](https://docs.spring.io/spring-data/mongodb/docs/current/reference/html/) - documentation of the Spring Data MongoDB project with examples and templates.
