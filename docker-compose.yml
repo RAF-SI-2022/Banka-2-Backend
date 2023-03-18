@@ -25,6 +25,22 @@ services:
     networks:
       db:
 
+  dbexchange:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    container_name: dbexchange
+    restart: on-failure
+    expose:
+      - "27017"
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    volumes:
+      - dbexchange:/var/lib/mongodb
+    networks:
+      - db
+
   flyway:
     image: flyway/flyway:9
     command: -url=jdbc:mariadb://dbusers:3306/users -schemas=users -user=root -password=root -connectRetries=60 migrate
@@ -81,7 +97,7 @@ services:
 
 volumes:
   dbusers:
-  #mongodb:
+  dbexchange:
 
 networks:
   db:
