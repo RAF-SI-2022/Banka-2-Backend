@@ -48,15 +48,6 @@ services:
     networks:
       - db
 
-  banka2backend-test:
-    container_name: banka2backend-test
-    image: banka2backend-prod
-    entrypoint: ["mvn", "test"]
-    depends_on:
-      - dbusers
-    networks:
-      - db
-
   banka2backend-prod:
     container_name: banka2backend-prod
     image: banka2backend-prod
