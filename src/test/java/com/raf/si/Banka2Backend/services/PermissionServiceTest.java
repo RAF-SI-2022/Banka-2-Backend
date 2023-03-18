@@ -72,7 +72,6 @@ public class PermissionServiceTest {
 
     List<Permission> result = permissionService.findByPermissionNames(permissionNames);
 
-    //assertNull(result);
-    assertNotNull(result);
+    assertNull(result);
   }
 }

@@ -1,6 +1,16 @@
 # Backend Documentation
 
-## Setup
+## Setup & Installation
+
+### Requirements
+
+The following software is required for the development process:
+
+1. [Java](https://openjdk.org/) - you'll need to download **Java 17** and set the `PATH` as well as `JAVA_HOME` variables to point to the installation dir. (`PATH` should point to the `/bin` directory, while `JAVA_HOME` should point to the Java installation directory (the "root" directory.)) [OpenJDK](https://openjdk.org/) is recommended.
+2. [Apache Maven](https://maven.apache.org/install.html) - included in the project repository.
+3. [Docker Desktop](https://www.docker.com/products/docker-desktop/) - required for building and testing the project. **Please download and install Docker Desktop if you're not already using it.**
+
+### Installing (Forking)
 
 Start by forking the latest sprint branch into your GitHub account.
 
@@ -10,7 +20,7 @@ Once you clone the project to your computer, run the following command:
     ./init
 ```
 
-This will set up the required Git scripts to help keep your workflow smooth.
+This script will download the required JDK and set up Git hooks to ensure you only push clean, tested code.
 
 ## Building
 
