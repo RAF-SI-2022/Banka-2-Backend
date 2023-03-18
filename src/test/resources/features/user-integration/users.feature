@@ -32,25 +32,21 @@ Feature: User service
     Then reactivate user in database
 
   Scenario: admin edits user in database
-  When admin logged in and user exists in database
-  Then update user in database
+    When admin logged in and user exists in database
+    Then update user in database
+
+  Scenario: logged in user updates their profile
+    Given any user logs in
+    When user is logged in
+    Then user updates his profile
+
+  Scenario: logged in user changes his password
+    When user is logged in
+    Then user changes his password
+
+  Scenario: Deleting user
+    Given admin is logged in
+    When deleting user from database
+    Then user no longer in database
 
 
-#  Scenario: get user by email //todo uloguj se opet
-#    When user exists in database
-#    Then get user by email
-
-#  Scenario: update user//todo uloguj se opet
-#    When user exists in database
-#    Then reactivate user in db
-
-#  Scenario: Deleting user //todo na kraju
-#    Given user in database
-#    When deleting user from database
-#    Then user no longer in database
-
-
-#  Scenario: Finding user by id
-#    Given user in database
-#    When user exists in database
-#    Then finding user by id
