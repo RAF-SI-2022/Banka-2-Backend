@@ -1,6 +1,6 @@
 package com.raf.si.Banka2Backend.requests;
 
-import com.raf.si.Banka2Backend.models.PermissionName;
+import com.raf.si.Banka2Backend.models.users.PermissionName;
 import java.util.List;
 import lombok.Data;
 

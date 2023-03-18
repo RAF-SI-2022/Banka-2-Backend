@@ -1,4 +1,4 @@
-version: "3"
+version: "3.4"
 
 services:
 
@@ -13,28 +13,58 @@ services:
     environment:
       MARIADB_ROOT_USER: root
       MARIADB_ROOT_PASSWORD: root
-      MARIADB_DATABASE: users
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     healthcheck:
-      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      test: [ "CMD", "bash", "/healthcheck.sh" ]
       interval: 2s
       timeout: 5s
       retries: 5
+      start_period: 15s
     volumes:
+      - ./docker/healthcheck/dbusers/healthcheck.sh:/healthcheck.sh:ro
+      - ./docker/provision/dbusers/dbusers-init.sql:/docker-entrypoint-initdb.d/dbusers-init.sql:ro
       - dbusers:/var/lib/mysql
     networks:
-      db:
+      - net_all
+
+  dbexchange:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    container_name: dbexchange
+    restart: on-failure
+    expose:
+      - "27017"
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    healthcheck:
+      test: [ "CMD", "bash", "/healthcheck.sh" ]
+      interval: 2s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+    volumes:
+      - ./docker/healthcheck/dbexchange/healthcheck.sh:/healthcheck.sh:ro
+      - ./docker/provision/dbexchange/dbexchange-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - dbexchange:/var/lib/mongodb
+    networks:
+      - net_all
 
   flyway:
     image: flyway/flyway:9
-    command: -url=jdbc:mariadb://dbusers:3306/users -schemas=users -user=root -password=root -connectRetries=60 migrate
+    container_name: flyway
+    command: "-url=jdbc:mariadb://dbusers:3306/users-dev -schemas=users -user=root -password=root -connectRetries=60 migrate &&
+              -url=jdbc:mariadb://dbusers:3306/users-test -schemas=users -user=root -password=root -connectRetries=60 migrate &&
+              -url=jdbc:mariadb://dbusers:3306/users-prod -schemas=users -user=root -password=root -connectRetries=60 migrate"
     volumes:
       - ./src/main/resources/db/migration:/flyway/sql
       - ./flywayConfig:/flyway/conf
     depends_on:
-      - dbusers
+      dbusers:
+        condition: service_healthy
     networks:
-      - db
+      - net_all
 
   banka2backend-dev:
     container_name: banka2backend-dev
@@ -44,9 +74,14 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - dbusers
+      dbusers:
+        condition: service_healthy
+      dbexchange:
+        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
     networks:
-      - db
+      - net_all
 
   banka2backend-prod:
     container_name: banka2backend-prod
@@ -56,9 +91,14 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - dbusers
+      dbusers:
+        condition: service_healthy
+      dbexchange:
+        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
     networks:
-      - db
+      - net_all
 
   phpmyadmin:
     image: phpmyadmin
@@ -74,15 +114,16 @@ services:
       MYSQL_USER: root
       MYSQL_PASSWORD: root
     depends_on:
-      - dbusers
+      dbusers:
+        condition: service_healthy
     networks:
-      - db
+      - net_all
 
 
 volumes:
   dbusers:
-  #mongodb:
+  dbexchange:
 
 networks:
-  db:
+  net_all:
     driver: bridge
