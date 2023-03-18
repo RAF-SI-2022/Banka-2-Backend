@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.Fetch;
 
 @Data
 @Builder
@@ -66,7 +67,7 @@ public class User {
 
   private boolean active;
 
-  @ManyToMany
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
       name = "users_permissions",
       joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
