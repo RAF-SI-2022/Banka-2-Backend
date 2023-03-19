@@ -23,7 +23,8 @@ public class UserService implements UserDetailsService, UserServiceInterface {
   private final PasswordResetTokenRepository passwordResetTokenRepository;
 
   @Autowired
-  public UserService(UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository) {
+  public UserService(
+      UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository) {
     this.userRepository = userRepository;
     this.passwordResetTokenRepository = passwordResetTokenRepository;
   }
@@ -56,7 +57,8 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 
   @Override
   public List<Permission> getUserPermissions(String email) {
-    List<Permission> permissions = new ArrayList<>(userRepository.findUserByEmail(email).get().getPermissions());
+    List<Permission> permissions =
+        new ArrayList<>(userRepository.findUserByEmail(email).get().getPermissions());
     return permissions;
   }
 
@@ -67,9 +69,9 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 
   @Override
   public void deleteById(Long id) throws UserNotFoundException {
-    try{
+    try {
       userRepository.deleteById(id);
-    } catch(Exception e) {
+    } catch (Exception e) {
       throw new UserNotFoundException("User with id " + id + " not found.");
     }
   }

@@ -148,14 +148,15 @@ public class UserController {
     if (!authorisationService.isAuthorised(PermissionName.DELETE_USERS, signedInUserEmail)) {
       return ResponseEntity.status(401).body("You don't have permission to delete users.");
     }
-//    Optional<User> userOptional = this.userService.findById(id);
-//    if (userOptional.isEmpty()) {
-//      return ResponseEntity.status(400).body("Can't delete user with id " + id + ", because it doesn't exist");
-//    }
+    //    Optional<User> userOptional = this.userService.findById(id);
+    //    if (userOptional.isEmpty()) {
+    //      return ResponseEntity.status(400).body("Can't delete user with id " + id + ", because it
+    // doesn't exist");
+    //    }
 
     try {
-      userService.deleteById(id);//todo propravi ovo da baca exception
-    } catch(UserNotFoundException e){
+      userService.deleteById(id); // todo propravi ovo da baca exception
+    } catch (UserNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
     }
     return new ResponseEntity<>(HttpStatus.OK);
@@ -301,9 +302,4 @@ public class UserController {
                 .build());
     return ResponseEntity.ok().body(userService.save(updatedUser.get()));
   }
-
-
-
-
-
 }
