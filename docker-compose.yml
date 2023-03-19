@@ -62,8 +62,8 @@ services:
       - ./src/main/resources/db/migration:/flyway/sql
       - ./flywayConfig:/flyway/conf
     depends_on:
-      - dbusers
-#        condition: service_healthy
+      dbusers:
+        condition: service_healthy
     networks:
       - net_all
 
