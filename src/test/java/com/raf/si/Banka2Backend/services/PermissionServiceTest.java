@@ -26,12 +26,12 @@ public class PermissionServiceTest {
 
     long id = 1L;
     List<Permission> permissionList =
-            Arrays.asList(
-                    Permission.builder().id(id++).permissionName(PermissionName.ADMIN_USER).build(),
-                    Permission.builder().id(id++).permissionName(PermissionName.CREATE_USERS).build(),
-                    Permission.builder().id(id++).permissionName(PermissionName.DELETE_USERS).build(),
-                    Permission.builder().id(id++).permissionName(PermissionName.READ_USERS).build(),
-                    Permission.builder().id(id).permissionName(PermissionName.UPDATE_USERS).build());
+        Arrays.asList(
+            Permission.builder().id(id++).permissionName(PermissionName.ADMIN_USER).build(),
+            Permission.builder().id(id++).permissionName(PermissionName.CREATE_USERS).build(),
+            Permission.builder().id(id++).permissionName(PermissionName.DELETE_USERS).build(),
+            Permission.builder().id(id++).permissionName(PermissionName.READ_USERS).build(),
+            Permission.builder().id(id).permissionName(PermissionName.UPDATE_USERS).build());
 
     when(permissionRepository.findAll()).thenReturn(permissionList);
 
@@ -45,14 +45,14 @@ public class PermissionServiceTest {
     long id = 1L;
 
     List<PermissionName> permissionNames =
-            Arrays.asList(
-                    PermissionName.ADMIN_USER, PermissionName.READ_USERS, PermissionName.DELETE_USERS);
+        Arrays.asList(
+            PermissionName.ADMIN_USER, PermissionName.READ_USERS, PermissionName.DELETE_USERS);
 
     List<Permission> permissionsByName =
-            Arrays.asList(
-                    Permission.builder().id(id++).permissionName(PermissionName.ADMIN_USER).build(),
-                    Permission.builder().id(id++).permissionName(PermissionName.CREATE_USERS).build(),
-                    Permission.builder().id(id).permissionName(PermissionName.DELETE_USERS).build());
+        Arrays.asList(
+            Permission.builder().id(id++).permissionName(PermissionName.ADMIN_USER).build(),
+            Permission.builder().id(id++).permissionName(PermissionName.CREATE_USERS).build(),
+            Permission.builder().id(id).permissionName(PermissionName.DELETE_USERS).build());
 
     when(permissionRepository.findByPermissionNames(permissionNames)).thenReturn(permissionsByName);
 
@@ -64,7 +64,7 @@ public class PermissionServiceTest {
   public void findByPermissionNames_failure() {
 
     List<PermissionName> permissionNames =
-            Arrays.asList(PermissionName.ADMIN_USER, PermissionName.READ_USERS);
+        Arrays.asList(PermissionName.ADMIN_USER, PermissionName.READ_USERS);
 
     when(permissionRepository.findByPermissionNames(permissionNames)).thenReturn(null);
 

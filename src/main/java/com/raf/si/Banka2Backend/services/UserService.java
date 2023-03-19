@@ -98,7 +98,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
     user.setPassword(newPassword);
 
     Optional<PasswordResetToken> passwordResetTokenFromDB =
-            passwordResetTokenRepository.findPasswordResetTokenByToken(passwordResetToken);
+        passwordResetTokenRepository.findPasswordResetTokenByToken(passwordResetToken);
 
     if (passwordResetTokenFromDB.isPresent()) {
       Optional<User> userFromDB = userRepository.findById(user.getId());

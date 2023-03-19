@@ -5,12 +5,11 @@ import static org.mockito.Mockito.*;
 
 import com.raf.si.Banka2Backend.exceptions.PasswordResetTokenNotFoundException;
 import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
-import java.util.*;
-
 import com.raf.si.Banka2Backend.models.users.PasswordResetToken;
 import com.raf.si.Banka2Backend.models.users.User;
 import com.raf.si.Banka2Backend.repositories.users.PasswordResetTokenRepository;
 import com.raf.si.Banka2Backend.repositories.users.UserRepository;
+import java.util.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,10 +21,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
-  @Mock
-  UserRepository userRepository;
-  @Mock
-  PasswordResetTokenRepository passwordResetTokenRepository;
+  @Mock UserRepository userRepository;
+  @Mock PasswordResetTokenRepository passwordResetTokenRepository;
 
   @InjectMocks UserService userService;
 
@@ -35,37 +32,37 @@ public class UserServiceTest {
     long id = 1L;
 
     List<User> userList =
-            Arrays.asList(
-                    User.builder()
-                            .id(id++)
-                            .firstName("Petar")
-                            .lastName("Petrovic")
-                            .phone("000000000")
-                            .jmbg("000000000")
-                            .password("12345")
-                            .email("petar@gmail.com")
-                            .jobPosition("/")
-                            .build(),
-                    User.builder()
-                            .id(id++)
-                            .firstName("Marko")
-                            .lastName("Markovic")
-                            .phone("000000000")
-                            .jmbg("000000000")
-                            .password("12345")
-                            .email("marko@gmail.com")
-                            .jobPosition("/")
-                            .build(),
-                    User.builder()
-                            .id(id)
-                            .firstName("Darko")
-                            .lastName("Darkovic")
-                            .phone("000000000")
-                            .jmbg("000000000")
-                            .password("12345")
-                            .email("darko@gmail.com")
-                            .jobPosition("/")
-                            .build());
+        Arrays.asList(
+            User.builder()
+                .id(id++)
+                .firstName("Petar")
+                .lastName("Petrovic")
+                .phone("000000000")
+                .jmbg("000000000")
+                .password("12345")
+                .email("petar@gmail.com")
+                .jobPosition("/")
+                .build(),
+            User.builder()
+                .id(id++)
+                .firstName("Marko")
+                .lastName("Markovic")
+                .phone("000000000")
+                .jmbg("000000000")
+                .password("12345")
+                .email("marko@gmail.com")
+                .jobPosition("/")
+                .build(),
+            User.builder()
+                .id(id)
+                .firstName("Darko")
+                .lastName("Darkovic")
+                .phone("000000000")
+                .jmbg("000000000")
+                .password("12345")
+                .email("darko@gmail.com")
+                .jobPosition("/")
+                .build());
 
     when(userRepository.findAll()).thenReturn(userList);
 
@@ -79,16 +76,16 @@ public class UserServiceTest {
     long id = 1L;
 
     User user =
-            User.builder()
-                    .id(id)
-                    .firstName("Darko")
-                    .lastName("Darkovic")
-                    .phone("000000000")
-                    .jmbg("000000000")
-                    .password("12345")
-                    .email("darko@gmail.com")
-                    .jobPosition("/")
-                    .build();
+        User.builder()
+            .id(id)
+            .firstName("Darko")
+            .lastName("Darkovic")
+            .phone("000000000")
+            .jmbg("000000000")
+            .password("12345")
+            .email("darko@gmail.com")
+            .jobPosition("/")
+            .build();
 
     when(userRepository.findById(id)).thenReturn(Optional.of(user));
 
@@ -105,10 +102,10 @@ public class UserServiceTest {
     when(userRepository.findById(id)).thenReturn(Optional.empty());
 
     assertThrows(
-            UserNotFoundException.class,
-            () -> {
-              userService.findById(id);
-            });
+        UserNotFoundException.class,
+        () -> {
+          userService.findById(id);
+        });
   }
 
   @Test
@@ -119,16 +116,16 @@ public class UserServiceTest {
     String emailSearch = "darko@gmail.com";
 
     User user =
-            User.builder()
-                    .id(id)
-                    .firstName("Darko")
-                    .lastName("Darkovic")
-                    .phone("000000000")
-                    .jmbg("000000000")
-                    .password("12345")
-                    .email("darko@gmail.com")
-                    .jobPosition("/")
-                    .build();
+        User.builder()
+            .id(id)
+            .firstName("Darko")
+            .lastName("Darkovic")
+            .phone("000000000")
+            .jmbg("000000000")
+            .password("12345")
+            .email("darko@gmail.com")
+            .jobPosition("/")
+            .build();
 
     when(userRepository.findUserByEmail(emailSearch)).thenReturn(Optional.of(user));
 
@@ -145,10 +142,10 @@ public class UserServiceTest {
     when(userRepository.findUserByEmail(emailSearch)).thenThrow(UserNotFoundException.class);
 
     assertThrows(
-            UserNotFoundException.class,
-            () -> {
-              userService.findByEmail(emailSearch);
-            });
+        UserNotFoundException.class,
+        () -> {
+          userService.findByEmail(emailSearch);
+        });
   }
 
   @Test
@@ -158,16 +155,16 @@ public class UserServiceTest {
     String email = "darko@gmail.com";
 
     User userFromDB =
-            User.builder()
-                    .id(id)
-                    .firstName("Darko")
-                    .lastName("Darkovic")
-                    .phone("000000000")
-                    .jmbg("000000000")
-                    .password("12345")
-                    .email("darko@gmail.com")
-                    .jobPosition("/")
-                    .build();
+        User.builder()
+            .id(id)
+            .firstName("Darko")
+            .lastName("Darkovic")
+            .phone("000000000")
+            .jmbg("000000000")
+            .password("12345")
+            .email("darko@gmail.com")
+            .jobPosition("/")
+            .build();
 
     when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(userFromDB));
 
@@ -193,16 +190,16 @@ public class UserServiceTest {
     long id = 1L;
 
     User newUser =
-            User.builder()
-                    .id(id)
-                    .firstName("Darko")
-                    .lastName("Darkovic")
-                    .phone("000000000")
-                    .jmbg("000000000")
-                    .password("12345")
-                    .email("darko@gmail.com")
-                    .jobPosition("/")
-                    .build();
+        User.builder()
+            .id(id)
+            .firstName("Darko")
+            .lastName("Darkovic")
+            .phone("000000000")
+            .jmbg("000000000")
+            .password("12345")
+            .email("darko@gmail.com")
+            .jobPosition("/")
+            .build();
 
     when(userRepository.save(newUser)).thenReturn(newUser);
 
@@ -237,23 +234,23 @@ public class UserServiceTest {
   public void getUserByPasswordResetToken_success() {
 
     User user =
-            User.builder()
-                    .id(1L)
-                    .firstName("Darko")
-                    .lastName("Darkovic")
-                    .phone("000000000")
-                    .jmbg("000000000")
-                    .password("12345")
-                    .email("darko@gmail.com")
-                    .jobPosition("/")
-                    .build();
+        User.builder()
+            .id(1L)
+            .firstName("Darko")
+            .lastName("Darkovic")
+            .phone("000000000")
+            .jmbg("000000000")
+            .password("12345")
+            .email("darko@gmail.com")
+            .jobPosition("/")
+            .build();
     String token = UUID.randomUUID().toString();
     PasswordResetToken passwordResetToken = new PasswordResetToken(user, token);
 
     when(passwordResetTokenRepository.findPasswordResetTokenByToken(token))
-            .thenReturn(Optional.of(passwordResetToken));
+        .thenReturn(Optional.of(passwordResetToken));
     when(userRepository.findById(passwordResetToken.getUser().getId()))
-            .thenReturn(Optional.of(user));
+        .thenReturn(Optional.of(user));
 
     Optional<User> userWithToken = userService.getUserByPasswordResetToken(token);
 
@@ -266,13 +263,13 @@ public class UserServiceTest {
     String token = UUID.randomUUID().toString();
 
     when(passwordResetTokenRepository.findPasswordResetTokenByToken(token))
-            .thenReturn(Optional.empty());
+        .thenReturn(Optional.empty());
 
     assertThrows(
-            PasswordResetTokenNotFoundException.class,
-            () -> {
-              userService.getUserByPasswordResetToken(token);
-            });
+        PasswordResetTokenNotFoundException.class,
+        () -> {
+          userService.getUserByPasswordResetToken(token);
+        });
   }
 
   @Test
@@ -281,16 +278,16 @@ public class UserServiceTest {
     long id = 1L;
 
     User user =
-            User.builder()
-                    .id(id)
-                    .firstName("Darko")
-                    .lastName("Darkovic")
-                    .phone("000000000")
-                    .jmbg("000000000")
-                    .password("12345")
-                    .email("darko@gmail.com")
-                    .jobPosition("/")
-                    .build();
+        User.builder()
+            .id(id)
+            .firstName("Darko")
+            .lastName("Darkovic")
+            .phone("000000000")
+            .jmbg("000000000")
+            .password("12345")
+            .email("darko@gmail.com")
+            .jobPosition("/")
+            .build();
 
     String newPassword = "54321";
 
@@ -298,7 +295,7 @@ public class UserServiceTest {
     PasswordResetToken passwordResetToken = new PasswordResetToken(user, token);
 
     when(passwordResetTokenRepository.findPasswordResetTokenByToken(token))
-            .thenReturn(Optional.of(passwordResetToken));
+        .thenReturn(Optional.of(passwordResetToken));
     when(userRepository.findById(id)).thenReturn(Optional.of(user));
 
     when(userRepository.save(user)).thenReturn(user);
@@ -317,29 +314,29 @@ public class UserServiceTest {
     long id = 1L;
 
     User user =
-            User.builder()
-                    .id(id)
-                    .firstName("Darko")
-                    .lastName("Darkovic")
-                    .phone("000000000")
-                    .jmbg("000000000")
-                    .password("12345")
-                    .email("darko@gmail.com")
-                    .jobPosition("/")
-                    .build();
+        User.builder()
+            .id(id)
+            .firstName("Darko")
+            .lastName("Darkovic")
+            .phone("000000000")
+            .jmbg("000000000")
+            .password("12345")
+            .email("darko@gmail.com")
+            .jobPosition("/")
+            .build();
 
     String newPassword = "54321";
 
     String token = UUID.randomUUID().toString();
 
     when(passwordResetTokenRepository.findPasswordResetTokenByToken(token))
-            .thenReturn(Optional.empty());
+        .thenReturn(Optional.empty());
 
     assertThrows(
-            PasswordResetTokenNotFoundException.class,
-            () -> {
-              userService.changePassword(user, newPassword, token);
-            });
+        PasswordResetTokenNotFoundException.class,
+        () -> {
+          userService.changePassword(user, newPassword, token);
+        });
   }
 
   @Test
@@ -348,16 +345,16 @@ public class UserServiceTest {
     long id = 1L;
 
     User user =
-            User.builder()
-                    .id(id)
-                    .firstName("Darko")
-                    .lastName("Darkovic")
-                    .phone("000000000")
-                    .jmbg("000000000")
-                    .password("12345")
-                    .email("darko@gmail.com")
-                    .jobPosition("/")
-                    .build();
+        User.builder()
+            .id(id)
+            .firstName("Darko")
+            .lastName("Darkovic")
+            .phone("000000000")
+            .jmbg("000000000")
+            .password("12345")
+            .email("darko@gmail.com")
+            .jobPosition("/")
+            .build();
 
     String newPassword = "54321";
 
@@ -366,13 +363,13 @@ public class UserServiceTest {
     PasswordResetToken passwordResetToken = new PasswordResetToken(user, token);
 
     when(passwordResetTokenRepository.findPasswordResetTokenByToken(token))
-            .thenReturn(Optional.of(passwordResetToken));
+        .thenReturn(Optional.of(passwordResetToken));
     when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
 
     assertThrows(
-            UserNotFoundException.class,
-            () -> {
-              userService.changePassword(user, newPassword, token);
-            });
+        UserNotFoundException.class,
+        () -> {
+          userService.changePassword(user, newPassword, token);
+        });
   }
 }
