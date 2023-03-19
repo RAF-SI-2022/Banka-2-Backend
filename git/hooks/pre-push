@@ -36,7 +36,7 @@ if (! (docker run --rm --network container:dbusers banka2backend-test)); then
   exit 1
 fi
 
-docker compose down
+#docker compose down
 
 # Default pre-push
 
