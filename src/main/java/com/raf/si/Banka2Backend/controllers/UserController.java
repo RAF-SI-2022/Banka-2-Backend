@@ -2,6 +2,7 @@ package com.raf.si.Banka2Backend.controllers;
 
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
+import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
 import com.raf.si.Banka2Backend.models.Permission;
 import com.raf.si.Banka2Backend.models.PermissionName;
 import com.raf.si.Banka2Backend.models.User;
@@ -21,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @CrossOrigin
@@ -146,13 +148,16 @@ public class UserController {
     if (!authorisationService.isAuthorised(PermissionName.DELETE_USERS, signedInUserEmail)) {
       return ResponseEntity.status(401).body("You don't have permission to delete users.");
     }
-    Optional<User> userOptional = this.userService.findById(id);
-    if (userOptional.isEmpty()) {
-      return ResponseEntity.status(400)
-          .body("Can't delete user with id " + id + ", because it doesn't exist");
-    }
+//    Optional<User> userOptional = this.userService.findById(id);
+//    if (userOptional.isEmpty()) {
+//      return ResponseEntity.status(400).body("Can't delete user with id " + id + ", because it doesn't exist");
+//    }
 
-    userService.deleteById(id);
+    try {
+      userService.deleteById(id);//todo propravi ovo da baca exception
+    } catch(UserNotFoundException e){
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+    }
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

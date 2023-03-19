@@ -2,6 +2,9 @@ Feature: User service
 
   Additional description
 
+  Scenario: not logged in user tires to access site
+    When user not logged in
+    Then user accesses endpoint
 
   Scenario: user logs in
     When user can login
@@ -16,12 +19,16 @@ Feature: User service
     Then user gets his permissions
 
   Scenario: Creating new user
-    When Creating new user
-    Then New user is saved in database
+    When creating new user
+    Then new user is saved in database
 
   Scenario: get all users
     When database not empty
     Then get all users from database
+
+  Scenario: get user by his id
+    When user exists in database
+    Then get user by his id
 
   Scenario: deactivate user
     When user exists in database
@@ -40,12 +47,16 @@ Feature: User service
     When user is logged in
     Then user updates his profile
 
+  Scenario: get user by his email
+    When user exists in database
+    Then get user by his email
+
   Scenario: logged in user changes his password
     When user is logged in
     Then user changes his password
 
   Scenario: Deleting user
-    Given admin is logged in
+    Given privileged user logged in
     When deleting user from database
     Then user no longer in database
 

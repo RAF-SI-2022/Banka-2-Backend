@@ -1,14 +1,17 @@
 package com.raf.si.Banka2Backend.cucumber.integration.users;
 
 import com.jayway.jsonpath.JsonPath;
+import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
 import com.raf.si.Banka2Backend.models.Permission;
 import com.raf.si.Banka2Backend.models.User;
 import com.raf.si.Banka2Backend.services.UserService;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.jsonwebtoken.Jwts;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -28,6 +31,38 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
   protected static String token;
   protected static Optional<User> loggedInUser;
   protected static Optional<User> testUser;
+
+
+  //Test not logged in user tires to access site
+  @When("user not logged in")
+  public void user_not_logged_in() {
+    token = "";
+  }
+  @Then("user accesses endpoint")
+  public void user_accesses_endpoint() {
+    try {
+      Exception exception = assertThrows(Exception.class, () -> {
+        mockMvc.perform(get("/api/users")
+                        .contentType("application/json")
+                        .header("Content-Type", "application/json")
+                        .header("Access-Control-Allow-Origin", "*")
+                        .header("Authorization", "Bearer " + token)
+                )
+                .andExpect(status().isOk())
+                .andReturn();
+      });
+
+      String expectedMessage = "JWT String argument cannot be null or empty.";
+      String actualMessage = exception.getMessage();
+
+      System.err.println("ERROR MESSAGE");
+      System.err.println(actualMessage);
+      assertEquals(actualMessage, expectedMessage);
+    }
+    catch (Exception e) {
+      fail(e.getMessage());
+    }
+  }
 
 
   //Test logging in by admin
@@ -75,7 +110,6 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
       assertNotEquals(token, "");
 
       for (Permission p: loggedInUser.get().getPermissions()) {
-        System.err.println(p.getPermissionName());
         if (p.getPermissionName().toString().equals("ADMIN_USER")) {
           isAdmin = true;
           break;
@@ -131,10 +165,10 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
 
 
   //Test creating new user
-  @When("Creating new user")
+  @When("creating new user")
   public void creating_new_user() {
     try {
-      MvcResult mvcResult = mockMvc.perform(post("/api/users/register") //todo odkomentarisi kada se napise testDeleteUserId
+      MvcResult mvcResult = mockMvc.perform(post("/api/users/register")
                       .contentType("application/json")
                       .content("""
                               {
@@ -161,7 +195,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
       fail(e.getMessage());
     }
   }
-  @Then("New user is saved in database")
+  @Then("new user is saved in database")
   public void new_user_is_saved_in_database() {
     Optional<User> user = userService.findByEmail("testUser@gmail.com");
     try {
@@ -201,7 +235,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
   }
 
 
-  //Test deactivate user
+  //Test findUserById
   @When("user exists in database")
   public void user_exists_in_database() {
     Optional<User> user = userService.findByEmail("testUser@gmail.com");
@@ -213,6 +247,24 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
       fail(e.getMessage());
     }
   }
+  @Then("get user by his id")
+  public void get_user_by_his_id() {
+    try {
+      mockMvc.perform(get("/api/users/" + testUser.get().getId())
+                      .contentType("application/json")
+                      .header("Content-Type", "application/json")
+                      .header("Access-Control-Allow-Origin", "*")
+                      .header("Authorization", "Bearer " + token)
+              )
+              .andExpect(status().isOk())
+              .andReturn();
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
+  }
+
+
+  //Test deactivate user
   @Then("deactivate user in database")
   public void deactivate_user_in_database() {
     try {
@@ -224,7 +276,10 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
               )
               .andExpect(status().isOk())
               .andReturn();
-    } catch (Exception e) {
+      boolean isActive = userService.findById(testUser.get().getId()).get().isActive();
+      assertFalse(isActive);
+    }
+    catch (Exception e) {
       fail(e.getMessage());
     }
   }
@@ -242,7 +297,10 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
               )
               .andExpect(status().isOk())
               .andReturn();
-    } catch (Exception e) {
+      boolean isActive = userService.findById(testUser.get().getId()).get().isActive();
+      assertTrue(isActive);
+    }
+    catch (Exception e) {
       fail(e.getMessage());
     }
   }
@@ -258,7 +316,6 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
       assertNotEquals(token, "");
 
       for (Permission p: loggedInUser.get().getPermissions()) {
-        System.err.println(p.getPermissionName());
         if (p.getPermissionName().toString().equals("ADMIN_USER")) {
           isAdmin = true;
           break;
@@ -295,7 +352,10 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
               )
               .andExpect(status().isOk())
               .andReturn();
-    } catch (Exception e) {
+      String editedName = userService.findById(testUser.get().getId()).get().getFirstName();
+      assertEquals(editedName, "NewTestUser");
+    }
+    catch (Exception e) {
       fail(e.getMessage());
     }
   }
@@ -305,6 +365,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
   @Given("any user logs in")
   public void any_user_logs_in() {
     token = null;
+
 
     try {
       MvcResult mvcResult = mockMvc.perform(post("/auth/login")
@@ -352,6 +413,26 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
               )
               .andExpect(status().isOk())
               .andReturn();
+      String editedName = userService.findById(testUser.get().getId()).get().getFirstName();
+      assertEquals(editedName, "UserEditedName");
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
+  }
+
+
+  //Test findUserByEmail
+  @Then("get user by his email")
+  public void get_user_by_his_email() {
+    try {
+      mockMvc.perform(get("/api/users/email")
+                      .contentType("application/json")
+                      .header("Content-Type", "application/json")
+                      .header("Access-Control-Allow-Origin", "*")
+                      .header("Authorization", "Bearer " + token)
+              )
+              .andExpect(status().isOk())
+              .andReturn();
     } catch (Exception e) {
       fail(e.getMessage());
     }
@@ -375,6 +456,9 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
               )
               .andExpect(status().isOk())
               .andReturn();
+      String oldPass = testUser.get().getPassword();
+      String newPass = userService.findById(testUser.get().getId()).get().getPassword();
+      assertNotEquals(oldPass, newPass);
     } catch (Exception e) {
       fail(e.getMessage());
     }
@@ -382,9 +466,11 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
 
 
   //Testing deleting user
-  @Given("admin is logged in")
-  public void admin_is_logged_in() {
+  @Given("privileged user logged in")
+  public void privileged_user_logged_in() {
     token = null;
+    boolean privileged = false;
+
     try {
       MvcResult mvcResult = mockMvc.perform(post("/auth/login")
                       .contentType("application/json")
@@ -402,15 +488,29 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
 
       assertNotEquals(token, null);
       assertNotEquals(token, "");
+
+      for (Permission p: loggedInUser.get().getPermissions()) {
+        if (p.getPermissionName().toString().equals("ADMIN_USER") || p.getPermissionName().toString().equals("DELETE_USERS")) {
+          privileged = true;
+          break;
+        }
+      }
+      assertNotEquals(privileged, false);
     } catch (Exception e) {
-      fail("Admin failed to login");
+      fail("User failed to login");
     }
   }
   @When("deleting user from database")
   public void deleting_user_from_database() {
     try{
-      Optional<User> toDeleteUser = userService.findByEmail("testUser@gmail.com");
-      userService.deleteById(toDeleteUser.get().getId());
+      mockMvc.perform(delete("/api/users/" + testUser.get().getId())
+                      .contentType("application/json")
+                      .header("Content-Type", "application/json")
+                      .header("Access-Control-Allow-Origin", "*")
+                      .header("Authorization", "Bearer " + token)
+              )
+              .andExpect(status().isOk())
+              .andReturn();
     }
     catch (Exception e){
       fail(e.getMessage());
@@ -418,12 +518,24 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
   }
   @Then("user no longer in database")
   public void user_no_longer_in_database() {
-    Exception exception = assertThrows(Exception.class, () -> userService.findByEmail("testUser@gmail.com"));
-    String expectedMessage = "Can't delete user with id " + testUser.get().getId() + ", because they dont exist";
+    Exception exception = assertThrows(UserNotFoundException.class, () -> {
+      try {
+        mockMvc.perform(get("/api/users/" + 4)
+                        .contentType("application/json")
+                        .header("Content-Type", "application/json")
+                        .header("Access-Control-Allow-Origin", "*")
+                        .header("Authorization", "Bearer " + token)
+                )
+                .andExpect(status().isOk())
+                .andReturn();
+      } catch (UserNotFoundException e) {
+        fail(e.getMessage());
+      }
+    });
+
+    String expectedMessage = "User with email testUser@gmail.com not found.";
     String actualMessage = exception.getMessage();
     assertEquals(actualMessage, expectedMessage);
   }
-
-
 
 }
