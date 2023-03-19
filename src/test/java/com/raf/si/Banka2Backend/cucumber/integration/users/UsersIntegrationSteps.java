@@ -32,7 +32,6 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
   public void user_not_logged_in() {
     token = "";
   }
-
   @Then("user accesses endpoint")
   public void user_accesses_endpoint() {
     try {
@@ -53,9 +52,6 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
 
       String expectedMessage = "JWT String argument cannot be null or empty.";
       String actualMessage = exception.getMessage();
-
-      System.err.println("ERROR MESSAGE");
-      System.err.println(actualMessage);
       assertEquals(actualMessage, expectedMessage);
     } catch (Exception e) {
       fail(e.getMessage());
@@ -523,7 +519,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                   .header("Content-Type", "application/json")
                   .header("Access-Control-Allow-Origin", "*")
                   .header("Authorization", "Bearer " + token))
-          .andExpect(status().isOk())
+          .andExpect(status().isNoContent())
           .andReturn();
     } catch (Exception e) {
       fail(e.getMessage());
@@ -532,27 +528,8 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
 
   @Then("user no longer in database")
   public void user_no_longer_in_database() {
-    Exception exception =
-        assertThrows(
-            UserNotFoundException.class,
-            () -> {
-              try {
-                mockMvc
-                    .perform(
-                        get("/api/users/" + testUser.get().getId())
-                            .contentType("application/json")
-                            .header("Content-Type", "application/json")
-                            .header("Access-Control-Allow-Origin", "*")
-                            .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isOk())
-                    .andReturn();
-              } catch (UserNotFoundException e) {
-                fail(e.getMessage());
-              }
-            });
-
-    String expectedMessage = "User with email testUser@gmail.com not found.";
-    String actualMessage = exception.getMessage();
-    assertEquals(actualMessage, expectedMessage);
+    Optional<User> test = userService.findById(testUser.get().getId());
+    if (test.isPresent()) fail("User is present and must not be!");
   }
+
 }

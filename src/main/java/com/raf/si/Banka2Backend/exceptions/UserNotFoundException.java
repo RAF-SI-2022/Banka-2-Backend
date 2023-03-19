@@ -2,9 +2,11 @@ package com.raf.si.Banka2Backend.exceptions;
 
 public class UserNotFoundException extends RuntimeException {
 
-  private String message;
+  public UserNotFoundException(long id) {
+    super("User with id <" + id + "> not found.");
+  }
 
-  public UserNotFoundException(String message) {
-    super(message);
+  public UserNotFoundException(String email) {
+    super("User with email <" + email + "> not found.");
   }
 }

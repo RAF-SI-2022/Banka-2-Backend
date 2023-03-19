@@ -63,17 +63,13 @@ public class UserService implements UserDetailsService, UserServiceInterface {
   }
 
   @Override
-  public Optional<User> findById(Long id) throws NoSuchElementException {
-    return userRepository.findById(id);
+  public Optional<User> findById(Long id) {
+      return userRepository.findById(id);
   }
 
   @Override
   public void deleteById(Long id) throws UserNotFoundException {
-    try {
       userRepository.deleteById(id);
-    } catch (Exception e) {
-      throw new UserNotFoundException("User with id " + id + " not found.");
-    }
   }
 
   @Override
