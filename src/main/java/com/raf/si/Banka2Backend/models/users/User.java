@@ -66,7 +66,7 @@ public class User {
 
   private boolean active;
 
-  @ManyToMany
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
       name = "users_permissions",
       joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},

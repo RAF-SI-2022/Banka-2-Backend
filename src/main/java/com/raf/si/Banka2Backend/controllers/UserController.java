@@ -2,6 +2,7 @@ package com.raf.si.Banka2Backend.controllers;
 
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
+import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
 import com.raf.si.Banka2Backend.models.users.Permission;
 import com.raf.si.Banka2Backend.models.users.PermissionName;
 import com.raf.si.Banka2Backend.models.users.User;
@@ -21,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @CrossOrigin
@@ -146,18 +148,12 @@ public class UserController {
     if (!authorisationService.isAuthorised(PermissionName.DELETE_USERS, signedInUserEmail)) {
       return ResponseEntity.status(401).body("You don't have permission to delete users.");
     }
-    Optional<User> userOptional = this.userService.findById(id);
-    if (userOptional.isEmpty()) {
-      return ResponseEntity.status(400)
-          .body("Can't delete user with id " + id + ", because it doesn't exist");
+    try {
+      userService.deleteById(id);
+    } catch (UserNotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
     }
-    // Soft delete - setting active to false, not really deleting user from data base
-    //        User user = userOptional.get();
-    //        user.setActive(false);
-    //        return ResponseEntity.ok().body(this.userService.save(user));
-
-    userService.deleteUser(id);
-    return new ResponseEntity<>(HttpStatus.OK);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   @PostMapping("/reactivate/{id}")
@@ -205,12 +201,8 @@ public class UserController {
   public ResponseEntity<?> updateProfile(
       @PathVariable(name = "id") Long id, @RequestBody UpdateProfileRequest user) {
     String signedInUserEmail = getContext().getAuthentication().getName();
-    //        if(!authorisationService.isAuthorised(PermissionName.UPDATE_USERS,
-    // signedInUserEmail)){
-    //            return ResponseEntity.status(401).body("You don't have permission to update
-    // users.");
-    //        }
     Optional<User> logovan = userService.findByEmail(signedInUserEmail);
+
     if (logovan.isPresent()) {
       if (!logovan.get().getId().equals(id)) {
         return ResponseEntity.status(401).body("You don't have permission to update this user.");
@@ -244,12 +236,8 @@ public class UserController {
   public ResponseEntity<?> changePassword(
       @PathVariable(name = "id") Long id, @RequestBody ChangePasswordRequest user) {
     String signedInUserEmail = getContext().getAuthentication().getName();
-    //        if(!authorisationService.isAuthorised(PermissionName.UPDATE_USERS,
-    // signedInUserEmail)){
-    //            return ResponseEntity.status(401).body("You don't have permission to update
-    // users.");
-    //        }
     Optional<User> logovan = userService.findByEmail(signedInUserEmail);
+
     if (logovan.isPresent()) {
       if (!logovan.get().getId().equals(id)) {
         return ResponseEntity.status(401).body("You don't have permission to update this user.");

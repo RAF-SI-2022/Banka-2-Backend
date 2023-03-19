@@ -1,5 +1,6 @@
 package com.raf.si.Banka2Backend.services;
 
+import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
 import com.raf.si.Banka2Backend.models.users.PasswordResetToken;
 import com.raf.si.Banka2Backend.models.users.Permission;
 import com.raf.si.Banka2Backend.models.users.User;
@@ -38,6 +39,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
         myUser.get().getEmail(), myUser.get().getPassword(), new ArrayList<>());
   }
 
+  @Override
   public Optional<User> findByEmail(String email) {
     return userRepository.findUserByEmail(email);
   }
@@ -65,12 +67,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
   }
 
   @Override
-  public void deleteUser(Long id) {
-    userRepository.deleteById(id);
-  }
-
-  @Override
-  public void deleteById(Long id) {
+  public void deleteById(Long id) throws UserNotFoundException {
     userRepository.deleteById(id);
   }
 
