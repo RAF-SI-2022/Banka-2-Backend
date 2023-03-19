@@ -465,7 +465,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
   }
 
 
-  //Testing deleting user
+  //Testing deleting user todo fix
   @Given("privileged user logged in")
   public void privileged_user_logged_in() {
     token = null;
@@ -520,7 +520,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
   public void user_no_longer_in_database() {
     Exception exception = assertThrows(UserNotFoundException.class, () -> {
       try {
-        mockMvc.perform(get("/api/users/" + 4)
+        mockMvc.perform(get("/api/users/" + testUser.get().getId())
                         .contentType("application/json")
                         .header("Content-Type", "application/json")
                         .header("Access-Control-Allow-Origin", "*")
