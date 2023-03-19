@@ -54,10 +54,10 @@ services:
   flyway:
     image: flyway/flyway:9
     container_name: flyway
-#    command: "-url=jdbc:mariadb://dbusers:3306/users-dev -schemas=users -user=root -password=root -connectRetries=60 migrate &&
-#              -url=jdbc:mariadb://dbusers:3306/users-test -schemas=users -user=root -password=root -connectRetries=60 migrate &&
-#              -url=jdbc:mariadb://dbusers:3306/users-prod -schemas=users -user=root -password=root -connectRetries=60 migrate"
-    command: -url=jdbc:mariadb://dbusers:3306/users-dev -schemas=users -user=root -password=root -connectRetries=60 migrate
+    command: "-url=jdbc:mariadb://dbusers:3306/users-dev -schemas=users -user=root -password=root -connectRetries=60 migrate &&
+              -url=jdbc:mariadb://dbusers:3306/users-test -schemas=users -user=root -password=root -connectRetries=60 migrate &&
+              -url=jdbc:mariadb://dbusers:3306/users-prod -schemas=users -user=root -password=root -connectRetries=60 migrate"
+#    command: -url=jdbc:mariadb://dbusers:3306/users-dev -schemas=users -user=root -password=root -connectRetries=60 migrate
     volumes:
       - ./src/main/resources/db/migration:/flyway/sql
       - ./flywayConfig:/flyway/conf

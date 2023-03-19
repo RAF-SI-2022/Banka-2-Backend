@@ -12,5 +12,5 @@ fi
 
 # Check databases
 mysql --host=localhost --user=root --password=root users-dev  -e "SHOW TABLES"
-#mysql --host=localhost --user=root --password=root users-test -e "SHOW TABLES"
-#mysql --host=localhost --user=root --password=root users-prod -e "SHOW TABLES"
+mysql --host=localhost --user=root --password=root users-test -e "SHOW TABLES"
+mysql --host=localhost --user=root --password=root users-prod -e "SHOW TABLES"
