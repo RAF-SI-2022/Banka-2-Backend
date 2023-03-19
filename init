@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Initializes the local repo copy.
+
+cp -a ./git/hooks/. ./.git/hooks

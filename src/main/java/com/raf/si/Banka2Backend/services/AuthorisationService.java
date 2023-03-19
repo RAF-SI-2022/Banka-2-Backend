@@ -1,12 +1,12 @@
 package com.raf.si.Banka2Backend.services;
 
-import com.raf.si.Banka2Backend.models.PasswordResetToken;
-import com.raf.si.Banka2Backend.models.Permission;
-import com.raf.si.Banka2Backend.models.PermissionName;
-import com.raf.si.Banka2Backend.models.User;
-import com.raf.si.Banka2Backend.repositories.PasswordResetTokenRepository;
-import com.raf.si.Banka2Backend.repositories.PermissionRepository;
-import com.raf.si.Banka2Backend.repositories.UserRepository;
+import com.raf.si.Banka2Backend.models.users.PasswordResetToken;
+import com.raf.si.Banka2Backend.models.users.Permission;
+import com.raf.si.Banka2Backend.models.users.PermissionName;
+import com.raf.si.Banka2Backend.models.users.User;
+import com.raf.si.Banka2Backend.repositories.users.PasswordResetTokenRepository;
+import com.raf.si.Banka2Backend.repositories.users.PermissionRepository;
+import com.raf.si.Banka2Backend.repositories.users.UserRepository;
 import java.util.Calendar;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
