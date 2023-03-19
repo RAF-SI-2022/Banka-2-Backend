@@ -5,7 +5,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
-import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
 import com.raf.si.Banka2Backend.models.users.Permission;
 import com.raf.si.Banka2Backend.models.users.User;
 import com.raf.si.Banka2Backend.services.UserService;
@@ -32,6 +31,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
   public void user_not_logged_in() {
     token = "";
   }
+
   @Then("user accesses endpoint")
   public void user_accesses_endpoint() {
     try {
@@ -531,5 +531,4 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
     Optional<User> test = userService.findById(testUser.get().getId());
     if (test.isPresent()) fail("User is present and must not be!");
   }
-
 }
