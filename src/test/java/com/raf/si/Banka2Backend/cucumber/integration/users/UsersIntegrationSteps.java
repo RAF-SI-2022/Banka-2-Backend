@@ -82,11 +82,11 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                       .contentType("application/json")
                       .content(
                           """
-                              {
-                                "email": "anesic3119rn+banka2backend+admin@raf.rs",
-                                "password": "admin"
-                              }
-                              """))
+                                                            {
+                                                              "email": "anesic3119rn+banka2backend+admin@raf.rs",
+                                                              "password": "admin"
+                                                            }
+                                                            """))
               .andExpect(status().isOk())
               .andReturn();
       token = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.token");
@@ -172,20 +172,20 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                       .contentType("application/json")
                       .content(
                           """
-                              {
-                                "firstName": "TestUser",
-                                "lastName": "TestUser",
-                                "email": "testUser@gmail.com",
-                                "password": "admin",
-                                "permissions": [
-                                  "ADMIN_USER"
-                                ],
-                                "jobPosition": "ADMINISTRATOR",
-                                "active": true,
-                                "jmbg": "1231231231235",
-                                "phone": "640601548865"
-                              }
-                              """)
+                                                            {
+                                                              "firstName": "TestUser",
+                                                              "lastName": "TestUser",
+                                                              "email": "testUser@gmail.com",
+                                                              "password": "admin",
+                                                              "permissions": [
+                                                                "ADMIN_USER"
+                                                              ],
+                                                              "jobPosition": "ADMINISTRATOR",
+                                                              "active": true,
+                                                              "jmbg": "1231231231235",
+                                                              "phone": "640601548865"
+                                                            }
+                                                            """)
                       .header("Content-Type", "application/json")
                       .header("Access-Control-Allow-Origin", "*")
                       .header("Authorization", "Bearer " + token))
@@ -336,19 +336,19 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                   .contentType("application/json")
                   .content(
                       """
-                              {
-                                "firstName": "NewTestUser",
-                                "lastName": "NewTestUser",
-                                "email": "testUser@gmail.com",
-                                "permissions": [
-                                  "READ_USERS"
-                                ],
-                                "jobPosition": "NEWTESTJOB",
-                                "active": true,
-                                "jmbg": "1231231231235",
-                                "phone": "640601548865"
-                              }
-                              """)
+                                                    {
+                                                      "firstName": "NewTestUser",
+                                                      "lastName": "NewTestUser",
+                                                      "email": "testUser@gmail.com",
+                                                      "permissions": [
+                                                        "READ_USERS"
+                                                      ],
+                                                      "jobPosition": "NEWTESTJOB",
+                                                      "active": true,
+                                                      "jmbg": "1231231231235",
+                                                      "phone": "640601548865"
+                                                    }
+                                                    """)
                   .header("Content-Type", "application/json")
                   .header("Access-Control-Allow-Origin", "*")
                   .header("Authorization", "Bearer " + token))
@@ -374,11 +374,11 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                       .contentType("application/json")
                       .content(
                           """
-                              {
-                                "email": "testUser@gmail.com",
-                                "password": "admin"
-                              }
-                              """))
+                                                            {
+                                                              "email": "testUser@gmail.com",
+                                                              "password": "admin"
+                                                            }
+                                                            """))
               .andExpect(status().isOk())
               .andReturn();
       token = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.token");
@@ -406,13 +406,13 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                   .contentType("application/json")
                   .content(
                       """
-                                {
-                                  "email": "testUser@gmail.com",
-                                  "firstName": "UserEditedName",
-                                  "lastName": "UserEditedLName",
-                                  "phone": "666666666"
-                                }
-                              """)
+                                                      {
+                                                        "email": "testUser@gmail.com",
+                                                        "firstName": "UserEditedName",
+                                                        "lastName": "UserEditedLName",
+                                                        "phone": "666666666"
+                                                      }
+                                                    """)
                   .header("Content-Type", "application/json")
                   .header("Access-Control-Allow-Origin", "*")
                   .header("Authorization", "Bearer " + token))
@@ -453,10 +453,10 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                   .contentType("application/json")
                   .content(
                       """
-                                {
-                                    "password": "testPass"
-                                }
-                              """)
+                                                      {
+                                                          "password": "testPass"
+                                                      }
+                                                    """)
                   .header("Content-Type", "application/json")
                   .header("Access-Control-Allow-Origin", "*")
                   .header("Authorization", "Bearer " + token))
@@ -484,11 +484,11 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                       .contentType("application/json")
                       .content(
                           """
-                              {
-                                "email": "anesic3119rn+banka2backend+admin@raf.rs",
-                                "password": "admin"
-                              }
-                              """))
+                                                            {
+                                                              "email": "anesic3119rn+banka2backend+admin@raf.rs",
+                                                              "password": "admin"
+                                                            }
+                                                            """))
               .andExpect(status().isOk())
               .andReturn();
       token = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.token");
@@ -528,7 +528,28 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
 
   @Then("user no longer in database")
   public void user_no_longer_in_database() {
-    Optional<User> test = userService.findById(testUser.get().getId());
-    if (test.isPresent()) fail("User is present and must not be!");
+    Exception exception =
+        assertThrows(
+            Exception.class,
+            () -> {
+              mockMvc
+                  .perform(
+                      get("/api/users/" + testUser.get().getId())
+                          .contentType("application/json")
+                          .header("Content-Type", "application/json")
+                          .header("Access-Control-Allow-Origin", "*")
+                          .header("Authorization", "Bearer " + token))
+                  .andExpect(status().isOk())
+                  .andReturn();
+            });
+
+    String expectedMessage =
+        "Request processing failed; nested exception is "
+            + "com.raf.si.Banka2Backend.exceptions.UserNotFoundException: User with id <"
+            + testUser.get().getId()
+            + "> not found.";
+    String actualMessage = exception.getMessage();
+
+    assertEquals(expectedMessage, actualMessage);
   }
 }

@@ -63,8 +63,6 @@ public class PermissionServiceTest {
   @Test
   public void findByPermissionNames_failure() {
 
-    long id = 1L;
-
     List<PermissionName> permissionNames =
         Arrays.asList(PermissionName.ADMIN_USER, PermissionName.READ_USERS);
 

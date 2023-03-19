@@ -1,14 +1,22 @@
 package com.raf.si.Banka2Backend.services;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.raf.si.Banka2Backend.models.users.PasswordResetToken;
 import com.raf.si.Banka2Backend.models.users.Permission;
 import com.raf.si.Banka2Backend.models.users.PermissionName;
 import com.raf.si.Banka2Backend.models.users.User;
+import com.raf.si.Banka2Backend.repositories.users.PasswordResetTokenRepository;
 import com.raf.si.Banka2Backend.repositories.users.UserRepository;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,6 +27,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class AuthorisationServiceTest {
 
   @Mock UserRepository userRepository;
+
+  @Mock PasswordResetTokenRepository passwordResetTokenRepository;
 
   @InjectMocks AuthorisationService authorisationService;
 
@@ -86,7 +96,7 @@ public class AuthorisationServiceTest {
   }
 
   @Test
-  public void isAuthorised_notFound() {
+  public void isAuthorised_userNotFound() {
 
     PermissionName permission = PermissionName.ADMIN_USER;
     String email = "darko@gmail.com";
@@ -94,5 +104,39 @@ public class AuthorisationServiceTest {
     when(userRepository.findUserByEmail(email)).thenReturn(Optional.empty());
 
     assertFalse(authorisationService.isAuthorised(permission, email));
+  }
+
+  @Test
+  public void validatePasswordResetToken_tokenNotFound() {
+
+    String token = UUID.randomUUID().toString();
+    String expectedMessage = "Token not found";
+
+    when(passwordResetTokenRepository.findPasswordResetTokenByToken(token))
+        .thenReturn(Optional.empty());
+
+    assertEquals(expectedMessage, authorisationService.validatePasswordResetToken(token));
+  }
+
+  @Test
+  public void validatePasswordResetToken_tokenExpired() {
+
+    String token = UUID.randomUUID().toString();
+    String expectedMessage = "Token expired";
+
+    PasswordResetToken passwordResetToken = new PasswordResetToken();
+    passwordResetToken.setExpirationDate(
+        Date.from(
+            LocalDateTime.now()
+                .minus(Duration.ofMinutes(10))
+                .atZone(ZoneId.systemDefault())
+                .toInstant()));
+
+    when(passwordResetTokenRepository.findPasswordResetTokenByToken(token))
+        .thenReturn(Optional.of(passwordResetToken));
+
+    assertEquals(expectedMessage, authorisationService.validatePasswordResetToken(token));
+
+    verify(passwordResetTokenRepository).delete(passwordResetToken);
   }
 }
