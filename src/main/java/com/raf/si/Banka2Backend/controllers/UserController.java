@@ -3,9 +3,9 @@ package com.raf.si.Banka2Backend.controllers;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
-import com.raf.si.Banka2Backend.models.Permission;
-import com.raf.si.Banka2Backend.models.PermissionName;
-import com.raf.si.Banka2Backend.models.User;
+import com.raf.si.Banka2Backend.models.users.Permission;
+import com.raf.si.Banka2Backend.models.users.PermissionName;
+import com.raf.si.Banka2Backend.models.users.User;
 import com.raf.si.Banka2Backend.requests.ChangePasswordRequest;
 import com.raf.si.Banka2Backend.requests.RegisterRequest;
 import com.raf.si.Banka2Backend.requests.UpdateProfileRequest;

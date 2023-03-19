@@ -2,16 +2,13 @@ package com.raf.si.Banka2Backend.cucumber.integration.users;
 
 import com.jayway.jsonpath.JsonPath;
 import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
-import com.raf.si.Banka2Backend.models.Permission;
-import com.raf.si.Banka2Backend.models.User;
+import com.raf.si.Banka2Backend.models.users.Permission;
+import com.raf.si.Banka2Backend.models.users.User;
 import com.raf.si.Banka2Backend.services.UserService;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.jsonwebtoken.Jwts;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
