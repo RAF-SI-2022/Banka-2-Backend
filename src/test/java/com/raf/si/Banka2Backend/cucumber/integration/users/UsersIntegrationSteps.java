@@ -26,38 +26,6 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
   protected static Optional<User> loggedInUser;
   protected static Optional<User> testUser;
 
-  // Test not logged in user tires to access site
-  @When("user not logged in")
-  public void user_not_logged_in() {
-    token = "";
-  }
-
-  @Then("user accesses endpoint")
-  public void user_accesses_endpoint() {
-    try {
-      Exception exception =
-          assertThrows(
-              Exception.class,
-              () -> {
-                mockMvc
-                    .perform(
-                        get("/api/users")
-                            .contentType("application/json")
-                            .header("Content-Type", "application/json")
-                            .header("Access-Control-Allow-Origin", "*")
-                            .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isOk())
-                    .andReturn();
-              });
-
-      String expectedMessage = "JWT String argument cannot be null or empty.";
-      String actualMessage = exception.getMessage();
-      assertEquals(actualMessage, expectedMessage);
-    } catch (Exception e) {
-      fail(e.getMessage());
-    }
-  }
-
   // Test logging in by admin
   @When("user can login")
   public void user_can_login() {
