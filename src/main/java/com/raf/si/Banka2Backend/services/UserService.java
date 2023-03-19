@@ -1,5 +1,6 @@
 package com.raf.si.Banka2Backend.services;
 
+import com.raf.si.Banka2Backend.exceptions.PasswordResetTokenNotFoundException;
 import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
 import com.raf.si.Banka2Backend.models.users.PasswordResetToken;
 import com.raf.si.Banka2Backend.models.users.Permission;
@@ -9,6 +10,7 @@ import com.raf.si.Banka2Backend.repositories.users.UserRepository;
 import com.raf.si.Banka2Backend.services.interfaces.UserServiceInterface;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -62,13 +64,25 @@ public class UserService implements UserDetailsService, UserServiceInterface {
   }
 
   @Override
-  public Optional<User> findById(Long id) {
-    return userRepository.findById(id);
+  public Optional<User> findById(Long id) throws UserNotFoundException {
+
+    Optional<User> user = userRepository.findById(id);
+
+    if (user.isPresent()) {
+      return user;
+    } else {
+      throw new UserNotFoundException(id);
+    }
   }
 
   @Override
   public void deleteById(Long id) throws UserNotFoundException {
-    userRepository.deleteById(id);
+
+    try {
+      userRepository.deleteById(id);
+    } catch (NoSuchElementException e) {
+      throw new UserNotFoundException(id);
+    }
   }
 
   @Override
@@ -82,7 +96,25 @@ public class UserService implements UserDetailsService, UserServiceInterface {
   @Override
   public void changePassword(User user, String newPassword, String passwordResetToken) {
     user.setPassword(newPassword);
-    userRepository.save(user);
-    this.passwordResetTokenRepository.deleteByToken(passwordResetToken);
+
+    Optional<PasswordResetToken> passwordResetTokenFromDB =
+            passwordResetTokenRepository.findPasswordResetTokenByToken(passwordResetToken);
+
+    if (passwordResetTokenFromDB.isPresent()) {
+      Optional<User> userFromDB = userRepository.findById(user.getId());
+
+      if (userFromDB.isPresent()) {
+        User userToChangePasswordTo = userFromDB.get();
+        userToChangePasswordTo.setPassword(newPassword);
+
+        userRepository.save(user);
+      } else {
+        throw new UserNotFoundException(user.getId());
+      }
+
+      passwordResetTokenRepository.deleteByToken(passwordResetToken);
+    } else {
+      throw new PasswordResetTokenNotFoundException(passwordResetToken);
+    }
   }
 }
