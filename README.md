@@ -10,7 +10,7 @@ The following software is required for the development process:
 2. [Apache Maven](https://maven.apache.org/install.html) - included in the project repository.
 3. [Docker Desktop](https://www.docker.com/products/docker-desktop/) - required for building and testing the project. **Please download and install Docker Desktop if you're not already using it.**
 
-### Installing (Forking)
+### Installing (Forking).
 
 Start by forking the latest sprint branch into your GitHub account.
 
