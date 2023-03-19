@@ -88,9 +88,11 @@ public class UserService implements UserDetailsService, UserServiceInterface {
   @Override
   public Optional<User> getUserByPasswordResetToken(String token) {
     Optional<PasswordResetToken> passwordResetToken =
-        this.passwordResetTokenRepository.findPasswordResetTokenByToken(token);
-    if (passwordResetToken.isEmpty()) return null;
-    return this.userRepository.findById(passwordResetToken.get().getUser().getId());
+        passwordResetTokenRepository.findPasswordResetTokenByToken(token);
+
+    if (passwordResetToken.isPresent())
+      return userRepository.findById(passwordResetToken.get().getUser().getId());
+    else throw new PasswordResetTokenNotFoundException(token);
   }
 
   @Override

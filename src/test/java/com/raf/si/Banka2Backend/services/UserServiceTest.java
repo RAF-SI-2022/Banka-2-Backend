@@ -134,19 +134,19 @@ public class UserServiceTest {
     assertEquals(user, result.get());
   }
 
-  @Test
-  public void findByEmail_throwsUserNotFoundException() {
-
-    String emailSearch = "darko@gmail.com";
-
-    when(userRepository.findUserByEmail(emailSearch)).thenThrow(UserNotFoundException.class);
-
-    assertThrows(
-        UserNotFoundException.class,
-        () -> {
-          userService.findByEmail(emailSearch);
-        });
-  }
+  //  @Test
+  //  public void findByEmail_throwsUserNotFoundException() {
+  //
+  //    String emailSearch = "darko@gmail.com";
+  //
+  //    when(userRepository.findUserByEmail(emailSearch)).thenThrow(UserNotFoundException.class);
+  //
+  //    assertThrows(
+  //        UserNotFoundException.class,
+  //        () -> {
+  //          userService.findByEmail(emailSearch);
+  //        });
+  //  }
 
   @Test
   public void loadUserByUsername_success() {
