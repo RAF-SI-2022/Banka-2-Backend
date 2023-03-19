@@ -2,7 +2,7 @@ package com.raf.si.Banka2Backend.cucumber.integration.users;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.raf.si.Banka2Backend.models.User;
+import com.raf.si.Banka2Backend.models.users.User;
 import com.raf.si.Banka2Backend.services.UserService;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;

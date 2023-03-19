@@ -1,4 +1,4 @@
-package com.raf.si.Banka2Backend.models;
+package com.raf.si.Banka2Backend.models.users;
 
 public enum PermissionName {
   ADMIN_USER,

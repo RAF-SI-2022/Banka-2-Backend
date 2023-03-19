@@ -3,10 +3,10 @@ package com.raf.si.Banka2Backend.services;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-import com.raf.si.Banka2Backend.models.Permission;
-import com.raf.si.Banka2Backend.models.PermissionName;
-import com.raf.si.Banka2Backend.models.User;
-import com.raf.si.Banka2Backend.repositories.UserRepository;
+import com.raf.si.Banka2Backend.models.users.Permission;
+import com.raf.si.Banka2Backend.models.users.PermissionName;
+import com.raf.si.Banka2Backend.models.users.User;
+import com.raf.si.Banka2Backend.repositories.users.UserRepository;
 import java.util.Collections;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;

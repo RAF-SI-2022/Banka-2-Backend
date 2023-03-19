@@ -1,6 +1,6 @@
 package com.raf.si.Banka2Backend.responses;
 
-import com.raf.si.Banka2Backend.models.Permission;
+import com.raf.si.Banka2Backend.models.users.Permission;
 import java.util.List;
 import lombok.Data;
 

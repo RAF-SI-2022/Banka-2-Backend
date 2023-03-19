@@ -1,7 +1,7 @@
-package com.raf.si.Banka2Backend.repositories;
+package com.raf.si.Banka2Backend.repositories.users;
 
-import com.raf.si.Banka2Backend.models.Permission;
-import com.raf.si.Banka2Backend.models.PermissionName;
+import com.raf.si.Banka2Backend.models.users.Permission;
+import com.raf.si.Banka2Backend.models.users.PermissionName;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

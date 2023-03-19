@@ -1,7 +1,7 @@
 package com.raf.si.Banka2Backend.responses;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.raf.si.Banka2Backend.models.Permission;
+import com.raf.si.Banka2Backend.models.users.Permission;
 import java.util.List;
 import lombok.Builder;
 import lombok.Data;
