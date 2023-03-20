@@ -7,8 +7,9 @@ jobs:
     # combination of matrix variables
     strategy:
       matrix:
-        # TODO debug on [ubuntu-22.04, windows-2022, macos-12]
-        os: [ubuntu-22.04, windows-2022]
+        # TODO debug on [ubuntu-22.04, windows-2022, macos-12];
+        # their output will overwrite outputs.res - need a workaround
+        os: [ubuntu-22.04]
     runs-on: ${{ matrix.os }}
     continue-on-error: false
     outputs:
