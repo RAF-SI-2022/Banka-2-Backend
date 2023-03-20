@@ -3,9 +3,9 @@ package com.raf.si.Banka2Backend.services;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-import com.raf.si.Banka2Backend.models.Permission;
-import com.raf.si.Banka2Backend.models.PermissionName;
-import com.raf.si.Banka2Backend.repositories.PermissionRepository;
+import com.raf.si.Banka2Backend.models.users.Permission;
+import com.raf.si.Banka2Backend.models.users.PermissionName;
+import com.raf.si.Banka2Backend.repositories.users.PermissionRepository;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -17,61 +17,59 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class PermissionServiceTest {
 
-    @Mock PermissionRepository permissionRepository;
+  @Mock PermissionRepository permissionRepository;
 
-    @InjectMocks PermissionService permissionService;
+  @InjectMocks PermissionService permissionService;
 
-    @Test
-    public void getAllPermissions_success() {
+  @Test
+  public void getAllPermissions_success() {
 
-        long id = 1L;
-        List<Permission> permissionList =
-                Arrays.asList(
-                        Permission.builder().id(id++).permissionName(PermissionName.ADMIN_USER).build(),
-                        Permission.builder().id(id++).permissionName(PermissionName.CREATE_USERS).build(),
-                        Permission.builder().id(id++).permissionName(PermissionName.DELETE_USERS).build(),
-                        Permission.builder().id(id++).permissionName(PermissionName.READ_USERS).build(),
-                        Permission.builder().id(id).permissionName(PermissionName.UPDATE_USERS).build());
+    long id = 1L;
+    List<Permission> permissionList =
+        Arrays.asList(
+            Permission.builder().id(id++).permissionName(PermissionName.ADMIN_USER).build(),
+            Permission.builder().id(id++).permissionName(PermissionName.CREATE_USERS).build(),
+            Permission.builder().id(id++).permissionName(PermissionName.DELETE_USERS).build(),
+            Permission.builder().id(id++).permissionName(PermissionName.READ_USERS).build(),
+            Permission.builder().id(id).permissionName(PermissionName.UPDATE_USERS).build());
 
-        when(permissionRepository.findAll()).thenReturn(permissionList);
+    when(permissionRepository.findAll()).thenReturn(permissionList);
 
-        final List<Permission> result = permissionService.findAll();
-        assertIterableEquals(permissionList, result);
-    }
+    final List<Permission> result = permissionService.findAll();
+    assertIterableEquals(permissionList, result);
+  }
 
-    @Test
-    public void findByPermissionNames_success() {
+  @Test
+  public void findByPermissionNames_success() {
 
-        long id = 1L;
+    long id = 1L;
 
-        List<PermissionName> permissionNames =
-                Arrays.asList(
-                        PermissionName.ADMIN_USER, PermissionName.READ_USERS, PermissionName.DELETE_USERS);
+    List<PermissionName> permissionNames =
+        Arrays.asList(
+            PermissionName.ADMIN_USER, PermissionName.READ_USERS, PermissionName.DELETE_USERS);
 
-        List<Permission> permissionsByName =
-                Arrays.asList(
-                        Permission.builder().id(id++).permissionName(PermissionName.ADMIN_USER).build(),
-                        Permission.builder().id(id++).permissionName(PermissionName.CREATE_USERS).build(),
-                        Permission.builder().id(id).permissionName(PermissionName.DELETE_USERS).build());
+    List<Permission> permissionsByName =
+        Arrays.asList(
+            Permission.builder().id(id++).permissionName(PermissionName.ADMIN_USER).build(),
+            Permission.builder().id(id++).permissionName(PermissionName.CREATE_USERS).build(),
+            Permission.builder().id(id).permissionName(PermissionName.DELETE_USERS).build());
 
-        when(permissionRepository.findByPermissionNames(permissionNames)).thenReturn(permissionsByName);
+    when(permissionRepository.findByPermissionNames(permissionNames)).thenReturn(permissionsByName);
 
-        final List<Permission> result = permissionService.findByPermissionNames(permissionNames);
-        assertEquals(permissionsByName, result);
-    }
+    final List<Permission> result = permissionService.findByPermissionNames(permissionNames);
+    assertEquals(permissionsByName, result);
+  }
 
-    @Test
-    public void findByPermissionNames_failure() {
+  @Test
+  public void findByPermissionNames_failure() {
 
-        long id = 1L;
+    List<PermissionName> permissionNames =
+        Arrays.asList(PermissionName.ADMIN_USER, PermissionName.READ_USERS);
 
-        List<PermissionName> permissionNames =
-                Arrays.asList(PermissionName.ADMIN_USER, PermissionName.READ_USERS);
+    when(permissionRepository.findByPermissionNames(permissionNames)).thenReturn(null);
 
-        when(permissionRepository.findByPermissionNames(permissionNames)).thenReturn(null);
+    List<Permission> result = permissionService.findByPermissionNames(permissionNames);
 
-        List<Permission> result = permissionService.findByPermissionNames(permissionNames);
-
-        assertNull(result);
-    }
+    assertNull(result);
+  }
 }
