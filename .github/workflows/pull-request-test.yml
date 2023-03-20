@@ -7,13 +7,10 @@ jobs:
     # combination of matrix variables
     strategy:
       matrix:
-        # TODO debug on [ubuntu-22.04, windows-2022, macos-12];
-        # their output will overwrite outputs.res - need a workaround
+        # TODO debug on [ubuntu-22.04, windows-2022, macos-12]
         os: [ubuntu-22.04]
     runs-on: ${{ matrix.os }}
     continue-on-error: false
-    outputs:
-      res: ${{ job.status }}
     steps:
       # Check out the current repository into the VM
       - uses: actions/checkout@v3
@@ -33,7 +30,7 @@ jobs:
   report:
     needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && needs.test.outputs.res == 'success'
+    if: github.event_name == 'pull_request'
     permissions:
       issues: write
     steps:
@@ -44,5 +41,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              labels: ["test-${{ needs.test.outputs.res }}"]
+              labels: ["test-${{ needs.test.result }}"]
             })
