@@ -1,5 +1,5 @@
 name: pull-request-test
-run-name: ${{ github.ref }}-pull-request-test
+run-name: ${{github.actor}}/${{ github.ref_name }}:pull-request-test
 on: [push]
 jobs:
   pull-request-test:
@@ -13,6 +13,12 @@ jobs:
     steps:
       # Check out the current repository into the VM
       - uses: actions/checkout@v3
+      # Set up Java version from project
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
       # Take permission of all files
       - run: chmod 777 -R .
       # Test the repository
