@@ -1,8 +1,7 @@
 package com.raf.si.Banka2Backend.cucumber.integration.usersFailures;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
@@ -12,6 +11,7 @@ import com.raf.si.Banka2Backend.services.UserService;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
@@ -115,189 +115,522 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
   }
 
   // Test admin gets permissions from nonexistent user
-  @When("admin logged in")
-  public void admin_logged_in() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+  @When("user doesnt exist in database")
+  public void user_doesnt_exist_in_database() {
+    try {
+      Exception exception =
+          assertThrows(
+              Exception.class,
+              () -> {
+                mockMvc
+                    .perform(
+                        get("/api/users/" + -1L)
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+              });
+
+      String expectedMessage =
+          "Request processing failed; nested exception is com.raf.si.Banka2Backend.exceptions.UserNotFoundException: User with id <-1> not found.";
+      String actualMessage = exception.getMessage();
+      assertEquals(actualMessage, expectedMessage);
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
   }
 
   @Then("get perms form nonexistent user")
   public void get_perms_form_nonexistent_user() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
-  }
+    try {
+      Exception exception =
+          assertThrows(
+              Exception.class,
+              () -> {
+                mockMvc
+                    .perform(
+                        get("/api/users/permissions/" + -1L)
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+              });
 
-  // Test user creates user with bad data
-  @When("user creates user with bad data")
-  public void user_creates_user_with_bad_data() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
-  }
-
-  @Then("user not created in database")
-  public void user_not_created_in_database() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+      String expectedMessage =
+          "Request processing failed; nested exception is com.raf.si.Banka2Backend.exceptions.UserNotFoundException: User with id <-1> not found.";
+      String actualMessage = exception.getMessage();
+      assertEquals(actualMessage, expectedMessage);
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
   }
 
   // Test get nonexistent user from database
-  @When("user doesnt exist in database")
-  public void user_doesnt_exist_in_database() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
-  }
-
   @Then("get nonexistent user by id")
   public void get_nonexistent_user_by_id() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+    try {
+      Exception exception =
+          assertThrows(
+              Exception.class,
+              () -> {
+                mockMvc
+                    .perform(
+                        get("/api/users/" + -1L)
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+              });
+
+      String expectedMessage =
+          "Request processing failed; nested exception is com.raf.si.Banka2Backend.exceptions.UserNotFoundException: User with id <-1> not found.";
+      String actualMessage = exception.getMessage();
+      assertEquals(actualMessage, expectedMessage);
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
   }
 
   // Test deactivate nonexistent user
   @Then("deactivate nonexistent user")
   public void deactivate_nonexistent_user() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+    try {
+      Exception exception =
+          assertThrows(
+              Exception.class,
+              () -> {
+                mockMvc
+                    .perform(
+                        post("/api/users/deactivate/" + -1L)
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+              });
+
+      String expectedMessage =
+          "Request processing failed; nested exception is com.raf.si.Banka2Backend.exceptions.UserNotFoundException: User with id <-1> not found.";
+      String actualMessage = exception.getMessage();
+      assertEquals(actualMessage, expectedMessage);
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
   }
 
   // Test reactivate nonexistent user
   @Then("reactivate nonexistent user")
   public void reactivate_nonexistent_user() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+    try {
+      Exception exception =
+          assertThrows(
+              Exception.class,
+              () -> {
+                mockMvc
+                    .perform(
+                        post("/api/users/reactivate/" + -1L)
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+              });
+
+      String expectedMessage =
+          "Request processing failed; nested exception is com.raf.si.Banka2Backend.exceptions.UserNotFoundException: User with id <-1> not found.";
+      String actualMessage = exception.getMessage();
+      assertEquals(actualMessage, expectedMessage);
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
   }
 
   // Test edit nonexistent user in database
   @Then("update nonexistent user in database")
   public void update_nonexistent_user_in_database() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
-  }
+    try {
+      Exception exception =
+          assertThrows(
+              Exception.class,
+              () -> {
+                mockMvc
+                    .perform(
+                        put("/api/users/" + -1L)
+                            .contentType("application/json")
+                            .content(
+                                """
+                                                                        {
+                                                                          "firstName": "NewTestUser",
+                                                                          "lastName": "NewTestUser",
+                                                                          "email": "testUser@gmail.com",
+                                                                          "permissions": [
+                                                                            "READ_USERS"
+                                                                          ],
+                                                                          "jobPosition": "NEWTESTJOB",
+                                                                          "active": true,
+                                                                          "jmbg": "1231231231235",
+                                                                          "phone": "640601548865"
+                                                                        }
+                                                                        """)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+              });
 
-  // Test get nonexistent user by his email
-  @Then("get nonexistent user by email")
-  public void get_nonexistent_user_by_email() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+      String expectedMessage =
+          "Request processing failed; nested exception is com.raf.si.Banka2Backend.exceptions.UserNotFoundException: User with id <-1> not found.";
+      String actualMessage = exception.getMessage();
+      assertEquals(actualMessage, expectedMessage);
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
   }
 
   // Test deleting nonexistent user
   @Then("deleting nonexistent user from database")
   public void deleting_nonexistent_user_from_database() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
-  }
+    try {
+      Exception exception =
+          assertThrows(
+              Exception.class,
+              () -> {
+                mockMvc
+                    .perform(
+                        delete("/api/users/" + -1L)
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isNoContent())
+                    .andReturn();
+              });
 
-  // Test logged in user updates their profile with bad data
-  @Given("any user logs in")
-  public void any_user_logs_in() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
-  }
-
-  @When("user updates his profile with bad data")
-  public void user_updates_his_profile_with_bad_data() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
-  }
-
-  @Then("user profile not updated")
-  public void user_profile_not_updated() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+      String expectedMessage =
+          "Request processing failed; nested exception is org.springframework.dao.EmptyResultDataAccessException: No class com.raf.si.Banka2Backend.models.users.User entity with id -1 exists!";
+      String actualMessage = exception.getMessage();
+      assertEquals(actualMessage, expectedMessage);
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
   }
 
   // Test non admin user gets all permission names
+  @Given("non privileged user logs in")
+  public void non_privileged_user_logs_in() {
+    try {
+      // pravimo test usera
+      mockMvc
+          .perform(
+              post("/api/users/register")
+                  .contentType("application/json")
+                  .content(
+                      """
+                                                    {
+                                                      "firstName": "nonPrivUser",
+                                                      "lastName": "nonPrivUserLn",
+                                                      "email": "nonpriv@gmail.com",
+                                                      "password": "1234",
+                                                      "permissions": [],
+                                                      "jobPosition": "TEST",
+                                                      "active": true,
+                                                      "jmbg": "1231231231235",
+                                                      "phone": "640601548865"
+                                                    }
+                                                    """)
+                  .header("Content-Type", "application/json")
+                  .header("Access-Control-Allow-Origin", "*")
+                  .header("Authorization", "Bearer " + token))
+          .andExpect(status().isOk())
+          .andReturn();
+
+      // logujemo se kao test user
+      MvcResult mvcResult =
+          mockMvc
+              .perform(
+                  post("/auth/login")
+                      .contentType("application/json")
+                      .content(
+                          """
+                                                            {
+                                                              "email": "nonpriv@gmail.com",
+                                                              "password": "1234"
+                                                            }
+                                                            """))
+              .andExpect(status().isOk())
+              .andReturn();
+      token = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.token");
+
+      Optional<User> user = userService.findByEmail("nonpriv@gmail.com");
+      assertNotNull(user);
+      assertEquals("nonpriv@gmail.com", user.get().getEmail());
+      loggedInUser = user;
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
+  }
+
   @When("non privileged user logged in")
   public void non_privileged_user_logged_in() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+    try {
+      assertNotEquals(token, null);
+      assertNotEquals(token, "");
+      assertEquals(loggedInUser.get().getPermissions().size(), 0);
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
   }
 
   @Then("user doesnt get all permission names")
   public void user_doesnt_get_all_permission_names() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+    try {
+      mockMvc
+          .perform(
+              get("/api/users/permissions")
+                  .contentType("application/json")
+                  .header("Content-Type", "application/json")
+                  .header("Access-Control-Allow-Origin", "*")
+                  .header("Authorization", "Bearer " + token))
+          .andExpect(status().isUnauthorized())
+          .andReturn();
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
   }
 
   // Test non privileged user gets users permissions
   @When("non privileged user logged in and user exists in database")
   public void non_privileged_user_logged_in_and_user_exists_in_database() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+    try {
+      assertNotEquals(token, null);
+      assertNotEquals(token, "");
+      assertEquals(loggedInUser.get().getPermissions().size(), 0);
+
+      Optional<User> user = userService.findByEmail("nonpriv@gmail.com");
+      assertNotNull(user);
+
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
   }
 
   @Then("user doesnt gets users permissions")
   public void user_doesnt_gets_users_permissions() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+    try {
+      mockMvc
+          .perform(
+              get("/api/users/permissions/" + loggedInUser.get().getId())
+                  .contentType("application/json")
+                  .header("Content-Type", "application/json")
+                  .header("Access-Control-Allow-Origin", "*")
+                  .header("Authorization", "Bearer " + token))
+          .andExpect(status().isUnauthorized())
+          .andReturn();
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
   }
 
   // Test non privileged user gets user by his id
   @Then("user doesnt get user by id")
   public void user_doesnt_get_user_by_id() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+    try {
+      mockMvc
+          .perform(
+              get("/api/users/" + loggedInUser.get().getId())
+                  .contentType("application/json")
+                  .header("Content-Type", "application/json")
+                  .header("Access-Control-Allow-Origin", "*")
+                  .header("Authorization", "Bearer " + token))
+          .andExpect(status().isUnauthorized())
+          .andReturn();
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
   }
 
   // Test non privileged user deactivates user
-  @Then("user still active")
-  public void user_still_active() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+  @Then("user doesnt deactivate user")
+  public void user_doesnt_deactivate_user() {
+    try {
+      mockMvc
+          .perform(
+              post("/api/users/deactivate/" + loggedInUser.get().getId())
+                  .contentType("application/json")
+                  .header("Content-Type", "application/json")
+                  .header("Access-Control-Allow-Origin", "*")
+                  .header("Authorization", "Bearer " + token))
+          .andExpect(status().isUnauthorized())
+          .andReturn();
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
   }
 
   // Test non privileged user reactivates user
-  @Then("user still not active")
-  public void user_still_not_active() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+  @Then("user doesnt reactivate user")
+  public void user_doesnt_reactivate_user() {
+    try {
+      mockMvc
+          .perform(
+              post("/api/users/reactivate/" + loggedInUser.get().getId())
+                  .contentType("application/json")
+                  .header("Content-Type", "application/json")
+                  .header("Access-Control-Allow-Origin", "*")
+                  .header("Authorization", "Bearer " + token))
+          .andExpect(status().isUnauthorized())
+          .andReturn();
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
   }
 
   // Test non privileged user edits user in database
   @Then("user not updated")
   public void user_not_updated() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+    try {
+      mockMvc
+          .perform(
+              put("/api/users/" + loggedInUser.get().getId())
+                  .contentType("application/json")
+                  .content(
+                      """
+                                                    {
+                                                      "firstName": "NewTestUser",
+                                                      "lastName": "NewTestUser",
+                                                      "email": "testUser@gmail.com",
+                                                      "permissions": [
+                                                        "READ_USERS"
+                                                      ],
+                                                      "jobPosition": "NEWTESTJOB",
+                                                      "active": true,
+                                                      "jmbg": "1231231231235",
+                                                      "phone": "640601548865"
+                                                    }
+                                                    """)
+                  .header("Content-Type", "application/json")
+                  .header("Access-Control-Allow-Origin", "*")
+                  .header("Authorization", "Bearer " + token))
+          .andExpect(status().isUnauthorized())
+          .andReturn();
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
   }
 
   // Test non privileged user get user by his email
-  @Then("suer doesnt user by his email")
-  public void suer_doesnt_user_by_his_email() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+  @Then("user doesnt user by his email")
+  public void user_doesnt_user_by_his_email() {
+    try {
+      mockMvc
+          .perform(
+              get("/api/users/email")
+                  .contentType("application/json")
+                  .header("Content-Type", "application/json")
+                  .header("Access-Control-Allow-Origin", "*")
+                  .header("Authorization", "Bearer " + token))
+          .andExpect(status().isUnauthorized())
+          .andReturn();
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
   }
 
   // Test non privileged user deleting user
   @Then("user still in database")
   public void user_still_in_database() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+    try {
+      mockMvc
+          .perform(
+              delete("/api/users/" + loggedInUser.get().getId())
+                  .contentType("application/json")
+                  .header("Content-Type", "application/json")
+                  .header("Access-Control-Allow-Origin", "*")
+                  .header("Authorization", "Bearer " + token))
+          .andExpect(status().isUnauthorized())
+          .andReturn();
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
+    ;
   }
 
   // Test non privileged user creates new user
-  @When("non privileged user logged in and user creates new user")
-  public void non_privileged_user_logged_in_and_user_creates_new_user() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
-  }
-
   @Then("user not created")
   public void user_not_created() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+    try {
+      MvcResult mvcResult =
+          mockMvc
+              .perform(
+                  post("/api/users/register")
+                      .contentType("application/json")
+                      .content(
+                          """
+                                                            {
+                                                              "firstName": "TestUser",
+                                                              "lastName": "TestUser",
+                                                              "email": "testUser@gmail.com",
+                                                              "password": "admin",
+                                                              "permissions": [
+                                                                "ADMIN_USER"
+                                                              ],
+                                                              "jobPosition": "ADMINISTRATOR",
+                                                              "active": true,
+                                                              "jmbg": "1231231231235",
+                                                              "phone": "640601548865"
+                                                            }
+                                                            """)
+                      .header("Content-Type", "application/json")
+                      .header("Access-Control-Allow-Origin", "*")
+                      .header("Authorization", "Bearer " + token))
+              .andExpect(status().isUnauthorized())
+              .andReturn();
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
   }
 
   // Test non privileged user get all users
   @When("non privileged user logged in and database not empty")
   public void non_privileged_user_logged_in_and_database_not_empty() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+
+    assertNotEquals(token, null);
+    assertNotEquals(token, "");
+    assertEquals(loggedInUser.get().getPermissions().size(), 0);
+
+    List<User> users = userService.findAll();
+    assertNotEquals(users.size(), 0);
   }
 
-  @Then("user gets all users from database")
-  public void user_gets_all_users_from_database() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+  @Then("user doesnt get all users from database")
+  public void user_doesnt_get_all_users_from_database() {
+    try {
+      System.err.println(loggedInUser);
+      mockMvc
+          .perform(
+              get("/api/users")
+                  .contentType("application/json")
+                  .header("Content-Type", "application/json")
+                  .header("Access-Control-Allow-Origin", "*")
+                  .header("Authorization", "Bearer " + token))
+          .andExpect(status().isUnauthorized())
+          .andReturn();
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
+  }
+
+  @Given("delete test user")
+  public void delete_test_user() {
+    userService.deleteById(loggedInUser.get().getId());
   }
 }

@@ -1,6 +1,6 @@
 Feature: User service
 
-  Additional description
+  Test for user controller nad service, they are meant to test good requests meant to pass
 
   Scenario: user logs in
     When user can login

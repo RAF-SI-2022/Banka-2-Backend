@@ -437,7 +437,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
     }
   }
 
-  // Testing deleting user todo fix
+  // Testing deleting user
   @Given("privileged user logged in")
   public void privileged_user_logged_in() {
     token = null;

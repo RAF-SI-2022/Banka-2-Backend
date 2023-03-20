@@ -1,6 +1,6 @@
 Feature: User service
 
-  Additional description
+  Test for user controller nad service, they are meant to test bad requests and unauthorised requests
 
   Scenario: not logged in user tires to access site
     When user not logged in
@@ -11,13 +11,9 @@ Feature: User service
     When logged in user
     Then is not found
 
-  Scenario: admin gets permissions from nonexistent user
-    When admin logged in
+  Scenario: user gets permissions from nonexistent user
+    When user doesnt exist in database
     Then get perms form nonexistent user
-
-  Scenario: user creates user with bad data
-    When user creates user with bad data
-    Then user not created in database
 
   Scenario: get nonexistent user from database
     When user doesnt exist in database
@@ -31,24 +27,12 @@ Feature: User service
     When user doesnt exist in database
     Then reactivate nonexistent user
 
-  Scenario: edit nonexistent user in database
-    When user doesnt exist in database
-    Then update nonexistent user in database
-
-  Scenario: get nonexistent user by his email
-    When user doesnt exist in database
-    Then get nonexistent user by email
-
   Scenario: deleting nonexistent user
     When user doesnt exist in database
     Then deleting nonexistent user from database
 
-  Scenario: logged in user updates their profile with bad data
-    Given any user logs in
-    When user updates his profile with bad data
-    Then user profile not updated
-
   Scenario: non admin user gets all permission names
+    Given non privileged user logs in
     When non privileged user logged in
     Then user doesnt get all permission names
 
@@ -57,12 +41,11 @@ Feature: User service
     Then user doesnt gets users permissions
 
   Scenario: non privileged user creates new user
-    When non privileged user logged in and user creates new user
     Then user not created
 
   Scenario: non privileged user get all users
     When non privileged user logged in and database not empty
-    Then user gets all users from database
+    Then user doesnt get all users from database
 
   Scenario: non privileged user gets user by his id
     When non privileged user logged in and user exists in database
@@ -70,11 +53,11 @@ Feature: User service
 
   Scenario: non privileged user deactivates user
     When non privileged user logged in and user exists in database
-    Then user still active
+    Then user doesnt deactivate user
 
   Scenario: non privileged user reactivates user
     When non privileged user logged in and user exists in database
-    Then user still not active
+    Then user doesnt reactivate user
 
   Scenario: non privileged user edits user in database
     When non privileged user logged in and user exists in database
@@ -82,8 +65,11 @@ Feature: User service
 
   Scenario: non privileged user get user by his email
     When non privileged user logged in and user exists in database
-    Then suer doesnt user by his email
+    Then user doesnt user by his email
 
   Scenario: non privileged user deleting user
     When non privileged user logged in and user exists in database
     Then user still in database
+
+  Scenario: wipe db from test user
+    Given delete test user
