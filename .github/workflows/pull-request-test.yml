@@ -1,5 +1,5 @@
 name: Test service
-run-name: ${{ github.repository }}:${{ github.ref_name }}#test
+run-name: ${{ github.repository }}:${{ github.ref_name }}[test]
 on: [push, pull_request]
 jobs:
   test:
