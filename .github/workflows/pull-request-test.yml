@@ -1,14 +1,14 @@
-name: pull-request-test
-run-name: ${{ github.repository }}:pull-request-test
-on: [push]
+name: Test service
+run-name: ${{ github.repository }}:test
+on: [push, pull_request]
 jobs:
-  pull-request-test:
+  test:
     # Enables multiple runs with every possible
     # combination of matrix variables
     strategy:
       matrix:
         # TODO debug on [ubuntu-22.04, windows-2022, macos-12]
-        os: [ubuntu-22.04]
+        os: [ubuntu-22.04, windows-2022]
     runs-on: ${{ matrix.os }}
     continue-on-error: false
     steps:
@@ -27,3 +27,17 @@ jobs:
       - run: make test
       # Remove services
       - run: docker compose -v down
+  report:
+    if: github.event_name == 'pull_request' && jobs.test.result == 'success'
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.setLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ["test-${{ jobs.test.result }}"]
+            })
