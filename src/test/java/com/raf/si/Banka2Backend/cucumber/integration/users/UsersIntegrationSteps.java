@@ -19,9 +19,10 @@ import org.springframework.test.web.servlet.MvcResult;
 
 public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
 
-  @Autowired private UserService userService;
-
-  @Autowired protected MockMvc mockMvc;
+  @Autowired
+  private UserService userService;
+  @Autowired
+  protected MockMvc mockMvc;
   protected static String token;
   protected static Optional<User> loggedInUser;
   protected static Optional<User> testUser;
