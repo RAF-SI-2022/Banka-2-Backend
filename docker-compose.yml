@@ -43,7 +43,7 @@ services:
       interval: 2s
       timeout: 10s
       retries: 5
-      start_period: 15s
+      start_period: 25s
     volumes:
       - ./docker/healthcheck/dbexchange/healthcheck.sh:/healthcheck.sh:ro
       - ./docker/provision/dbexchange/dbexchange-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
