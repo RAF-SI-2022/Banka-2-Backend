@@ -1,5 +1,5 @@
 name: pull-request-test
-run-name: ${{ vars.GITHUB_REPOSITORY }}:pull-request-test
+run-name: ${{ github.repository }}:pull-request-test
 on: [push]
 jobs:
   pull-request-test:
@@ -21,7 +21,7 @@ jobs:
           java-version: '17'
           cache: 'maven'
       # Take permission of all files
-      - run: cd ${{ vars.GITHUB_WORKSPACE }}
+      - run: cd ${{ github.workspace }}
       - run: chmod 777 -R .
       # Test the repository
       - run: make test
