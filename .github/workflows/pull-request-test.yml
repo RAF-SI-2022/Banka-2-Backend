@@ -1,5 +1,4 @@
-name: 'pull-request-test'
-description: 'Executes tests on the current pull request'
+name: pull-request-test
 run-name: ${{ github.head_ref }}-pull-request-test
 on: [push]
 jobs:
