@@ -1,0 +1,20 @@
+name: 'pull-request-test'
+description: 'Executes tests on the current pull request'
+run-name: ${{ github.head_ref }}-pull-request-test
+on: [push]
+jobs:
+  pull-request-test:
+    # Enables multiple runs with every possible
+    # combination of matrix variables
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, windows-2022, macos-12]
+    runs-on: ${{ matrix.os }}
+    continue-on-error: false
+    steps:
+      # Check out the current repository into the VM
+      - uses: actions/checkout@v3
+      # Test the repository
+      - run: make test
+      # Remove services
+      - run: docker compose -v down
