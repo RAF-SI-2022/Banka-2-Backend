@@ -20,7 +20,7 @@ jobs:
           java-version: '17'
           cache: 'maven'
       # Take permission of all files
-      - run: chmod 777 -R .
+      - run: chmod 777 -R *
       # Test the repository
       - run: make test
       # Remove services

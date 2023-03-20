@@ -19,7 +19,7 @@ test:
 	docker compose up -d flyway
 	docker compose up -d dbexchange
 	docker run --rm --network container:dbusers banka2backend-test
-	docker compose rm -s -f banka2backend-test
+	-docker compose rm -s -f banka2backend-test
 
 prod:
 	./mvnw spotless:apply
