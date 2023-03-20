@@ -1,5 +1,5 @@
 name: pull-request-test
-run-name: ${{ GITHUB_REPOSITORY }}:pull-request-test
+run-name: ${{github.actor}}/${{ github.ref_name }}:pull-request-test
 on: [push]
 jobs:
   pull-request-test:
