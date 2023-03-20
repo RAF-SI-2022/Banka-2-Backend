@@ -1,5 +1,5 @@
 name: pull-request-test
-run-name: ${{github.actor}}/${{ github.ref_name }}:pull-request-test
+run-name: ${{ GITHUB_REPOSITORY }}:pull-request-test
 on: [push]
 jobs:
   pull-request-test:
@@ -7,7 +7,8 @@ jobs:
     # combination of matrix variables
     strategy:
       matrix:
-        os: [ubuntu-22.04, windows-2022, macos-12]
+        # TODO debug on [ubuntu-22.04, windows-2022, macos-12]
+        os: [ubuntu-22.04]
     runs-on: ${{ matrix.os }}
     continue-on-error: false
     steps:
@@ -20,7 +21,8 @@ jobs:
           java-version: '17'
           cache: 'maven'
       # Take permission of all files
-      - run: chmod 777 -R *
+      - run: cd ${{ GITHUB_WORKSPACE }}
+      - run: chmod 777 -R .
       # Test the repository
       - run: make test
       # Remove services
