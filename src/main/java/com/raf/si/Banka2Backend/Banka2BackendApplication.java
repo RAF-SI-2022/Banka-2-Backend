@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 @SpringBootApplication
-@EnableJpaRepositories("com.raf.si.Banka2Backend.repositories.users")
-@EnableMongoRepositories("com.raf.si.Banka2Backend.repositories.exchange")
+@EnableJpaRepositories("com.raf.si.Banka2Backend.repositories.mariadb")
+@EnableMongoRepositories("com.raf.si.Banka2Backend.repositories.mongodb")
 public class Banka2BackendApplication {
 
   public static void main(String[] args) {

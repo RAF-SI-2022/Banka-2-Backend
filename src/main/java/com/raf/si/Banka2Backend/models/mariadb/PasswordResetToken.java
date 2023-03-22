@@ -1,4 +1,4 @@
-package com.raf.si.Banka2Backend.models.users;
+package com.raf.si.Banka2Backend.models.mariadb;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

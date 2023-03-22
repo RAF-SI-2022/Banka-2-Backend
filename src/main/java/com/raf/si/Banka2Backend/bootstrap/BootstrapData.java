@@ -1,10 +1,10 @@
 package com.raf.si.Banka2Backend.bootstrap;
 
-import com.raf.si.Banka2Backend.models.users.Permission;
-import com.raf.si.Banka2Backend.models.users.PermissionName;
-import com.raf.si.Banka2Backend.models.users.User;
-import com.raf.si.Banka2Backend.repositories.users.PermissionRepository;
-import com.raf.si.Banka2Backend.repositories.users.UserRepository;
+import com.raf.si.Banka2Backend.models.mariadb.Permission;
+import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
+import com.raf.si.Banka2Backend.models.mariadb.User;
+import com.raf.si.Banka2Backend.repositories.mariadb.PermissionRepository;
+import com.raf.si.Banka2Backend.repositories.mariadb.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

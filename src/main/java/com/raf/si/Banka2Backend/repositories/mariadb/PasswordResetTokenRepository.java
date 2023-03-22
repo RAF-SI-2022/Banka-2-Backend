@@ -1,6 +1,6 @@
-package com.raf.si.Banka2Backend.repositories.users;
+package com.raf.si.Banka2Backend.repositories.mariadb;
 
-import com.raf.si.Banka2Backend.models.users.PasswordResetToken;
+import com.raf.si.Banka2Backend.models.mariadb.PasswordResetToken;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

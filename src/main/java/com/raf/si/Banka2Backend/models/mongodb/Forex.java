@@ -1,4 +1,4 @@
-package com.raf.si.Banka2Backend.models.exchange;
+package com.raf.si.Banka2Backend.models.mongodb;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
