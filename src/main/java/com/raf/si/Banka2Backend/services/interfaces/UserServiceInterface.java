@@ -1,7 +1,7 @@
 package com.raf.si.Banka2Backend.services.interfaces;
 
-import com.raf.si.Banka2Backend.models.users.Permission;
-import com.raf.si.Banka2Backend.models.users.User;
+import com.raf.si.Banka2Backend.models.mariadb.Permission;
+import com.raf.si.Banka2Backend.models.mariadb.User;
 import java.util.List;
 import java.util.Optional;
 

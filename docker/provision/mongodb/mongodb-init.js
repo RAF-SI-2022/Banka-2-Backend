@@ -1,21 +1,20 @@
 /**
- * Exchange database (MongoDB) initialization shell script (JS).
+ * MongoDB initialization shell script (JS).
  * Reference: https://www.mongodb.com/docs/manual/reference/method/
  */
 
 // prod
-db = db.getSiblingDb('exchange-prod')
+db = db.getSiblingDb('prod')
 db.createCollection('accounts')
 
 // test
-db = db.getSiblingDb('exchange-test')
+db = db.getSiblingDb('test')
 db.dropDatabase()
-db = db.getSiblingDb('exchange-test')
+db = db.getSiblingDb('test')
 db.createCollection('tests')
 
 // dev
-db = db.getSiblingDb('exchange-dev')
-db.createCollection('forexes')
+db = db.getSiblingDb('dev')
 
 // user
 db.createUser(
@@ -25,15 +24,15 @@ db.createUser(
         roles: [
             {
                 role: "readWrite",
-                db: "exchange-prod"
+                db: "prod"
             },
             {
                 role: "readWrite",
-                db: "exchange-test"
+                db: "test"
             },
             {
                 role: "readWrite",
-                db: "exchange-dev"
+                db: "dev"
             },
         ]
     }
