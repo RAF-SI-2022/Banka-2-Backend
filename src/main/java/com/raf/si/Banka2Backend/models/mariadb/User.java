@@ -1,4 +1,4 @@
-package com.raf.si.Banka2Backend.models.users;
+package com.raf.si.Banka2Backend.models.mariadb;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;

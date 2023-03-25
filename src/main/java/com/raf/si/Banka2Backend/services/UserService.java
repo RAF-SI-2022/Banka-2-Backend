@@ -2,11 +2,11 @@ package com.raf.si.Banka2Backend.services;
 
 import com.raf.si.Banka2Backend.exceptions.PasswordResetTokenNotFoundException;
 import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
-import com.raf.si.Banka2Backend.models.users.PasswordResetToken;
-import com.raf.si.Banka2Backend.models.users.Permission;
-import com.raf.si.Banka2Backend.models.users.User;
-import com.raf.si.Banka2Backend.repositories.users.PasswordResetTokenRepository;
-import com.raf.si.Banka2Backend.repositories.users.UserRepository;
+import com.raf.si.Banka2Backend.models.mariadb.PasswordResetToken;
+import com.raf.si.Banka2Backend.models.mariadb.Permission;
+import com.raf.si.Banka2Backend.models.mariadb.User;
+import com.raf.si.Banka2Backend.repositories.mariadb.PasswordResetTokenRepository;
+import com.raf.si.Banka2Backend.repositories.mariadb.UserRepository;
 import com.raf.si.Banka2Backend.services.interfaces.UserServiceInterface;
 import java.util.ArrayList;
 import java.util.List;

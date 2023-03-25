@@ -1,8 +1,8 @@
 package com.raf.si.Banka2Backend.services;
 
-import com.raf.si.Banka2Backend.models.users.Permission;
-import com.raf.si.Banka2Backend.models.users.PermissionName;
-import com.raf.si.Banka2Backend.repositories.users.PermissionRepository;
+import com.raf.si.Banka2Backend.models.mariadb.Permission;
+import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
+import com.raf.si.Banka2Backend.repositories.mariadb.PermissionRepository;
 import com.raf.si.Banka2Backend.services.interfaces.PermissionServiceInterface;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
