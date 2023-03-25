@@ -1,10 +1,12 @@
 package com.raf.si.Banka2Backend.bootstrap;
 
-import com.raf.si.Banka2Backend.models.mariadb.Permission;
-import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
-import com.raf.si.Banka2Backend.models.mariadb.User;
+import com.raf.si.Banka2Backend.bootstrap.readers.CurrencyReader;
+import com.raf.si.Banka2Backend.models.mariadb.*;
+import com.raf.si.Banka2Backend.repositories.mariadb.CurrencyRepository;
+import com.raf.si.Banka2Backend.repositories.mariadb.InflationRepository;
 import com.raf.si.Banka2Backend.repositories.mariadb.PermissionRepository;
 import com.raf.si.Banka2Backend.repositories.mariadb.UserRepository;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,20 +38,32 @@ public class BootstrapData implements CommandLineRunner {
 
   private final UserRepository userRepository;
   private final PermissionRepository permissionRepository;
+  private final CurrencyRepository currencyRepository;
+  private final InflationRepository inflationRepository;
   private final PasswordEncoder passwordEncoder;
 
   @Autowired
   public BootstrapData(
       UserRepository userRepository,
       PermissionRepository permissionRepository,
+      CurrencyRepository currencyRepository,
+      InflationRepository inflationRepository,
       PasswordEncoder passwordEncoder) {
     this.userRepository = userRepository;
     this.permissionRepository = permissionRepository;
+    this.currencyRepository = currencyRepository;
+    this.inflationRepository = inflationRepository;
     this.passwordEncoder = passwordEncoder;
   }
 
   @Override
   public void run(String... args) throws Exception {
+
+    // If empty, add currencies in db from csv
+    long numberOfRows = this.currencyRepository.count();
+    if (numberOfRows == 0) {
+      this.insertCurrencies();
+    }
 
     // Do this only on the first ever run of the app.
     // Includes both initial admin run and permissions run.
@@ -91,5 +105,13 @@ public class BootstrapData implements CommandLineRunner {
     this.userRepository.save(admin);
 
     System.out.println("Loaded!");
+  }
+
+  private void insertCurrencies() throws IOException {
+    CurrencyReader cs = new CurrencyReader();
+    List<Currency> currencyList = cs.getCurrencies();
+    this.currencyRepository.saveAll(currencyList);
+    List<Inflation> inflationList = cs.getInflations();
+    this.inflationRepository.saveAll(inflationList);
   }
 }
