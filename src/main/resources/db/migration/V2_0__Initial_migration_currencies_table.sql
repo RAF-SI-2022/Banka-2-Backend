@@ -13,5 +13,5 @@ CREATE TABLE IF NOT EXISTS `inflations`
     `year`           INT    NOT NULL,
     `inflation_rate` FLOAT  NOT NULL,
     `currency_id`    BIGINT NOT NULL,
-    CONSTRAINT fk_inflations_currencies foreign key (currency_id) references currencies (id)
+    FOREIGN KEY (currency_id) REFERENCES currencies(id)
 );

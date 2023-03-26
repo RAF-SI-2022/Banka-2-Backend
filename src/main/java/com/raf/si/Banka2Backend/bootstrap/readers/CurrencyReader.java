@@ -31,7 +31,7 @@ public class CurrencyReader {
       c.setCurrencySymbol(getCurrencySymbol(currencyCsv.getCurrencyCode()));
       List<Inflation> inflationList = this.getInflationList(c);
       this.inflations.addAll(inflationList);
-      c.setInflationList(inflationList);
+      c.setInflations(inflationList);
       result.add(c);
     }
     return result;

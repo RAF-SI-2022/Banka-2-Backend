@@ -24,10 +24,7 @@ public class Inflation {
   private Float inflationRate;
 
   @JsonIgnore
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinTable(
-      name = "currencies_inflations",
-      joinColumns = {@JoinColumn(name = "inflation_id", referencedColumnName = "id")},
-      inverseJoinColumns = {@JoinColumn(name = "currency_id", referencedColumnName = "id")})
+  @ManyToOne
+  @JoinColumn(name = "currency_id")
   private Currency currency;
 }

@@ -25,10 +25,6 @@ public class Currency {
   private String currencySymbol;
   private String polity;
 
-  @OneToMany(fetch = FetchType.EAGER)
-  @JoinTable(
-      name = "currencies_inflations",
-      joinColumns = {@JoinColumn(name = "currency_id", referencedColumnName = "id")},
-      inverseJoinColumns = {@JoinColumn(name = "inflation_id", referencedColumnName = "id")})
-  private List<Inflation> inflationList;
+  @OneToMany(mappedBy = "currency")
+  private List<Inflation> inflations;
 }
