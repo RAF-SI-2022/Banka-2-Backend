@@ -4,8 +4,6 @@ import com.raf.si.Banka2Backend.exceptions.ExchangeNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.Exchange;
 import com.raf.si.Banka2Backend.repositories.mariadb.ExchangeRepository;
 import com.raf.si.Banka2Backend.services.interfaces.ExchangeServiceInterface;
-
-import java.time.Clock;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -49,7 +47,7 @@ public class ExchangeService implements ExchangeServiceInterface {
   public boolean isExchangeActive(String micCode) {
 
     Optional<Exchange> exchangeEntry = exchangeRepository.findExchangeByMicCode(micCode);
-    if(!exchangeEntry.isPresent()){
+    if (!exchangeEntry.isPresent()) {
       throw new ExchangeNotFoundException(micCode);
     }
     Exchange exchange = exchangeEntry.get();
