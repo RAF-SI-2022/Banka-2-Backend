@@ -4,9 +4,16 @@ import com.raf.si.Banka2Backend.bootstrap.readers.CurrencyReader;
 import com.raf.si.Banka2Backend.models.mariadb.*;
 import com.raf.si.Banka2Backend.repositories.mariadb.CurrencyRepository;
 import com.raf.si.Banka2Backend.repositories.mariadb.InflationRepository;
+import com.raf.si.Banka2Backend.models.mariadb.Exchange;
+import com.raf.si.Banka2Backend.models.mariadb.Permission;
+import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
+import com.raf.si.Banka2Backend.models.mariadb.User;
+import com.raf.si.Banka2Backend.repositories.mariadb.ExchangeRepository;
 import com.raf.si.Banka2Backend.repositories.mariadb.PermissionRepository;
 import com.raf.si.Banka2Backend.repositories.mariadb.UserRepository;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +48,7 @@ public class BootstrapData implements CommandLineRunner {
   private final CurrencyRepository currencyRepository;
   private final InflationRepository inflationRepository;
   private final PasswordEncoder passwordEncoder;
+  private final ExchangeRepository exchangeRepository;
 
   @Autowired
   public BootstrapData(
@@ -48,12 +56,14 @@ public class BootstrapData implements CommandLineRunner {
       PermissionRepository permissionRepository,
       CurrencyRepository currencyRepository,
       InflationRepository inflationRepository,
-      PasswordEncoder passwordEncoder) {
+      PasswordEncoder passwordEncoder,
+      ExchangeRepository exchangeRepository) {
     this.userRepository = userRepository;
     this.permissionRepository = permissionRepository;
     this.currencyRepository = currencyRepository;
     this.inflationRepository = inflationRepository;
     this.passwordEncoder = passwordEncoder;
+    this.exchangeRepository = exchangeRepository;
   }
 
   @Override
@@ -66,6 +76,30 @@ public class BootstrapData implements CommandLineRunner {
     }
 
     // Do this only on the first ever run of the app.
+    // read from file
+    List<Exchange> exchanges =
+        Files.lines(Paths.get("src/main/resources/exchange.csv"))
+            .parallel()
+            .skip(1)
+            .map(line -> line.split(","))
+            .filter(data -> exchangeRepository.findExchangeByMicCode(data[2]) == null)
+            .map(
+                data ->
+                    new Exchange(
+                        data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]))
+            .toList();
+
+    // save into repository
+    for (int i = 0; i < exchanges.size() - 1; i++) {
+      for (int j = i + 1; j < exchanges.size(); j++) {
+        Exchange e = exchanges.get(i);
+        Exchange e1 = exchanges.get(j);
+        if (e.getAcronym() == e1.getAcronym()) {
+          System.out.println("id " + e.getId() + "id " + e1.getId());
+        }
+      }
+    }
+    exchangeRepository.saveAll(exchanges);
     // Includes both initial admin run and permissions run.
     Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
     if (adminUser.isPresent()) {
