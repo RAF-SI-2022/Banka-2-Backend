@@ -72,34 +72,18 @@ public class BootstrapData implements CommandLineRunner {
     // If empty, add currencies in db from csv
     long numberOfRows = this.currencyRepository.count();
     if (numberOfRows == 0) {
+      System.out.println("Added currencies");
       this.insertCurrencies();
     }
 
-    // Do this only on the first ever run of the app.
-    // read from file
-    List<Exchange> exchanges =
-        Files.lines(Paths.get("src/main/resources/exchange.csv"))
-            .parallel()
-            .skip(1)
-            .map(line -> line.split(","))
-            .filter(data -> exchangeRepository.findExchangeByMicCode(data[2]) == null)
-            .map(
-                data ->
-                    new Exchange(
-                        data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]))
-            .toList();
-
-    // save into repository
-    for (int i = 0; i < exchanges.size() - 1; i++) {
-      for (int j = i + 1; j < exchanges.size(); j++) {
-        Exchange e = exchanges.get(i);
-        Exchange e1 = exchanges.get(j);
-        if (e.getAcronym() == e1.getAcronym()) {
-          System.out.println("id " + e.getId() + "id " + e1.getId());
-        }
-      }
+    // If empty, add exchange markets in db from csv
+    long numberOfExchanges = this.exchangeRepository.count();
+    if (numberOfExchanges == 0) {
+      System.out.println("Added exchange markets");
+      this.loadExchangeMarkets();
     }
-    exchangeRepository.saveAll(exchanges);
+
+
     // Includes both initial admin run and permissions run.
     Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
     if (adminUser.isPresent()) {
@@ -147,5 +131,30 @@ public class BootstrapData implements CommandLineRunner {
     this.currencyRepository.saveAll(currencyList);
     List<Inflation> inflationList = cs.getInflations();
     this.inflationRepository.saveAll(inflationList);
+  }
+
+  private void loadExchangeMarkets() throws IOException {
+    // Do this only on the first ever run of the app.
+    // read from file
+    List<Exchange> exchanges =
+            Files.lines(Paths.get("src/main/resources/exchange.csv"))
+                    .parallel()
+                    .skip(1)
+                    .map(line -> line.split(","))
+                    .filter(data -> exchangeRepository.findExchangeByMicCode(data[2]).isEmpty())
+                    .map(data -> new Exchange(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]))
+                    .toList();
+
+    // save into repository
+    for (int i = 0; i < exchanges.size() - 1; i++) {
+      for (int j = i + 1; j < exchanges.size(); j++) {
+        Exchange e = exchanges.get(i);
+        Exchange e1 = exchanges.get(j);
+        if (e.getAcronym() == e1.getAcronym()) {
+          System.out.println("id " + e.getId() + "id " + e1.getId());
+        }
+      }
+    }
+    exchangeRepository.saveAll(exchanges);
   }
 }
