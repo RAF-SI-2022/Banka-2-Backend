@@ -2,20 +2,24 @@ package com.raf.si.Banka2Backend.configuration;
 
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class InfluxDBConfiguration {
 
+  @Value("${spring.influx.url}")
+  private String url;
+
+  @Value("${spring.influx.user")
+  private String username;
+
+  @Value("${spring.influx.password}")
+  private String password;
+
   @Bean(destroyMethod = "close")
   public InfluxDBClient influxDBClient() {
-    String url = "http://localhost:8086";
-    String token =
-        "UkrZwmfzvugMa9F7fDA6P7H6jAI3xmvFYeJ6mPhlwi9aNiHXEpHdaYsHel1aR29QsG7r_39k3zV8PYUkBTvwVA==";
-    String org = "raf";
-    String bucket = "raf";
-
-    return InfluxDBClientFactory.create(url, token.toCharArray(), org, bucket);
+    return InfluxDBClientFactory.create(url, this.username, this.password.toCharArray());
   }
 }

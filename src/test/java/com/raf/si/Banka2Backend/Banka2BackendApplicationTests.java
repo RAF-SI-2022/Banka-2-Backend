@@ -50,7 +50,7 @@ public class Banka2BackendApplicationTests {
     //      temperature.time = Instant.now();
     //      writeApi.writeMeasurement( WritePrecision.NS, testMeasurement);
     WriteApi writeApi = this.influxDBClient.makeWriteApi();
-    writeApi.writePoint(point);
+    writeApi.writePoint("raf", "raf", point);
     writeApi.listenEvents(
         WriteSuccessEvent.class,
         event -> {
