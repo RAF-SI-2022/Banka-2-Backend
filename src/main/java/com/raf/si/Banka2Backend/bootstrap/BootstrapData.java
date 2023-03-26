@@ -83,7 +83,6 @@ public class BootstrapData implements CommandLineRunner {
       this.loadExchangeMarkets();
     }
 
-
     // Includes both initial admin run and permissions run.
     Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
     if (adminUser.isPresent()) {
@@ -137,13 +136,16 @@ public class BootstrapData implements CommandLineRunner {
     // Do this only on the first ever run of the app.
     // read from file
     List<Exchange> exchanges =
-            Files.lines(Paths.get("src/main/resources/exchange.csv"))
-                    .parallel()
-                    .skip(1)
-                    .map(line -> line.split(","))
-                    .filter(data -> exchangeRepository.findExchangeByMicCode(data[2]).isEmpty())
-                    .map(data -> new Exchange(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]))
-                    .toList();
+        Files.lines(Paths.get("src/main/resources/exchange.csv"))
+            .parallel()
+            .skip(1)
+            .map(line -> line.split(","))
+            .filter(data -> exchangeRepository.findExchangeByMicCode(data[2]).isEmpty())
+            .map(
+                data ->
+                    new Exchange(
+                        data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]))
+            .toList();
 
     // save into repository
     for (int i = 0; i < exchanges.size() - 1; i++) {
