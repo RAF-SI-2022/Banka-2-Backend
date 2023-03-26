@@ -30,7 +30,7 @@ if "%1" == "test" (
     docker compose rm -s -f banka2backend-prod
     docker compose up -d mariadb
     docker compose up -d flyway
-    docker compose up -d mongodb
+    docker compose up -d influxdb
     docker run --rm --network container:mariadb banka2backend-test
     docker compose rm -s -f banka2backend-test
     goto end
@@ -43,7 +43,7 @@ if "%1" == "prod" (
 	docker compose down
     docker compose up -d mariadb
     docker compose up -d flyway
-    docker compose up -d mongodb
+    docker compose up -d influxdb
     docker compose up -d banka2backend-prod
     goto end
 )
@@ -51,7 +51,7 @@ if "%1" == "prod" (
 if "%1" == "restart-services" (
     :restart-services
     docker compose restart mariadb
-    docker compose restart mongodb
+    docker compose restart influxdb
     docker compose restart flyway
     goto end
 )
@@ -61,7 +61,7 @@ if "%1" == "reset-all" (
     docker compose -v down
     docker compose up -d mariadb
     docker compose up -d flyway
-    docker compose up -d mongodb
+    docker compose up -d influxdb
     goto end
 )
 

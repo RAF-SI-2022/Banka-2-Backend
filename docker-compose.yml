@@ -27,30 +27,6 @@ services:
     networks:
       - net_all
 
-  mongodb:
-    image: mongodb/mongodb-community-server:6.0-ubi8
-    container_name: mongodb
-    restart: on-failure
-    expose:
-      - "27017"
-    ports:
-      - "27017:27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=root
-    healthcheck:
-      test: [ "CMD", "bash", "/healthcheck.sh" ]
-      interval: 2s
-      timeout: 10s
-      retries: 5
-      start_period: 25s
-    volumes:
-      - ./docker/healthcheck/mongodb/healthcheck.sh:/healthcheck.sh:ro
-      - ./docker/provision/mongodb/mongodb-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-      - mongodb:/var/lib/mongodb
-    networks:
-      - net_all
-
   flyway:
     image: flyway/flyway:9
     container_name: flyway
@@ -77,8 +53,6 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
-      mongodb:
-        condition: service_healthy
       flyway:
         condition: service_completed_successfully
     networks:
@@ -93,8 +67,6 @@ services:
       - "8080:8080"
     depends_on:
       mariadb:
-        condition: service_healthy
-      mongodb:
         condition: service_healthy
       flyway:
         condition: service_completed_successfully
@@ -120,10 +92,23 @@ services:
     networks:
       - net_all
 
-
+  influxdb:
+    container_name: influxdb
+    image: influxdb:2.6.1
+    environment:
+      - DOCKER_INFLUXDB_INIT_USERNAME=root
+      - DOCKER_INFLUXDB_INIT_PASSWORD=rootRoot
+      - DOCKER_INFLUXDB_INIT_ORG=raf
+      - DOCKER_INFLUXDB_INIT_BUCKET=raf
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb:/var/lib/influx
+    networks:
+      - net_all
 volumes:
   mariadb:
-  mongodb:
+  influxdb:
 
 networks:
   net_all:

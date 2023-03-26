@@ -16,6 +16,7 @@
 	<description>Backend projekat za tim Banka2</description>
 	<properties>
 		<java.version>17</java.version>
+		<okhttp3.version>4.9.3</okhttp3.version>
 	</properties>
 	<dependencies>
 		<!-- Core server dependencies -->
@@ -70,12 +71,6 @@
 		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
-		</dependency>
-
-		<!-- MongoDB connection -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-mongodb</artifactId>
 		</dependency>
 
 		<!-- Testing -->
@@ -158,6 +153,13 @@
 			<artifactId>cucumber-junit-platform-engine</artifactId>
 			<version>7.11.1</version>
 			<scope>test</scope>
+		</dependency>
+
+		<!--	INFLUXDB	-->
+		<dependency>
+			<groupId>com.influxdb</groupId>
+			<artifactId>influxdb-client-java</artifactId>
+			<version>6.7.0</version>
 		</dependency>
 	</dependencies>
 

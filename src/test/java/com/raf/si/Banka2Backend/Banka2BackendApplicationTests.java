@@ -2,13 +2,22 @@ package com.raf.si.Banka2Backend;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import org.junit.jupiter.api.BeforeAll;
+import com.influxdb.annotations.Column;
+import com.influxdb.annotations.Measurement;
+import com.influxdb.client.InfluxDBClient;
+import com.influxdb.client.QueryApi;
+import com.influxdb.client.WriteApi;
+import com.influxdb.client.domain.WritePrecision;
+import com.influxdb.client.write.Point;
+import com.influxdb.client.write.events.WriteErrorEvent;
+import com.influxdb.client.write.events.WriteSuccessEvent;
+import com.influxdb.query.FluxRecord;
+import com.influxdb.query.FluxTable;
+import java.time.Instant;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ContextConfiguration;
 
 @SpringBootTest
@@ -16,28 +25,75 @@ import org.springframework.test.context.ContextConfiguration;
 public class Banka2BackendApplicationTests {
 
   /** Document to be used in these tests. */
-  private static final Map<String, Object> TEST_DOC = new HashMap<>();
+  private static Point TEST_POINT;
 
-  /** The collection to run tests on. */
-  private static final String TEST_COL = "tests";
-
-  @Autowired private MongoTemplate mongo;
-
-  @BeforeAll
-  static void init() {
-    TEST_DOC.put("firstName", "John");
-    TEST_DOC.put("lastName", "Doe");
-    TEST_DOC.put("age", 25);
-    TEST_DOC.put("cool", true);
-  }
+  @Autowired private InfluxDBClient influxDBClient;
 
   @Test
-  void givenApplicationProperties_whenAppRun_thenMongoDbInsertSucceeds() {
-    Map<String, Object> inserted = mongo.insert(TEST_DOC, TEST_COL);
-    assertNotNull(inserted.get("_id"));
-    TEST_DOC.forEach(
-        (k, v) -> {
-          assertEquals(inserted.get(k), v);
+  void givenApplicationProperties_whenAppRun_thenInfluxDbInsertSucceeds() {
+    Point point =
+        Point.measurement("testMeasurement")
+            .addTag("pearson1", "testPearson")
+            .addField("firstName", "John")
+            .addField("lastName", "Doe")
+            .addField("age", 25)
+            .addField("cool", true)
+            .time(System.currentTimeMillis(), WritePrecision.MS);
+
+    //
+    // Write by POJO
+    //
+    //      TestMeasurement testMeasurement = new TestMeasurement();
+    //      unosenje vrednosti
+    //      temperature.location = "south";
+    //      temperature.value = 62D;
+    //      temperature.time = Instant.now();
+    //      writeApi.writeMeasurement( WritePrecision.NS, testMeasurement);
+    WriteApi writeApi = this.influxDBClient.makeWriteApi();
+    writeApi.writePoint("raf", "raf", point);
+    writeApi.listenEvents(
+        WriteSuccessEvent.class,
+        event -> {
+          assertNotNull(event.getLineProtocol());
         });
+    writeApi.listenEvents(
+        WriteErrorEvent.class,
+        event -> {
+          Throwable exception = event.getThrowable();
+        });
+
+    String flux =
+        "from(bucket:\"raf\") |> range(start: 0) |> filter(fn: (r) => r._measurement == \"testMeasurement\")";
+
+    QueryApi queryApi = this.influxDBClient.getQueryApi();
+
+    List<FluxTable> tables = queryApi.query(flux);
+    for (FluxTable fluxTable : tables) {
+      List<FluxRecord> records = fluxTable.getRecords();
+      for (FluxRecord fluxRecord : records) {
+        System.out.println(
+            "record: " + fluxRecord.getTime() + ": " + fluxRecord.getValueByKey("_value"));
+        assertNotNull(fluxRecord.getValueByKey("_value"));
+      }
+    }
+    System.out.println("test: jeste");
+    assertEquals(1, 1);
+  }
+
+  @Measurement(name = "testMeasurement")
+  private static class TestMeasurement {
+    @Column(tag = true)
+    String pearson1;
+
+    @Column String firstName;
+
+    @Column String lastName;
+
+    @Column Integer age;
+
+    @Column Boolean cool;
+
+    @Column(timestamp = true)
+    Instant time;
   }
 }
