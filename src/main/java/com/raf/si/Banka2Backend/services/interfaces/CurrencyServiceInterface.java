@@ -5,9 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CurrencyServiceInterface {
-    List<Currency> findAll();
+  List<Currency> findAll();
 
-    Optional<Currency> findById(Long currencyId);
-
-
+  Optional<Currency> findById(Long currencyId);
 }

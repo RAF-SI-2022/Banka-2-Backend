@@ -6,65 +6,68 @@ import com.raf.si.Banka2Backend.models.mariadb.Currency;
 import com.raf.si.Banka2Backend.models.mariadb.Inflation;
 import com.raf.si.Banka2Backend.services.CurrencyService;
 import com.raf.si.Banka2Backend.services.InflationService;
+import java.util.Optional;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.util.Optional;
-
-
 @RestController
 @CrossOrigin
 @RequestMapping("/api/currencies")
 public class CurrencyController {
-    private final CurrencyService currencyService;
-    private final InflationService inflationService;
+  private final CurrencyService currencyService;
+  private final InflationService inflationService;
 
-    @Autowired
-    public CurrencyController(CurrencyService currencyService, InflationService inflationService) {
-        this.currencyService = currencyService;
-        this.inflationService = inflationService;
+  @Autowired
+  public CurrencyController(CurrencyService currencyService, InflationService inflationService) {
+    this.currencyService = currencyService;
+    this.inflationService = inflationService;
+  }
+
+  @GetMapping()
+  public ResponseEntity<?> findAll() {
+    return ResponseEntity.ok(this.currencyService.findAll());
+  }
+
+  @GetMapping(value = "/{id}")
+  public ResponseEntity<?> findById(@PathVariable(name = "id") Long id) {
+    return ResponseEntity.ok(this.currencyService.findById(id));
+  }
+
+  @GetMapping(value = "/{id}/inflation")
+  public ResponseEntity<?> findInflationByCurrencyId(@PathVariable(name = "id") Long id) {
+    return ResponseEntity.ok(this.inflationService.findAllByCurrencyId(id));
+  }
+
+  @GetMapping(value = "/{id}/inflation/{year}")
+  public ResponseEntity<?> findInflationByCurrencyIdAndYear(
+      @PathVariable(name = "id") Long id, @PathVariable(name = "year") Integer year) {
+    return ResponseEntity.ok(this.inflationService.findByYear(id, year));
+  }
+
+  @PostMapping(value = "/inflation/add")
+  public ResponseEntity<?> addInflation(
+      @RequestBody @Valid InflationDto inflationDto, BindingResult result) {
+    if (result.hasErrors()) {
+      return ResponseEntity.badRequest()
+          .body("Body is not valid. Should have inflationRate, year, currencyId");
     }
-
-    @GetMapping()
-    public ResponseEntity<?> findAll() {
-        return ResponseEntity.ok(this.currencyService.findAll());
+    Optional<Currency> currency;
+    try {
+      currency = this.currencyService.findById(inflationDto.getCurrencyId());
+    } catch (CurrencyNotFoundException e) {
+      return ResponseEntity.badRequest()
+          .body("Currency with id: " + inflationDto.getCurrencyId() + " can not be found");
     }
-
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<?> findById(@PathVariable(name = "id") Long id) {
-        return ResponseEntity.ok(this.currencyService.findById(id));
-    }
-
-    @GetMapping(value = "/{id}/inflation")
-    public ResponseEntity<?> findInflationByCurrencyId(@PathVariable(name = "id") Long id) {
-        return ResponseEntity.ok(this.inflationService.findAllByCurrencyId(id));
-    }
-
-    @GetMapping(value = "/{id}/inflation/{year}")
-    public ResponseEntity<?> findInflationByCurrencyIdAndYear(@PathVariable(name = "id") Long id, @PathVariable(name = "year") Integer year) {
-        return ResponseEntity.ok(this.inflationService.findByYear(id, year));
-    }
-
-    @PostMapping(value = "/inflation/add")
-    public ResponseEntity<?> addInflation(@RequestBody @Valid InflationDto inflationDto, BindingResult result) {
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body("Body is not valid. Should have inflationRate, year, currencyId");
-        }
-        Optional<Currency> currency;
-        try {
-            currency = this.currencyService.findById(inflationDto.getCurrencyId());
-        }catch (CurrencyNotFoundException e) {
-            return ResponseEntity.badRequest().body("Currency with id: " + inflationDto.getCurrencyId() + " can not be found");
-        }
-        Inflation inflation = Inflation.builder()
+    Inflation inflation =
+        Inflation.builder()
             .inflationRate(inflationDto.getInflationRate())
             .year(inflationDto.getYear())
             .currency(currency.get())
             .build();
-        this.inflationService.save(inflation);
-        return ResponseEntity.ok(inflation);
-    }
+    this.inflationService.save(inflation);
+    return ResponseEntity.ok(inflation);
+  }
 }
