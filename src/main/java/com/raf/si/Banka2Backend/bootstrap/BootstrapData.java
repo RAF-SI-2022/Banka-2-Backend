@@ -2,13 +2,13 @@ package com.raf.si.Banka2Backend.bootstrap;
 
 import com.raf.si.Banka2Backend.bootstrap.readers.CurrencyReader;
 import com.raf.si.Banka2Backend.models.mariadb.*;
-import com.raf.si.Banka2Backend.repositories.mariadb.CurrencyRepository;
-import com.raf.si.Banka2Backend.repositories.mariadb.InflationRepository;
 import com.raf.si.Banka2Backend.models.mariadb.Exchange;
 import com.raf.si.Banka2Backend.models.mariadb.Permission;
 import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
 import com.raf.si.Banka2Backend.models.mariadb.User;
+import com.raf.si.Banka2Backend.repositories.mariadb.CurrencyRepository;
 import com.raf.si.Banka2Backend.repositories.mariadb.ExchangeRepository;
+import com.raf.si.Banka2Backend.repositories.mariadb.InflationRepository;
 import com.raf.si.Banka2Backend.repositories.mariadb.PermissionRepository;
 import com.raf.si.Banka2Backend.repositories.mariadb.UserRepository;
 import java.io.IOException;
