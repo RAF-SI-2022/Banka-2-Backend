@@ -8,34 +8,35 @@ import lombok.*;
 @Data
 @Builder
 @AllArgsConstructor
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 @Entity
 @Table(
-        name = "futureTable",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"futureName"})})
+        name = "futureTable")
 public class Future {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    public Future() {
-//    }
-//
-//    public Future(
-//            String futureName,
-//            Integer contractSize,
-//            String contractUnit,
-//            Integer maintenanceMargin,
-//            String settlementDate,
-//            Boolean openFuture) {
-//        this.futureName = futureName;
-//        this.contractSize = contractSize;
-//        this.contractUnit = contractUnit;
-//        this.maintenanceMargin = maintenanceMargin;
-//        this.settlementDate = settlementDate;
-//        this.openFuture = openFuture;
-//    }
+
+    public Future() {
+
+    }
+
+    public Future(
+            String futureName,
+            Integer contractSize,
+            String contractUnit,
+            Integer maintenanceMargin,
+            String settlementDate,
+            Boolean openFuture) {//open contract
+        this.futureName = futureName;
+        this.contractSize = contractSize;
+        this.contractUnit = contractUnit;
+        this.maintenanceMargin = maintenanceMargin;
+        this.settlementDate = settlementDate;
+        this.openFuture = openFuture;
+    }
 
     @NotNull
     private String futureName;
@@ -49,8 +50,9 @@ public class Future {
     @NotNull
     private Integer maintenanceMargin;
 
-    @NotNull
     private String settlementDate;
 
     private Boolean openFuture;
+
+
 }

@@ -1,6 +1,5 @@
 package com.raf.si.Banka2Backend.controllers;
 
-
 import com.raf.si.Banka2Backend.services.AuthorisationService;
 import com.raf.si.Banka2Backend.services.FutureService;
 import com.raf.si.Banka2Backend.services.UserService;
@@ -41,4 +40,5 @@ public class FutureController {
   public ResponseEntity<?> findByName(@PathVariable(name = "name") String contractName) {
     return ResponseEntity.ok().body(futureService.findByName(contractName));
   }
+
 }
