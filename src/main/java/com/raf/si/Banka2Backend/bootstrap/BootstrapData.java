@@ -71,7 +71,7 @@ public class BootstrapData implements CommandLineRunner {
     // If empty, add futures in db from csv
     long numberOfRowsFutures = this.futureRepository.count();
     if (numberOfRowsFutures == 0) {
-      System.out.println("Added currencies");
+      System.out.println("Added futures");
       this.loadFutureTable();
     }
 
@@ -185,7 +185,6 @@ public class BootstrapData implements CommandLineRunner {
             .toList();
 
     futureRepository.saveAll(futures);
-    // todo randomize futures if we want more diversity in futures, also maybe make some of them
-    // already signed
+    // todo randomize futures if we want more diversity in futures, also maybe make some of thema lready signed
   }
 }
