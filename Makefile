@@ -105,5 +105,7 @@ reset-all:
 # testing the actual application.
 test-devenv:
 	#TODO add windows images
-	docker build -t test-devenv-ubuntu-x64     -f ./docker/test-devenv.ubuntu.x64.Dockerfile .
+	docker build -t test-devenv-ubuntu-x64 -f ./docker/test-devenv.ubuntu.x64.Dockerfile .
+	docker run --rm -it --cap-add=NET_ADMIN --privileged --entrypoint /home/project/docker/test-devenv.sh test-devenv-ubuntu-x64
 	docker build -t test-devenv-ubuntu-aarch64 -f ./docker/test-devenv.ubuntu.aarch64.Dockerfile .
+	docker run --rm -it --cap-add=NET_ADMIN --privileged --entrypoint /home/project/docker/test-devenv.sh test-devenv-ubuntu-aarch64

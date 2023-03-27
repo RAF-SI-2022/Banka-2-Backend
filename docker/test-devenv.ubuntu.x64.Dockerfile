@@ -37,4 +37,3 @@ FROM stage2 as stage3
 RUN rm -rf /home/project
 WORKDIR /home/project
 COPY . /home/project
-RUN docker/test-devenv.sh

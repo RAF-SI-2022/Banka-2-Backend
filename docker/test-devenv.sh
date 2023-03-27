@@ -2,10 +2,10 @@
 
 # Run docker and test working
 sudo dockerd &
-sudo service docker start
 sudo docker run hello-world
 
 # Test make init
+cd /home/project
 make init
 
 # Fetch JDK dir
@@ -17,4 +17,5 @@ JAVA_HOME=$wd
 export JAVA_HOME="$wd"
 
 # Test make test
+sudo service docker start
 make test
