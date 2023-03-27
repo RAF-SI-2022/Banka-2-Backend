@@ -28,6 +28,8 @@ jdk = ./lib/jdk-amazon-corretto-${ver}-${arch}-${os}
 # Initializes the repository on the local machine: sets up
 # the .git folder and downloads the correct JDK.
 init:
+	# Disable auto-modification of CR/LF endings
+	-git config core.autocrlf false
 	# Copy git hooks
 	cp -a ./git/hooks/. ./.git/hooks
 	# Download the package
@@ -50,7 +52,6 @@ init:
 	mkdir -p $(jdk)
 	mv ./lib/extracted/* $(jdk)
 	rm -rf ./lib/extracted
-	-git config --global core.autocrlf false
 
 # Builds the production image.
 build:
@@ -103,4 +104,6 @@ reset-all:
 # For testing the development environment. Do NOT use for
 # testing the actual application.
 test-devenv:
-	echo "TODO"
+	#TODO add windows images
+	docker build -t test-devenv-ubuntu-x64     -f ./docker/test-devenv.ubuntu.x64.Dockerfile .
+	docker build -t test-devenv-ubuntu-aarch64 -f ./docker/test-devenv.ubuntu.aarch64.Dockerfile .

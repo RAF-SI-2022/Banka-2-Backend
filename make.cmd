@@ -6,6 +6,7 @@ rem Initializes the repository on the local machine: sets up
 rem the .git folder and downloads the correct JDK.
 if "%1" == "init" (
     :init
+    rem TODO add contents from Makefile.init
     xcopy "git\hooks" ".git\hooks" /E /C /H /R /K /Y
     goto end
 )
@@ -84,9 +85,9 @@ rem For testing the development environment. Do NOT use for
 rem testing the actual application.
 if "%1" == "test-devenv" (
     :test-devenv
-    docker build -t test-devenv-ubuntu-x64 -f ./docker/test-devenv.ubuntu.x64.Dockerfile .
-    rem docker run --rm --cap-add=NET_ADMIN --privileged test-devenv-ubuntu-x64
-    rem docker compose -f devenv-docker-compose.yml up --build --force-recreate --no-deps -d test-devenv-ubuntu-x64
+    rem TODO add windows images
+    docker build -t test-devenv-ubuntu-x64     -f ./docker/test-devenv.ubuntu.x64.Dockerfile .
+    docker build -t test-devenv-ubuntu-aarch64 -f ./docker/test-devenv.ubuntu.aarch64.Dockerfile .
     goto end
 )
 

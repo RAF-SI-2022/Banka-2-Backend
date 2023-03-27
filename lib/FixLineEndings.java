@@ -1,5 +1,5 @@
 /**
- * Fixes line endings in docker/healthcheck/* files.
+ * Fixes line endings in passed files. #TODO complete
  */
 public class FixLineEndings {
 
