@@ -6,8 +6,43 @@ rem Initializes the repository on the local machine: sets up
 rem the .git folder and downloads the correct JDK.
 if "%1" == "init" (
     :init
-    rem TODO add contents from Makefile.init
+
+	rem Disable auto-modification of CR/LF endings
+	call git config core.autocrlf false
+
+	rem Copy git hooks
     xcopy "git\hooks" ".git\hooks" /E /C /H /R /K /Y
+
+	rem Download the package
+	set targetJdk = amazon-corretto-17-x64-windows-jdk.zip
+	set sourceJdk = https://corretto.aws/downloads/latest/%targetJdk%
+	curl -L -o ./lib/%targetJdk% %sourceJdk%
+
+	rem Download the checksum
+	set targetSha = amazon-corretto-17-x64-windows-jdk.zip.checksum
+	set sourceSha = https://corretto.aws/downloads/latest_sha256/%targetSha%
+	curl -L -o ./lib/%targetSha% %sourceSha%
+
+	rem Check SHA256
+	rem cd lib && \
+	rem echo "%targetJdk%" > %targetSha% && \
+	rem ${commsha}
+
+	rem Unpack
+	set jdk = ./lib/jdk-amazon-corretto-17-x64-windows
+	mkdir -p %jdk%
+	rem tar -xf ./lib/%targetJdk% -C %jdk%
+
+	rem Remove residue
+	del /f ./lib/%targetJdk%
+	del /f ./lib/%targetSha%
+
+	rem Move files directly into current dir
+	move /y %jdk%/amazon-* ./lib/extracted
+	rmdir %jdk% /s /q
+	mkdir -p %jdk%
+	move /y ./lib/extracted/* %jdk%
+	rmdir ./lib/extracted /s /q
     goto end
 )
 
@@ -17,6 +52,14 @@ if "%1" == "build" (
     mvnw spotless:apply
 	docker build -t banka2backend-prod -f prod.Dockerfile .
     goto end
+)
+
+rem Builds the app locally and starts the required services
+rem in a docker container (the app is run locally.)
+if "%1" == "local" (
+    :local
+	rem TODO
+	goto end
 )
 
 rem Builds the dev image and starts the required services.

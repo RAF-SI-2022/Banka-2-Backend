@@ -58,6 +58,11 @@ build:
 	./mvnw spotless:apply
 	docker build -t banka2backend-prod -f prod.Dockerfile .
 
+# Builds the app locally and starts the required services
+# in a docker container (the app is run locally.)
+local:
+	echo "TODO"
+
 # Builds the dev image and starts the required services.
 dev:
 	./mvnw spotless:apply
