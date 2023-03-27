@@ -185,6 +185,7 @@ public class BootstrapData implements CommandLineRunner {
             .toList();
 
     futureRepository.saveAll(futures);
-    // todo randomize futures if we want more diversity in futures, also maybe make some of thema lready signed
+    // todo randomize futures if we want more diversity in futures, also maybe make some of thema
+    // lready signed
   }
 }
