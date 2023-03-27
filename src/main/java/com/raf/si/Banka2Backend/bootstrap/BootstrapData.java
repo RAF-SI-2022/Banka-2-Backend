@@ -6,11 +6,7 @@ import com.raf.si.Banka2Backend.models.mariadb.Exchange;
 import com.raf.si.Banka2Backend.models.mariadb.Permission;
 import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
 import com.raf.si.Banka2Backend.models.mariadb.User;
-import com.raf.si.Banka2Backend.repositories.mariadb.CurrencyRepository;
-import com.raf.si.Banka2Backend.repositories.mariadb.ExchangeRepository;
-import com.raf.si.Banka2Backend.repositories.mariadb.InflationRepository;
-import com.raf.si.Banka2Backend.repositories.mariadb.PermissionRepository;
-import com.raf.si.Banka2Backend.repositories.mariadb.UserRepository;
+import com.raf.si.Banka2Backend.repositories.mariadb.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -49,6 +45,7 @@ public class BootstrapData implements CommandLineRunner {
   private final InflationRepository inflationRepository;
   private final PasswordEncoder passwordEncoder;
   private final ExchangeRepository exchangeRepository;
+  private final FutureRepository futureRepository;
 
   @Autowired
   public BootstrapData(
@@ -57,23 +54,32 @@ public class BootstrapData implements CommandLineRunner {
       CurrencyRepository currencyRepository,
       InflationRepository inflationRepository,
       PasswordEncoder passwordEncoder,
-      ExchangeRepository exchangeRepository) {
+      ExchangeRepository exchangeRepository,
+      FutureRepository futureRepository) {
     this.userRepository = userRepository;
     this.permissionRepository = permissionRepository;
     this.currencyRepository = currencyRepository;
     this.inflationRepository = inflationRepository;
     this.passwordEncoder = passwordEncoder;
     this.exchangeRepository = exchangeRepository;
+    this.futureRepository = futureRepository;
   }
 
   @Override
   public void run(String... args) throws Exception {
 
+    // If empty, add futures in db from csv
+    long numberOfRowsFutures = this.futureRepository.count();
+    if (numberOfRowsFutures == 0) {
+      System.out.println("Added futures");
+      this.loadFutureTable();
+    }
+
     // If empty, add currencies in db from csv
-    long numberOfRows = this.currencyRepository.count();
-    if (numberOfRows == 0) {
+    long numberOfRowsCurrency = this.currencyRepository.count();
+    if (numberOfRowsCurrency == 0) {
       System.out.println("Added currencies");
-      this.insertCurrencies();
+      this.loeadCurrenciesTable();
     }
 
     // If empty, add exchange markets in db from csv
@@ -124,7 +130,7 @@ public class BootstrapData implements CommandLineRunner {
     System.out.println("Loaded!");
   }
 
-  private void insertCurrencies() throws IOException {
+  private void loeadCurrenciesTable() throws IOException {
     CurrencyReader cs = new CurrencyReader();
     List<Currency> currencyList = cs.getCurrencies();
     this.currencyRepository.saveAll(currencyList);
@@ -158,5 +164,28 @@ public class BootstrapData implements CommandLineRunner {
       }
     }
     exchangeRepository.saveAll(exchanges);
+  }
+
+  private void loadFutureTable() throws IOException {
+    List<Future> futures =
+        Files.lines(Paths.get("src/main/resources/future_data.csv"))
+            .parallel()
+            .skip(1)
+            .map(line -> line.split(","))
+            .filter(data -> futureRepository.findFutureByFutureName(data[0]).isEmpty())
+            .map(
+                data ->
+                    new Future(
+                        data[0],
+                        Integer.parseInt(data[1]),
+                        data[2],
+                        Integer.parseInt(data[3]),
+                        null,
+                        true))
+            .toList();
+
+    futureRepository.saveAll(futures);
+    // todo randomize futures if we want more diversity in futures, also maybe make some of thema
+    // lready signed
   }
 }
