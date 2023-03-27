@@ -40,5 +40,4 @@ public class FutureController {
   public ResponseEntity<?> findByName(@PathVariable(name = "name") String contractName) {
     return ResponseEntity.ok().body(futureService.findByName(contractName));
   }
-
 }
