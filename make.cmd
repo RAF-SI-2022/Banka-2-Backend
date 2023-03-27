@@ -2,6 +2,15 @@
 
 if "%1" == "" goto dev
 
+rem Initializes the repository on the local machine: sets up
+rem the .git folder and downloads the correct JDK.
+if "%1" == "init" (
+    :init
+    xcopy "git\hooks" ".git\hooks" /E /C /H /R /K /Y
+    goto end
+)
+
+rem Builds the production image.
 if "%1" == "build" (
     :build
     mvnw spotless:apply
@@ -9,6 +18,7 @@ if "%1" == "build" (
     goto end
 )
 
+rem Builds the dev image and starts the required services.
 if "%1" == "dev" (
     :dev
     mvnw spotless:apply
@@ -22,6 +32,7 @@ if "%1" == "dev" (
     goto end
 )
 
+rem Builds the test image and starts the required services.
 if "%1" == "test" (
     :test
     mvnw spotless:apply
@@ -36,6 +47,7 @@ if "%1" == "test" (
     goto end
 )
 
+rem Builds the prod image and starts the required services.
 if "%1" == "prod" (
     :prod
     mvnw spotless:apply
@@ -48,6 +60,7 @@ if "%1" == "prod" (
     goto end
 )
 
+rem # Restarts all Docker helper services.
 if "%1" == "restart-services" (
     :restart-services
     docker compose restart mariadb
@@ -56,12 +69,24 @@ if "%1" == "restart-services" (
     goto end
 )
 
+rem Removes and rebuilds all Docker helper services. Use this
+rem command if encountering errors in your build process.
 if "%1" == "reset-all" (
     :init
     docker compose -v down
     docker compose up -d mariadb
     docker compose up -d flyway
     docker compose up -d mongodb
+    goto end
+)
+
+rem For testing the development environment. Do NOT use for
+rem testing the actual application.
+if "%1" == "test-devenv" (
+    :test-devenv
+    docker build -t test-devenv-ubuntu-x64 -f ./docker/test-devenv.ubuntu.x64.Dockerfile .
+    rem docker run --rm --cap-add=NET_ADMIN --privileged test-devenv-ubuntu-x64
+    rem docker compose -f devenv-docker-compose.yml up --build --force-recreate --no-deps -d test-devenv-ubuntu-x64
     goto end
 )
 
