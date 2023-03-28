@@ -31,8 +31,6 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
-    permissions:
-      issues: write
     steps:
       - uses: actions/github-script@v6
         with:
