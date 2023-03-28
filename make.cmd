@@ -77,7 +77,7 @@ rem Builds the production image.
 if "%1" == "build" (
     :build
     mvnw spotless:apply
-	docker build -t banka2backend-prod -f prod.Dockerfile .
+	docker build -t banka2backend-prod -f ./docker/prod.Dockerfile .
     goto end
 )
 
@@ -113,7 +113,7 @@ rem Builds the dev image and starts the required services.
 if "%1" == "dev" (
     :dev
     mvnw spotless:apply
-    docker build -t banka2backend-dev -f dev.Dockerfile .
+    docker build -t banka2backend-dev -f ./docker/dev.Dockerfile .
     docker compose rm -s -f banka2backend-test
     docker compose rm -s -f banka2backend-prod
     docker compose up -d mariadb
@@ -127,7 +127,7 @@ rem Builds the test image and starts the required services.
 if "%1" == "test" (
     :test
     mvnw spotless:apply
-    docker build -t banka2backend-test -f test.Dockerfile .
+    docker build -t banka2backend-test -f ./docker/test.Dockerfile .
     docker compose rm -s -f banka2backend-dev
     docker compose rm -s -f banka2backend-prod
     docker compose up -d mariadb
@@ -142,7 +142,7 @@ rem Builds the prod image and starts the required services.
 if "%1" == "prod" (
     :prod
     mvnw spotless:apply
-	docker build -t banka2backend-prod -f prod.Dockerfile .
+	docker build -t banka2backend-prod -f ./docker/prod.Dockerfile .
 	docker compose down
     docker compose up -d mariadb
     docker compose up -d flyway

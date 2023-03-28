@@ -68,7 +68,7 @@ init:
 # Builds the production image.
 build:
 	./mvnw spotless:apply
-	docker build -t banka2backend-prod -f prod.Dockerfile .
+	docker build -t banka2backend-prod -f ./docker/prod.Dockerfile .
 
 # Builds the app locally and starts the required services
 # in a docker container (the app is run locally.)
@@ -95,7 +95,7 @@ local-test:
 # Builds the dev image and starts the required services.
 dev:
 	./mvnw spotless:apply
-	docker build -t banka2backend-dev -f dev.Dockerfile .
+	docker build -t banka2backend-dev -f ./docker/dev.Dockerfile .
 	docker compose up -d mariadb
 	docker compose up -d flyway
 	docker compose up -d mongodb
@@ -104,7 +104,7 @@ dev:
 # Builds the test image and starts the required services.
 test:
 	./mvnw spotless:apply
-	docker build -t banka2backend-test -f test.Dockerfile .
+	docker build -t banka2backend-test -f ./docker/test.Dockerfile .
 	docker compose up -d mariadb
 	docker compose up -d flyway
 	docker compose up -d mongodb
@@ -114,7 +114,7 @@ test:
 # Builds the prod image and starts the required services.
 prod:
 	./mvnw spotless:apply
-	docker build -t banka2backend-prod -f prod.Dockerfile .
+	docker build -t banka2backend-prod -f ./docker/prod.Dockerfile .
 	docker compose down
 	docker compose up -d mariadb
 	docker compose up -d flyway
