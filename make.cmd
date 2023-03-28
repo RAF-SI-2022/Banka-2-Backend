@@ -83,13 +83,29 @@ if "%1" == "build" (
 
 rem Builds the app locally and starts the required services
 rem in a docker container (the app is run locally.)
-if "%1" == "local" (
-    :local
+if "%1" == "local-dev" (
+    :local-dev
 	docker compose up -d mariadb
 	docker compose up -d flyway
 	docker compose up -d mongodb
 	set JAVA_HOME=%projectHome%\lib\%jdk%
+	%JAVA_HOME%/bin/javac.exe lib/FixLineEndings.java
+	%JAVA_HOME%/bin/java.exe -cp lib FixLineEndings
 	mvnw spotless:apply clean compile exec:java
+	goto end
+)
+
+rem Builds the app locally and starts the required services
+rem in a docker container, then runs app tests.
+if "%1" == "local-test" (
+    :local-test
+	docker compose up -d mariadb
+	docker compose up -d flyway
+	docker compose up -d mongodb
+	set JAVA_HOME=%projectHome%\lib\%jdk%
+	%JAVA_HOME%/bin/javac.exe lib/FixLineEndings.java
+	%JAVA_HOME%/bin/java.exe -cp lib FixLineEndings
+	mvnw spotless:apply clean compile test
 	goto end
 )
 
@@ -135,9 +151,9 @@ if "%1" == "prod" (
     goto end
 )
 
-rem # Restarts all Docker helper services.
-if "%1" == "restart-services" (
-    :restart-services
+rem Restarts all Docker helper services.
+if "%1" == "services" (
+    :services
     docker compose restart mariadb
     docker compose restart mongodb
     docker compose restart flyway
@@ -146,7 +162,7 @@ if "%1" == "restart-services" (
 
 rem Removes and rebuilds all Docker helper services. Use this
 rem command if encountering errors in your build process.
-if "%1" == "reset-all" (
+if "%1" == "reset" (
     :init
     docker compose -v down
     docker compose up -d mariadb
@@ -155,8 +171,9 @@ if "%1" == "reset-all" (
     goto end
 )
 
-rem For testing the development environment. Do NOT use for
-rem testing the actual application.
+rem DANGER!!! For testing the development environment.
+rem Executes Docker containers in privileged mode. Do NOT use
+rem for app development!
 if "%1" == "test-devenv" (
     :test-devenv
     rem TODO add windows images

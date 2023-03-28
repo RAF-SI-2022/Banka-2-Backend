@@ -72,12 +72,25 @@ build:
 
 # Builds the app locally and starts the required services
 # in a docker container (the app is run locally.)
-local:
+local-dev:
 	docker compose up -d mariadb
 	docker compose up -d flyway
 	docker compose up -d mongodb
-	cd ${targetJdk} && export JAVA_HOME=$(pwd)#TODO test this!
+	cd lib/${targetJdk} && export JAVA_HOME=$(pwd)#TODO test this!
+	./lib/${targetJdk}/bin/javac.exe ./lib/FixLineEndings.java
+	./lib/${targetJdk}/bin/java.exe -cp lib FixLineEndings
 	./mvnw spotless:apply clean compile exec:java
+
+# Builds the app locally and starts the required services
+# in a docker container, then runs app tests.
+local-test:
+	docker compose up -d mariadb
+	docker compose up -d flyway
+	docker compose up -d mongodb
+	cd lib/${targetJdk} && export JAVA_HOME=$(pwd)#TODO test this!
+	./lib/${targetJdk}/bin/javac.exe ./lib/FixLineEndings.java
+	./lib/${targetJdk}/bin/java.exe -cp lib FixLineEndings
+	./mvnw spotless:apply clean compile test
 
 # Builds the dev image and starts the required services.
 dev:
@@ -109,21 +122,22 @@ prod:
 	docker compose up -d banka2backend-prod
 
 # Restarts all Docker helper services.
-restart-services:
+services:
 	docker compose restart mariadb
 	docker compose restart mongodb
 	docker compose restart flyway
 
 # Removes and rebuilds all Docker helper services. Use this
 # command if encountering errors in your build process.
-reset-all:
+reset:
 	docker compose -v down
 	docker compose up -d mariadb
 	docker compose up -d flyway
 	docker compose up -d mongodb
 
-# For testing the development environment. Do NOT use for
-# testing the actual application.
+# DANGER!!! For testing the development environment.
+# Executes Docker containers in privileged mode. Do NOT use
+# for app development!
 test-devenv:
 	#TODO add windows images
 	docker build -t test-devenv-ubuntu-x64 -f ./docker/test-devenv.ubuntu.x64.Dockerfile .
