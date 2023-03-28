@@ -28,7 +28,8 @@ jobs:
       # Remove services
       - run: docker compose -v down
   report:
-    permissions: write-all
+    permissions:
+      issues: 'write'
     needs: test
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
