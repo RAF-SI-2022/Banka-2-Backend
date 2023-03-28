@@ -20,7 +20,6 @@ import org.springframework.test.web.servlet.MvcResult;
 public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
 
   @Autowired private UserService userService;
-
   @Autowired protected MockMvc mockMvc;
   protected static String token;
   protected static Optional<User> loggedInUser;
@@ -438,7 +437,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
     }
   }
 
-  // Testing deleting user todo fix
+  // Testing deleting user
   @Given("privileged user logged in")
   public void privileged_user_logged_in() {
     token = null;
