@@ -28,6 +28,7 @@ jobs:
       # Remove services
       - run: docker compose -v down
   report:
+    permissions: write-all
     needs: test
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
@@ -35,6 +36,7 @@ jobs:
       - uses: actions/github-script@v6
         with:
           script: |
+            console.log(context)
             github.rest.issues.setLabels({
               issue_number: context.issue.number,
               owner: context.repo.owner,
