@@ -6,6 +6,7 @@ sudo docker run hello-world
 
 # Test make init
 cd /home/project
+rm -rf lib/jdk-*
 make init
 
 # Fetch JDK dir

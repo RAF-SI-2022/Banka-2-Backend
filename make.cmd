@@ -22,7 +22,7 @@ if "%1" == "init" (
     xcopy "git\hooks" ".git\hooks" /E /C /H /R /K /Y
 	echo "Done"
 	rem Download the package
-	echo "Downloading Oracle JDK..."
+	echo "Downloading Amazon Corretto JDK..."
 	curl -Lo ./lib/%targetJdk% %sourceJdk%
 	rem Download the checksum
 	curl -Lo ./lib/%targetSha% %sourceSha%

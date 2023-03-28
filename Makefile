@@ -38,7 +38,7 @@ init:
 	cp -a ./git/hooks/. ./.git/hooks
 	echo "Done"
 	# Download the package
-	echo "Downloading Oracle JDK..."
+	echo "Downloading Amazon Corretto JDK..."
 	curl -L -o ./lib/${targetJdk} ${sourceJdk}
 	# Download the checksum
 	curl -L -o ./lib/${targetSha} ${sourceSha}
