@@ -37,6 +37,3 @@ FROM stage2 as stage3
 RUN rm -rf /home/project
 WORKDIR /home/project
 COPY . /home/project
-
-FROM stage3 as stage4
-ENTRYPOINT [ "docker/test-devenv.sh" ]
