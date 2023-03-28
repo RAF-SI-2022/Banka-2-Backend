@@ -2,7 +2,7 @@ FROM maven:3.8.5-openjdk-17-slim as base
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
-ADD .. /usr/src/app
+ADD . /usr/src/app
 RUN mvn spotless:apply clean package -DskipTests -Dspring.profiles.active=prod
 
 FROM base AS stage1
