@@ -5,6 +5,7 @@ if "%1" == "" goto dev
 
 rem Initializes the repository on the local machine: sets up
 rem the .git folder and downloads the correct JDK.
+set projectHome=%cd%
 set targetJdk=amazon-corretto-17-x64-windows-jdk.zip
 set sourceJdk=https://corretto.aws/downloads/latest/%targetJdk%
 set targetSha=amazon-corretto-17-x64-windows-jdk.zip.checksum
@@ -84,7 +85,11 @@ rem Builds the app locally and starts the required services
 rem in a docker container (the app is run locally.)
 if "%1" == "local" (
     :local
-	rem TODO
+	docker compose up -d mariadb
+	docker compose up -d flyway
+	docker compose up -d mongodb
+	set JAVA_HOME=%projectHome%\lib\%jdk%
+	mvnw spotless:apply clean compile exec:java
 	goto end
 )
 

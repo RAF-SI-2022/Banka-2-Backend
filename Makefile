@@ -24,6 +24,7 @@ sourceJdk = https://corretto.aws/downloads/latest/${targetJdk}
 targetSha = amazon-corretto-${ver}-${arch}-${os}-jdk.${ext}.checksum
 sourceSha = https://corretto.aws/downloads/latest_sha256/${targetJdk}
 jdk = ./lib/jdk-amazon-corretto-${ver}-${arch}-${os}
+fullJdk = $(shell pwd)
 
 # Initializes the repository on the local machine: sets up
 # the .git folder and downloads the correct JDK.
@@ -72,7 +73,11 @@ build:
 # Builds the app locally and starts the required services
 # in a docker container (the app is run locally.)
 local:
-	echo "TODO"
+	docker compose up -d mariadb
+	docker compose up -d flyway
+	docker compose up -d mongodb
+	cd ${targetJdk} && export JAVA_HOME=$(pwd)#TODO test this!
+	./mvnw spotless:apply clean compile exec:java
 
 # Builds the dev image and starts the required services.
 dev:
