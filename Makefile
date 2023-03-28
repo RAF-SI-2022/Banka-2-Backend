@@ -29,18 +29,27 @@ jdk = ./lib/jdk-amazon-corretto-${ver}-${arch}-${os}
 # the .git folder and downloads the correct JDK.
 init:
 	# Disable auto-modification of CR/LF endings
+	echo "Disabling git config core.autocrlf (this repo)..."
 	-git config core.autocrlf false
+	echo "Done"
 	# Copy git hooks
+	echo "Copying git hooks..."
 	cp -a ./git/hooks/. ./.git/hooks
+	echo "Done"
 	# Download the package
+	echo "Downloading Oracle JDK..."
 	curl -L -o ./lib/${targetJdk} ${sourceJdk}
 	# Download the checksum
 	curl -L -o ./lib/${targetSha} ${sourceSha}
+	echo "Done"
 	# Check SHA256
+	echo "Verifying JDK checksum..."
 	cd lib && \
 	echo '  ${targetJdk}' >> ${targetSha} && \
 	${commsha}
+	echo "Done"
 	# Unpack
+	echo "Unpacking JDK..."
 	mkdir -p ${jdk}
 	tar -xf ./lib/amazon-corretto-${ver}-${arch}-${os}-jdk.${ext} -C ${jdk}
 	# Remove residue
@@ -52,6 +61,8 @@ init:
 	mkdir -p $(jdk)
 	mv ./lib/extracted/* $(jdk)
 	rm -rf ./lib/extracted
+	echo "Done"
+	echo "Init complete"
 
 # Builds the production image.
 build:

@@ -1,48 +1,74 @@
 @echo off
+setlocal enableextensions enabledelayedexpansion
 
 if "%1" == "" goto dev
 
 rem Initializes the repository on the local machine: sets up
 rem the .git folder and downloads the correct JDK.
+set targetJdk=amazon-corretto-17-x64-windows-jdk.zip
+set sourceJdk=https://corretto.aws/downloads/latest/%targetJdk%
+set targetSha=amazon-corretto-17-x64-windows-jdk.zip.checksum
+set sourceSha=https://corretto.aws/downloads/latest_sha256/%targetJdk%
+set jdk=jdk-amazon-corretto-17-x64-windows
 if "%1" == "init" (
     :init
-
 	rem Disable auto-modification of CR/LF endings
+	echo "Disabling git config core.autocrlf (this repo)..."
 	call git config core.autocrlf false
-
+	echo "Done"
 	rem Copy git hooks
+	echo "Copying git hooks..."
     xcopy "git\hooks" ".git\hooks" /E /C /H /R /K /Y
-
+	echo "Done"
 	rem Download the package
-	set targetJdk = amazon-corretto-17-x64-windows-jdk.zip
-	set sourceJdk = https://corretto.aws/downloads/latest/%targetJdk%
-	curl -L -o ./lib/%targetJdk% %sourceJdk%
-
+	echo "Downloading Oracle JDK..."
+	curl -Lo ./lib/%targetJdk% %sourceJdk%
 	rem Download the checksum
-	set targetSha = amazon-corretto-17-x64-windows-jdk.zip.checksum
-	set sourceSha = https://corretto.aws/downloads/latest_sha256/%targetSha%
-	curl -L -o ./lib/%targetSha% %sourceSha%
-
+	curl -Lo ./lib/%targetSha% %sourceSha%
+	echo "Done"
 	rem Check SHA256
-	rem cd lib && \
-	rem echo "%targetJdk%" > %targetSha% && \
-	rem ${commsha}
-
+	cd lib
+	echo "Verifying JDK checksum..."
+	del shacomputed0.txt
+	del shacomputed1.txt
+	set /p shadownload=<%targetSha%
+	>shacomputed0.txt (
+	    certutil -hashfile %targetJdk% SHA256
+	)
+	>shacomputed1.txt (
+	    findstr /r /c:"^[a-z0-9]*$" shacomputed0.txt
+	)
+	fsutil file seteof shacomputed1.txt 64 1> NUL
+	rem File may have multiple lines, but we're only interested
+	rem in the first line, so we'll keep the first var
+	SET count=1
+	FOR /F "tokens=* USEBACKQ" %%F IN (`type shacomputed1.txt`) DO (
+      SET shacomputed!count!=%%F
+      SET /a count=!count!+1
+    )
+    if "!shacomputed1!"=="" (
+	    echo "Bad SHA, do make init again"
+	    exit 1
+    )
+	if not "!shadownload!"=="!shacomputed1!" (
+	    echo "Bad SHA, do make init again"
+	    exit 1
+	)
+	del shacomputed0.txt >NUL
+	del shacomputed1.txt >NUL
+	echo "Done"
 	rem Unpack
-	set jdk = ./lib/jdk-amazon-corretto-17-x64-windows
-	mkdir -p %jdk%
-	rem tar -xf ./lib/%targetJdk% -C %jdk%
-
-	rem Remove residue
-	del /f ./lib/%targetJdk%
-	del /f ./lib/%targetSha%
-
-	rem Move files directly into current dir
-	move /y %jdk%/amazon-* ./lib/extracted
+	echo "Unpacking JDK..."
+	cd lib
 	rmdir %jdk% /s /q
-	mkdir -p %jdk%
-	move /y ./lib/extracted/* %jdk%
-	rmdir ./lib/extracted /s /q
+	tar -xf %targetJdk%
+	rem Remove residue
+	del %targetJdk%
+	del %targetSha%
+	rem Move files directly into current dir
+	move /y jdk* %jdk%
+	echo "Done"
+	echo "Init complete"
     goto end
 )
 
@@ -137,3 +163,4 @@ if "%1" == "test-devenv" (
 )
 
 :end
+endlocal
