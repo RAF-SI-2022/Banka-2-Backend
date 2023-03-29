@@ -2,6 +2,7 @@ package com.raf.si.Banka2Backend.bootstrap;
 
 import com.raf.si.Banka2Backend.bootstrap.readers.CurrencyReader;
 import com.raf.si.Banka2Backend.models.mariadb.*;
+import com.raf.si.Banka2Backend.models.mariadb.Currency;
 import com.raf.si.Banka2Backend.models.mariadb.Exchange;
 import com.raf.si.Banka2Backend.models.mariadb.Permission;
 import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
@@ -11,10 +12,9 @@ import com.raf.si.Banka2Backend.services.ForexService;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -174,13 +174,15 @@ public class BootstrapData implements CommandLineRunner {
     exchangeRepository.saveAll(exchanges);
   }
 
-  private void loadFutureTable() throws IOException {
+  private void loadFutureTable() throws IOException {//todo promeni da ucitava sa id
+    SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yyyy");
+    String formattedDate = dateFormat.format(new Date());
+
     List<Future> futures =
         Files.lines(Paths.get("src/main/resources/csvs/future_data.csv"))
             .parallel()
             .skip(1)
             .map(line -> line.split(","))
-            .filter(data -> futureRepository.findFutureByFutureName(data[0]).isEmpty())
             .map(
                 data ->
                     new Future(
@@ -188,16 +190,16 @@ public class BootstrapData implements CommandLineRunner {
                         Integer.parseInt(data[1]),
                         data[2],
                         Integer.parseInt(data[3]),
-                        null,
+                        formattedDate,
                         true))
             .toList();
 
     futureRepository.saveAll(futures);
 
-    randomiseFutureTableData();
+//    randomiseFutureTableData(); todo fix
   }
 
-  private void randomiseFutureTableData() {
+  private void randomiseFutureTableData() { //calendar.add(Calendar.MONTH, 1);
     List<Future> allFutures = new ArrayList<>();
     List<Future> newRandomisedFutures = new ArrayList<>();
     allFutures = futureRepository.findAll();
@@ -226,4 +228,5 @@ public class BootstrapData implements CommandLineRunner {
     }
     futureRepository.saveAll(newRandomisedFutures);
   }
+
 }
