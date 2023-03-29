@@ -51,13 +51,13 @@ public class FutureController {
   }
 
   @GetMapping(value = "/name/{name}")
-  public ResponseEntity<?> findByName(@PathVariable(name = "name") String futureName) {
+  public ResponseEntity<?> findFuturesByName(@PathVariable(name = "name") String futureName) {
     String signedInUserEmail = getContext().getAuthentication().getName(); // todo dodaj nove perms
     if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
       return ResponseEntity.status(401).body("You don't have permission to read users.");
     }
     System.out.println(futureName);
 
-    return ResponseEntity.ok().body(futureService.findByName(futureName));
+    return ResponseEntity.ok().body(futureService.findFuturesByFutureName(futureName));
   }
 }

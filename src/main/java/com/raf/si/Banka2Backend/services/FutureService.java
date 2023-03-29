@@ -27,6 +27,12 @@ public class FutureService implements FutureServiceInterface {
   }
 
   @Override
+  public Optional<List<Future>> findFuturesByFutureName(String futureName) {
+    return futureRepository.findFuturesByFutureName(futureName);
+  }
+
+  @Deprecated
+  @Override
   public Optional<Future> findByName(String futureName) {
     return futureRepository.findFutureByFutureName(futureName);
   }

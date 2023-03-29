@@ -10,5 +10,8 @@ public interface FutureServiceInterface {
 
   Optional<Future> findById(Long Id);
 
+  Optional<List<Future>> findFuturesByFutureName(String futureName);
+
+  @Deprecated
   Optional<Future> findByName(String contractName);
 }
