@@ -33,6 +33,15 @@ public class Future {
     this.openFuture = openFuture;
   }
 
+  public Future(Future future) { // za randomizaciju u bootstrap
+    this.futureName = future.futureName;
+    this.contractSize = future.contractSize;
+    this.contractUnit = future.contractUnit;
+    this.maintenanceMargin = future.maintenanceMargin;
+    this.settlementDate = future.settlementDate;
+    this.openFuture = future.openFuture;
+  }
+
   @NotNull private String futureName;
 
   @NotNull private Integer contractSize;

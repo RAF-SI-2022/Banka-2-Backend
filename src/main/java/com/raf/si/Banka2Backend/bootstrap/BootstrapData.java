@@ -7,6 +7,7 @@ import com.raf.si.Banka2Backend.models.mariadb.Permission;
 import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
 import com.raf.si.Banka2Backend.models.mariadb.User;
 import com.raf.si.Banka2Backend.repositories.mariadb.*;
+import com.raf.si.Banka2Backend.services.ForexService;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -14,8 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-
-import com.raf.si.Banka2Backend.services.ForexService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -56,8 +55,7 @@ public class BootstrapData implements CommandLineRunner {
 
   @Autowired
   public BootstrapData(
-          ForexService forexService,
-
+      ForexService forexService,
       UserRepository userRepository,
       PermissionRepository permissionRepository,
       CurrencyRepository currencyRepository,
@@ -77,7 +75,6 @@ public class BootstrapData implements CommandLineRunner {
 
   @Override
   public void run(String... args) throws Exception {
-
 
     // If empty, add futures in db from csv
     long numberOfRowsFutures = this.futureRepository.count();
@@ -200,14 +197,14 @@ public class BootstrapData implements CommandLineRunner {
     randomiseFutureTableData();
   }
 
-  private void randomiseFutureTableData(){
+  private void randomiseFutureTableData() {
     List<Future> allFutures = new ArrayList<>();
     List<Future> newRandomisedFutures = new ArrayList<>();
     allFutures = futureRepository.findAll();
     Random randomGenerator = new Random();
 
-    for (Future future : allFutures){
-      switch (randomGenerator.nextInt(4) + 1){
+    for (Future future : allFutures) {
+      switch (randomGenerator.nextInt(4) + 1) {
         case 1 -> {
           newRandomisedFutures.add(new Future(future));
         }
@@ -229,5 +226,4 @@ public class BootstrapData implements CommandLineRunner {
     }
     futureRepository.saveAll(newRandomisedFutures);
   }
-
 }
