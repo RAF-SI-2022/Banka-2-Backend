@@ -13,6 +13,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
+
+import com.raf.si.Banka2Backend.services.ForexService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,6 +42,8 @@ public class BootstrapData implements CommandLineRunner {
   private static final String ADMIN_JOB = "administrator";
   private static final boolean ADMIN_ACTIVE = true;
 
+  public static final String forexApiKey = "6DL0Q8YP76H9K9T6";
+
   private final UserRepository userRepository;
   private final PermissionRepository permissionRepository;
   private final CurrencyRepository currencyRepository;
@@ -47,8 +52,12 @@ public class BootstrapData implements CommandLineRunner {
   private final ExchangeRepository exchangeRepository;
   private final FutureRepository futureRepository;
 
+  private final ForexService forexService;
+
   @Autowired
   public BootstrapData(
+          ForexService forexService,
+
       UserRepository userRepository,
       PermissionRepository permissionRepository,
       CurrencyRepository currencyRepository,
@@ -56,6 +65,7 @@ public class BootstrapData implements CommandLineRunner {
       PasswordEncoder passwordEncoder,
       ExchangeRepository exchangeRepository,
       FutureRepository futureRepository) {
+    this.forexService = forexService;
     this.userRepository = userRepository;
     this.permissionRepository = permissionRepository;
     this.currencyRepository = currencyRepository;
@@ -67,6 +77,7 @@ public class BootstrapData implements CommandLineRunner {
 
   @Override
   public void run(String... args) throws Exception {
+
 
     // If empty, add futures in db from csv
     long numberOfRowsFutures = this.futureRepository.count();
@@ -142,7 +153,7 @@ public class BootstrapData implements CommandLineRunner {
     // Do this only on the first ever run of the app.
     // read from file
     List<Exchange> exchanges =
-        Files.lines(Paths.get("src/main/resources/exchange.csv"))
+        Files.lines(Paths.get("src/main/resources/csvs/exchange.csv"))
             .parallel()
             .skip(1)
             .map(line -> line.split(","))
@@ -168,7 +179,7 @@ public class BootstrapData implements CommandLineRunner {
 
   private void loadFutureTable() throws IOException {
     List<Future> futures =
-        Files.lines(Paths.get("src/main/resources/future_data.csv"))
+        Files.lines(Paths.get("src/main/resources/csvs/future_data.csv"))
             .parallel()
             .skip(1)
             .map(line -> line.split(","))
@@ -185,7 +196,38 @@ public class BootstrapData implements CommandLineRunner {
             .toList();
 
     futureRepository.saveAll(futures);
-    // todo randomize futures if we want more diversity in futures, also maybe make some of thema
-    // lready signed
+
+    randomiseFutureTableData();
   }
+
+  private void randomiseFutureTableData(){
+    List<Future> allFutures = new ArrayList<>();
+    List<Future> newRandomisedFutures = new ArrayList<>();
+    allFutures = futureRepository.findAll();
+    Random randomGenerator = new Random();
+
+    for (Future future : allFutures){
+      switch (randomGenerator.nextInt(4) + 1){
+        case 1 -> {
+          newRandomisedFutures.add(new Future(future));
+        }
+        case 2 -> {
+          Future newFuture = new Future(future);
+          newFuture.setMaintenanceMargin(newFuture.getMaintenanceMargin() + 100);
+          newRandomisedFutures.add(newFuture);
+        }
+        case 3 -> {
+          Future newFuture = new Future(future);
+          newFuture.setMaintenanceMargin(newFuture.getMaintenanceMargin() - 50);
+          newRandomisedFutures.add(newFuture);
+        }
+        case 4 -> {
+          newRandomisedFutures.add(new Future(future));
+          newRandomisedFutures.add(new Future(future));
+        }
+      }
+    }
+    futureRepository.saveAll(newRandomisedFutures);
+  }
+
 }
