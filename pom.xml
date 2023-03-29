@@ -164,6 +164,14 @@
             <version>7.11.1</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- JSONObject -->
+        <!-- https://mvnrepository.com/artifact/org.json/json -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20230227</version>
+        </dependency>
     </dependencies>
 
     <build>
