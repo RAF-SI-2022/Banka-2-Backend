@@ -29,5 +29,4 @@ public class ForexController {
       @PathVariable(name = "toCurrency") String toCurrency) {
     return forexService.getForexForCurrencies(fromCurrency, toCurrency);
   }
-
 }
