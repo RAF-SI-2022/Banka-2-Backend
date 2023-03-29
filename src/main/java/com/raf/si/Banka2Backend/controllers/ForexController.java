@@ -1,5 +1,6 @@
 package com.raf.si.Banka2Backend.controllers;
 
+import com.raf.si.Banka2Backend.models.mariadb.Forex;
 import com.raf.si.Banka2Backend.services.ForexService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +24,10 @@ public class ForexController {
   }
 
   @GetMapping("/{fromCurrency}/{toCurrency}")
-  public void test(
+  public Forex test(
       @PathVariable(name = "fromCurrency") String fromCurrency,
       @PathVariable(name = "toCurrency") String toCurrency) {
-    System.out.println(forexService.getForexForCurrencies(fromCurrency, toCurrency));
+    return forexService.getForexForCurrencies(fromCurrency, toCurrency);
   }
+
 }
