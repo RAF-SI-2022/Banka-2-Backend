@@ -23,12 +23,14 @@ public class Future {
       Integer contractSize,
       String contractUnit,
       Integer maintenanceMargin,
+      String type,
       String settlementDate,
       Boolean openFuture) { // open contract
     this.futureName = futureName;
     this.contractSize = contractSize;
     this.contractUnit = contractUnit;
     this.maintenanceMargin = maintenanceMargin;
+    this.type = type;
     this.settlementDate = settlementDate;
     this.openFuture = openFuture;
   }
@@ -38,6 +40,7 @@ public class Future {
     this.contractSize = future.contractSize;
     this.contractUnit = future.contractUnit;
     this.maintenanceMargin = future.maintenanceMargin;
+    this.type = future.type;
     this.settlementDate = future.settlementDate;
     this.openFuture = future.openFuture;
   }
@@ -49,6 +52,8 @@ public class Future {
   @NotNull private String contractUnit;
 
   @NotNull private Integer maintenanceMargin;
+
+  @NotNull private String type;
 
   private String settlementDate;
 
