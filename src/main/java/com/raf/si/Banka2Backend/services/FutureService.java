@@ -35,8 +35,6 @@ public class FutureService implements FutureServiceInterface {
   @Override
   public Optional<Future> buySellFuture(FutureRequestBuySell futureRequest) {
 
-
-
     return Optional.empty();
   }
 

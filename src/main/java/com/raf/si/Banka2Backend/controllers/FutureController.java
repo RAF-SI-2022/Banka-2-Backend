@@ -61,14 +61,11 @@ public class FutureController {
   }
 
   @PostMapping
-  public ResponseEntity<?> buyFuture(@RequestBody FutureRequestBuySell futureRequest){
+  public ResponseEntity<?> buyFuture(@RequestBody FutureRequestBuySell futureRequest) {
     String signedInUserEmail = getContext().getAuthentication().getName(); // todo dodaj nove perms
     if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
       return ResponseEntity.status(401).body("You don't have permission to buy/sell.");
     }
     return ResponseEntity.ok().body(futureService.buySellFuture(futureRequest));
   }
-
-
-
 }
