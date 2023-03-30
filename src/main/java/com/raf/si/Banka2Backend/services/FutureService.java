@@ -2,6 +2,7 @@ package com.raf.si.Banka2Backend.services;
 
 import com.raf.si.Banka2Backend.models.mariadb.Future;
 import com.raf.si.Banka2Backend.repositories.mariadb.FutureRepository;
+import com.raf.si.Banka2Backend.requests.FutureRequestBuySell;
 import com.raf.si.Banka2Backend.services.interfaces.FutureServiceInterface;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,14 @@ public class FutureService implements FutureServiceInterface {
   @Override
   public Optional<List<Future>> findFuturesByFutureName(String futureName) {
     return futureRepository.findFuturesByFutureName(futureName);
+  }
+
+  @Override
+  public Optional<Future> buySellFuture(FutureRequestBuySell futureRequest) {
+
+
+
+    return Optional.empty();
   }
 
   @Deprecated

@@ -2,6 +2,8 @@ package com.raf.si.Banka2Backend.models.mariadb;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 @Data
@@ -24,15 +26,13 @@ public class Future {
       String contractUnit,
       Integer maintenanceMargin,
       String type,
-      String settlementDate,
-      Boolean openFuture) { // open contract
+      String settlementDate) { // open contract
     this.futureName = futureName;
     this.contractSize = contractSize;
     this.contractUnit = contractUnit;
     this.maintenanceMargin = maintenanceMargin;
     this.type = type;
     this.settlementDate = settlementDate;
-    this.openFuture = openFuture;
   }
 
   public Future(Future future) { // za randomizaciju u bootstrap
@@ -42,7 +42,6 @@ public class Future {
     this.maintenanceMargin = future.maintenanceMargin;
     this.type = future.type;
     this.settlementDate = future.settlementDate;
-    this.openFuture = future.openFuture;
   }
 
   @NotNull private String futureName;
@@ -57,5 +56,9 @@ public class Future {
 
   private String settlementDate;
 
-  private Boolean openFuture;
+  @JsonIgnore
+  @ManyToOne
+  @JoinColumn(name = "user_id")
+  private User user;
+
 }

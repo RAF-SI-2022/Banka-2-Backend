@@ -25,7 +25,7 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
   protected static String token;
 
   protected static Future testFuture =
-      new Future(1L, "corn", 8000, "bushel", 2100, "AGRICULTURE", null, true);
+      new Future(1L, "corn", 8000, "bushel", 2100, "AGRICULTURE", null, null);
 
   @Given("user logs in")
   public void user_logs_in() {

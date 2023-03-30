@@ -73,4 +73,7 @@ public class User {
       joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
       inverseJoinColumns = {@JoinColumn(name = "permission_id", referencedColumnName = "id")})
   private List<Permission> permissions;
+
+  @OneToMany(mappedBy = "user")
+  private List<Future> boughtFutures;
 }

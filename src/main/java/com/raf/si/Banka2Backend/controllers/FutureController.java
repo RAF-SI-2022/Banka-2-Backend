@@ -3,6 +3,7 @@ package com.raf.si.Banka2Backend.controllers;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
+import com.raf.si.Banka2Backend.requests.FutureRequestBuySell;
 import com.raf.si.Banka2Backend.services.AuthorisationService;
 import com.raf.si.Banka2Backend.services.FutureService;
 import com.raf.si.Banka2Backend.services.UserService;
@@ -44,7 +45,7 @@ public class FutureController {
   public ResponseEntity<?> findById(@PathVariable(name = "futureId") Long id) {
     String signedInUserEmail = getContext().getAuthentication().getName(); // todo dodaj nove perms
     if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-      return ResponseEntity.status(401).body("You don't have permission to read users.");
+      return ResponseEntity.status(401).body("You don't have permission to read.");
     }
 
     return ResponseEntity.ok().body(futureService.findById(id));
@@ -54,10 +55,20 @@ public class FutureController {
   public ResponseEntity<?> findFuturesByName(@PathVariable(name = "name") String futureName) {
     String signedInUserEmail = getContext().getAuthentication().getName(); // todo dodaj nove perms
     if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-      return ResponseEntity.status(401).body("You don't have permission to read users.");
+      return ResponseEntity.status(401).body("You don't have permission to read.");
     }
-    System.out.println(futureName);
-
     return ResponseEntity.ok().body(futureService.findFuturesByFutureName(futureName));
   }
+
+  @PostMapping
+  public ResponseEntity<?> buyFuture(@RequestBody FutureRequestBuySell futureRequest){
+    String signedInUserEmail = getContext().getAuthentication().getName(); // todo dodaj nove perms
+    if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+      return ResponseEntity.status(401).body("You don't have permission to buy/sell.");
+    }
+    return ResponseEntity.ok().body(futureService.buySellFuture(futureRequest));
+  }
+
+
+
 }
