@@ -150,7 +150,16 @@ public class BootstrapData implements CommandLineRunner {
             .map(
                 data ->
                     new Exchange(
-                        data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]))
+                        data[0],
+                        data[1],
+                        data[2],
+                        data[3],
+                        this.currencyRepository.findCurrencyByCurrencyCode(data[4]).isPresent()
+                            ? this.currencyRepository.findCurrencyByCurrencyCode(data[4]).get()
+                            : null,
+                        data[5],
+                        data[6],
+                        data[7]))
             .toList();
 
     // save into repository

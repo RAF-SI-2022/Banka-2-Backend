@@ -27,7 +27,7 @@ public class Exchange {
       String acronym,
       String micCode,
       String polity,
-      String currency,
+      Currency currency,
       String timeZone,
       String openTime,
       String closeTime) {
@@ -50,7 +50,9 @@ public class Exchange {
 
   private String polity;
 
-  private String currency;
+  @ManyToOne
+  @JoinColumn(name = "currency_id")
+  private Currency currency;
 
   private String timeZone;
 
