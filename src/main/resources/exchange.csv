@@ -1,4 +1,5 @@
 Exchange Name,Exchange Acronym,Exchange Mic Code,Country,Currency,Time Zone,Open Time,Close Time
+Nasdaq,NASDAQ,XNAS,USA,USD,America/New_York, 09:30, 16:00
 Jakarta Futures Exchange (bursa Berjangka Jakarta),BBJ,XBBJ,Indonesia,Indonesian Rupiah,Asia/Jakarta, 09:00, 17:30
 Asx - Trade24,SFE,XSFE,Australia,Australian Dollar,Australia/Melbourne, 10:00, 16:00
 Cboe Edga U.s. Equities Exchange Dark,EDGADARK,EDGD,United States,United States Dollar,America/New_York, 09:30, 16:00
