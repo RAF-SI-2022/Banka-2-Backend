@@ -25,13 +25,15 @@ public class Future {
       String contractUnit,
       Integer maintenanceMargin,
       String type,
-      String settlementDate) { // open contract
+      String settlementDate,
+      boolean forSale) { // open contract
     this.futureName = futureName;
     this.contractSize = contractSize;
     this.contractUnit = contractUnit;
     this.maintenanceMargin = maintenanceMargin;
     this.type = type;
     this.settlementDate = settlementDate;
+    this.forSale = forSale;
   }
 
   public Future(Future future) { // za randomizaciju u bootstrap
@@ -41,6 +43,7 @@ public class Future {
     this.maintenanceMargin = future.maintenanceMargin;
     this.type = future.type;
     this.settlementDate = future.settlementDate;
+    this.forSale = future.forSale;
   }
 
   @NotNull private String futureName;
@@ -54,6 +57,8 @@ public class Future {
   @NotNull private String type;
 
   private String settlementDate;
+
+  private boolean forSale;
 
   @JsonIgnore
   @ManyToOne
