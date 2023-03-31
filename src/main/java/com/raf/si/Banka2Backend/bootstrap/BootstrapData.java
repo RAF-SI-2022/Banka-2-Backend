@@ -193,8 +193,7 @@ public class BootstrapData implements CommandLineRunner {
                         Integer.parseInt(data[3]),
                         data[4],
                         formattedDate,
-                  true)
-            )
+                        true))
             .toList();
 
     futureRepository.saveAll(futures);
