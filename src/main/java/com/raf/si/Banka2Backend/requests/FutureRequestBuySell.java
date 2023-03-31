@@ -4,11 +4,13 @@ import lombok.Data;
 
 @Data
 public class FutureRequestBuySell {
-  String stockName;
-  Integer amountToBuy;
-  String action; // BUT / SELL
-  Integer limit;
-  Integer stop;
-  Boolean allOrNone;
-  Boolean margin;
+//  String futureName;
+  Long id;
+  Long userId;
+  String type; // BUT / SELL
+//  Integer price;
+//  Integer amountToBuy;
+//  Integer limit;
+//  Integer stop;
+//  Boolean margin;
 }

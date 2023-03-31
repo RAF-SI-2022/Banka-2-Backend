@@ -12,9 +12,11 @@ import org.springframework.stereotype.Service;
 public class FutureService implements FutureServiceInterface {
 
   private FutureRepository futureRepository;
+  private UserService userService;
 
-  public FutureService(FutureRepository futureRepository) {
+  public FutureService(UserService userService, FutureRepository futureRepository) {
     this.futureRepository = futureRepository;
+    this.userService = userService;
   }
 
   @Override
@@ -32,10 +34,21 @@ public class FutureService implements FutureServiceInterface {
     return futureRepository.findFuturesByFutureName(futureName);
   }
 
+
   @Override
   public Optional<Future> buySellFuture(FutureRequestBuySell futureRequest) {
+    Optional<Future> future = futureRepository.findById(futureRequest.getId());
 
-    return Optional.empty();
+    if (futureRequest.getType().equals("BUY")){//todo ovo promeni, trenutno postavljeno divljacki radi testiranja
+      future.get().setUser(userService.findById(futureRequest.getUserId()).get());
+      futureRepository.save(future.get());
+
+    }
+    else if (futureRequest.getType().equals("SELL")){
+      future.get().setUser(null);
+      futureRepository.save(future.get());
+    }
+    return future;
   }
 
   @Deprecated
@@ -43,4 +56,5 @@ public class FutureService implements FutureServiceInterface {
   public Optional<Future> findByName(String futureName) {
     return futureRepository.findFutureByFutureName(futureName);
   }
+
 }
