@@ -34,17 +34,17 @@ public class FutureService implements FutureServiceInterface {
     return futureRepository.findFuturesByFutureName(futureName);
   }
 
-
   @Override
   public Optional<Future> buySellFuture(FutureRequestBuySell futureRequest) {
     Optional<Future> future = futureRepository.findById(futureRequest.getId());
 
-    if (futureRequest.getType().equals("BUY")){//todo ovo promeni, trenutno postavljeno divljacki radi testiranja
+    if (futureRequest
+        .getType()
+        .equals("BUY")) { // todo ovo promeni, trenutno postavljeno divljacki radi testiranja
       future.get().setUser(userService.findById(futureRequest.getUserId()).get());
       futureRepository.save(future.get());
 
-    }
-    else if (futureRequest.getType().equals("SELL")){
+    } else if (futureRequest.getType().equals("SELL")) {
       future.get().setUser(null);
       futureRepository.save(future.get());
     }
@@ -56,5 +56,4 @@ public class FutureService implements FutureServiceInterface {
   public Optional<Future> findByName(String futureName) {
     return futureRepository.findFutureByFutureName(futureName);
   }
-
 }
