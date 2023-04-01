@@ -27,17 +27,17 @@ jobs:
       - run: make test
       # Remove services
       - run: docker compose -v down
-  report:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.issues.setLabels({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: ["test-${{ needs.test.result }}"]
-            })
+#   report:
+#     needs: test
+#     runs-on: ubuntu-latest
+#     if: github.event_name == 'pull_request'
+#     steps:
+#       - uses: actions/github-script@v6
+#         with:
+#           script: |
+#             github.rest.issues.setLabels({
+#               issue_number: context.issue.number,
+#               owner: context.repo.owner,
+#               repo: context.repo.repo,
+#               labels: ["test-${{ needs.test.result }}"]
+#             })
