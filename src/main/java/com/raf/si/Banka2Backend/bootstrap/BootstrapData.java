@@ -153,12 +153,8 @@ public class BootstrapData implements CommandLineRunner {
     // Do this only on the first ever run of the app.
     // read from file
     List<Exchange> exchanges =
-<<<<<<< HEAD
-        Files.lines(Paths.get("src/main/resources/exchange.csv"))
-=======
         Files.lines(Paths.get("src/main/resources/csvs/exchange.csv"))
             .parallel()
->>>>>>> d013fccbc6f45e5932837641bbc3a10450b826b4
             .skip(1)
             .map(line -> line.split(","))
             .filter(data -> exchangeRepository.findExchangeByMicCode(data[2]).isEmpty())
