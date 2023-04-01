@@ -5,7 +5,9 @@ import com.raf.si.Banka2Backend.repositories.mariadb.FutureRepository;
 import com.raf.si.Banka2Backend.services.interfaces.FutureServiceInterface;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Service;
 
+@Service
 public class FutureService implements FutureServiceInterface {
 
   private FutureRepository futureRepository;

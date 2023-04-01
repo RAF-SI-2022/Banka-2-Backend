@@ -1,4 +1,4 @@
-package com.raf.si.Banka2Backend.cucumber.integration.currencies;
+package com.raf.si.Banka2Backend.cucumber.integration.future;
 
 import static io.cucumber.core.options.Constants.GLUE_PROPERTY_NAME;
 
@@ -9,8 +9,8 @@ import org.junit.platform.suite.api.Suite;
 
 @Suite
 @IncludeEngines("cucumber")
-@SelectClasspathResource("features/currency-integration/currencies.feature")
+@SelectClasspathResource("features/future-integration/future.feature")
 @ConfigurationParameter(
     key = GLUE_PROPERTY_NAME,
-    value = "com.raf.si.Banka2Backend.cucumber.integration.currencies")
-public class CurrenciesIntegrationTest {}
+    value = "com.raf.si.Banka2Backend.cucumber.integration.future")
+public class FutureIntegrationTest {}
