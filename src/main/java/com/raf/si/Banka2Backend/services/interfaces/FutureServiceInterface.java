@@ -20,6 +20,8 @@ public interface FutureServiceInterface {
 
   ResponseEntity<?> removeFromMarket(Long futureId);
 
+  List<Long> getWaitingFuturesForUser(Long userId, String type, String futureName);
+
   @Deprecated
   Optional<Future> findByName(String contractName);
 }

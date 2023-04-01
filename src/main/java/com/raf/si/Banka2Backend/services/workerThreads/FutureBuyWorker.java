@@ -30,7 +30,7 @@ public class FutureBuyWorker extends Thread {
   @Override
   public void run() {
     while (true) {
-      System.out.println("start while - " + futuresRequestsMap.size());
+//      System.out.println("start while - " + futuresRequestsMap.size());
 
       for (Map.Entry<Long, FutureRequestBuySell> request : futuresRequestsMap.entrySet()) {
         futuresByName =
