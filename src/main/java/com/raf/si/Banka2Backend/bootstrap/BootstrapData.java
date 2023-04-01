@@ -2,17 +2,19 @@ package com.raf.si.Banka2Backend.bootstrap;
 
 import com.raf.si.Banka2Backend.bootstrap.readers.CurrencyReader;
 import com.raf.si.Banka2Backend.models.mariadb.*;
+import com.raf.si.Banka2Backend.models.mariadb.Currency;
 import com.raf.si.Banka2Backend.models.mariadb.Exchange;
 import com.raf.si.Banka2Backend.models.mariadb.Permission;
 import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
 import com.raf.si.Banka2Backend.models.mariadb.User;
 import com.raf.si.Banka2Backend.repositories.mariadb.*;
+import com.raf.si.Banka2Backend.services.ForexService;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,6 +41,8 @@ public class BootstrapData implements CommandLineRunner {
   private static final String ADMIN_JOB = "administrator";
   private static final boolean ADMIN_ACTIVE = true;
 
+  public static final String forexApiKey = "6DL0Q8YP76H9K9T6";
+
   private final UserRepository userRepository;
   private final PermissionRepository permissionRepository;
   private final CurrencyRepository currencyRepository;
@@ -47,8 +51,11 @@ public class BootstrapData implements CommandLineRunner {
   private final ExchangeRepository exchangeRepository;
   private final FutureRepository futureRepository;
 
+  private final ForexService forexService;
+
   @Autowired
   public BootstrapData(
+      ForexService forexService,
       UserRepository userRepository,
       PermissionRepository permissionRepository,
       CurrencyRepository currencyRepository,
@@ -56,6 +63,7 @@ public class BootstrapData implements CommandLineRunner {
       PasswordEncoder passwordEncoder,
       ExchangeRepository exchangeRepository,
       FutureRepository futureRepository) {
+    this.forexService = forexService;
     this.userRepository = userRepository;
     this.permissionRepository = permissionRepository;
     this.currencyRepository = currencyRepository;
@@ -142,7 +150,7 @@ public class BootstrapData implements CommandLineRunner {
     // Do this only on the first ever run of the app.
     // read from file
     List<Exchange> exchanges =
-        Files.lines(Paths.get("src/main/resources/exchange.csv"))
+        Files.lines(Paths.get("src/main/resources/csvs/exchange.csv"))
             .parallel()
             .skip(1)
             .map(line -> line.split(","))
@@ -166,13 +174,16 @@ public class BootstrapData implements CommandLineRunner {
     exchangeRepository.saveAll(exchanges);
   }
 
-  private void loadFutureTable() throws IOException {
+  private void loadFutureTable()
+      throws IOException, ParseException { // todo promeni da ucitava sa id
+    SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yyyy");
+    String formattedDate = dateFormat.format(new Date());
+
     List<Future> futures =
-        Files.lines(Paths.get("src/main/resources/future_data.csv"))
+        Files.lines(Paths.get("src/main/resources/csvs/future_data.csv"))
             .parallel()
             .skip(1)
             .map(line -> line.split(","))
-            .filter(data -> futureRepository.findFutureByFutureName(data[0]).isEmpty())
             .map(
                 data ->
                     new Future(
@@ -180,12 +191,41 @@ public class BootstrapData implements CommandLineRunner {
                         Integer.parseInt(data[1]),
                         data[2],
                         Integer.parseInt(data[3]),
-                        null,
+                        data[4],
+                        formattedDate,
                         true))
             .toList();
 
     futureRepository.saveAll(futures);
-    // todo randomize futures if we want more diversity in futures, also maybe make some of thema
-    // lready signed
+
+    randomiseFutureTableData();
+  }
+
+  private void randomiseFutureTableData()
+      throws ParseException { // calendar.add(Calendar.MONTH, 1);
+    List<Future> allFutures = futureRepository.findAll();
+    List<Future> newRandomisedFutures = new ArrayList<>();
+    Random randomGenerator = new Random();
+    SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yyyy");
+    Calendar calendar = Calendar.getInstance();
+    int dateIncreaseAmount = 1;
+    int moneyDecreased;
+
+    for (Future future : allFutures) {
+      moneyDecreased = future.getMaintenanceMargin();
+
+      for (int i = 0; i <= randomGenerator.nextInt(6) + 4; i++) {
+        Future newFuture = new Future(future);
+        calendar.setTime(dateFormat.parse(newFuture.getSettlementDate()));
+        calendar.add(Calendar.MONTH, dateIncreaseAmount++);
+        newFuture.setSettlementDate(dateFormat.format(calendar.getTime()));
+        moneyDecreased -= randomGenerator.nextInt(200) + 100;
+        newFuture.setMaintenanceMargin(moneyDecreased);
+        newRandomisedFutures.add(newFuture);
+      }
+      dateIncreaseAmount = 1;
+    }
+
+    futureRepository.saveAll(newRandomisedFutures);
   }
 }

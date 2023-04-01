@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
     name = "users",
     uniqueConstraints = {@UniqueConstraint(columnNames = {"email", "jmbg"})})
 public class User {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -72,4 +73,7 @@ public class User {
       joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
       inverseJoinColumns = {@JoinColumn(name = "permission_id", referencedColumnName = "id")})
   private List<Permission> permissions;
+
+  @OneToMany(mappedBy = "user")
+  private List<Future> boughtFutures;
 }
