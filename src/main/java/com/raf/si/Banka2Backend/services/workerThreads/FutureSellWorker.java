@@ -11,7 +11,6 @@ import lombok.SneakyThrows;
 
 public class FutureSellWorker extends Thread {
 
-
   private Map<Long, FutureRequestBuySell> futuresRequestsMap = new ConcurrentHashMap<>();
   private List<FutureRequestBuySell> requestsToRemove;
   private List<Future> futuresByName;
@@ -28,13 +27,14 @@ public class FutureSellWorker extends Thread {
   @Override
   public void run() {
     while (true) {
-//      System.out.println("start while ");
-//      System.out.println(futuresRequestsMap.size());
+      //      System.out.println("start while ");
+      //      System.out.println(futuresRequestsMap.size());
 
-      for(Map.Entry<Long, FutureRequestBuySell> request: futuresRequestsMap.entrySet()){
+      for (Map.Entry<Long, FutureRequestBuySell> request : futuresRequestsMap.entrySet()) {
 
         // nadjemo sve kojie imaju isto ime kao request
-        futuresByName = futureService.findFuturesByFutureName(request.getValue().getFutureName()).get();
+        futuresByName =
+            futureService.findFuturesByFutureName(request.getValue().getFutureName()).get();
 
         for (Future futureFromTable : futuresByName) {
           if (next) continue;
@@ -72,8 +72,6 @@ public class FutureSellWorker extends Thread {
       Thread.sleep(10000); // todo promeni ako treba duzinu sleep-a
     }
   }
-
-
 
   public Map<Long, FutureRequestBuySell> getFuturesRequestsMap() {
     return futuresRequestsMap;

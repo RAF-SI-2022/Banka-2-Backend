@@ -45,7 +45,8 @@ public class FutureService implements FutureServiceInterface {
   }
 
   @Override
-  public ResponseEntity<?> buyFuture(FutureRequestBuySell futureRequest) {//todo ako se kupuje od druge osobe razmeni pare
+  public ResponseEntity<?> buyFuture(
+      FutureRequestBuySell futureRequest) { // todo ako se kupuje od druge osobe razmeni pare
     if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) { // regularni buy
       Optional<Future> future = futureRepository.findById(futureRequest.getId());
       if (future.isEmpty()) return ResponseEntity.status(500).body("Internal server error");
@@ -53,10 +54,9 @@ public class FutureService implements FutureServiceInterface {
       future.get().setForSale(false);
       futureRepository.save(future.get());
       return ResponseEntity.ok().body("Future is set for sale");
-    }
-    else {
-        futureBuyWorker.getFuturesRequestsMap().put(futureRequest.getId(), futureRequest);
-        return ResponseEntity.ok().body("Future is set for custom sale and is waiting for trigger");
+    } else {
+      futureBuyWorker.getFuturesRequestsMap().put(futureRequest.getId(), futureRequest);
+      return ResponseEntity.ok().body("Future is set for custom sale and is waiting for trigger");
     }
   }
 
@@ -65,7 +65,8 @@ public class FutureService implements FutureServiceInterface {
   }
 
   @Override
-  public ResponseEntity<?> sellFuture(FutureRequestBuySell futureRequest) {//todo ako se kupuje od druge osobe razmeni pare
+  public ResponseEntity<?> sellFuture(
+      FutureRequestBuySell futureRequest) { // todo ako se kupuje od druge osobe razmeni pare
     if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) {
       Optional<Future> future = futureRepository.findById(futureRequest.getId());
       if (future.isEmpty()) return ResponseEntity.status(500).body("Internal server error");
@@ -73,8 +74,7 @@ public class FutureService implements FutureServiceInterface {
       future.get().setMaintenanceMargin(futureRequest.getPrice());
       futureRepository.save(future.get());
       return ResponseEntity.ok().body("Future is set for sale");
-    }
-    else {
+    } else {
       futureSellWorker.getFuturesRequestsMap().put(futureRequest.getId(), futureRequest);
       return ResponseEntity.ok().body("Future is set for custom sale and is waiting for trigger");
     }

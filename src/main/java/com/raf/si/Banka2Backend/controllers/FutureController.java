@@ -71,11 +71,11 @@ public class FutureController {
       return ResponseEntity.status(401).body("You don't have permission to buy/sell.");
     }
     Optional<User> user = userService.findByEmail(signedInUserEmail);
-//    Optional<Future> future = futureService.findById(futureRequest.getId());
-//    if (future.get().getUser().getId() != user.get().getId()) {
-//      return ResponseEntity.status(401)
-//              .body("You don't have permission to modify this future contract.");
-//    }
+    //    Optional<Future> future = futureService.findById(futureRequest.getId());
+    //    if (future.get().getUser().getId() != user.get().getId()) {
+    //      return ResponseEntity.status(401)
+    //              .body("You don't have permission to modify this future contract.");
+    //    }
     futureRequest.setUserId(user.get().getId());
     return futureService.buyFuture(futureRequest);
   }
