@@ -4,7 +4,7 @@ import com.raf.si.Banka2Backend.models.mariadb.Future;
 import com.raf.si.Banka2Backend.repositories.mariadb.FutureRepository;
 import com.raf.si.Banka2Backend.requests.FutureRequestBuySell;
 import com.raf.si.Banka2Backend.services.interfaces.FutureServiceInterface;
-import com.raf.si.Banka2Backend.services.workerThreads.FutureWorker;
+import com.raf.si.Banka2Backend.services.workerThreads.FutureSellWorker;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -14,11 +14,12 @@ public class FutureService implements FutureServiceInterface {
 
   private FutureRepository futureRepository;
   private UserService userService;
-  private FutureWorker futureWorker = new FutureWorker();
+  private FutureSellWorker futureSellWorker;
 
   public FutureService(UserService userService, FutureRepository futureRepository) {
     this.futureRepository = futureRepository;
     this.userService = userService;
+    futureSellWorker = new FutureSellWorker(this);
     //    futureWorker.start();
   }
 
