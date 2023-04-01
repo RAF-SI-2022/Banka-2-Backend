@@ -13,7 +13,9 @@ public interface FutureServiceInterface {
 
   Optional<List<Future>> findFuturesByFutureName(String futureName);
 
-  Optional<Future> buySellFuture(FutureRequestBuySell futureRequest);
+  Optional<Future> buyFuture(FutureRequestBuySell futureRequest);
+
+  Optional<Future> sellFuture(FutureRequestBuySell futureRequest);
 
   @Deprecated
   Optional<Future> findByName(String contractName);

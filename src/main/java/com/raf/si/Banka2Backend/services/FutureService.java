@@ -6,6 +6,8 @@ import com.raf.si.Banka2Backend.requests.FutureRequestBuySell;
 import com.raf.si.Banka2Backend.services.interfaces.FutureServiceInterface;
 import java.util.List;
 import java.util.Optional;
+
+import com.raf.si.Banka2Backend.services.workerThreads.FutureWorker;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,10 +15,13 @@ public class FutureService implements FutureServiceInterface {
 
   private FutureRepository futureRepository;
   private UserService userService;
+  private FutureWorker futureWorker = new FutureWorker();
+
 
   public FutureService(UserService userService, FutureRepository futureRepository) {
     this.futureRepository = futureRepository;
     this.userService = userService;
+//    futureWorker.start();
   }
 
   @Override
@@ -34,22 +39,37 @@ public class FutureService implements FutureServiceInterface {
     return futureRepository.findFuturesByFutureName(futureName);
   }
 
+
   @Override
-  public Optional<Future> buySellFuture(FutureRequestBuySell futureRequest) {
-    Optional<Future> future = futureRepository.findById(futureRequest.getId());
+  public Optional<Future> buyFuture(FutureRequestBuySell futureRequest) {
+    if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0){//regularni buy
+      Optional<Future> future = futureRepository.findById(futureRequest.getId());
 
-    if (futureRequest
-        .getType()
-        .equals("BUY")) { // todo ovo promeni, trenutno postavljeno divljacki radi testiranja
-      future.get().setUser(userService.findById(futureRequest.getUserId()).get());
-      futureRepository.save(future.get());
-
-    } else if (futureRequest.getType().equals("SELL")) {
-      future.get().setUser(null);
-      futureRepository.save(future.get());
+      if (future.isPresent()){
+        future.get().setUser(userService.findById(futureRequest.getUserId()).get());
+        future.get().setForSale(false);
+        futureRepository.save(future.get());
+      }
+      else{
+        System.out.println("custom buy");
+        //todo
+      }
     }
-    return future;
+
+    return Optional.empty();//todo return future
   }
+
+  @Override
+  public Optional<Future> sellFuture(FutureRequestBuySell futureRequest) {
+
+
+
+
+    return Optional.empty();
+  }
+
+
+
 
   @Deprecated
   @Override

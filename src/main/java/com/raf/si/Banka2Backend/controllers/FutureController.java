@@ -60,12 +60,24 @@ public class FutureController {
     return ResponseEntity.ok().body(futureService.findFuturesByFutureName(futureName));
   }
 
-  @PostMapping
+  @PostMapping(value = "/buy")
   public ResponseEntity<?> buyFuture(@RequestBody FutureRequestBuySell futureRequest) {
     String signedInUserEmail = getContext().getAuthentication().getName(); // todo dodaj nove perms
     if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
       return ResponseEntity.status(401).body("You don't have permission to buy/sell.");
     }
-    return ResponseEntity.ok().body(futureService.buySellFuture(futureRequest));
+    futureRequest.setUserId(userService.findByEmail(signedInUserEmail).get().getId());
+    return ResponseEntity.ok().body(futureService.buyFuture(futureRequest));
   }
+//TODO POSTALJI ID USERA U FUNKCIJU, PREKO EMAIL-A
+  @PostMapping(value = "/sell")
+  public ResponseEntity<?> sellFuture(@RequestBody FutureRequestBuySell futureRequest) {
+    String signedInUserEmail = getContext().getAuthentication().getName(); // todo dodaj nove perms
+    if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+      return ResponseEntity.status(401).body("You don't have permission to buy/sell.");
+    }
+    futureRequest.setUserId(userService.findByEmail(signedInUserEmail).get().getId());
+    return ResponseEntity.ok().body(futureService.sellFuture(futureRequest));
+  }
+
 }
