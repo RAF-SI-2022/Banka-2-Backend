@@ -232,6 +232,9 @@ public class BootstrapData implements CommandLineRunner {
         calendar.add(Calendar.MONTH, dateIncreaseAmount++);
         newFuture.setSettlementDate(dateFormat.format(calendar.getTime()));
         moneyDecreased -= randomGenerator.nextInt(200) + 100;
+        if(moneyDecreased<=0){
+          moneyDecreased = randomGenerator.nextInt(200) + 100;
+        }
         newFuture.setMaintenanceMargin(moneyDecreased);
         newRandomisedFutures.add(newFuture);
       }
