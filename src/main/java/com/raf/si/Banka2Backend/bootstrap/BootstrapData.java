@@ -7,7 +7,6 @@ import com.raf.si.Banka2Backend.models.mariadb.Currency;
 import com.raf.si.Banka2Backend.models.mariadb.Exchange;
 import com.raf.si.Banka2Backend.models.mariadb.Permission;
 import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
-import com.raf.si.Banka2Backend.models.mariadb.User;
 import com.raf.si.Banka2Backend.repositories.mariadb.*;
 import com.raf.si.Banka2Backend.services.ForexService;
 import java.io.IOException;
@@ -93,12 +92,15 @@ public class BootstrapData implements CommandLineRunner {
     }
 
     // If empty, add exchange markets in db from csv
-    long numberOfExchanges = this.exchangeRepository.count();
-    if (numberOfExchanges == 0) {
-      System.out.println("Added exchange markets");
-      this.loadExchangeMarkets();
-    }
+    // New data introduced in V2_2, if we keep this code devs will not get proper exchanges in db
+    //    long numberOfExchanges = this.exchangeRepository.count();
+    //    if (numberOfExchanges == 0) {
+    //      System.out.println("Added exchange markets");
+    //      this.loadExchangeMarkets();
+    //    }
 
+    System.out.println("Added exchange markets");
+    this.loadExchangeMarkets();
     // Includes both initial admin run and permissions run.
     Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
     if (adminUser.isPresent()) {
@@ -178,7 +180,16 @@ public class BootstrapData implements CommandLineRunner {
             .map(
                 data ->
                     new Exchange(
-                        data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]))
+                        data[0],
+                        data[1],
+                        data[2],
+                        data[3],
+                        this.currencyRepository.findCurrencyByCurrencyCode(data[4]).isPresent()
+                            ? this.currencyRepository.findCurrencyByCurrencyCode(data[4]).get()
+                            : null,
+                        data[5],
+                        data[6],
+                        data[7]))
             .toList();
 
     // save into repository

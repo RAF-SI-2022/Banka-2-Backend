@@ -11,7 +11,6 @@ else
 endif
 # Get os and sha commands for each os
 ifeq ($(os),Linux)
-
 	os = linux
 	commsha = sha256sum -c ${targetSha}
 endif

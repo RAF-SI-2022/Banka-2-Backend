@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
     name = "users",
     uniqueConstraints = {@UniqueConstraint(columnNames = {"email", "jmbg"})})
 public class User {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
