@@ -7,6 +7,7 @@ import com.raf.si.Banka2Backend.services.interfaces.FutureServiceInterface;
 import com.raf.si.Banka2Backend.services.workerThreads.FutureSellWorker;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,7 +21,7 @@ public class FutureService implements FutureServiceInterface {
     this.futureRepository = futureRepository;
     this.userService = userService;
     futureSellWorker = new FutureSellWorker(this);
-    //    futureWorker.start();
+    futureSellWorker.start();
   }
 
   @Override
@@ -39,7 +40,7 @@ public class FutureService implements FutureServiceInterface {
   }
 
   @Override
-  public Optional<Future> buyFuture(FutureRequestBuySell futureRequest) {
+  public ResponseEntity<?> buyFuture(FutureRequestBuySell futureRequest) {
     if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) { // regularni buy
       Optional<Future> future = futureRepository.findById(futureRequest.getId());
 
@@ -53,13 +54,36 @@ public class FutureService implements FutureServiceInterface {
       }
     }
 
-    return Optional.empty(); // todo return future
+    return null; // todo return future
+  }
+
+  public void updateFuture(Future future) {
+    futureRepository.save(future);
   }
 
   @Override
-  public Optional<Future> sellFuture(FutureRequestBuySell futureRequest) {
+  public ResponseEntity<?> sellFuture(FutureRequestBuySell futureRequest) {
+    if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) {
+      Optional<Future> future = futureRepository.findById(futureRequest.getId());
+      future.get().setForSale(true);
+      future.get().setMaintenanceMargin(futureRequest.getPrice());
+      futureRepository.save(future.get());
+      return ResponseEntity.ok().body("Future is set for sale");
+    } else {
+      futureSellWorker.getFuturesRequests().add(futureRequest);
+      return ResponseEntity.ok().body("Future is set for custom sale and is waiting for trigger");
+    }
+  }
 
-    return Optional.empty();
+  @Override
+  public ResponseEntity<?> removeFromMarket(Long futureId) {
+    Optional<Future> future = findById(futureId);
+    future.get().setForSale(false);
+    updateFuture(future.get());
+
+    if (!findById(futureId).get().isForSale())
+      return ResponseEntity.ok().body("Removed from market");
+    return ResponseEntity.status(500).body("Internal server error");
   }
 
   @Deprecated

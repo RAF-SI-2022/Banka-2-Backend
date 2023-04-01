@@ -4,6 +4,7 @@ import com.raf.si.Banka2Backend.models.mariadb.Future;
 import com.raf.si.Banka2Backend.requests.FutureRequestBuySell;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.http.ResponseEntity;
 
 public interface FutureServiceInterface {
 
@@ -13,9 +14,11 @@ public interface FutureServiceInterface {
 
   Optional<List<Future>> findFuturesByFutureName(String futureName);
 
-  Optional<Future> buyFuture(FutureRequestBuySell futureRequest);
+  ResponseEntity<?> buyFuture(FutureRequestBuySell futureRequest);
 
-  Optional<Future> sellFuture(FutureRequestBuySell futureRequest);
+  ResponseEntity<?> sellFuture(FutureRequestBuySell futureRequest);
+
+  ResponseEntity<?> removeFromMarket(Long futureId);
 
   @Deprecated
   Optional<Future> findByName(String contractName);
