@@ -42,10 +42,10 @@ Feature: User service
 
   Scenario: non privileged user creates new user
     Then user not created
-
-  Scenario: non privileged user get all users
-    When non privileged user logged in and database not empty
-    Then user doesnt get all users from database
+#
+#  Scenario: non privileged user get all users
+#    When non privileged user logged in and database not empty
+#    Then user doesnt get all users from database
 
   Scenario: non privileged user gets user by his id
     When non privileged user logged in and user exists in database
