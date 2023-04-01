@@ -6,8 +6,9 @@ import com.raf.si.Banka2Backend.requests.FutureRequestBuySell;
 import com.raf.si.Banka2Backend.services.interfaces.FutureServiceInterface;
 import com.raf.si.Banka2Backend.services.workerThreads.FutureBuyWorker;
 import com.raf.si.Banka2Backend.services.workerThreads.FutureSellWorker;
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -89,6 +90,24 @@ public class FutureService implements FutureServiceInterface {
     if (!findById(futureId).get().isForSale())
       return ResponseEntity.ok().body("Removed from market");
     return ResponseEntity.status(500).body("Internal server error");
+  }
+
+  @Override
+  public List<Long> getWaitingFuturesForUser(Long userId, String type, String futureName) {
+    List<Long> futureIdsToReturn = new ArrayList<>();
+
+    Map<Long,FutureRequestBuySell> mapToSearch = new HashMap<>();
+
+    if (type.equals("buy")) mapToSearch = futureBuyWorker.getFuturesRequestsMap();
+    else if (type.equals("sell")) mapToSearch = futureBuyWorker.getFuturesRequestsMap();
+
+    for (Map.Entry<Long, FutureRequestBuySell> future: mapToSearch.entrySet()) {
+      if (future.getValue().getUserId().equals(userId) && future.getValue().getFutureName().equals(futureName)){
+        futureIdsToReturn.add(future.getKey());
+      }
+    }
+
+    return futureIdsToReturn;
   }
 
   @Deprecated

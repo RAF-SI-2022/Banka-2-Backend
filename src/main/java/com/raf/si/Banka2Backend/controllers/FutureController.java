@@ -115,4 +115,14 @@ public class FutureController {
 
     return futureService.removeFromMarket(id);
   }
+
+  @GetMapping(value = "waiting-futures/{type}/{futureName}")
+  public ResponseEntity<?> getAllWaitingFuturesForUser(@PathVariable(name = "type") String type, String futureName) {
+    String signedInUserEmail = getContext().getAuthentication().getName(); // todo dodaj nove perms
+    if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+      return ResponseEntity.status(401).body("You don't have permission to read users.");
+    }
+    return ResponseEntity.ok().body(futureService.getWaitingFuturesForUser(userService.findByEmail(signedInUserEmail).get().getId(), type, futureName));
+  }
+
 }
