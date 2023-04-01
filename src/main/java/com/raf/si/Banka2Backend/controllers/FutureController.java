@@ -69,7 +69,7 @@ public class FutureController {
     futureRequest.setUserId(userService.findByEmail(signedInUserEmail).get().getId());
     return ResponseEntity.ok().body(futureService.buyFuture(futureRequest));
   }
-//TODO POSTALJI ID USERA U FUNKCIJU, PREKO EMAIL-A
+  // TODO POSTALJI ID USERA U FUNKCIJU, PREKO EMAIL-A
   @PostMapping(value = "/sell")
   public ResponseEntity<?> sellFuture(@RequestBody FutureRequestBuySell futureRequest) {
     String signedInUserEmail = getContext().getAuthentication().getName(); // todo dodaj nove perms
@@ -79,5 +79,4 @@ public class FutureController {
     futureRequest.setUserId(userService.findByEmail(signedInUserEmail).get().getId());
     return ResponseEntity.ok().body(futureService.sellFuture(futureRequest));
   }
-
 }
