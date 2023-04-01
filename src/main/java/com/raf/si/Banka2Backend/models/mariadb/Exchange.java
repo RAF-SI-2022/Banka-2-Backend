@@ -7,13 +7,15 @@ import lombok.*;
 
 @Data
 // @Builder
-// @AllArgsConstructor
+@AllArgsConstructor
 // @RequiredArgsConstructor
 // @NoArgsConstructor
 @Entity
 @Table(
     name = "exchange",
-    uniqueConstraints = {@UniqueConstraint(columnNames = {"acronym", "micCode"})})
+    uniqueConstraints = {
+      @UniqueConstraint(columnNames = {"acronym", "micCode"}),
+    })
 public class Exchange {
 
   @Id

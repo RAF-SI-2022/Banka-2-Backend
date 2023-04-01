@@ -83,12 +83,15 @@ public class BootstrapData implements CommandLineRunner {
     }
 
     // If empty, add exchange markets in db from csv
-    long numberOfExchanges = this.exchangeRepository.count();
-    if (numberOfExchanges == 0) {
-      System.out.println("Added exchange markets");
-      this.loadExchangeMarkets();
-    }
+    // New data introduced in V2_2, if we keep this code devs will not get proper exchanges in db
+    //    long numberOfExchanges = this.exchangeRepository.count();
+    //    if (numberOfExchanges == 0) {
+    //      System.out.println("Added exchange markets");
+    //      this.loadExchangeMarkets();
+    //    }
 
+    System.out.println("Added exchange markets");
+    this.loadExchangeMarkets();
     // Includes both initial admin run and permissions run.
     Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
     if (adminUser.isPresent()) {
@@ -143,7 +146,6 @@ public class BootstrapData implements CommandLineRunner {
     // read from file
     List<Exchange> exchanges =
         Files.lines(Paths.get("src/main/resources/exchange.csv"))
-            .parallel()
             .skip(1)
             .map(line -> line.split(","))
             .filter(data -> exchangeRepository.findExchangeByMicCode(data[2]).isEmpty())
