@@ -61,7 +61,7 @@ public class Future {
   private boolean forSale;
 
   @JsonIgnore
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "user_id")
   private User user;
 }
