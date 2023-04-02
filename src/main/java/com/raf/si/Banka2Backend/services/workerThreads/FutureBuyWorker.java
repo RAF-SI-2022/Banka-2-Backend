@@ -32,6 +32,8 @@ public class FutureBuyWorker extends Thread {
     while (true) {
 //      System.out.println("start while - " + futuresRequestsMap.size());
 
+//      System.out.println("prvi "  + futuresRequestsMap);
+
       for (Map.Entry<Long, FutureRequestBuySell> request : futuresRequestsMap.entrySet()) {
         futuresByName =
             futureService.findFuturesByFutureName(request.getValue().getFutureName()).get();
@@ -41,8 +43,7 @@ public class FutureBuyWorker extends Thread {
 
           if (request.getValue().getLimit() != 0) { // ako je postalvjen limit
             if (futureFromTable.isForSale()
-                && futureFromTable.getMaintenanceMargin() < request.getValue().getLimit()
-                && !futureFromTable.getId().equals(request.getValue().getId())) {
+                && futureFromTable.getMaintenanceMargin() < request.getValue().getLimit()) {
               System.out.println("kupljen za limit");
               futureFromTable.setUser(userService.findById(request.getValue().getUserId()).get());
               futureFromTable.setForSale(false);
@@ -54,8 +55,7 @@ public class FutureBuyWorker extends Thread {
 
           if (request.getValue().getStop() != 0) { // ako je postalvjen stop
             if (futureFromTable.isForSale()
-                && futureFromTable.getMaintenanceMargin() > request.getValue().getStop()
-                && !futureFromTable.getId().equals(request.getValue().getId())) {
+                && futureFromTable.getMaintenanceMargin() > request.getValue().getStop()) {
               System.out.println("kupljen za stop");
               futureFromTable.setUser(userService.findById(request.getValue().getUserId()).get());
               futureFromTable.setForSale(false);
@@ -71,6 +71,7 @@ public class FutureBuyWorker extends Thread {
   }
 
   public Map<Long, FutureRequestBuySell> getFuturesRequestsMap() {
+//    System.out.println(futuresRequestsMap);
     return futuresRequestsMap;
   }
 }
