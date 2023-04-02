@@ -124,7 +124,7 @@ public class UserController {
   }
 
 
-  private void setInitialUserBalance(User user) {
+  private void setInitialUserBalance(User user) {//todo ovo promeni kasnije da nemaju odmah 100.000 $
     Balance balance = new Balance();
     balance.setUser(user);
     Optional<Currency> rsd = this.currencyService.findByCurrencyCode("RSD");
@@ -132,10 +132,19 @@ public class UserController {
     balance.setCurrency(rsd.get());
     balance.setAmount(100000f);
 
+    Balance balance2 = new Balance();
+    balance2.setUser(user);
+    Optional<Currency> usd = this.currencyService.findByCurrencyCode("USD");
+    if (usd.isEmpty()) throw new CurrencyNotFoundException("USD");
+    balance2.setCurrency(usd.get());
+    balance2.setAmount(100000f);
+
     List<Balance> balances = new ArrayList<>();
     balances.add(balance);
+    balances.add(balance2);
     user.setBalances(balances);
     this.balanceService.save(balance);
+    this.balanceService.save(balance2);
   }
 
   @GetMapping()
