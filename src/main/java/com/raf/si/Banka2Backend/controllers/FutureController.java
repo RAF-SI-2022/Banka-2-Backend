@@ -117,12 +117,17 @@ public class FutureController {
   }
 
   @GetMapping(value = "waiting-futures/{type}/{futureName}")
-  public ResponseEntity<?> getAllWaitingFuturesForUser(@PathVariable(name = "type") String type, String futureName) {
+  public ResponseEntity<?> getAllWaitingFuturesForUser(@PathVariable(name = "type") String type,@PathVariable(name = "futureName") String futureName) {
     String signedInUserEmail = getContext().getAuthentication().getName(); // todo dodaj nove perms
     if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
       return ResponseEntity.status(401).body("You don't have permission to read users.");
     }
-    return ResponseEntity.ok().body(futureService.getWaitingFuturesForUser(userService.findByEmail(signedInUserEmail).get().getId(), type, futureName));
+    Optional<User> user = userService.findByEmail(signedInUserEmail);
+    if(user.isPresent()){
+      return ResponseEntity.ok().body(futureService.getWaitingFuturesForUser(user.get().getId(), type, futureName));
+    }
+
+    return ResponseEntity.status(400).body("glupost");
   }
 
 }

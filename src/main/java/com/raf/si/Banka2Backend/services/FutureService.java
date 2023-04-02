@@ -51,10 +51,11 @@ public class FutureService implements FutureServiceInterface {
     if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) { // regularni buy
       Optional<Future> future = futureRepository.findById(futureRequest.getId());
       if (future.isEmpty()) return ResponseEntity.status(500).body("Internal server error");
+      if(!future.get().isForSale()) return ResponseEntity.status(500).body("Internal server error");
       future.get().setUser(userService.findById(futureRequest.getUserId()).get());
       future.get().setForSale(false);
       futureRepository.save(future.get());
-      return ResponseEntity.ok().body("Future is set for sale");
+      return ResponseEntity.ok().body(findById(futureRequest.getId()));
     } else {
       futureBuyWorker.getFuturesRequestsMap().put(futureRequest.getId(), futureRequest);
       return ResponseEntity.ok().body("Future is set for custom sale and is waiting for trigger");
@@ -71,24 +72,31 @@ public class FutureService implements FutureServiceInterface {
     if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) {
       Optional<Future> future = futureRepository.findById(futureRequest.getId());
       if (future.isEmpty()) return ResponseEntity.status(500).body("Internal server error");
+      if(future.get().isForSale()) return ResponseEntity.status(500).body("Internal server error");
       future.get().setForSale(true);
       future.get().setMaintenanceMargin(futureRequest.getPrice());
       futureRepository.save(future.get());
-      return ResponseEntity.ok().body("Future is set for sale");
+      return ResponseEntity.ok().body(findById(futureRequest.getId()));
     } else {
-      futureSellWorker.getFuturesRequestsMap().put(futureRequest.getId(), futureRequest);
-      return ResponseEntity.ok().body("Future is set for custom sale and is waiting for trigger");
+      futureSellWorker.setFuturesRequestsMap(futureRequest.getId(), futureRequest);
+      return ResponseEntity.ok().body(findById(futureRequest.getId()));
     }
   }
 
   @Override
   public ResponseEntity<?> removeFromMarket(Long futureId) {
     Optional<Future> future = findById(futureId);
+    if(future.isEmpty()) return ResponseEntity.status(500).body("Internal server error");
+
+    if(!future.get().isForSale()){
+      return ResponseEntity.status(500).body("This isnt for sale");
+    }
+
     future.get().setForSale(false);
     updateFuture(future.get());
 
     if (!findById(futureId).get().isForSale())
-      return ResponseEntity.ok().body("Removed from market");
+      return ResponseEntity.ok().body(findById(futureId));
     return ResponseEntity.status(500).body("Internal server error");
   }
 
@@ -99,7 +107,8 @@ public class FutureService implements FutureServiceInterface {
     Map<Long,FutureRequestBuySell> mapToSearch = new HashMap<>();
 
     if (type.equals("buy")) mapToSearch = futureBuyWorker.getFuturesRequestsMap();
-    else if (type.equals("sell")) mapToSearch = futureBuyWorker.getFuturesRequestsMap();
+    else if (type.equals("sell")) mapToSearch = futureSellWorker.getFuturesRequestsMap();
+
 
     for (Map.Entry<Long, FutureRequestBuySell> future: mapToSearch.entrySet()) {
       if (future.getValue().getUserId().equals(userId) && future.getValue().getFutureName().equals(futureName)){

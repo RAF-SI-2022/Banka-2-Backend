@@ -27,8 +27,8 @@ public class FutureSellWorker extends Thread {
   @Override
   public void run() {
     while (true) {
-      //      System.out.println("start while ");
-      //      System.out.println(futuresRequestsMap.size());
+
+      //System.out.println("thread "  + futuresRequestsMap);
 
       for (Map.Entry<Long, FutureRequestBuySell> request : futuresRequestsMap.entrySet()) {
 
@@ -75,5 +75,8 @@ public class FutureSellWorker extends Thread {
 
   public Map<Long, FutureRequestBuySell> getFuturesRequestsMap() {
     return futuresRequestsMap;
+  }
+  public void setFuturesRequestsMap(Long singleId, FutureRequestBuySell future) {
+     this.futuresRequestsMap.put(singleId,future);
   }
 }
