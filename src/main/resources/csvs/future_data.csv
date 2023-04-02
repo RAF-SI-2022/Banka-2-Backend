@@ -33,3 +33,21 @@ platinum,50,troy ounce,3700,ENERGY
 copper,25000,pound,6100,ENERGY
 aluminum,50000,pound,3600,ENERGY
 e-mini copper,12500,pound,3050,ENERGY
+copper mini,12500,pound,1500,METALS
+silver mini,1000,troy ounce,2500,METALS
+platinum mini,10,troy ounce,2500,METALS
+gold options,100,troy ounce,5000,METALS
+silver options,5000,troy ounce,6000,METALS
+palladium options,100,troy ounce,7000,METALS
+cotton,50000,pound,2000,SOFTS
+coffee,37500,pound,1500,SOFTS
+sugar,112000,pound,1200,SOFTS
+cocoa,10,metric ton,1800,SOFTS
+orange juice,15000,pound,2000,SOFTS
+lumber options,1100,board feet,2000,SOFTS
+lean hog options,40000,pound,2000,MEATS
+live cattle options,40000,pound,2000,MEATS
+feeder cattle options,50000,pound,2000,MEATS
+butter options,20000,pound,3000,MEATS
+cheese options,20000,pound,3000,MEATS
+pork belly options,40000,pound,3500,MEATS

@@ -40,7 +40,9 @@ public class BootstrapData implements CommandLineRunner {
   private static final String ADMIN_PHONE = "0657817522";
   private static final String ADMIN_JOB = "administrator";
   private static final boolean ADMIN_ACTIVE = true;
+
   public static final String forexApiKey = "6DL0Q8YP76H9K9T6";
+
   private final UserRepository userRepository;
   private final PermissionRepository permissionRepository;
   private final CurrencyRepository currencyRepository;
@@ -143,7 +145,6 @@ public class BootstrapData implements CommandLineRunner {
     balances.add(balance1);
     admin.setBalances(balances);
     this.userRepository.save(admin);
-    this.balanceRepository.save(balance1);
 
     System.out.println("Loaded!");
   }
@@ -252,6 +253,9 @@ public class BootstrapData implements CommandLineRunner {
         calendar.add(Calendar.MONTH, dateIncreaseAmount++);
         newFuture.setSettlementDate(dateFormat.format(calendar.getTime()));
         moneyDecreased -= randomGenerator.nextInt(200) + 100;
+        if(moneyDecreased<=0){
+          moneyDecreased = randomGenerator.nextInt(200) + 100;
+        }
         newFuture.setMaintenanceMargin(moneyDecreased);
         newRandomisedFutures.add(newFuture);
       }

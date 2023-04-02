@@ -79,4 +79,6 @@ public class User {
 
   @OneToMany(mappedBy = "user")
   private List<Future> boughtFutures;
+  //  @OneToMany(mappedBy = "user")
+  //  private List<Future> boughtFutures;
 }
