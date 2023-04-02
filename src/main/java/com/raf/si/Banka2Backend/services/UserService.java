@@ -43,7 +43,12 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 
   @Override
   public Optional<User> findByEmail(String email) {
-    return userRepository.findUserByEmail(email);
+    Optional<User> user = userRepository.findUserByEmail(email);
+    if (user.isPresent()) {
+      return user;
+    } else {
+      throw new UserNotFoundException("email");
+    }
   }
 
   @Override

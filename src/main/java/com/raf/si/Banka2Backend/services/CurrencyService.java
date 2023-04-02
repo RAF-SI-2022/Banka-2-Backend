@@ -35,7 +35,7 @@ public class CurrencyService implements CurrencyServiceInterface {
 
   @Override
   public Optional<Currency> findByCurrencyCode(String currencyCode) {
-    Optional<Currency> currency = this.currencyRepository.findByCurrencyCode(currencyCode);
+    Optional<Currency> currency = this.currencyRepository.findCurrencyByCurrencyCode(currencyCode);
     if (currency.isPresent()) {
       return currency;
     } else {

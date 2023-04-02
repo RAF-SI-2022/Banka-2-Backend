@@ -151,7 +151,7 @@ public class BootstrapData implements CommandLineRunner {
   private Balance getInitialAdminBalance(User admin) {
     Balance balance = new Balance();
     balance.setUser(admin);
-    Optional<Currency> rsd = this.currencyRepository.findByCurrencyCode("RSD");
+    Optional<Currency> rsd = this.currencyRepository.findCurrencyByCurrencyCode("RSD");
     if (rsd.isEmpty()) {
       throw new CurrencyNotFoundException("RSD");
     }
