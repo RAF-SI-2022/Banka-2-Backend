@@ -43,12 +43,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 
   @Override
   public Optional<User> findByEmail(String email) {
-    Optional<User> user = userRepository.findUserByEmail(email);
-    if (user.isPresent()) {
-      return user;
-    } else {
-      throw new UserNotFoundException("email");
-    }
+    return userRepository.findUserByEmail(email);
   }
 
   @Override
@@ -82,7 +77,6 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 
   @Override
   public void deleteById(Long id) throws UserNotFoundException {
-
     try {
       userRepository.deleteById(id);
     } catch (NoSuchElementException e) {

@@ -145,7 +145,7 @@ public class BootstrapData implements CommandLineRunner {
     balances.add(balance1);
     admin.setBalances(balances);
     this.userRepository.save(admin);
-
+    this.balanceRepository.save(balance1);
     System.out.println("Loaded!");
   }
 
