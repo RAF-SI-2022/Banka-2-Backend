@@ -22,4 +22,7 @@ public interface BalanceServiceInterface {
   Balance save(Balance balance);
 
   void exchangeMoney(String userFromEmail, String userToEmail, Float amount, String currencyCode);
+
+  Balance findBalanceByUserIdAndCurrency(Long userId, String currency);
+
 }

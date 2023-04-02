@@ -2,11 +2,13 @@ package com.raf.si.Banka2Backend.controllers;
 
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
+import com.raf.si.Banka2Backend.models.mariadb.Balance;
 import com.raf.si.Banka2Backend.models.mariadb.Future;
 import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
 import com.raf.si.Banka2Backend.models.mariadb.User;
 import com.raf.si.Banka2Backend.requests.FutureRequestBuySell;
 import com.raf.si.Banka2Backend.services.AuthorisationService;
+import com.raf.si.Banka2Backend.services.BalanceService;
 import com.raf.si.Banka2Backend.services.FutureService;
 import com.raf.si.Banka2Backend.services.UserService;
 import java.util.Optional;
@@ -20,18 +22,18 @@ import org.springframework.web.bind.annotation.*;
 public class FutureController {
 
   private final AuthorisationService authorisationService;
-
   private final FutureService futureService;
-
+  private final BalanceService balanceService;
   private final UserService userService;
 
   @Autowired
   public FutureController(
-      AuthorisationService authorisationService,
-      FutureService futureService,
-      UserService userService) {
+          AuthorisationService authorisationService,
+          FutureService futureService,
+          BalanceService balanceService, UserService userService) {
     this.authorisationService = authorisationService;
     this.futureService = futureService;
+    this.balanceService = balanceService;
     this.userService = userService;
   }
 
@@ -63,7 +65,6 @@ public class FutureController {
     return ResponseEntity.ok().body(futureService.findFuturesByFutureName(futureName));
   }
 
-  // todo dodaj check na pocetku da proveri da li  future postoji
   @PostMapping(value = "/buy")
   public ResponseEntity<?> buyFuture(@RequestBody FutureRequestBuySell futureRequest) {
     String signedInUserEmail = getContext().getAuthentication().getName();
@@ -71,13 +72,12 @@ public class FutureController {
       return ResponseEntity.status(401).body("You don't have permission to buy/sell.");
     }
     Optional<User> user = userService.findByEmail(signedInUserEmail);
-    //    Optional<Future> future = futureService.findById(futureRequest.getId());
-    //    if (future.get().getUser().getId() != user.get().getId()) {
-    //      return ResponseEntity.status(401)
-    //              .body("You don't have permission to modify this future contract.");
-    //    }
+
+    //todo kasnije promeni (ako treba) umesto USD u nesto custom sa fronta
+    Balance usersBalance = balanceService.findBalanceByUserIdAndCurrency(1L, "USD");
+
     futureRequest.setUserId(user.get().getId());
-    return futureService.buyFuture(futureRequest, signedInUserEmail);
+    return futureService.buyFuture(futureRequest, signedInUserEmail, usersBalance.getAmount());
   }
 
   @PostMapping(value = "/sell")

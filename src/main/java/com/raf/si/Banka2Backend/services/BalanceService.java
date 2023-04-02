@@ -6,7 +6,6 @@ import com.raf.si.Banka2Backend.exceptions.NotEnoughMoneyException;
 import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.Balance;
 import com.raf.si.Banka2Backend.models.mariadb.Currency;
-import com.raf.si.Banka2Backend.models.mariadb.User;
 import com.raf.si.Banka2Backend.repositories.mariadb.BalanceRepository;
 import com.raf.si.Banka2Backend.services.interfaces.BalanceServiceInterface;
 import java.util.List;
@@ -69,11 +68,19 @@ public class BalanceService implements BalanceServiceInterface {
     }
   }
 
-
-
   @Override
   public List<Balance> findAllByUserId(Long userId) {
     return this.balanceRepository.findAllByUser_Id(userId);
+  }
+
+  @Override
+  public Balance findBalanceByUserIdAndCurrency(Long userId, String currencyCode) {
+    Optional<Currency> currency = this.currencyService.findCurrencyByCurrencyCode(currencyCode);
+    if (currency.isEmpty()) return null;
+
+    Optional<Balance> balance = balanceRepository.findBalanceByUserIdAndCurrencyId(userId, currency.get().getId());
+    if (balance.isPresent()) return balance.get();
+    return null;
   }
 
   @Override
