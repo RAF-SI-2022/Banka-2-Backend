@@ -8,4 +8,6 @@ public interface CurrencyServiceInterface {
   List<Currency> findAll();
 
   Optional<Currency> findById(Long currencyId);
+
+  Optional<Currency> findByCurrencyCode(String currencyCode);
 }

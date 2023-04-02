@@ -1,12 +1,12 @@
 package com.raf.si.Banka2Backend.bootstrap;
 
 import com.raf.si.Banka2Backend.bootstrap.readers.CurrencyReader;
+import com.raf.si.Banka2Backend.exceptions.CurrencyNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.*;
 import com.raf.si.Banka2Backend.models.mariadb.Currency;
 import com.raf.si.Banka2Backend.models.mariadb.Exchange;
 import com.raf.si.Banka2Backend.models.mariadb.Permission;
 import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
-import com.raf.si.Banka2Backend.models.mariadb.User;
 import com.raf.si.Banka2Backend.repositories.mariadb.*;
 import com.raf.si.Banka2Backend.services.ForexService;
 import java.io.IOException;
@@ -50,6 +50,7 @@ public class BootstrapData implements CommandLineRunner {
   private final PasswordEncoder passwordEncoder;
   private final ExchangeRepository exchangeRepository;
   private final FutureRepository futureRepository;
+  private final BalanceRepository balanceRepository;
 
   private final ForexService forexService;
 
@@ -62,6 +63,7 @@ public class BootstrapData implements CommandLineRunner {
       InflationRepository inflationRepository,
       PasswordEncoder passwordEncoder,
       ExchangeRepository exchangeRepository,
+      BalanceRepository balanceRepository,
       FutureRepository futureRepository) {
     this.forexService = forexService;
     this.userRepository = userRepository;
@@ -70,6 +72,7 @@ public class BootstrapData implements CommandLineRunner {
     this.inflationRepository = inflationRepository;
     this.passwordEncoder = passwordEncoder;
     this.exchangeRepository = exchangeRepository;
+    this.balanceRepository = balanceRepository;
     this.futureRepository = futureRepository;
   }
 
@@ -87,7 +90,7 @@ public class BootstrapData implements CommandLineRunner {
     long numberOfRowsCurrency = this.currencyRepository.count();
     if (numberOfRowsCurrency == 0) {
       System.out.println("Added currencies");
-      this.loeadCurrenciesTable();
+      this.loadCurrenciesAndInflationTable();
     }
 
     // If empty, add exchange markets in db from csv
@@ -136,12 +139,29 @@ public class BootstrapData implements CommandLineRunner {
 
     // Add admin perms
     admin.setPermissions(permissions);
+    // Add initial 100_000 RSD to admin
+    Balance balance1 = this.getInitialAdminBalance(admin);
+    List<Balance> balances = new ArrayList<>();
+    balances.add(balance1);
+    admin.setBalances(balances);
     this.userRepository.save(admin);
 
     System.out.println("Loaded!");
   }
 
-  private void loeadCurrenciesTable() throws IOException {
+  private Balance getInitialAdminBalance(User admin) {
+    Balance balance = new Balance();
+    balance.setUser(admin);
+    Optional<Currency> rsd = this.currencyRepository.findCurrencyByCurrencyCode("RSD");
+    if (rsd.isEmpty()) {
+      throw new CurrencyNotFoundException("RSD");
+    }
+    balance.setCurrency(rsd.get());
+    balance.setAmount(100000f);
+    return balance;
+  }
+
+  private void loadCurrenciesAndInflationTable() throws IOException {
     CurrencyReader cs = new CurrencyReader();
     List<Currency> currencyList = cs.getCurrencies();
     this.currencyRepository.saveAll(currencyList);
@@ -196,6 +216,7 @@ public class BootstrapData implements CommandLineRunner {
             .parallel()
             .skip(1)
             .map(line -> line.split(","))
+            .filter(data -> futureRepository.findFutureByFutureName(data[0]).isEmpty())
             .map(
                 data ->
                     new Future(
