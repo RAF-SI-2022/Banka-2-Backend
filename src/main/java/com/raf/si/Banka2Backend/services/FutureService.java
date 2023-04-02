@@ -49,7 +49,7 @@ public class FutureService implements FutureServiceInterface {
   }
 
   @Override
-  public ResponseEntity<?> buyFuture(FutureRequestBuySell futureRequest, String fromUserEmail) {
+  public ResponseEntity<?> buyFuture(FutureRequestBuySell futureRequest, String fromUserEmail, Float usersMoneyInCurrency) {
     if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) { // regularni buy
       Optional<Future> future = futureRepository.findById(futureRequest.getId());
 
@@ -58,9 +58,11 @@ public class FutureService implements FutureServiceInterface {
       if(!future.get().isForSale())
         return ResponseEntity.status(500).body("Internal server error");
 
+
       User toUser = future.get().getUser();
       if (toUser != null) {
         float amount = future.get().getMaintenanceMargin();
+        if (usersMoneyInCurrency < amount)  return ResponseEntity.status(500).body("Not enough money bro >:(");
         balanceService.exchangeMoney(fromUserEmail, toUser.getEmail(), amount, "USD");
       }
 
@@ -68,7 +70,8 @@ public class FutureService implements FutureServiceInterface {
       future.get().setForSale(false);
       futureRepository.save(future.get());
       return ResponseEntity.ok().body(findById(futureRequest.getId()));
-    } else {
+    }
+    else {
       futureBuyWorker.getFuturesRequestsMap().put(futureRequest.getId(), futureRequest);
       return ResponseEntity.ok().body("Future is set for custom sale and is waiting for trigger");
     }
