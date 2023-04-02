@@ -77,10 +77,9 @@ public class FutureController {
     //              .body("You don't have permission to modify this future contract.");
     //    }
     futureRequest.setUserId(user.get().getId());
-    return futureService.buyFuture(futureRequest);
+    return futureService.buyFuture(futureRequest, signedInUserEmail);
   }
 
-  // TODO POSTALJI ID USERA U FUNKCIJU, PREKO EMAIL-A
   @PostMapping(value = "/sell")
   public ResponseEntity<?> sellFuture(@RequestBody FutureRequestBuySell futureRequest) {
     String signedInUserEmail = getContext().getAuthentication().getName();
@@ -91,8 +90,7 @@ public class FutureController {
     Optional<User> user = userService.findByEmail(signedInUserEmail);
     Optional<Future> future = futureService.findById(futureRequest.getId());
     if (future.get().getUser().getId() != user.get().getId()) {
-      return ResponseEntity.status(401)
-          .body("You don't have permission to modify this future contract.");
+      return ResponseEntity.status(401).body("You don't have permission to modify this future contract.");
     }
 
     futureRequest.setUserId(user.get().getId());

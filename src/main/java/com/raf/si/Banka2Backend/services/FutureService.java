@@ -1,6 +1,7 @@
 package com.raf.si.Banka2Backend.services;
 
 import com.raf.si.Banka2Backend.models.mariadb.Future;
+import com.raf.si.Banka2Backend.models.mariadb.User;
 import com.raf.si.Banka2Backend.repositories.mariadb.FutureRepository;
 import com.raf.si.Banka2Backend.requests.FutureRequestBuySell;
 import com.raf.si.Banka2Backend.services.interfaces.FutureServiceInterface;
@@ -15,14 +16,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class FutureService implements FutureServiceInterface {
 
-  private UserService userService;
-  private FutureRepository futureRepository;
-  private FutureSellWorker futureSellWorker;
-  private FutureBuyWorker futureBuyWorker;
+  private final UserService userService;
+  private final FutureRepository futureRepository;
+  private final FutureSellWorker futureSellWorker;
+  private final FutureBuyWorker futureBuyWorker;
+  private final BalanceService balanceService;
 
-  public FutureService(UserService userService, FutureRepository futureRepository) {
+  public FutureService(UserService userService, FutureRepository futureRepository, BalanceService balanceService) {
     this.futureRepository = futureRepository;
     this.userService = userService;
+    this.balanceService = balanceService;
     futureSellWorker = new FutureSellWorker(this);
     futureBuyWorker = new FutureBuyWorker(this, userService);
 
@@ -46,12 +49,21 @@ public class FutureService implements FutureServiceInterface {
   }
 
   @Override
-  public ResponseEntity<?> buyFuture(
-      FutureRequestBuySell futureRequest) { // todo ako se kupuje od druge osobe razmeni pare
+  public ResponseEntity<?> buyFuture(FutureRequestBuySell futureRequest, String fromUserEmail) {
     if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) { // regularni buy
       Optional<Future> future = futureRepository.findById(futureRequest.getId());
-      if (future.isEmpty()) return ResponseEntity.status(500).body("Internal server error");
-      if(!future.get().isForSale()) return ResponseEntity.status(500).body("Internal server error");
+
+      if (future.isEmpty())
+        return ResponseEntity.status(500).body("Internal server error");
+      if(!future.get().isForSale())
+        return ResponseEntity.status(500).body("Internal server error");
+
+      User toUser = future.get().getUser();
+      if (toUser != null) {
+        float amount = future.get().getMaintenanceMargin();
+        balanceService.exchangeMoney(fromUserEmail, toUser.getEmail(), amount, "USD");
+      }
+
       future.get().setUser(userService.findById(futureRequest.getUserId()).get());
       future.get().setForSale(false);
       futureRepository.save(future.get());
@@ -62,13 +74,13 @@ public class FutureService implements FutureServiceInterface {
     }
   }
 
+
   public void updateFuture(Future future) {
     futureRepository.save(future);
   }
 
   @Override
-  public ResponseEntity<?> sellFuture(
-      FutureRequestBuySell futureRequest) { // todo ako se kupuje od druge osobe razmeni pare
+  public ResponseEntity<?> sellFuture(FutureRequestBuySell futureRequest) {
     if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) {
       Optional<Future> future = futureRepository.findById(futureRequest.getId());
       if (future.isEmpty()) return ResponseEntity.status(500).body("Internal server error");
@@ -82,6 +94,7 @@ public class FutureService implements FutureServiceInterface {
       return ResponseEntity.ok().body(findById(futureRequest.getId()));
     }
   }
+
 
   @Override
   public ResponseEntity<?> removeFromMarket(Long futureId) {
