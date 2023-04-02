@@ -2,18 +2,17 @@ package com.raf.si.Banka2Backend.controllers;
 
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
+import com.raf.si.Banka2Backend.exceptions.CurrencyNotFoundException;
 import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
-import com.raf.si.Banka2Backend.models.mariadb.Permission;
-import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
-import com.raf.si.Banka2Backend.models.mariadb.User;
+import com.raf.si.Banka2Backend.models.mariadb.*;
 import com.raf.si.Banka2Backend.requests.ChangePasswordRequest;
 import com.raf.si.Banka2Backend.requests.RegisterRequest;
 import com.raf.si.Banka2Backend.requests.UpdateProfileRequest;
 import com.raf.si.Banka2Backend.requests.UpdateUserRequest;
 import com.raf.si.Banka2Backend.responses.RegisterResponse;
-import com.raf.si.Banka2Backend.services.AuthorisationService;
-import com.raf.si.Banka2Backend.services.PermissionService;
-import com.raf.si.Banka2Backend.services.UserService;
+import com.raf.si.Banka2Backend.services.*;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,17 +31,23 @@ public class UserController {
   private final PermissionService permissionService;
   private final AuthorisationService authorisationService;
   private final PasswordEncoder passwordEncoder;
+  private final CurrencyService currencyService;
+  private final BalanceService balanceService;
 
   @Autowired
   public UserController(
-      UserService userService,
-      PermissionService permissionService,
-      AuthorisationService authorisationService,
-      PasswordEncoder passwordEncoder) {
+          UserService userService,
+          PermissionService permissionService,
+          AuthorisationService authorisationService,
+          PasswordEncoder passwordEncoder,
+          CurrencyService currencyService,
+          BalanceService balanceService) {
     this.userService = userService;
     this.permissionService = permissionService;
     this.authorisationService = authorisationService;
     this.passwordEncoder = passwordEncoder;
+    this.currencyService = currencyService;
+    this.balanceService = balanceService;
   }
 
   @GetMapping(value = "/permissions")
@@ -97,6 +102,9 @@ public class UserController {
             .active(user.isActive())
             .permissions(permissions)
             .build();
+
+    userService.save(newUser);//mora duplo zbog balansa
+    setInitialUserBalance(newUser);
     userService.save(newUser);
 
     RegisterResponse response =
@@ -113,6 +121,21 @@ public class UserController {
             .build();
 
     return ResponseEntity.ok(response);
+  }
+
+
+  private void setInitialUserBalance(User user) {
+    Balance balance = new Balance();
+    balance.setUser(user);
+    Optional<Currency> rsd = this.currencyService.findByCurrencyCode("RSD");
+    if (rsd.isEmpty()) throw new CurrencyNotFoundException("RSD");
+    balance.setCurrency(rsd.get());
+    balance.setAmount(100000f);
+
+    List<Balance> balances = new ArrayList<>();
+    balances.add(balance);
+    user.setBalances(balances);
+    this.balanceService.save(balance);
   }
 
   @GetMapping()
