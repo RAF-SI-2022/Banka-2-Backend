@@ -32,6 +32,13 @@ public class ForexController {
     return ResponseEntity.ok().body(forexService.findAll());
   }
 
+  @GetMapping("/{fromCurrency}/{toCurrency}")
+  public Forex getForexUsingFromAndToCurrency(
+          @PathVariable(name = "fromCurrency") String fromCurrency,
+          @PathVariable(name = "toCurrency") String toCurrency) {
+    return forexService.getForexForCurrencies(fromCurrency, toCurrency);
+  }
+
   @PostMapping("/buy-sell")
   public ResponseEntity<?> buyOrSell(@RequestBody @Valid BuySellForexDto dto) {
     Forex forex =

@@ -77,7 +77,6 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 
   @Override
   public void deleteById(Long id) throws UserNotFoundException {
-
     try {
       userRepository.deleteById(id);
     } catch (NoSuchElementException e) {
