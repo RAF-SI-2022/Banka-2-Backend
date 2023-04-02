@@ -28,7 +28,7 @@ public class FutureSellWorker extends Thread {
   public void run() {
     while (true) {
 
-      System.out.println("thread "  + futuresRequestsMap);
+      //System.out.println("thread "  + futuresRequestsMap);
 
       for (Map.Entry<Long, FutureRequestBuySell> request : futuresRequestsMap.entrySet()) {
 
