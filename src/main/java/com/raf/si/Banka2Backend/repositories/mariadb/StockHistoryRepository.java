@@ -1,10 +1,15 @@
 package com.raf.si.Banka2Backend.repositories.mariadb;
 
+import com.raf.si.Banka2Backend.models.mariadb.Stock;
 import com.raf.si.Banka2Backend.models.mariadb.StockHistory;
 import java.util.List;
+import java.util.Optional;
+
+import com.raf.si.Banka2Backend.models.mariadb.StockHistoryType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface StockHistoryRepository extends JpaRepository<StockHistory, Long> {
@@ -25,7 +30,10 @@ public interface StockHistoryRepository extends JpaRepository<StockHistory, Long
   List<StockHistory> getStockHistoryByStockIdAndTimePeriodForYTD(Long id);
 
   @Query(
-      value = "SELECT * FROM WHERE stock_id = :id AND type = :type ORDER BY on_date ASC",
+      value = "SELECT * FROM stock_history WHERE stock_id = :id AND type = :type ORDER BY on_date ASC",
       nativeQuery = true)
   List<StockHistory> getStockHistoryByStockIdAndTimePeriod(Long id, String type);
+
+  @Transactional
+  void deleteByStockIdAndType(Long stockId, StockHistoryType type);
 }
