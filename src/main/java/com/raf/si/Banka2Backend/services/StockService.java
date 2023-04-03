@@ -5,6 +5,7 @@ import com.raf.si.Banka2Backend.models.mariadb.Stock;
 import com.raf.si.Banka2Backend.models.mariadb.StockHistory;
 import com.raf.si.Banka2Backend.repositories.mariadb.StockHistoryRepository;
 import com.raf.si.Banka2Backend.repositories.mariadb.StockRepository;
+import com.raf.si.Banka2Backend.requests.StockRequest;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
@@ -14,8 +15,6 @@ import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-
-import com.raf.si.Banka2Backend.requests.StockRequest;
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -114,23 +113,17 @@ public class StockService {
     else return stockHistoryRepository.getStockHistoryByStockIdAndTimePeriod(id, type);
   }
 
-  //todo stavi da ne bude void
-  public ResponseEntity<?> buyStock(StockRequest stockRequest){
+  // todo stavi da ne bude void
+  public ResponseEntity<?> buyStock(StockRequest stockRequest) {
     Stock stock = getStockBySymbol(stockRequest.getStockSymbol());
 
     BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
 
-
     return null;
   }
 
-
-  public ResponseEntity<?>  sellStock(StockRequest stockRequest){
+  public ResponseEntity<?> sellStock(StockRequest stockRequest) {
 
     return null;
   }
-
-
-
-
 }
