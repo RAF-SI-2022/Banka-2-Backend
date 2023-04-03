@@ -1,11 +1,10 @@
 package com.raf.si.Banka2Backend.models.mariadb;
 
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-
-import javax.persistence.*;
 
 @Data
 @Builder
@@ -15,26 +14,26 @@ import javax.persistence.*;
 @Table(name = "orders")
 public class Order {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private String orderType; //stock, future, forex...
+  private String orderType; // stock, future, forex...
 
-    private String type; //buy, sell
+  private String type; // buy, sell
 
-    private String symbol;
+  private String symbol;
 
-    private int amount;
+  private int amount;
 
-    private double price;
+  private double price;
 
-    private String status;//odobreno, na cekanju, odbijeno
+  private String status; // odobreno, na cekanju, odbijeno
 
-    private boolean finished;
+  private boolean finished;
 
-    private String lastModified;
+  private String lastModified;
 
-//  todo  private opcija
+  //  todo  private opcija
 
 }

@@ -17,7 +17,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -70,7 +69,6 @@ public class BootstrapData implements CommandLineRunner {
 
   @Autowired
   public BootstrapData(
-      ForexService forexService,
       UserRepository userRepository,
       PermissionRepository permissionRepository,
       CurrencyRepository currencyRepository,
@@ -78,20 +76,20 @@ public class BootstrapData implements CommandLineRunner {
       PasswordEncoder passwordEncoder,
       ExchangeRepository exchangeRepository,
       FutureRepository futureRepository,
+      BalanceRepository balanceRepository,
+      ForexService forexService,
       StockRepository stockRepository,
       StockHistoryRepository stockHistoryRepository,
       EntityManagerFactory entityManagerFactory) {
-      BalanceRepository balanceRepository,
-      FutureRepository futureRepository) {
-    this.forexService = forexService;
     this.userRepository = userRepository;
     this.permissionRepository = permissionRepository;
     this.currencyRepository = currencyRepository;
     this.inflationRepository = inflationRepository;
     this.passwordEncoder = passwordEncoder;
     this.exchangeRepository = exchangeRepository;
-    this.balanceRepository = balanceRepository;
     this.futureRepository = futureRepository;
+    this.balanceRepository = balanceRepository;
+    this.forexService = forexService;
     this.stockRepository = stockRepository;
     this.stockHistoryRepository = stockHistoryRepository;
     this.entityManagerFactory = entityManagerFactory;
@@ -287,7 +285,7 @@ public class BootstrapData implements CommandLineRunner {
         calendar.add(Calendar.MONTH, dateIncreaseAmount++);
         newFuture.setSettlementDate(dateFormat.format(calendar.getTime()));
         moneyDecreased -= randomGenerator.nextInt(200) + 100;
-        if(moneyDecreased<=0){
+        if (moneyDecreased <= 0) {
           moneyDecreased = randomGenerator.nextInt(200) + 100;
         }
         newFuture.setMaintenanceMargin(moneyDecreased);

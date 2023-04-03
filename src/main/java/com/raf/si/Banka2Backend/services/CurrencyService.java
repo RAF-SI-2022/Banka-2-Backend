@@ -47,5 +47,4 @@ public class CurrencyService implements CurrencyServiceInterface {
   public Optional<Currency> findCurrencyByCurrencyCode(String currencyCode) {
     return currencyRepository.findCurrencyByCurrencyCode(currencyCode);
   }
-
 }

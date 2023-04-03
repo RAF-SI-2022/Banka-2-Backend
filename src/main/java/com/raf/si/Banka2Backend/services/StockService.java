@@ -94,7 +94,7 @@ public class StockService {
 
   public List<StockHistory> getStockHistoryByStockIdAndTimePeriod(Long id, String type) {
 
-    if(type.equals("YTD"))
+    if (type.equals("YTD"))
       return stockHistoryRepository.getStockHistoryByStockIdAndTimePeriodForYTD(id);
 
     Integer period = null;

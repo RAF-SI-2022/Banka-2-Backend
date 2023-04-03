@@ -33,8 +33,15 @@ public class BalanceService implements BalanceServiceInterface {
 
   @Override
   @Transactional
-  public void buyOrSellCurrency( String userEmail, String fromCurrencyCode, String toCurrencyCode, Float exchangeRate, Integer amountOfMoney) {
-    Optional<Balance> balanceForFromCurrency = this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(userEmail, fromCurrencyCode);
+  public void buyOrSellCurrency(
+      String userEmail,
+      String fromCurrencyCode,
+      String toCurrencyCode,
+      Float exchangeRate,
+      Integer amountOfMoney) {
+    Optional<Balance> balanceForFromCurrency =
+        this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(
+            userEmail, fromCurrencyCode);
 
     if (balanceForFromCurrency.isEmpty()) {
       throw new BalanceNotFoundException(userEmail, fromCurrencyCode);
@@ -48,7 +55,9 @@ public class BalanceService implements BalanceServiceInterface {
     this.balanceRepository.save(balanceForFromCurrency.get());
 
     // Check if balance for toCurrency exists. If yes update it with new amount, if not create it.
-    Optional<Balance> balanceForToCurrency =this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(userEmail, toCurrencyCode);
+    Optional<Balance> balanceForToCurrency =
+        this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(
+            userEmail, toCurrencyCode);
     Optional<Currency> newCurrency = this.currencyService.findByCurrencyCode(toCurrencyCode);
 
     if (balanceForToCurrency.isPresent()) {
@@ -57,8 +66,7 @@ public class BalanceService implements BalanceServiceInterface {
           balanceForToCurrency.get().getAmount() + amountOfMoney * exchangeRate;
       balanceForToCurrency.get().setAmount(newAmountInToCurrency);
       this.balanceRepository.save(balanceForToCurrency.get());
-    }
-    else {
+    } else {
       // create new balance for toCurrency
       Balance newBalanceForToCurrency = new Balance();
       newBalanceForToCurrency.setUser(this.userService.findByEmail(userEmail).get());
@@ -78,21 +86,24 @@ public class BalanceService implements BalanceServiceInterface {
     Optional<Currency> currency = this.currencyService.findCurrencyByCurrencyCode(currencyCode);
     if (currency.isEmpty()) return null;
 
-    Optional<Balance> balance = balanceRepository.findBalanceByUserIdAndCurrencyId(userId, currency.get().getId());
+    Optional<Balance> balance =
+        balanceRepository.findBalanceByUserIdAndCurrencyId(userId, currency.get().getId());
     if (balance.isPresent()) return balance.get();
     return null;
   }
 
   @Override
-  public Balance increaseBalance(String userEmail, String currencyCode, Float amount) throws CurrencyNotFoundException, UserNotFoundException {
-    Optional<Balance> balance = this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(userEmail, currencyCode);
+  public Balance increaseBalance(String userEmail, String currencyCode, Float amount)
+      throws CurrencyNotFoundException, UserNotFoundException {
+    Optional<Balance> balance =
+        this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(
+            userEmail, currencyCode);
 
     if (balance.isPresent()) {
       balance.get().setAmount(balance.get().getAmount() + amount);
       this.balanceRepository.save(balance.get());
       return balance.get();
-    }
-    else {
+    } else {
       Balance newBalance = new Balance();
       newBalance.setUser(this.userService.findByEmail(userEmail).get());
       newBalance.setCurrency(this.currencyService.findByCurrencyCode(currencyCode).get());
@@ -126,9 +137,9 @@ public class BalanceService implements BalanceServiceInterface {
   }
 
   @Override
-  public void exchangeMoney(String userFromEmail, String userToEmail, Float amount, String currencyCode) {
+  public void exchangeMoney(
+      String userFromEmail, String userToEmail, Float amount, String currencyCode) {
     decreaseBalance(userFromEmail, currencyCode, amount);
     increaseBalance(userToEmail, currencyCode, amount);
   }
-
 }
