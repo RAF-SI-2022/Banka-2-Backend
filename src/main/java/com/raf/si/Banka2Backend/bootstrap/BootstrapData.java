@@ -9,12 +9,21 @@ import com.raf.si.Banka2Backend.models.mariadb.Permission;
 import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
 import com.raf.si.Banka2Backend.repositories.mariadb.*;
 import com.raf.si.Banka2Backend.services.ForexService;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import javax.persistence.EntityManagerFactory;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -53,27 +62,37 @@ public class BootstrapData implements CommandLineRunner {
   private final BalanceRepository balanceRepository;
 
   private final ForexService forexService;
+  private final StockRepository stockRepository;
+  private final StockHistoryRepository stockHistoryRepository;
+
+  private final EntityManagerFactory entityManagerFactory;
 
   @Autowired
   public BootstrapData(
-      ForexService forexService,
       UserRepository userRepository,
       PermissionRepository permissionRepository,
       CurrencyRepository currencyRepository,
       InflationRepository inflationRepository,
       PasswordEncoder passwordEncoder,
       ExchangeRepository exchangeRepository,
+      FutureRepository futureRepository,
       BalanceRepository balanceRepository,
-      FutureRepository futureRepository) {
-    this.forexService = forexService;
+      ForexService forexService,
+      StockRepository stockRepository,
+      StockHistoryRepository stockHistoryRepository,
+      EntityManagerFactory entityManagerFactory) {
     this.userRepository = userRepository;
     this.permissionRepository = permissionRepository;
     this.currencyRepository = currencyRepository;
     this.inflationRepository = inflationRepository;
     this.passwordEncoder = passwordEncoder;
     this.exchangeRepository = exchangeRepository;
-    this.balanceRepository = balanceRepository;
     this.futureRepository = futureRepository;
+    this.balanceRepository = balanceRepository;
+    this.forexService = forexService;
+    this.stockRepository = stockRepository;
+    this.stockHistoryRepository = stockHistoryRepository;
+    this.entityManagerFactory = entityManagerFactory;
   }
 
   @Override
@@ -94,6 +113,18 @@ public class BootstrapData implements CommandLineRunner {
     }
 
     // If empty, add exchange markets in db from csv
+    long numberOfExchanges = this.exchangeRepository.count();
+    if (numberOfExchanges == 0) {
+      System.out.println("Added exchange markets");
+      this.loadExchangeMarkets();
+    }
+
+    long numberOfStocks = stockRepository.count();
+    if (numberOfStocks == 0) {
+      System.out.println("Added stocks");
+      loadStocksTable();
+    }
+
     // New data introduced in V2_2, if we keep this code devs will not get proper exchanges in db
     //    long numberOfExchanges = this.exchangeRepository.count();
     //    if (numberOfExchanges == 0) {
@@ -254,7 +285,7 @@ public class BootstrapData implements CommandLineRunner {
         calendar.add(Calendar.MONTH, dateIncreaseAmount++);
         newFuture.setSettlementDate(dateFormat.format(calendar.getTime()));
         moneyDecreased -= randomGenerator.nextInt(200) + 100;
-        if(moneyDecreased<=0){
+        if (moneyDecreased <= 0) {
           moneyDecreased = randomGenerator.nextInt(200) + 100;
         }
         newFuture.setMaintenanceMargin(moneyDecreased);
@@ -264,5 +295,94 @@ public class BootstrapData implements CommandLineRunner {
     }
 
     futureRepository.saveAll(newRandomisedFutures);
+  }
+
+  private void loadStocksTable() throws IOException {
+
+    SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
+    Session session = sessionFactory.openSession();
+
+    BufferedReader br = new BufferedReader(new FileReader("src/main/resources/stocks.csv"));
+
+    String header = br.readLine();
+    String line = br.readLine();
+
+    while (line != null) {
+
+      String[] data = line.split(",");
+
+      Optional<Exchange> exchange = exchangeRepository.findExchangeByAcronym(data[12]);
+      Exchange mergedExchange = (Exchange) session.merge(exchange.get());
+
+      Stock stock =
+          Stock.builder()
+              .companyName(data[0])
+              .outstandingShares(Long.valueOf(data[1]))
+              .dividendYield(new BigDecimal(data[2]))
+              .openValue(new BigDecimal(data[3]))
+              .highValue(new BigDecimal(data[4]))
+              .lowValue(new BigDecimal(data[5]))
+              .priceValue(new BigDecimal(data[6]))
+              .volumeValue(Long.valueOf(data[7]))
+              .lastUpdated(LocalDate.parse(data[8]))
+              .previousClose(new BigDecimal(data[9]))
+              .changeValue(new BigDecimal(data[10]))
+              .changePercent(data[11])
+              .exchange(mergedExchange)
+              .symbol(data[13])
+              .websiteUrl(data[14])
+              .build();
+
+      session.beginTransaction();
+      session.persist(stock);
+      session.getTransaction().commit();
+
+      line = br.readLine();
+    }
+
+    br.close();
+
+    for (Stock s : stockRepository.findAll()) {
+
+      Stock mergedStock = (Stock) session.merge(s);
+      BufferedReader br1 =
+          new BufferedReader(new FileReader("src/main/resources/stock_history.csv"));
+
+      String header1 = br1.readLine();
+      String line1 = br1.readLine();
+
+      while (line1 != null) {
+
+        String[] data = line1.split(",");
+        String symbol = data[6];
+
+        if (symbol.equals(s.getSymbol())) {
+          StockHistory stockHistory =
+              StockHistory.builder()
+                  .openValue(new BigDecimal(data[0]))
+                  .highValue(new BigDecimal(data[1]))
+                  .lowValue(new BigDecimal(data[2]))
+                  .closeValue(new BigDecimal(data[3]))
+                  .volumeValue(Long.valueOf(data[4]))
+                  .onDate(
+                      data[5].contains(" ")
+                          ? LocalDateTime.parse(
+                              data[5], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                          : LocalDateTime.parse(
+                              data[5] + " 00:00:00",
+                              DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                  .stock(mergedStock)
+                  .type(StockHistoryType.valueOf(data[7]))
+                  .build();
+
+          session.beginTransaction();
+          session.persist(stockHistory);
+          session.getTransaction().commit();
+        }
+        line1 = br1.readLine();
+      }
+
+      br1.close();
+    }
   }
 }

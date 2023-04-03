@@ -11,7 +11,6 @@ import com.raf.si.Banka2Backend.requests.UpdateProfileRequest;
 import com.raf.si.Banka2Backend.requests.UpdateUserRequest;
 import com.raf.si.Banka2Backend.responses.RegisterResponse;
 import com.raf.si.Banka2Backend.services.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,12 +35,12 @@ public class UserController {
 
   @Autowired
   public UserController(
-          UserService userService,
-          PermissionService permissionService,
-          AuthorisationService authorisationService,
-          PasswordEncoder passwordEncoder,
-          CurrencyService currencyService,
-          BalanceService balanceService) {
+      UserService userService,
+      PermissionService permissionService,
+      AuthorisationService authorisationService,
+      PasswordEncoder passwordEncoder,
+      CurrencyService currencyService,
+      BalanceService balanceService) {
     this.userService = userService;
     this.permissionService = permissionService;
     this.authorisationService = authorisationService;
@@ -103,7 +102,7 @@ public class UserController {
             .permissions(permissions)
             .build();
 
-    userService.save(newUser);//mora duplo zbog balansa
+    userService.save(newUser); // mora duplo zbog balansa
     setInitialUserBalance(newUser);
     userService.save(newUser);
 
@@ -123,8 +122,8 @@ public class UserController {
     return ResponseEntity.ok(response);
   }
 
-
-  private void setInitialUserBalance(User user) {//todo ovo promeni kasnije da nemaju odmah 100.000 $
+  private void setInitialUserBalance(
+      User user) { // todo ovo promeni kasnije da nemaju odmah 100.000 $
     Balance balance = new Balance();
     balance.setUser(user);
     Optional<Currency> rsd = this.currencyService.findByCurrencyCode("RSD");

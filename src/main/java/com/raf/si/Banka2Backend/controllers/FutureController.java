@@ -28,9 +28,10 @@ public class FutureController {
 
   @Autowired
   public FutureController(
-          AuthorisationService authorisationService,
-          FutureService futureService,
-          BalanceService balanceService, UserService userService) {
+      AuthorisationService authorisationService,
+      FutureService futureService,
+      BalanceService balanceService,
+      UserService userService) {
     this.authorisationService = authorisationService;
     this.futureService = futureService;
     this.balanceService = balanceService;
@@ -73,7 +74,7 @@ public class FutureController {
     }
     Optional<User> user = userService.findByEmail(signedInUserEmail);
 
-    //todo kasnije promeni (ako treba) umesto USD u nesto custom sa fronta
+    // todo kasnije promeni (ako treba) umesto USD u nesto custom sa fronta
     Balance usersBalance = balanceService.findBalanceByUserIdAndCurrency(1L, "USD");
 
     futureRequest.setUserId(user.get().getId());
@@ -90,7 +91,8 @@ public class FutureController {
     Optional<User> user = userService.findByEmail(signedInUserEmail);
     Optional<Future> future = futureService.findById(futureRequest.getId());
     if (future.get().getUser().getId() != user.get().getId()) {
-      return ResponseEntity.status(401).body("You don't have permission to modify this future contract.");
+      return ResponseEntity.status(401)
+          .body("You don't have permission to modify this future contract.");
     }
 
     futureRequest.setUserId(user.get().getId());
@@ -115,17 +117,19 @@ public class FutureController {
   }
 
   @GetMapping(value = "waiting-futures/{type}/{futureName}")
-  public ResponseEntity<?> getAllWaitingFuturesForUser(@PathVariable(name = "type") String type,@PathVariable(name = "futureName") String futureName) {
+  public ResponseEntity<?> getAllWaitingFuturesForUser(
+      @PathVariable(name = "type") String type,
+      @PathVariable(name = "futureName") String futureName) {
     String signedInUserEmail = getContext().getAuthentication().getName(); // todo dodaj nove perms
     if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
       return ResponseEntity.status(401).body("You don't have permission to read users.");
     }
     Optional<User> user = userService.findByEmail(signedInUserEmail);
-    if(user.isPresent()){
-      return ResponseEntity.ok().body(futureService.getWaitingFuturesForUser(user.get().getId(), type, futureName));
+    if (user.isPresent()) {
+      return ResponseEntity.ok()
+          .body(futureService.getWaitingFuturesForUser(user.get().getId(), type, futureName));
     }
 
     return ResponseEntity.status(400).body("glupost");
   }
-
 }
