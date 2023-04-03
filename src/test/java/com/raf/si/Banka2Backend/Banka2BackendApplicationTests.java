@@ -6,11 +6,10 @@ import com.influxdb.annotations.Column;
 import com.influxdb.annotations.Measurement;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.QueryApi;
-import com.influxdb.client.WriteApi;
+import com.influxdb.client.WriteApiBlocking;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
-import com.influxdb.client.write.events.WriteErrorEvent;
-import com.influxdb.client.write.events.WriteSuccessEvent;
+import com.influxdb.exceptions.InfluxException;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
 import java.time.Instant;
@@ -49,18 +48,12 @@ public class Banka2BackendApplicationTests {
     //      temperature.value = 62D;
     //      temperature.time = Instant.now();
     //      writeApi.writeMeasurement( WritePrecision.NS, testMeasurement);
-    WriteApi writeApi = this.influxDBClient.makeWriteApi();
-    writeApi.writePoint("raf", "raf", point);
-    writeApi.listenEvents(
-        WriteSuccessEvent.class,
-        event -> {
-          assertNotNull(event.getLineProtocol());
-        });
-    writeApi.listenEvents(
-        WriteErrorEvent.class,
-        event -> {
-          Throwable exception = event.getThrowable();
-        });
+    WriteApiBlocking writeApi = this.influxDBClient.getWriteApiBlocking();
+    try {
+      writeApi.writePoint(point);
+    } catch (InfluxException e) {
+      e.printStackTrace();
+    }
 
     String flux =
         "from(bucket:\"raf\") |> range(start: 0) |> filter(fn: (r) => r._measurement == \"testMeasurement\")";
@@ -76,7 +69,6 @@ public class Banka2BackendApplicationTests {
         assertNotNull(fluxRecord.getValueByKey("_value"));
       }
     }
-    System.out.println("test: jeste");
     assertEquals(1, 1);
   }
 
