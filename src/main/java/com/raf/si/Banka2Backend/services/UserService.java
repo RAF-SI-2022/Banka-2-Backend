@@ -70,18 +70,23 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 
     if (user.isPresent()) {
       return user;
-    } else {
+    }
+    else {
       throw new UserNotFoundException(id);
     }
   }
 
   @Override
   public void deleteById(Long id) throws UserNotFoundException {
-    try {
+
+
+//    try {
+
       userRepository.deleteById(id);
-    } catch (NoSuchElementException e) {
-      throw new UserNotFoundException(id);
-    }
+//    }
+//    catch (NoSuchElementException e) {
+//      throw new UserNotFoundException(id);
+//    }
   }
 
   @Override
@@ -109,12 +114,14 @@ public class UserService implements UserDetailsService, UserServiceInterface {
         userToChangePasswordTo.setPassword(newPassword);
 
         userRepository.save(user);
-      } else {
+      }
+      else {
         throw new UserNotFoundException(user.getId());
       }
 
       passwordResetTokenRepository.deleteByToken(passwordResetToken);
-    } else {
+    }
+    else {
       throw new PasswordResetTokenNotFoundException(passwordResetToken);
     }
   }
