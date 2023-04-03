@@ -43,12 +43,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 
   @Override
   public Optional<User> findByEmail(String email) {
-    Optional<User> user = userRepository.findUserByEmail(email);
-    if (user.isPresent()) {
-      return user;
-    } else {
-      throw new UserNotFoundException("email");
-    }
+    return userRepository.findUserByEmail(email);
   }
 
   @Override
@@ -75,7 +70,8 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 
     if (user.isPresent()) {
       return user;
-    } else {
+    }
+    else {
       throw new UserNotFoundException(id);
     }
   }
@@ -83,11 +79,12 @@ public class UserService implements UserDetailsService, UserServiceInterface {
   @Override
   public void deleteById(Long id) throws UserNotFoundException {
 
-    try {
+//    try {
       userRepository.deleteById(id);
-    } catch (NoSuchElementException e) {
-      throw new UserNotFoundException(id);
-    }
+//    }
+//    catch (NoSuchElementException e) {
+//      throw new UserNotFoundException(id);
+//    }
   }
 
   @Override
@@ -115,12 +112,14 @@ public class UserService implements UserDetailsService, UserServiceInterface {
         userToChangePasswordTo.setPassword(newPassword);
 
         userRepository.save(user);
-      } else {
+      }
+      else {
         throw new UserNotFoundException(user.getId());
       }
 
       passwordResetTokenRepository.deleteByToken(passwordResetToken);
-    } else {
+    }
+    else {
       throw new PasswordResetTokenNotFoundException(passwordResetToken);
     }
   }

@@ -24,4 +24,7 @@ public interface FutureServiceInterface {
 
   @Deprecated
   Optional<Future> findByName(String contractName);
+
+  ResponseEntity<?> removeWaitingSellFuture(Long id);
+  ResponseEntity<?> removeWaitingBuyFuture(Long id);
 }

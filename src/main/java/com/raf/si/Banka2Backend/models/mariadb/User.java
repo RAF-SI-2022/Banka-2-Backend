@@ -77,8 +77,4 @@ public class User {
   @OneToMany(mappedBy = "user")
   private List<Balance> balances; // one balance object for every currency user operates with
 
-  @OneToMany(mappedBy = "user")
-  private List<Future> boughtFutures;
-  //  @OneToMany(mappedBy = "user")
-  //  private List<Future> boughtFutures;
 }
