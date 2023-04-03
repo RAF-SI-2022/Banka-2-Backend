@@ -3,11 +3,10 @@ package com.raf.si.Banka2Backend.services;
 import com.raf.si.Banka2Backend.models.mariadb.UserStock;
 import com.raf.si.Banka2Backend.repositories.mariadb.UserStocksRepository;
 import com.raf.si.Banka2Backend.services.interfaces.UserStockServiceInterface;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UserStockService implements UserStockServiceInterface {

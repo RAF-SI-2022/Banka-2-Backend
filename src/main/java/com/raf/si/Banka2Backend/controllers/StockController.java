@@ -63,10 +63,11 @@ public class StockController {
   public ResponseEntity<?> getStockHistoryByStockIdAndTimePeriod(
       @PathVariable Long id, @PathVariable String type) {
     try {
-      return ResponseEntity.ok().body(stockService.getStockHistoryForStockByIdAndType(id, type.toUpperCase()));
-    } catch(StockNotFoundException e) {
+      return ResponseEntity.ok()
+          .body(stockService.getStockHistoryForStockByIdAndType(id, type.toUpperCase()));
+    } catch (StockNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
-    } catch(ExternalAPILimitReachedException e) {
+    } catch (ExternalAPILimitReachedException e) {
       throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, e.getMessage(), e);
     }
   }
@@ -93,9 +94,7 @@ public class StockController {
   }
 
   @GetMapping(value = "/user-stocks")
-  public ResponseEntity<?> getAllUserStocks(){
+  public ResponseEntity<?> getAllUserStocks() {
     return ResponseEntity.ok().body(this.stockService.getAllUserStocks());
   }
-
-
 }
