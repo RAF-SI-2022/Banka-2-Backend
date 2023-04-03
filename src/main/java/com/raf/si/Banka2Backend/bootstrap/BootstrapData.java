@@ -1,19 +1,23 @@
 package com.raf.si.Banka2Backend.bootstrap;
 
 import com.raf.si.Banka2Backend.bootstrap.readers.CurrencyReader;
+import com.raf.si.Banka2Backend.exceptions.CurrencyNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.*;
 import com.raf.si.Banka2Backend.models.mariadb.Currency;
 import com.raf.si.Banka2Backend.models.mariadb.Exchange;
 import com.raf.si.Banka2Backend.models.mariadb.Permission;
 import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
-import com.raf.si.Banka2Backend.models.mariadb.User;
 import com.raf.si.Banka2Backend.repositories.mariadb.*;
+import com.raf.si.Banka2Backend.services.ForexService;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -47,6 +51,8 @@ public class BootstrapData implements CommandLineRunner {
   private static final String ADMIN_JOB = "administrator";
   private static final boolean ADMIN_ACTIVE = true;
 
+  public static final String forexApiKey = "6DL0Q8YP76H9K9T6";
+
   private final UserRepository userRepository;
   private final PermissionRepository permissionRepository;
   private final CurrencyRepository currencyRepository;
@@ -54,6 +60,9 @@ public class BootstrapData implements CommandLineRunner {
   private final PasswordEncoder passwordEncoder;
   private final ExchangeRepository exchangeRepository;
   private final FutureRepository futureRepository;
+  private final BalanceRepository balanceRepository;
+
+  private final ForexService forexService;
   private final StockRepository stockRepository;
   private final StockHistoryRepository stockHistoryRepository;
 
@@ -61,6 +70,7 @@ public class BootstrapData implements CommandLineRunner {
 
   @Autowired
   public BootstrapData(
+      ForexService forexService,
       UserRepository userRepository,
       PermissionRepository permissionRepository,
       CurrencyRepository currencyRepository,
@@ -71,12 +81,16 @@ public class BootstrapData implements CommandLineRunner {
       StockRepository stockRepository,
       StockHistoryRepository stockHistoryRepository,
       EntityManagerFactory entityManagerFactory) {
+      BalanceRepository balanceRepository,
+      FutureRepository futureRepository) {
+    this.forexService = forexService;
     this.userRepository = userRepository;
     this.permissionRepository = permissionRepository;
     this.currencyRepository = currencyRepository;
     this.inflationRepository = inflationRepository;
     this.passwordEncoder = passwordEncoder;
     this.exchangeRepository = exchangeRepository;
+    this.balanceRepository = balanceRepository;
     this.futureRepository = futureRepository;
     this.stockRepository = stockRepository;
     this.stockHistoryRepository = stockHistoryRepository;
@@ -97,7 +111,7 @@ public class BootstrapData implements CommandLineRunner {
     long numberOfRowsCurrency = this.currencyRepository.count();
     if (numberOfRowsCurrency == 0) {
       System.out.println("Added currencies");
-      this.loeadCurrenciesTable();
+      this.loadCurrenciesAndInflationTable();
     }
 
     // If empty, add exchange markets in db from csv
@@ -113,6 +127,15 @@ public class BootstrapData implements CommandLineRunner {
       loadStocksTable();
     }
 
+    // New data introduced in V2_2, if we keep this code devs will not get proper exchanges in db
+    //    long numberOfExchanges = this.exchangeRepository.count();
+    //    if (numberOfExchanges == 0) {
+    //      System.out.println("Added exchange markets");
+    //      this.loadExchangeMarkets();
+    //    }
+
+    System.out.println("Added exchange markets");
+    this.loadExchangeMarkets();
     // Includes both initial admin run and permissions run.
     Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
     if (adminUser.isPresent()) {
@@ -149,12 +172,30 @@ public class BootstrapData implements CommandLineRunner {
 
     // Add admin perms
     admin.setPermissions(permissions);
+    // Add initial 100_000 RSD to admin
+    Balance balance1 = this.getInitialAdminBalance(admin, "RSD");
+    Balance balance2 = this.getInitialAdminBalance(admin, "USD");
+    List<Balance> balances = new ArrayList<>();
+    balances.add(balance1);
+    balances.add(balance2);
+    admin.setBalances(balances);
     this.userRepository.save(admin);
-
+    this.balanceRepository.save(balance1);
+    this.balanceRepository.save(balance2);
     System.out.println("Loaded!");
   }
 
-  private void loeadCurrenciesTable() throws IOException {
+  private Balance getInitialAdminBalance(User admin, String currency) {
+    Balance balance = new Balance();
+    balance.setUser(admin);
+    Optional<Currency> curr = this.currencyRepository.findCurrencyByCurrencyCode(currency);
+    if (curr.isEmpty()) throw new CurrencyNotFoundException(currency);
+    balance.setCurrency(curr.get());
+    balance.setAmount(100000f);
+    return balance;
+  }
+
+  private void loadCurrenciesAndInflationTable() throws IOException {
     CurrencyReader cs = new CurrencyReader();
     List<Currency> currencyList = cs.getCurrencies();
     this.currencyRepository.saveAll(currencyList);
@@ -166,7 +207,7 @@ public class BootstrapData implements CommandLineRunner {
     // Do this only on the first ever run of the app.
     // read from file
     List<Exchange> exchanges =
-        Files.lines(Paths.get("src/main/resources/exchange.csv"))
+        Files.lines(Paths.get("src/main/resources/csvs/exchange.csv"))
             .parallel()
             .skip(1)
             .map(line -> line.split(","))
@@ -174,7 +215,16 @@ public class BootstrapData implements CommandLineRunner {
             .map(
                 data ->
                     new Exchange(
-                        data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]))
+                        data[0],
+                        data[1],
+                        data[2],
+                        data[3],
+                        this.currencyRepository.findCurrencyByCurrencyCode(data[4]).isPresent()
+                            ? this.currencyRepository.findCurrencyByCurrencyCode(data[4]).get()
+                            : null,
+                        data[5],
+                        data[6],
+                        data[7]))
             .toList();
 
     // save into repository
@@ -190,9 +240,13 @@ public class BootstrapData implements CommandLineRunner {
     exchangeRepository.saveAll(exchanges);
   }
 
-  private void loadFutureTable() throws IOException {
+  private void loadFutureTable()
+      throws IOException, ParseException { // todo promeni da ucitava sa id
+    SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yyyy");
+    String formattedDate = dateFormat.format(new Date());
+
     List<Future> futures =
-        Files.lines(Paths.get("src/main/resources/future_data.csv"))
+        Files.lines(Paths.get("src/main/resources/csvs/future_data.csv"))
             .parallel()
             .skip(1)
             .map(line -> line.split(","))
@@ -204,13 +258,45 @@ public class BootstrapData implements CommandLineRunner {
                         Integer.parseInt(data[1]),
                         data[2],
                         Integer.parseInt(data[3]),
-                        null,
+                        data[4],
+                        formattedDate,
                         true))
             .toList();
 
     futureRepository.saveAll(futures);
-    // todo randomize futures if we want more diversity in futures, also maybe make some of thema
-    // lready signed
+
+    randomiseFutureTableData();
+  }
+
+  private void randomiseFutureTableData()
+      throws ParseException { // calendar.add(Calendar.MONTH, 1);
+    List<Future> allFutures = futureRepository.findAll();
+    List<Future> newRandomisedFutures = new ArrayList<>();
+    Random randomGenerator = new Random();
+    SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yyyy");
+    Calendar calendar = Calendar.getInstance();
+    int dateIncreaseAmount = 1;
+    int moneyDecreased;
+
+    for (Future future : allFutures) {
+      moneyDecreased = future.getMaintenanceMargin();
+
+      for (int i = 0; i <= randomGenerator.nextInt(6) + 4; i++) {
+        Future newFuture = new Future(future);
+        calendar.setTime(dateFormat.parse(newFuture.getSettlementDate()));
+        calendar.add(Calendar.MONTH, dateIncreaseAmount++);
+        newFuture.setSettlementDate(dateFormat.format(calendar.getTime()));
+        moneyDecreased -= randomGenerator.nextInt(200) + 100;
+        if(moneyDecreased<=0){
+          moneyDecreased = randomGenerator.nextInt(200) + 100;
+        }
+        newFuture.setMaintenanceMargin(moneyDecreased);
+        newRandomisedFutures.add(newFuture);
+      }
+      dateIncreaseAmount = 1;
+    }
+
+    futureRepository.saveAll(newRandomisedFutures);
   }
 
   private void loadStocksTable() throws IOException {

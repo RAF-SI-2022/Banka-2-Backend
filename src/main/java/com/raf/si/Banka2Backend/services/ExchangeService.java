@@ -30,25 +30,41 @@ public class ExchangeService implements ExchangeServiceInterface {
 
   @Override
   public Optional<Exchange> findById(Long id) {
-    return exchangeRepository.findById(id);
+
+    Optional<Exchange> exchange = exchangeRepository.findById(id);
+    if (exchange.isPresent()) {
+      return exchange;
+    } else {
+      throw new ExchangeNotFoundException();
+    }
   }
 
   @Override
   public Optional<Exchange> findByMicCode(String micCode) {
-    return exchangeRepository.findExchangeByMicCode(micCode);
+    Optional<Exchange> exchange = exchangeRepository.findExchangeByMicCode(micCode);
+    if (exchange.isPresent()) {
+      return exchange;
+    } else {
+      throw new ExchangeNotFoundException();
+    }
   }
 
   @Override
   public Optional<Exchange> findByAcronym(String acronym) {
-    return exchangeRepository.findExchangeByAcronym(acronym);
+    Optional<Exchange> exchange = exchangeRepository.findExchangeByAcronym(acronym);
+    if (exchange.isPresent()) {
+      return exchange;
+    } else {
+      throw new ExchangeNotFoundException();
+    }
   }
 
   @Override
   public boolean isExchangeActive(String micCode) {
 
     Optional<Exchange> exchangeEntry = exchangeRepository.findExchangeByMicCode(micCode);
-    if (!exchangeEntry.isPresent()) {
-      throw new ExchangeNotFoundException(micCode);
+    if (exchangeEntry.isEmpty()) {
+      throw new ExchangeNotFoundException();
     }
     Exchange exchange = exchangeEntry.get();
     LocalTime openTime = LocalTime.parse(exchange.getOpenTime().substring(1));

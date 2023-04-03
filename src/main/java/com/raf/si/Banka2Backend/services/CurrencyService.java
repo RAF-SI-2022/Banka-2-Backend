@@ -32,4 +32,20 @@ public class CurrencyService implements CurrencyServiceInterface {
       throw new CurrencyNotFoundException(currencyId);
     }
   }
+
+  @Override
+  public Optional<Currency> findByCurrencyCode(String currencyCode) {
+    Optional<Currency> currency = this.currencyRepository.findCurrencyByCurrencyCode(currencyCode);
+    if (currency.isPresent()) {
+      return currency;
+    } else {
+      throw new CurrencyNotFoundException(currencyCode);
+    }
+  }
+
+  @Override
+  public Optional<Currency> findCurrencyByCurrencyCode(String currencyCode) {
+    return currencyRepository.findCurrencyByCurrencyCode(currencyCode);
+  }
+
 }

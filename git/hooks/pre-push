@@ -28,7 +28,7 @@ if (! (docker stats --no-stream > /dev/null 2>&1)); then
 fi
 
 # Compile and test code
-docker build -t banka2backend-test -f test.Dockerfile .
+docker build -t banka2backend-test -f ./docker/test.Dockerfile .
 docker compose up -d mariadb
 docker compose up -d flyway
 if (! (docker run --rm --network container:mariadb banka2backend-test)); then

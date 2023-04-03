@@ -3,6 +3,7 @@ package com.raf.si.Banka2Backend.services;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
+import com.raf.si.Banka2Backend.exceptions.ExchangeNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.Exchange;
 import com.raf.si.Banka2Backend.repositories.mariadb.ExchangeRepository;
 import java.time.LocalTime;
@@ -75,16 +76,9 @@ class ExchangeServiceTest {
 
   @Test
   void testFindByMicCodeWrongCode() {
-    Exchange exchange = new Exchange();
-    exchange.setId(1L);
-    exchange.setExchangeName("Exchange 1");
-    exchange.setMicCode("MIC");
+    when(exchangeRepository.findExchangeByMicCode("MIC1")).thenReturn(Optional.empty());
 
-    when(exchangeRepository.findExchangeByMicCode("MIC1")).thenReturn(Optional.of(exchange));
-
-    Optional<Exchange> result = exchangeService.findByMicCode("MIC1");
-
-    assertEquals(exchange, result.get());
+    assertThrows(ExchangeNotFoundException.class, () -> exchangeService.findByMicCode("MIC1"));
   }
 
   @Test
