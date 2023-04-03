@@ -70,9 +70,7 @@ public class StockController {
     }
 
     Optional<User> user = userService.findByEmail(signedInUserEmail);
-
-
-    return stockService.buyStock(stockRequest);
+    return stockService.buyStock(stockRequest, user.get());
   }
 
   @PostMapping(value = "/sell")
@@ -81,8 +79,8 @@ public class StockController {
     if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
       return ResponseEntity.status(401).body("You don't have permission to buy/sell.");
     }
-
-    return stockService.sellStock(stockRequest);
+    Optional<User> user = userService.findByEmail(signedInUserEmail);
+    return stockService.sellStock(stockRequest, user.get());
   }
 
 }

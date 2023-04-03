@@ -3,6 +3,7 @@ package com.raf.si.Banka2Backend.services;
 import com.raf.si.Banka2Backend.exceptions.StockNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.Stock;
 import com.raf.si.Banka2Backend.models.mariadb.StockHistory;
+import com.raf.si.Banka2Backend.models.mariadb.User;
 import com.raf.si.Banka2Backend.repositories.mariadb.StockHistoryRepository;
 import com.raf.si.Banka2Backend.repositories.mariadb.StockRepository;
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.util.Optional;
 
 import com.raf.si.Banka2Backend.requests.StockRequest;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -26,11 +28,14 @@ public class StockService {
   private static final String KEY = "J3WDDK9HZ1G71YIP";
   private StockRepository stockRepository;
   private StockHistoryRepository stockHistoryRepository;
+  private UserService userService;
 
+  @Autowired
   public StockService(
-      StockRepository stockRepository, StockHistoryRepository stockHistoryRepository) {
+      StockRepository stockRepository, StockHistoryRepository stockHistoryRepository, UserService userService) {
     this.stockRepository = stockRepository;
     this.stockHistoryRepository = stockHistoryRepository;
+    this.userService = userService;
   }
 
   public List<Stock> getAllStocks() {
@@ -115,7 +120,7 @@ public class StockService {
   }
 
   //todo stavi da ne bude void
-  public ResponseEntity<?> buyStock(StockRequest stockRequest){
+  public ResponseEntity<?> buyStock(StockRequest stockRequest, User user){
     Stock stock = getStockBySymbol(stockRequest.getStockSymbol());
 
     BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
@@ -125,7 +130,7 @@ public class StockService {
   }
 
 
-  public ResponseEntity<?>  sellStock(StockRequest stockRequest){
+  public ResponseEntity<?> sellStock(StockRequest stockRequest, User user){
 
     return null;
   }

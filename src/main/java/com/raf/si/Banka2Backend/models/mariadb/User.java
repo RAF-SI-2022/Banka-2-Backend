@@ -2,7 +2,6 @@ package com.raf.si.Banka2Backend.models.mariadb;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
-import java.util.Map;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
@@ -78,12 +77,8 @@ public class User {
   @OneToMany(mappedBy = "user")
   private List<Balance> balances; // one balance object for every currency user operates with
 
-  @ManyToMany
-  @JoinTable(
-          name = "users_stocks",
-          joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-          inverseJoinColumns = {@JoinColumn(name = "stock_id", referencedColumnName = "id")})
-  private List<Stock> stocks;
+  @OneToMany(mappedBy = "user")
+  private List<UserStock> stocks;
 
   @NotNull
   private Double dailyLimit;

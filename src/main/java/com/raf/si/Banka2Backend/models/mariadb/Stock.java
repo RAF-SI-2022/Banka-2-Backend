@@ -44,6 +44,4 @@ public class Stock {
 
   private String websiteUrl;
 
-  @ManyToMany(mappedBy = "stocks")
-  private List<User> users;
 }

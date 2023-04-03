@@ -11,5 +11,4 @@ public class StockRequest {
     Integer stop;
     boolean allOrNone;
     boolean margin;
-
 }
