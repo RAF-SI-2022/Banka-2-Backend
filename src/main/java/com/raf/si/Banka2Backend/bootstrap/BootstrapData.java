@@ -121,7 +121,7 @@ public class BootstrapData implements CommandLineRunner {
 
     long numberOfStocks = stockRepository.count();
     if (numberOfStocks == 0) {
-      System.out.println("Added stocks");
+      System.out.println("Adding stocks");
       loadStocksTable();
     }
 
