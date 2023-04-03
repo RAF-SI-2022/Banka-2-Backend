@@ -48,17 +48,17 @@ public class FutureService implements FutureServiceInterface {
   }
 
   @Override
-  public ResponseEntity<?> buyFuture(FutureRequestBuySell futureRequest, String fromUserEmail, Float usersMoneyInCurrency) {
+  public ResponseEntity<?> buyFuture(
+      FutureRequestBuySell futureRequest, String fromUserEmail, Float usersMoneyInCurrency) {
     if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) { // regularni buy
       Optional<Future> future = futureRepository.findById(futureRequest.getId());
 
-      if (future.isEmpty())
-        return ResponseEntity.status(500).body("Internal server error");
+      if (future.isEmpty()) return ResponseEntity.status(500).body("Internal server error");
       if (!future.get().isForSale())
         return ResponseEntity.status(500).body("Internal server error");
 
       User toUser = future.get().getUser();
-      if (toUser != null) {//provera da li user ima dovoljno para //todo trenutno je sve preko USD
+      if (toUser != null) { // provera da li user ima dovoljno para //todo trenutno je sve preko USD
         float amount = future.get().getMaintenanceMargin();
         if (usersMoneyInCurrency < amount)
           return ResponseEntity.status(500).body("Not enough money bro >:(");

@@ -18,6 +18,6 @@ public class RegisterResponse {
   private String jobPosition;
   private boolean active;
   private String jmbg;
-
+  private Double dailyLimit;
   private String phone;
 }
