@@ -44,7 +44,10 @@ public class StockController {
   @GetMapping("/{id}/history/{type}")
   public ResponseEntity<?> getStockHistoryByStockIdAndTimePeriod(
       @PathVariable Long id, @PathVariable String type) {
-    return ResponseEntity.ok()
-        .body(stockService.getStockHistoryByStockIdAndTimePeriod(id, type.toUpperCase()));
+    try {
+      return ResponseEntity.ok().body(stockService.getStockHistoryForStockByIdAndType(id, type.toUpperCase()));
+    } catch(StockNotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+    }
   }
 }
