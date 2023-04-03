@@ -7,9 +7,13 @@ import com.raf.si.Banka2Backend.models.mariadb.Stock;
 import com.raf.si.Banka2Backend.models.mariadb.StockHistory;
 import com.raf.si.Banka2Backend.models.mariadb.StockHistoryType;
 import com.raf.si.Banka2Backend.repositories.mariadb.ExchangeRepository;
+import com.raf.si.Banka2Backend.models.mariadb.User;
+import com.raf.si.Banka2Backend.models.mariadb.UserStock;
 import com.raf.si.Banka2Backend.repositories.mariadb.StockHistoryRepository;
 import com.raf.si.Banka2Backend.repositories.mariadb.StockRepository;
+import com.raf.si.Banka2Backend.requests.StockRequest;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -21,7 +25,11 @@ import java.util.*;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import java.util.*;
+
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManagerFactory;
@@ -34,12 +42,24 @@ public class StockService {
   private StockHistoryRepository stockHistoryRepository;
   private ExchangeRepository exchangeRepository;
 
+  private final StockRepository stockRepository;
+  private final StockHistoryRepository stockHistoryRepository;
+  private final UserService userService;
+  private final UserStockService userStockService;
+  private static boolean gotAll = false;
 
+
+  @Autowired
   public StockService(
           StockRepository stockRepository, StockHistoryRepository stockHistoryRepository, ExchangeRepository exchangeRepository) {
+          StockRepository stockRepository,
+          StockHistoryRepository stockHistoryRepository,
+          UserService userService, UserStockService userStockService) {
     this.stockRepository = stockRepository;
     this.stockHistoryRepository = stockHistoryRepository;
       this.exchangeRepository = exchangeRepository;
+    this.userService = userService;
+    this.userStockService = userStockService;
   }
 
   public List<Stock> getAllStocks() {
@@ -350,5 +370,70 @@ public class StockService {
           }
           default -> stockHistoryList;
       };
+  }
+
+  //todo margin buy i sell
+  public ResponseEntity<?> buyStock(StockRequest stockRequest, User user) {
+
+    Stock stock = getStockBySymbol(stockRequest.getStockSymbol());
+    BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
+
+    if (stockRequest.getStop() == 0 && stockRequest.getLimit() == 0) {
+      if (stockRequest.isAllOrNone()){
+
+      }
+      else {
+
+      }
+
+    }
+    else {
+      //todo buy with limits
+      System.out.println("buy with limits");
+    }
+
+    return null;
+  }
+
+  private List<UserStock> findStocksForSale(String stockSymbol, long buyingUserId, int amount, boolean gotAll){
+    List<UserStock> userStockToTryBuying = new ArrayList<>();
+    int collectedAmount = 0;
+    List<UserStock> allUserStocks = userStockService.findAll();
+
+    for (UserStock userStock: allUserStocks) {
+      if (userStock.getStock().getSymbol().equals(stockSymbol) && userStock.getAmountForSale() != 0 && userStock.getUser().getId() != buyingUserId){
+        userStockToTryBuying.add(userStock);
+        collectedAmount += userStock.getAmountForSale();
+      }
+
+      if (collectedAmount >= amount) {
+        gotAll = true;
+        return userStockToTryBuying;
+      }
+
+
+
+    }
+
+    return userStockToTryBuying;
+  }
+
+
+
+  public ResponseEntity<?> sellStock(StockRequest stockRequest, User user) {
+    if (stockRequest.getStop() == 0 && stockRequest.getLimit() == 0){
+      Optional<UserStock> userStock = userStockService.findUserStockByUserIdAndStockSymbol(user.getId(), stockRequest.getStockSymbol());
+
+      //premestamo iz amount u amount_for_sale
+      userStock.get().setAmount(userStock.get().getAmount() - stockRequest.getAmount());
+      userStock.get().setAmountForSale(stockRequest.getAmount());
+      return ResponseEntity.ok().body(userStockService.save(userStock.get()));
+    }
+    else{
+      //todo sell with limits
+      System.out.println("sell with limits");
+    }
+
+    return null;
   }
 }

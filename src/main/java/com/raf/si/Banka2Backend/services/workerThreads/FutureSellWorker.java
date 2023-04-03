@@ -28,8 +28,6 @@ public class FutureSellWorker extends Thread {
   public void run() {
     while (true) {
 
-      // System.out.println("thread "  + futuresRequestsMap);
-
       for (Map.Entry<Long, FutureRequestBuySell> request : futuresRequestsMap.entrySet()) {
 
         // nadjemo sve kojie imaju isto ime kao request
@@ -79,5 +77,14 @@ public class FutureSellWorker extends Thread {
 
   public void setFuturesRequestsMap(Long singleId, FutureRequestBuySell future) {
     this.futuresRequestsMap.put(singleId, future);
+  }
+
+  public boolean removeFuture(Long id) {
+
+    if (this.futuresRequestsMap.containsKey(id)) {
+      this.futuresRequestsMap.remove(id);
+      return false;
+    }
+    return true;
   }
 }

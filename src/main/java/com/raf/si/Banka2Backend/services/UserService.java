@@ -10,7 +10,6 @@ import com.raf.si.Banka2Backend.repositories.mariadb.UserRepository;
 import com.raf.si.Banka2Backend.services.interfaces.UserServiceInterface;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -77,11 +76,14 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 
   @Override
   public void deleteById(Long id) throws UserNotFoundException {
-    try {
-      userRepository.deleteById(id);
-    } catch (NoSuchElementException e) {
-      throw new UserNotFoundException(id);
-    }
+
+    //    try {
+
+    userRepository.deleteById(id);
+    //    }
+    //    catch (NoSuchElementException e) {
+    //      throw new UserNotFoundException(id);
+    //    }
   }
 
   @Override
@@ -117,5 +119,18 @@ public class UserService implements UserDetailsService, UserServiceInterface {
     } else {
       throw new PasswordResetTokenNotFoundException(passwordResetToken);
     }
+  }
+
+  @Override
+  public User changeUsersDailyLimit(String userEmail, Double limitChange) {
+    User user = findByEmail(userEmail).get();
+    user.setDailyLimit(user.getDailyLimit() + limitChange);
+    userRepository.save(user);
+    return user;
+  }
+
+  @Override
+  public Double getUsersDailyLimit(String userEmail) {
+    return findByEmail(userEmail).get().getDailyLimit();
   }
 }

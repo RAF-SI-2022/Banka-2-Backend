@@ -116,6 +116,26 @@ public class FutureController {
     return futureService.removeFromMarket(id);
   }
 
+  @PostMapping(value = "/remove-waiting-sell/{id}")
+  public ResponseEntity<?> removeWaitingSellFutures(@PathVariable(name = "id") Long id) {
+    String signedInUserEmail = getContext().getAuthentication().getName();
+
+    if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+      return ResponseEntity.status(401).body("You don't have permission to read users.");
+    }
+    return futureService.removeWaitingSellFuture(id);
+  }
+
+  @PostMapping(value = "/remove-waiting-buy/{id}")
+  public ResponseEntity<?> removeWaitingBuyFutures(@PathVariable(name = "id") Long id) {
+    String signedInUserEmail = getContext().getAuthentication().getName();
+
+    if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+      return ResponseEntity.status(401).body("You don't have permission to read users.");
+    }
+    return futureService.removeWaitingBuyFuture(id);
+  }
+
   @GetMapping(value = "waiting-futures/{type}/{futureName}")
   public ResponseEntity<?> getAllWaitingFuturesForUser(
       @PathVariable(name = "type") String type,
@@ -130,6 +150,6 @@ public class FutureController {
           .body(futureService.getWaitingFuturesForUser(user.get().getId(), type, futureName));
     }
 
-    return ResponseEntity.status(400).body("glupost");
+    return ResponseEntity.status(500).body("Internal error");
   }
 }
