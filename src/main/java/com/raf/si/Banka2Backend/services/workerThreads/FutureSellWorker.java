@@ -28,7 +28,6 @@ public class FutureSellWorker extends Thread {
   public void run() {
     while (true) {
 
-
       for (Map.Entry<Long, FutureRequestBuySell> request : futuresRequestsMap.entrySet()) {
 
         // nadjemo sve kojie imaju isto ime kao request

@@ -140,23 +140,24 @@ public class BootstrapData implements CommandLineRunner {
     // Add admin perms
     admin.setPermissions(permissions);
     // Add initial 100_000 RSD to admin
-    Balance balance1 = this.getInitialAdminBalance(admin);
+    Balance balance1 = this.getInitialAdminBalance(admin, "RSD");
+    Balance balance2 = this.getInitialAdminBalance(admin, "USD");
     List<Balance> balances = new ArrayList<>();
     balances.add(balance1);
+    balances.add(balance2);
     admin.setBalances(balances);
     this.userRepository.save(admin);
-
+    this.balanceRepository.save(balance1);
+    this.balanceRepository.save(balance2);
     System.out.println("Loaded!");
   }
 
-  private Balance getInitialAdminBalance(User admin) {
+  private Balance getInitialAdminBalance(User admin, String currency) {
     Balance balance = new Balance();
     balance.setUser(admin);
-    Optional<Currency> rsd = this.currencyRepository.findCurrencyByCurrencyCode("RSD");
-    if (rsd.isEmpty()) {
-      throw new CurrencyNotFoundException("RSD");
-    }
-    balance.setCurrency(rsd.get());
+    Optional<Currency> curr = this.currencyRepository.findCurrencyByCurrencyCode(currency);
+    if (curr.isEmpty()) throw new CurrencyNotFoundException(currency);
+    balance.setCurrency(curr.get());
     balance.setAmount(100000f);
     return balance;
   }

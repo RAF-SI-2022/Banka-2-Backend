@@ -12,4 +12,7 @@ public interface BalanceRepository extends JpaRepository<Balance, Long> {
       String userEmail, String currencyCode);
 
   List<Balance> findAllByUser_Id(Long userId);
+
+  Optional<Balance> findBalanceByUserIdAndCurrencyId(Long userId, Long currencyId);
+
 }
