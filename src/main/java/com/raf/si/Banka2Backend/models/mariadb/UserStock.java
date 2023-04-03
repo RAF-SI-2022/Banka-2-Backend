@@ -39,4 +39,5 @@ public class UserStock {
   @NotNull private Integer amount;
 
   @NotNull private Integer amountForSale;
+
 }

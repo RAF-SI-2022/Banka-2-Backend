@@ -62,8 +62,9 @@ public class StockController {
   public ResponseEntity<?> getStockHistoryByStockIdAndTimePeriod(
       @PathVariable Long id, @PathVariable String type) {
     try {
-      return ResponseEntity.ok().body(stockService.getStockHistoryForStockByIdAndType(id, type.toUpperCase()));
-    } catch(StockNotFoundException e) {
+      return ResponseEntity.ok()
+          .body(stockService.getStockHistoryForStockByIdAndType(id, type.toUpperCase()));
+    } catch (StockNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
     }
   }
@@ -88,6 +89,4 @@ public class StockController {
     Optional<User> user = userService.findByEmail(signedInUserEmail);
     return stockService.sellStock(stockRequest, user.get());
   }
-
-
 }
