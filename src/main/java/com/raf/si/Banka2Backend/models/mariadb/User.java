@@ -75,7 +75,7 @@ public class User {
       inverseJoinColumns = {@JoinColumn(name = "permission_id", referencedColumnName = "id")})
   private List<Permission> permissions;
 
-  @OneToMany(mappedBy = "user", cascade=CascadeType.REMOVE)
+  @OneToMany(mappedBy = "user")
   private List<Balance> balances; // one balance object for every currency user operates with
 
   @ManyToMany

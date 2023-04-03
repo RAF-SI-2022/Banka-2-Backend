@@ -36,7 +36,7 @@ public class CurrencyController {
     return ResponseEntity.ok(this.currencyService.findById(id));
   }
 
-  @GetMapping(value = "/code/{code}")
+  @GetMapping(value = "/{code}")
   public ResponseEntity<?> findByCurrencyCode(@PathVariable(name = "code") String currencyCode) {
     return ResponseEntity.ok(this.currencyService.findByCurrencyCode(currencyCode));
   }
