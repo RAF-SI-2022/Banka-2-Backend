@@ -25,14 +25,11 @@ import java.util.*;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import java.util.*;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import javax.persistence.EntityManagerFactory;
 
 @Service
 public class StockService {
@@ -41,26 +38,19 @@ public class StockService {
   private StockRepository stockRepository;
   private StockHistoryRepository stockHistoryRepository;
   private ExchangeRepository exchangeRepository;
-
-  private final StockRepository stockRepository;
-  private final StockHistoryRepository stockHistoryRepository;
   private final UserService userService;
   private final UserStockService userStockService;
   private static boolean gotAll = false;
 
 
-  @Autowired
-  public StockService(
-          StockRepository stockRepository, StockHistoryRepository stockHistoryRepository, ExchangeRepository exchangeRepository) {
-          StockRepository stockRepository,
-          StockHistoryRepository stockHistoryRepository,
-          UserService userService, UserStockService userStockService) {
-    this.stockRepository = stockRepository;
-    this.stockHistoryRepository = stockHistoryRepository;
-      this.exchangeRepository = exchangeRepository;
-    this.userService = userService;
-    this.userStockService = userStockService;
-  }
+    @Autowired
+    public StockService(StockRepository stockRepository, StockHistoryRepository stockHistoryRepository, ExchangeRepository exchangeRepository, StockRepository stockRepository1, StockHistoryRepository stockHistoryRepository1, UserService userService, UserStockService userStockService) {
+        this.exchangeRepository = exchangeRepository;
+        this.stockRepository = stockRepository1;
+        this.stockHistoryRepository = stockHistoryRepository1;
+        this.userService = userService;
+        this.userStockService = userStockService;
+    }
 
   public List<Stock> getAllStocks() {
     return stockRepository.findAll();
