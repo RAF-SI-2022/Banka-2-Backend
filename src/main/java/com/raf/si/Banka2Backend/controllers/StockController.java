@@ -61,8 +61,11 @@ public class StockController {
   @GetMapping("/{id}/history/{type}")
   public ResponseEntity<?> getStockHistoryByStockIdAndTimePeriod(
       @PathVariable Long id, @PathVariable String type) {
-    return ResponseEntity.ok()
-        .body(stockService.getStockHistoryByStockIdAndTimePeriod(id, type.toUpperCase()));
+    try {
+      return ResponseEntity.ok().body(stockService.getStockHistoryForStockByIdAndType(id, type.toUpperCase()));
+    } catch(StockNotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+    }
   }
 
   @PostMapping(value = "/buy")
@@ -73,8 +76,7 @@ public class StockController {
     }
 
     Optional<User> user = userService.findByEmail(signedInUserEmail);
-
-    return stockService.buyStock(stockRequest);
+    return stockService.buyStock(stockRequest, user.get());
   }
 
   @PostMapping(value = "/sell")
@@ -83,7 +85,9 @@ public class StockController {
     if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
       return ResponseEntity.status(401).body("You don't have permission to buy/sell.");
     }
-
-    return stockService.sellStock(stockRequest);
+    Optional<User> user = userService.findByEmail(signedInUserEmail);
+    return stockService.sellStock(stockRequest, user.get());
   }
+
+
 }
