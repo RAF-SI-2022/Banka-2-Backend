@@ -79,13 +79,12 @@ public class FutureSellWorker extends Thread {
     this.futuresRequestsMap.put(singleId, future);
   }
 
-  public boolean removeFuture(Long id){
+  public boolean removeFuture(Long id) {
 
-    if(this.futuresRequestsMap.containsKey(id)) {
+    if (this.futuresRequestsMap.containsKey(id)) {
       this.futuresRequestsMap.remove(id);
       return false;
     }
     return true;
-
   }
 }

@@ -34,7 +34,6 @@ public class FutureBuyWorker extends Thread {
 
       //      System.out.println("prvi "  + futuresRequestsMap);
 
-
       for (Map.Entry<Long, FutureRequestBuySell> request : futuresRequestsMap.entrySet()) {
         futuresByName =
             futureService.findFuturesByFutureName(request.getValue().getFutureName()).get();
@@ -45,7 +44,7 @@ public class FutureBuyWorker extends Thread {
           if (request.getValue().getLimit() != 0) { // ako je postalvjen limit
             if (futureFromTable.isForSale()
                 && futureFromTable.getMaintenanceMargin() < request.getValue().getLimit()) {
-//              System.out.println("kupljen za limit");
+              //              System.out.println("kupljen za limit");
               futureFromTable.setUser(userService.findById(request.getValue().getUserId()).get());
               futureFromTable.setForSale(false);
               futureService.updateFuture(futureFromTable);
@@ -57,7 +56,7 @@ public class FutureBuyWorker extends Thread {
           if (request.getValue().getStop() != 0) { // ako je postalvjen stop
             if (futureFromTable.isForSale()
                 && futureFromTable.getMaintenanceMargin() > request.getValue().getStop()) {
-//              System.out.println("kupljen za stop");
+              //              System.out.println("kupljen za stop");
               futureFromTable.setUser(userService.findById(request.getValue().getUserId()).get());
               futureFromTable.setForSale(false);
               futureService.updateFuture(futureFromTable);
@@ -78,16 +77,15 @@ public class FutureBuyWorker extends Thread {
   }
 
   public void setFuturesRequestsMap(Long id, FutureRequestBuySell futureRequest) {
-    this.futuresRequestsMap.put(id,futureRequest);
+    this.futuresRequestsMap.put(id, futureRequest);
   }
 
-  public boolean removeFuture(Long id){
+  public boolean removeFuture(Long id) {
 
-    if(this.futuresRequestsMap.containsKey(id)) {
+    if (this.futuresRequestsMap.containsKey(id)) {
       this.futuresRequestsMap.remove(id);
       return false;
     }
     return true;
-
   }
 }
