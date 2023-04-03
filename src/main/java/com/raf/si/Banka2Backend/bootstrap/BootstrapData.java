@@ -128,7 +128,7 @@ public class BootstrapData implements CommandLineRunner {
 
     long numberOfStocks = stockRepository.count();
     if (numberOfStocks == 0) {
-      System.out.println("Added stocks");
+      System.out.println("Adding stocks");
       loadStocksTable();
     }
 
@@ -342,7 +342,7 @@ public class BootstrapData implements CommandLineRunner {
               .lowValue(new BigDecimal(data[5]))
               .priceValue(new BigDecimal(data[6]))
               .volumeValue(Long.valueOf(data[7]))
-              .lastUpdated(LocalDate.parse(data[8]))
+              .lastUpdated(LocalDate.now())
               .previousClose(new BigDecimal(data[9]))
               .changeValue(new BigDecimal(data[10]))
               .changePercent(data[11])

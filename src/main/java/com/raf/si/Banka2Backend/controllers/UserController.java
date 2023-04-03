@@ -326,6 +326,7 @@ public class UserController {
                 .jobPosition(user.getJobPosition())
                 .active(user.isActive())
                 .permissions(permissions)
+                .dailyLimit(user.getDailyLimit())
                 .build());
     return ResponseEntity.ok().body(userService.save(updatedUser.get()));
   }

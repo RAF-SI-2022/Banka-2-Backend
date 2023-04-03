@@ -1,6 +1,7 @@
 package com.raf.si.Banka2Backend.services;
 
 import com.raf.si.Banka2Backend.exceptions.ExchangeNotFoundException;
+import com.raf.si.Banka2Backend.exceptions.ExternalAPILimitReachedException;
 import com.raf.si.Banka2Backend.exceptions.StockNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.Exchange;
 import com.raf.si.Banka2Backend.models.mariadb.Stock;
@@ -172,8 +173,7 @@ public class StockService {
 
         if (stockFromDB.isEmpty()) throw new StockNotFoundException(id);
 
-        if (type.equals("YTD"))
-            return stockHistoryRepository.getStockHistoryByStockIdAndTimePeriodForYTD(id);
+        if (type.equals("YTD")) return stockHistoryRepository.getStockHistoryByStockIdForYTD(id);
 
         Integer period = null;
 
@@ -184,12 +184,12 @@ public class StockService {
         }
 
         if (period != null)
-            return stockHistoryRepository.getStockHistoryByStockIdAndTimePeriod(id, period);
-        else return stockHistoryRepository.getStockHistoryByStockIdAndTimePeriod(id, type);
+            return stockHistoryRepository.getStockHistoryByStockIdAndHistoryType(id, period);
+        else return stockHistoryRepository.getStockHistoryByStockIdAndHistoryType(id, type);
     }
 
     public List<StockHistory> getStockHistoryForStockByIdAndType(Long stockId, String type)
-            throws StockNotFoundException {
+            throws StockNotFoundException, ExternalAPILimitReachedException {
 
         Stock stock = getStockById(stockId);
 
@@ -221,9 +221,7 @@ public class StockService {
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            List<StockHistory> stockHistory = parseResponse(response, stock, type);
-
-            return stockHistory;
+            return parseResponse(response, stock, type);
         } catch (IOException e) {
 
             return getStockHistoryByStockIdAndTimePeriod(stockId, type);
@@ -232,7 +230,8 @@ public class StockService {
         }
     }
 
-    public List<StockHistory> parseResponse(HttpResponse<String> response, Stock stock, String type) {
+    public List<StockHistory> parseResponse(HttpResponse<String> response, Stock stock, String type)
+            throws ExternalAPILimitReachedException {
 
         List<StockHistory> stockHistoryList = new ArrayList<>();
 
@@ -246,7 +245,13 @@ public class StockService {
             case "ONE_MONTH", "SIX_MONTHS", "ONE_YEAR", "YTD" -> key = "Time Series (Daily)";
         }
 
-        JSONObject timeSeries = fullResponse.getJSONObject(key);
+        JSONObject timeSeries;
+
+        try {
+            timeSeries = fullResponse.getJSONObject(key);
+        } catch (JSONException e) {
+            throw new ExternalAPILimitReachedException();
+        }
 
         Set<String> timestamps = timeSeries.keySet();
         List<String> listTimestamps = new ArrayList<>(timestamps);
@@ -386,71 +391,72 @@ public class StockService {
         BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
 
         if (stockRequest.getStop() == 0 && stockRequest.getLimit() == 0) {
-            Optional<UserStock> usersStockToChange = userStockService.findUserStockByUserIdAndStockSymbol(user.getId(), stockRequest.getStockSymbol());
-            //ako ga nemamo dodaj novi
+            Optional<UserStock> usersStockToChange =userStockService.findUserStockByUserIdAndStockSymbol(user.getId(), stockRequest.getStockSymbol());
+            // ako ga nemamo dodaj novi
             if (usersStockToChange.isEmpty()) {
                 userStockService.save(new UserStock(0L, user, stock, 0, 0));
-                usersStockToChange = userStockService.findUserStockByUserIdAndStockSymbol(user.getId(), stockRequest.getStockSymbol());
+                usersStockToChange =userStockService.findUserStockByUserIdAndStockSymbol(user.getId(), stockRequest.getStockSymbol());
             }
 
-            //ako je all or none
+            // ako je all or none
             if (stockRequest.isAllOrNone()) {
-                //pronadji ako neki user ima sve, ako ne baci error
+                // pronadji ako neki user ima sve, ako ne baci error
                 UserStock allOrNoneStockToBuy = findAllOrNone(stockRequest.getStockSymbol(), user.getId(), stockRequest.getAmount());
                 if (allOrNoneStockToBuy == null) return ResponseEntity.status(500).body("Nobody has all stocks needed, try buying form the company");
-                //todo razmeni balans usera
+                // todo razmeni balans usera
 
-                //stock koji kupuje samo ga izmeni
+                // stock koji kupuje samo ga izmeni
                 usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + stockRequest.getAmount());
                 allOrNoneStockToBuy.setAmountForSale(allOrNoneStockToBuy.getAmountForSale() - stockRequest.getAmount());
                 userStockService.save(allOrNoneStockToBuy);
                 return ResponseEntity.ok().body(userStockService.save(usersStockToChange.get()));
             }
-            else {//kupovina od vise usera ILI od komapnije za ostatak stockova
-                List<UserStock> userStocksToBuy = findStocksForSale(stockRequest.getStockSymbol(), user.getId(), stockRequest.getAmount());
+            else { // kupovina od vise usera ILI od komapnije za ostatak stockova
+                List<UserStock> userStocksToBuy =findStocksForSale(stockRequest.getStockSymbol(), user.getId(), stockRequest.getAmount());
                 int totalAmountFromStocks = 0;
                 int lastAmount = 0;
 
-                for (UserStock userStockToBuy : userStocksToBuy) { //prolazimo kroz sve stockove iz liste da im setujemo for sale na 0 (jer su kupljeni)
-                    totalAmountFromStocks += userStockToBuy.getAmountForSale(); //sabiramo total jer ako je poslednji ima vise nego sto nam treba, necemo da mu damo 0, neko oduzmemo koliko nam treba
+                for (UserStock userStockToBuy :userStocksToBuy) { // prolazimo kroz sve stockove iz liste da im setujemo for sale na 0
+                    // (jer su kupljeni)
+                    totalAmountFromStocks += userStockToBuy.getAmountForSale(); // sabiramo total jer ako je poslednji ima vise nego sto nam
+                    // treba, necemo da mu damo 0, neko oduzmemo koliko nam treba
                     lastAmount = userStockToBuy.getAmountForSale();
                     userStockToBuy.setAmountForSale(0);
-                    if (totalAmountFromStocks > stockRequest.getAmount()) {//ovaj if se triggeruje ako je imalo dovoljno usera koji prodaju i prevazisli smo kolicinu koju zelimo kuputi
-                        userStockToBuy.setAmountForSale(totalAmountFromStocks - stockRequest.getAmount()); //(need 10, got 30) set 20
+                    if (totalAmountFromStocks > stockRequest .getAmount()) { // ovaj if se triggeruje ako je imalo dovoljno usera koji prodaju
+                        // i prevazisli smo kolicinu koju zelimo kuputi
+                        userStockToBuy.setAmountForSale(totalAmountFromStocks - stockRequest.getAmount()); // (need 10, got 30) set 20
                         usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + stockRequest.getAmount());
                         userStockService.save(userStockToBuy);
                         return ResponseEntity.ok().body(userStockService.save(usersStockToChange.get()));
                     }
-                    //todo razmeni balans usera
+                    // todo razmeni balans usera
 
                     usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + lastAmount);
                     userStockService.save(userStockToBuy);
                 }
-                //ovde ce doci ako nije uspeo kupiti sve od usera, i ostatak kupuje od firme
+                // ovde ce doci ako nije uspeo kupiti sve od usera, i ostatak kupuje od firme
                 int remaining = stockRequest.getAmount() - totalAmountFromStocks;
                 if (remaining < 0) return ResponseEntity.status(500).body("Something went while buying stocks");
 
-                //todo skloni mu iz balansa
+                // todo skloni mu iz balansa
 
-//                if (remaining == 0){
-//                    System.out.println("usli smo u lastAmount " + (usersStockToChange.get().getAmount() + stockRequest.getAmount()));
-//                    System.out.println(usersStockToChange.get().getAmount() + " " + lastAmount);
-//                    usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + stockRequest.getAmount());
-//                    return ResponseEntity.ok().body(userStockService.save(usersStockToChange.get()));
-//                }
 
                 System.out.println("dosli do remaining " + remaining);
                 System.out.println("lastAmount " + lastAmount);
                 usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + remaining);
                 return ResponseEntity.ok().body(userStockService.save(usersStockToChange.get()));
             }
-        }
-        else {
+        } else {
             // todo buy with limits
             System.out.println("buy with limits");
         }
 
         return null;
+    }
+
+    public List<UserStock> getAllUserStocks() {
+        List<UserStock> allUserStocks = userStockService.findAll();
+        return allUserStocks;
     }
 
     private List<UserStock> findStocksForSale(String stockSymbol, long buyingUserId, int amount) {
@@ -462,9 +468,12 @@ public class StockService {
 
         for (UserStock userStock : allUserStocks) {
             System.out.println("---");
-            System.out.println("got " + userStock.getStock().getSymbol() + " " +userStock.getAmountForSale());
+            System.out.println(
+                    "got " + userStock.getStock().getSymbol() + " " + userStock.getAmountForSale());
 
-            if (userStock.getStock().getSymbol().equals(stockSymbol) && userStock.getAmountForSale() != 0 && userStock.getUser().getId() != buyingUserId) {
+            if (userStock.getStock().getSymbol().equals(stockSymbol)
+                    && userStock.getAmountForSale() != 0
+                    && userStock.getUser().getId() != buyingUserId) {
 
                 System.out.println("nasli smo ga");
 
@@ -506,11 +515,12 @@ public class StockService {
         List<UserStock> allUserStocks = userStockService.findAll();
 
         for (UserStock userStock : allUserStocks) {
-            if (userStock.getStock().getSymbol().equals(stockSymbol) && userStock.getAmountForSale() >= amount && userStock.getUser().getId() != buyingUserId) {
+            if (userStock.getStock().getSymbol().equals(stockSymbol)
+                    && userStock.getAmountForSale() >= amount
+                    && userStock.getUser().getId() != buyingUserId) {
                 return userStock;
             }
         }
         return null;
     }
-
 }
