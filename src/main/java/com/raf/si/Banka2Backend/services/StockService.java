@@ -132,11 +132,16 @@ public class StockService {
     BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
 
     if (stockRequest.getStop() == 0 && stockRequest.getLimit() == 0) {
-      if (stockRequest.isAllOrNone()){
+      List<UserStock> userStocksToBuy = findStocksForSale(stockRequest.getStockSymbol(), user.getId(), stockRequest.getAmount());
 
+      if (stockRequest.isAllOrNone()){
+//        if (!gotAll) return ResponseEntity.status(500).body("No user has all the needed stocks, buy from the company");
+
+        //todo nadji koji ima sve
       }
       else {
 
+        //prodji i kupi
       }
 
     }
@@ -148,7 +153,8 @@ public class StockService {
     return null;
   }
 
-  private List<UserStock> findStocksForSale(String stockSymbol, long buyingUserId, int amount, boolean gotAll){
+  private List<UserStock> findStocksForSale(String stockSymbol, long buyingUserId, int amount){
+    gotAll = false;
     List<UserStock> userStockToTryBuying = new ArrayList<>();
     int collectedAmount = 0;
     List<UserStock> allUserStocks = userStockService.findAll();
@@ -163,9 +169,6 @@ public class StockService {
         gotAll = true;
         return userStockToTryBuying;
       }
-
-
-
     }
 
     return userStockToTryBuying;
