@@ -13,5 +13,6 @@ public class UpdateUserRequest {
   private List<PermissionName> permissions;
   private String jobPosition;
   private boolean active;
+  private Double dailyLimit;
   private String phone;
 }

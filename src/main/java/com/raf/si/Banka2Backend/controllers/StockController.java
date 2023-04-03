@@ -92,5 +92,10 @@ public class StockController {
     return stockService.sellStock(stockRequest, user.get());
   }
 
+  @GetMapping(value = "/user-stocks")
+  public ResponseEntity<?> getAllUserStocks(){
+    return ResponseEntity.ok().body(this.stockService.getAllUserStocks());
+  }
+
 
 }
