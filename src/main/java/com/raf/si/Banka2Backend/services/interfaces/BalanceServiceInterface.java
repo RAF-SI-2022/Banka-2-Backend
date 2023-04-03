@@ -1,8 +1,6 @@
 package com.raf.si.Banka2Backend.services.interfaces;
 
 import com.raf.si.Banka2Backend.models.mariadb.Balance;
-import com.raf.si.Banka2Backend.models.mariadb.User;
-
 import java.util.List;
 
 public interface BalanceServiceInterface {
@@ -24,5 +22,4 @@ public interface BalanceServiceInterface {
   void exchangeMoney(String userFromEmail, String userToEmail, Float amount, String currencyCode);
 
   Balance findBalanceByUserIdAndCurrency(Long userId, String currency);
-
 }

@@ -34,8 +34,8 @@ public class ForexController {
 
   @GetMapping("/{fromCurrency}/{toCurrency}")
   public Forex getForexUsingFromAndToCurrency(
-          @PathVariable(name = "fromCurrency") String fromCurrency,
-          @PathVariable(name = "toCurrency") String toCurrency) {
+      @PathVariable(name = "fromCurrency") String fromCurrency,
+      @PathVariable(name = "toCurrency") String toCurrency) {
     return forexService.getForexForCurrencies(fromCurrency, toCurrency);
   }
 

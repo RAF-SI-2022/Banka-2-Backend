@@ -74,8 +74,9 @@ public class FutureSellWorker extends Thread {
   public Map<Long, FutureRequestBuySell> getFuturesRequestsMap() {
     return futuresRequestsMap;
   }
+
   public void setFuturesRequestsMap(Long singleId, FutureRequestBuySell future) {
-     this.futuresRequestsMap.put(singleId,future);
+    this.futuresRequestsMap.put(singleId, future);
   }
 
   public boolean removeFuture(Long id){

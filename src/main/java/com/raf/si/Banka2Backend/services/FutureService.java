@@ -7,9 +7,7 @@ import com.raf.si.Banka2Backend.requests.FutureRequestBuySell;
 import com.raf.si.Banka2Backend.services.interfaces.FutureServiceInterface;
 import com.raf.si.Banka2Backend.services.workerThreads.FutureBuyWorker;
 import com.raf.si.Banka2Backend.services.workerThreads.FutureSellWorker;
-
 import java.util.*;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +20,8 @@ public class FutureService implements FutureServiceInterface {
   private final FutureBuyWorker futureBuyWorker;
   private final BalanceService balanceService;
 
-  public FutureService(UserService userService, FutureRepository futureRepository, BalanceService balanceService) {
+  public FutureService(
+      UserService userService, FutureRepository futureRepository, BalanceService balanceService) {
     this.futureRepository = futureRepository;
     this.userService = userService;
     this.balanceService = balanceService;
@@ -49,20 +48,20 @@ public class FutureService implements FutureServiceInterface {
   }
 
   @Override
-  public ResponseEntity<?> buyFuture(FutureRequestBuySell futureRequest, String fromUserEmail, Float usersMoneyInCurrency) {
+  public ResponseEntity<?> buyFuture(
+      FutureRequestBuySell futureRequest, String fromUserEmail, Float usersMoneyInCurrency) {
     if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) { // regularni buy
       Optional<Future> future = futureRepository.findById(futureRequest.getId());
 
-      if (future.isEmpty())
+      if (future.isEmpty()) return ResponseEntity.status(500).body("Internal server error");
+      if (!future.get().isForSale())
         return ResponseEntity.status(500).body("Internal server error");
-      if(!future.get().isForSale())
-        return ResponseEntity.status(500).body("Internal server error");
-
 
       User toUser = future.get().getUser();
       if (toUser != null) {
         float amount = future.get().getMaintenanceMargin();
-        if (usersMoneyInCurrency < amount)  return ResponseEntity.status(500).body("Not enough money bro >:(");
+        if (usersMoneyInCurrency < amount)
+          return ResponseEntity.status(500).body("Not enough money bro >:(");
         balanceService.exchangeMoney(fromUserEmail, toUser.getEmail(), amount, "USD");
       }
 
@@ -76,7 +75,6 @@ public class FutureService implements FutureServiceInterface {
     }
   }
 
-
   public void updateFuture(Future future) {
     futureRepository.save(future);
   }
@@ -86,7 +84,7 @@ public class FutureService implements FutureServiceInterface {
     if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) {
       Optional<Future> future = futureRepository.findById(futureRequest.getId());
       if (future.isEmpty()) return ResponseEntity.status(500).body("Internal server error");
-      if(future.get().isForSale()) return ResponseEntity.status(500).body("Internal server error");
+      if (future.get().isForSale()) return ResponseEntity.status(500).body("Internal server error");
       future.get().setForSale(true);
       future.get().setMaintenanceMargin(futureRequest.getPrice());
       futureRepository.save(future.get());
@@ -97,21 +95,19 @@ public class FutureService implements FutureServiceInterface {
     }
   }
 
-
   @Override
   public ResponseEntity<?> removeFromMarket(Long futureId) {
     Optional<Future> future = findById(futureId);
-    if(future.isEmpty()) return ResponseEntity.status(500).body("Internal server error");
+    if (future.isEmpty()) return ResponseEntity.status(500).body("Internal server error");
 
-    if(!future.get().isForSale()){
+    if (!future.get().isForSale()) {
       return ResponseEntity.status(500).body("This isnt for sale");
     }
 
     future.get().setForSale(false);
     updateFuture(future.get());
 
-    if (!findById(futureId).get().isForSale())
-      return ResponseEntity.ok().body(findById(futureId));
+    if (!findById(futureId).get().isForSale()) return ResponseEntity.ok().body(findById(futureId));
     return ResponseEntity.status(500).body("Internal server error");
   }
   @Override
@@ -166,14 +162,14 @@ public class FutureService implements FutureServiceInterface {
   public List<Long> getWaitingFuturesForUser(Long userId, String type, String futureName) {
     List<Long> futureIdsToReturn = new ArrayList<>();
 
-    Map<Long,FutureRequestBuySell> mapToSearch = new HashMap<>();
+    Map<Long, FutureRequestBuySell> mapToSearch = new HashMap<>();
 
     if (type.equals("buy")) mapToSearch = futureBuyWorker.getFuturesRequestsMap();
     else if (type.equals("sell")) mapToSearch = futureSellWorker.getFuturesRequestsMap();
 
-
-    for (Map.Entry<Long, FutureRequestBuySell> future: mapToSearch.entrySet()) {
-      if (future.getValue().getUserId().equals(userId) && future.getValue().getFutureName().equals(futureName)){
+    for (Map.Entry<Long, FutureRequestBuySell> future : mapToSearch.entrySet()) {
+      if (future.getValue().getUserId().equals(userId)
+          && future.getValue().getFutureName().equals(futureName)) {
         futureIdsToReturn.add(future.getKey());
       }
     }

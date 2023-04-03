@@ -30,9 +30,9 @@ public class FutureBuyWorker extends Thread {
   @Override
   public void run() {
     while (true) {
-//      System.out.println("start while - " + futuresRequestsMap.size());
+      //      System.out.println("start while - " + futuresRequestsMap.size());
 
-//      System.out.println("prvi "  + futuresRequestsMap);
+      //      System.out.println("prvi "  + futuresRequestsMap);
 
 
       for (Map.Entry<Long, FutureRequestBuySell> request : futuresRequestsMap.entrySet()) {
@@ -73,7 +73,7 @@ public class FutureBuyWorker extends Thread {
   }
 
   public Map<Long, FutureRequestBuySell> getFuturesRequestsMap() {
-//    System.out.println(futuresRequestsMap);
+    //    System.out.println(futuresRequestsMap);
     return futuresRequestsMap;
   }
 
