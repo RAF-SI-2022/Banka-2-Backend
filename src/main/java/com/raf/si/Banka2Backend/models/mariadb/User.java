@@ -77,8 +77,10 @@ public class User {
   @OneToMany(mappedBy = "user")
   private List<Balance> balances; // one balance object for every currency user operates with
 
+  @JsonIgnore
   @OneToMany(mappedBy = "user")
   private List<UserStock> stocks;
 
-  @NotNull private Double dailyLimit;
+  @NotNull
+  private Double dailyLimit;
 }

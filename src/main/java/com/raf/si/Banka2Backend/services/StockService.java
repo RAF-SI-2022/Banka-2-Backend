@@ -385,6 +385,11 @@ public class StockService {
     return null;
   }
 
+  public List<UserStock> getAllUserStocks(){
+        List<UserStock> allUserStocks = userStockService.findAll();
+        return allUserStocks;
+  }
+
   private List<UserStock> findStocksForSale(String stockSymbol, long buyingUserId, int amount, boolean gotAll){
     List<UserStock> userStockToTryBuying = new ArrayList<>();
     int collectedAmount = 0;
