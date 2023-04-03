@@ -120,4 +120,18 @@ public class UserService implements UserDetailsService, UserServiceInterface {
       throw new PasswordResetTokenNotFoundException(passwordResetToken);
     }
   }
+
+  @Override
+  public User changeUsersDailyLimit(String userEmail, Double limitChange) {
+    User user = findByEmail(userEmail).get();
+    user.setDailyLimit(user.getDailyLimit() + limitChange);
+    userRepository.save(user);
+    return user;
+  }
+
+  @Override
+  public Double getUsersDailyLimit(String userEmail) {
+    return findByEmail(userEmail).get().getDailyLimit();
+  }
+
 }
