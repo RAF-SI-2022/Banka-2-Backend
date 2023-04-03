@@ -33,15 +33,8 @@ public class BalanceService implements BalanceServiceInterface {
 
   @Override
   @Transactional
-  public void buyOrSellCurrency(
-      String userEmail,
-      String fromCurrencyCode,
-      String toCurrencyCode,
-      Float exchangeRate,
-      Integer amountOfMoney) {
-    Optional<Balance> balanceForFromCurrency =
-        this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(
-            userEmail, fromCurrencyCode);
+  public void buyOrSellCurrency(String userEmail, String fromCurrencyCode, String toCurrencyCode, Float exchangeRate, Integer amountOfMoney) {
+    Optional<Balance> balanceForFromCurrency =this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(userEmail, fromCurrencyCode);
 
     if (balanceForFromCurrency.isEmpty()) {
       throw new BalanceNotFoundException(userEmail, fromCurrencyCode);
@@ -55,9 +48,7 @@ public class BalanceService implements BalanceServiceInterface {
     this.balanceRepository.save(balanceForFromCurrency.get());
 
     // Check if balance for toCurrency exists. If yes update it with new amount, if not create it.
-    Optional<Balance> balanceForToCurrency =
-        this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(
-            userEmail, toCurrencyCode);
+    Optional<Balance> balanceForToCurrency =this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(userEmail, toCurrencyCode);
     Optional<Currency> newCurrency = this.currencyService.findByCurrencyCode(toCurrencyCode);
 
     if (balanceForToCurrency.isPresent()) {
@@ -66,7 +57,8 @@ public class BalanceService implements BalanceServiceInterface {
           balanceForToCurrency.get().getAmount() + amountOfMoney * exchangeRate;
       balanceForToCurrency.get().setAmount(newAmountInToCurrency);
       this.balanceRepository.save(balanceForToCurrency.get());
-    } else {
+    }
+    else {
       // create new balance for toCurrency
       Balance newBalanceForToCurrency = new Balance();
       newBalanceForToCurrency.setUser(this.userService.findByEmail(userEmail).get());

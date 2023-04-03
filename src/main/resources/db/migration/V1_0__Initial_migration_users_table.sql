@@ -7,5 +7,6 @@ CREATE TABLE IF NOT EXISTS `users` (
     `jmbg` varchar(13) NOT NULL,
     `pozicija` varchar(20) NOT NULL,
     `broj_telefona` varchar(20) NOT NULL,
-    `aktivan` BOOLEAN
+    `aktivan` BOOLEAN,
+    `daily_limit` DOUBLE NOT NULL
 );
