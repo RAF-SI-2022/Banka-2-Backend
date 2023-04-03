@@ -100,7 +100,7 @@ public class UserController {
             .jobPosition(user.getJobPosition())
             .active(user.isActive())
             .permissions(permissions)
-            .dailyLimit(user.getDailyLimit())//todo limit ceka front integraciju
+            .dailyLimit(user.getDailyLimit()) // todo limit ceka front integraciju
             .build();
 
     userService.save(newUser); // mora duplo zbog balansa
@@ -331,12 +331,11 @@ public class UserController {
   }
 
   @GetMapping(value = "/limit")
-  public ResponseEntity<?> getUserDailyLimit(){
+  public ResponseEntity<?> getUserDailyLimit() {
     String signedInUserEmail = getContext().getAuthentication().getName();
     if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
       return ResponseEntity.status(401).body("You don't have permission to buy/sell.");
     }
     return ResponseEntity.ok().body(userService.getUsersDailyLimit(signedInUserEmail));
   }
-
 }

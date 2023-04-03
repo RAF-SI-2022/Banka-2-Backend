@@ -9,6 +9,7 @@ import com.raf.si.Banka2Backend.models.mariadb.Permission;
 import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
 import com.raf.si.Banka2Backend.repositories.mariadb.*;
 import com.raf.si.Banka2Backend.services.ForexService;
+import com.raf.si.Banka2Backend.services.StockService;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -22,8 +23,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import javax.persistence.EntityManagerFactory;
-
-import com.raf.si.Banka2Backend.services.StockService;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,18 +72,20 @@ public class BootstrapData implements CommandLineRunner {
 
   @Autowired
   public BootstrapData(
-          UserRepository userRepository,
-          PermissionRepository permissionRepository,
-          CurrencyRepository currencyRepository,
-          InflationRepository inflationRepository,
-          PasswordEncoder passwordEncoder,
-          ExchangeRepository exchangeRepository,
-          FutureRepository futureRepository,
-          BalanceRepository balanceRepository,
-          UserStocksRepository userStocksRepository, ForexService forexService,
-          StockRepository stockRepository,
-          StockHistoryRepository stockHistoryRepository,
-          StockService stockService, EntityManagerFactory entityManagerFactory) {
+      UserRepository userRepository,
+      PermissionRepository permissionRepository,
+      CurrencyRepository currencyRepository,
+      InflationRepository inflationRepository,
+      PasswordEncoder passwordEncoder,
+      ExchangeRepository exchangeRepository,
+      FutureRepository futureRepository,
+      BalanceRepository balanceRepository,
+      UserStocksRepository userStocksRepository,
+      ForexService forexService,
+      StockRepository stockRepository,
+      StockHistoryRepository stockHistoryRepository,
+      StockService stockService,
+      EntityManagerFactory entityManagerFactory) {
     this.userRepository = userRepository;
     this.permissionRepository = permissionRepository;
     this.currencyRepository = currencyRepository;
@@ -158,7 +159,7 @@ public class BootstrapData implements CommandLineRunner {
             .phone(ADMIN_PHONE)
             .jobPosition(ADMIN_JOB)
             .active(ADMIN_ACTIVE)
-            .dailyLimit(10000D)//USD
+            .dailyLimit(10000D) // USD
             .build();
 
     // Add initial perms
@@ -191,7 +192,7 @@ public class BootstrapData implements CommandLineRunner {
     System.out.println("Loaded!");
   }
 
-  private void giveAdminStocks(User user){//todo popravi
+  private void giveAdminStocks(User user) { // todo popravi
     Stock stock = stockService.getStockBySymbol("AAPL");
     Stock stock2 = stockService.getStockBySymbol("GOOGL");
     UserStock userStock = new UserStock(0L, user, stock, 100, 0);

@@ -2,7 +2,6 @@ package com.raf.si.Banka2Backend.models.mariadb;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -43,5 +42,4 @@ public class Stock {
   private Exchange exchange;
 
   private String websiteUrl;
-
 }
