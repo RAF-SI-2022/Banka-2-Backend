@@ -117,25 +117,23 @@ public class FutureController {
   }
 
   @PostMapping(value = "/remove-waiting-sell/{id}")
-  public ResponseEntity<?> removeWaitingSellFutures(@PathVariable(name = "id") Long id ){
+  public ResponseEntity<?> removeWaitingSellFutures(@PathVariable(name = "id") Long id) {
     String signedInUserEmail = getContext().getAuthentication().getName();
 
     if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
       return ResponseEntity.status(401).body("You don't have permission to read users.");
     }
     return futureService.removeWaitingSellFuture(id);
-
   }
 
   @PostMapping(value = "/remove-waiting-buy/{id}")
-  public ResponseEntity<?> removeWaitingBuyFutures(@PathVariable(name = "id") Long id ){
+  public ResponseEntity<?> removeWaitingBuyFutures(@PathVariable(name = "id") Long id) {
     String signedInUserEmail = getContext().getAuthentication().getName();
 
     if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
       return ResponseEntity.status(401).body("You don't have permission to read users.");
     }
     return futureService.removeWaitingBuyFuture(id);
-
   }
 
   @GetMapping(value = "waiting-futures/{type}/{futureName}")

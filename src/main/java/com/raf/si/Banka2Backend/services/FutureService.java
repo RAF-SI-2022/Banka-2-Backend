@@ -110,22 +110,23 @@ public class FutureService implements FutureServiceInterface {
     if (!findById(futureId).get().isForSale()) return ResponseEntity.ok().body(findById(futureId));
     return ResponseEntity.status(500).body("Internal server error");
   }
-  @Override
-  public ResponseEntity<?> removeWaitingSellFuture(Long id){
 
-    Map<Long,FutureRequestBuySell> mapToSearch = new HashMap<>();
+  @Override
+  public ResponseEntity<?> removeWaitingSellFuture(Long id) {
+
+    Map<Long, FutureRequestBuySell> mapToSearch = new HashMap<>();
     mapToSearch = futureSellWorker.getFuturesRequestsMap();
 
     boolean error = true;
-    for (Map.Entry<Long, FutureRequestBuySell> future: mapToSearch.entrySet()) {
-      if (future.getValue().getId().equals(id)){
+    for (Map.Entry<Long, FutureRequestBuySell> future : mapToSearch.entrySet()) {
+      if (future.getValue().getId().equals(id)) {
 
         error = futureSellWorker.removeFuture(id);
         break;
       }
     }
 
-    if(error){
+    if (error) {
       return ResponseEntity.status(500).body("Internal server error");
     }
 
@@ -135,21 +136,21 @@ public class FutureService implements FutureServiceInterface {
   }
 
   @Override
-  public ResponseEntity<?> removeWaitingBuyFuture(Long id){
+  public ResponseEntity<?> removeWaitingBuyFuture(Long id) {
 
-    Map<Long,FutureRequestBuySell> mapToSearch = new HashMap<>();
+    Map<Long, FutureRequestBuySell> mapToSearch = new HashMap<>();
     mapToSearch = futureBuyWorker.getFuturesRequestsMap();
 
     boolean error = true;
-    for (Map.Entry<Long, FutureRequestBuySell> future: mapToSearch.entrySet()) {
-      if (future.getValue().getId().equals(id)){
+    for (Map.Entry<Long, FutureRequestBuySell> future : mapToSearch.entrySet()) {
+      if (future.getValue().getId().equals(id)) {
 
         error = futureBuyWorker.removeFuture(id);
         break;
       }
     }
 
-    if(error){
+    if (error) {
       return ResponseEntity.status(500).body("Internal server error");
     }
 
