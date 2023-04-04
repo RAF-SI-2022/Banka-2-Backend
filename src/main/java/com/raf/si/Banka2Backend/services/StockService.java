@@ -505,8 +505,11 @@ public class StockService {
                             user.getId(), stockRequest.getStockSymbol());
 
             // premestamo iz amount u amount_for_sale
+            if((userStock.get().getAmount() - stockRequest.getAmount())<0){
+                return ResponseEntity.status(500).body("Internal error");
+            }
             userStock.get().setAmount(userStock.get().getAmount() - stockRequest.getAmount());
-            userStock.get().setAmountForSale(stockRequest.getAmount());
+            userStock.get().setAmountForSale(userStock.get().getAmountForSale() + stockRequest.getAmount());
             return ResponseEntity.ok().body(userStockService.save(userStock.get()));
         } else {
             // todo sell with limits
