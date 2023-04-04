@@ -100,7 +100,7 @@ public class UserController {
             .jobPosition(user.getJobPosition())
             .active(user.isActive())
             .permissions(permissions)
-            .dailyLimit(10000D) // todo limit ceka front integraciju
+            .dailyLimit(user.getDailyLimit()) // todo limit ceka front integraciju
             .build();
 
     userService.save(newUser); // mora duplo zbog balansa
@@ -118,7 +118,7 @@ public class UserController {
             .jobPosition(user.getJobPosition())
             .active(user.isActive())
             .permissions(permissions)
-            // todo vrati limit
+            .dailyLimit(user.getDailyLimit())
             .build();
 
     return ResponseEntity.ok(response);
@@ -326,6 +326,7 @@ public class UserController {
                 .jobPosition(user.getJobPosition())
                 .active(user.isActive())
                 .permissions(permissions)
+                .dailyLimit(user.getDailyLimit())
                 .build());
     return ResponseEntity.ok().body(userService.save(updatedUser.get()));
   }

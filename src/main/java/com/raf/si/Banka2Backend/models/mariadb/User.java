@@ -6,10 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
@@ -77,12 +74,9 @@ public class User {
   @OneToMany(mappedBy = "user")
   private List<Balance> balances; // one balance object for every currency user operates with
 
-  @ManyToMany
-  @JoinTable(
-      name = "users_stocks",
-      joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-      inverseJoinColumns = {@JoinColumn(name = "stock_id", referencedColumnName = "id")})
-  private List<Stock> stocks;
+  @JsonIgnore
+  @OneToMany(mappedBy = "user")
+  private List<UserStock> stocks;
 
   @NotNull private Double dailyLimit;
 }

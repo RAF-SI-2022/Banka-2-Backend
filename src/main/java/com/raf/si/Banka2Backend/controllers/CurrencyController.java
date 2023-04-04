@@ -33,12 +33,20 @@ public class CurrencyController {
 
   @GetMapping(value = "/{id}")
   public ResponseEntity<?> findById(@PathVariable(name = "id") Long id) {
-    return ResponseEntity.ok(this.currencyService.findById(id));
+    try {
+      return ResponseEntity.ok(this.currencyService.findById(id));
+    } catch (CurrencyNotFoundException currencyNotFoundException) {
+      return ResponseEntity.notFound().build();
+    }
   }
 
   @GetMapping(value = "/code/{code}")
   public ResponseEntity<?> findByCurrencyCode(@PathVariable(name = "code") String currencyCode) {
-    return ResponseEntity.ok(this.currencyService.findByCurrencyCode(currencyCode));
+    try {
+      return ResponseEntity.ok(this.currencyService.findByCurrencyCode(currencyCode));
+    } catch (CurrencyNotFoundException currencyNotFoundException) {
+      return ResponseEntity.notFound().build();
+    }
   }
 
   @GetMapping(value = "/{id}/inflation")
