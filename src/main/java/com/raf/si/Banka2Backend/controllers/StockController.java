@@ -99,7 +99,12 @@ public class StockController {
 
   @GetMapping(value = "/user-stocks")
   public ResponseEntity<?> getAllUserStocks() {
-    return ResponseEntity.ok().body(this.stockService.getAllUserStocks());
+    String signedInUserEmail = getContext().getAuthentication().getName();
+    if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+      return ResponseEntity.status(401).body("You don't have permission to remove stock from market.");
+    }
+
+    return ResponseEntity.ok().body(this.stockService.getAllUserStocks(userService.findByEmail(signedInUserEmail).get().getId()));
   }
 
   @PostMapping(value = "/remove/{symbol}")
@@ -110,5 +115,6 @@ public class StockController {
     }
     return ResponseEntity.ok().body(userStockService.removeFromMarket(userService.findByEmail(signedInUserEmail).get().getId(), symbol));
   }
+
 
 }

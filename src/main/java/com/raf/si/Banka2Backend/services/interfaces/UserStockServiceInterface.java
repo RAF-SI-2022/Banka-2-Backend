@@ -12,5 +12,7 @@ public interface UserStockServiceInterface {
 
   List<UserStock> findAll();
 
+  List<UserStock> findAllForUser(long userId);
+
   UserStock removeFromMarket(long userId, String stockSymbol);
 }
