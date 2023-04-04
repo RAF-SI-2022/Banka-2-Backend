@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-public class ExchangeFailuresIntegrationSteps {
+public class ExchangeFailuresIntegrationSteps extends ExchangeFailuresIntegrationTestConfig {
 
   @Autowired private UserService userService;
   @Autowired protected MockMvc mockMvc;

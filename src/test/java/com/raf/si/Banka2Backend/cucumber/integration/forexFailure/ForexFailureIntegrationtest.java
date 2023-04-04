@@ -1,4 +1,4 @@
-package com.raf.si.Banka2Backend.cucumber.integration.stocks;
+package com.raf.si.Banka2Backend.cucumber.integration.forexFailure;
 
 import static io.cucumber.core.options.Constants.GLUE_PROPERTY_NAME;
 
@@ -9,8 +9,8 @@ import org.junit.platform.suite.api.Suite;
 
 @Suite
 @IncludeEngines("cucumber")
-@SelectClasspathResource("features/stock-integration/stocks.feature")
+@SelectClasspathResource("features/forex-integration/forexFailure.feature")
 @ConfigurationParameter(
     key = GLUE_PROPERTY_NAME,
-    value = "com.raf.si.Banka2Backend.cucumber.integration.stocks")
-public class StocksIntegrationTest {}
+    value = "com.raf.si.Banka2Backend.cucumber.integration.forexFailure")
+public class ForexFailureIntegrationtest {}
