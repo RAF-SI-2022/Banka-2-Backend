@@ -32,4 +32,13 @@ public class UserStockService implements UserStockServiceInterface {
   public List<UserStock> findAll() {
     return userStocksRepository.findAll();
   }
+
+  @Override
+  public UserStock removeFromMarket(long userId, String stockSymbol) {
+    Optional<UserStock> userStock = userStocksRepository.findUserStockByUserIdAndStockSymbol(userId, stockSymbol);
+    userStock.get().setAmount(userStock.get().getAmount() + userStock.get().getAmountForSale());
+    userStock.get().setAmountForSale(0);
+    return  userStocksRepository.save(userStock.get());
+  }
+
 }

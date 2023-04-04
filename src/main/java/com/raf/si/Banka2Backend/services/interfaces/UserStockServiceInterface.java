@@ -11,4 +11,6 @@ public interface UserStockServiceInterface {
   UserStock save(UserStock userStock);
 
   List<UserStock> findAll();
+
+  UserStock removeFromMarket(long userId, String stockSymbol);
 }
