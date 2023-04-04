@@ -6,7 +6,10 @@ import static org.mockito.Mockito.when;
 
 import com.raf.si.Banka2Backend.models.mariadb.Forex;
 import com.raf.si.Banka2Backend.repositories.mariadb.ForexRepository;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -61,6 +64,8 @@ class ForexServiceTest {
   public void testGetForexForCurrenciesInDb() {
     String fromCurrency = "USD";
     String toCurrency = "EUR";
+    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    String systemTime = dateFormat.format(new Date());
 
     Forex forex =
         Forex.builder()
@@ -71,7 +76,7 @@ class ForexServiceTest {
             .askPrice("0.845")
             .bidPrice("0.855")
             .exchangeRate("0.85")
-            .lastRefreshed("2023-04-02 23:30:00")
+            .lastRefreshed(systemTime)
             .timeZone("UTC")
             .build();
 

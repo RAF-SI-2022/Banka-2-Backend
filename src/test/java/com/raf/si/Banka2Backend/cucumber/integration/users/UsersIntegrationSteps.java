@@ -152,7 +152,8 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                                                               "jobPosition": "ADMINISTRATOR",
                                                               "active": true,
                                                               "jmbg": "1231231231235",
-                                                              "phone": "640601548865"
+                                                              "phone": "640601548865",
+                                                              "dailyLimit": 5000
                                                             }
                                                             """)
                       .header("Content-Type", "application/json")
