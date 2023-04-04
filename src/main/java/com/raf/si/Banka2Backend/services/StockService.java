@@ -390,14 +390,12 @@ public class StockService {
         BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
         Balance usersBalance = balanceService.findBalanceByUserIdAndCurrency(user.getId(), "USD");
 
-        BigDecimal bdUserBalance = BigDecimal.valueOf(usersBalance.getAmount());
         BigDecimal totalPrice = price.multiply(BigDecimal.valueOf(stockRequest.getAmount()));
 
         //todo check da li ima dovoljno para
-//        //==0 equal | ==1 greater
-//        if (bdUserBalance.compareTo(totalPrice) < 0)
-//            return ResponseEntity.status(500).body("Nemas doboljo para, siramasan si buraz 💀");
-
+        //==0 equal | ==1 greater
+        if (usersBalance.getAmount() < totalPrice.floatValue())
+            return ResponseEntity.status(500).body("Nemas doboljo para, siramasan si buraz 💀");
 
         if (stockRequest.getStop() == 0 && stockRequest.getLimit() == 0) {
             Optional<UserStock> usersStockToChange =
@@ -419,10 +417,6 @@ public class StockService {
                 if (allOrNoneStockToBuy == null)
                     return ResponseEntity.status(500)
                             .body("Nobody has all stocks needed, try buying form the company");
-                //todo razmeni balans usera
-
-
-              //todo  balanceService.exchangeMoney(fromUserEmail, "to", 1, "USD");
 
                 // stock koji kupuje samo ga izmeni
                 usersStockToChange
@@ -431,6 +425,11 @@ public class StockService {
                 allOrNoneStockToBuy.setAmountForSale(
                         allOrNoneStockToBuy.getAmountForSale() - stockRequest.getAmount());
                 userStockService.save(allOrNoneStockToBuy);
+
+                //todo proveri dal radi
+                String toUserEmail = allOrNoneStockToBuy.getUser().getEmail();
+                balanceService.exchangeMoney(fromUserEmail, toUserEmail, totalPrice.floatValue(), "USD");
+
                 return ResponseEntity.ok().body(userStockService.save(usersStockToChange.get()));
             } else { // kupovina od vise usera ILI od komapnije za ostatak stockova
                 List<UserStock> userStocksToBuy =
@@ -439,29 +438,23 @@ public class StockService {
                 int totalAmountFromStocks = 0;
                 int lastAmount = 0;
 
-                for (UserStock userStockToBuy :
-                        userStocksToBuy) { // prolazimo kroz sve stockove iz liste da im setujemo for sale na 0
+                for (UserStock userStockToBuy : userStocksToBuy) { // prolazimo kroz sve stockove iz liste da im setujemo for sale na 0
                     // (jer su kupljeni)
-                    totalAmountFromStocks +=
-                            userStockToBuy
-                                    .getAmountForSale(); // sabiramo total jer ako je poslednji ima vise nego sto nam
+                    totalAmountFromStocks += userStockToBuy .getAmountForSale(); // sabiramo total jer ako je poslednji ima vise nego sto nam
                     // treba, necemo da mu damo 0, neko oduzmemo koliko nam treba
                     lastAmount = userStockToBuy.getAmountForSale();
+
+                    Float payToOneUser = lastAmount * price.floatValue();//platimo jednom useru, (od koga smo kupili neku kolicinu stockova)
+                    balanceService.exchangeMoney(fromUserEmail, userStockToBuy.getUser().getEmail(), payToOneUser, "USD");
                     userStockToBuy.setAmountForSale(0);
-                    if (totalAmountFromStocks
-                            > stockRequest
-                            .getAmount()) { // ovaj if se triggeruje ako je imalo dovoljno usera koji prodaju
+
+                    if (totalAmountFromStocks > stockRequest .getAmount()) { // ovaj if se triggeruje ako je imalo dovoljno usera koji prodaju
                         // i prevazisli smo kolicinu koju zelimo kuputi
-                        userStockToBuy.setAmountForSale(
-                                totalAmountFromStocks - stockRequest.getAmount()); // (need 10, got 30) set 20
-                        usersStockToChange
-                                .get()
-                                .setAmount(usersStockToChange.get().getAmount() + stockRequest.getAmount());
+                        userStockToBuy.setAmountForSale(totalAmountFromStocks - stockRequest.getAmount()); // (need 10, got 30) set 20
+                        usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + stockRequest.getAmount());
                         userStockService.save(userStockToBuy);
                         return ResponseEntity.ok().body(userStockService.save(usersStockToChange.get()));
                     }
-                    // todo razmeni balans usera
-
                     usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + lastAmount);
                     userStockService.save(userStockToBuy);
                 }
@@ -470,11 +463,9 @@ public class StockService {
                 if (remaining < 0)
                     return ResponseEntity.status(500).body("Something went while buying stocks");
 
-                // todo skloni mu iz balansa
 
-                System.out.println("dosli do remaining " + remaining);
-                System.out.println("lastAmount " + lastAmount);
                 usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + remaining);
+                balanceService.decreaseBalance(fromUserEmail, "USD", price.floatValue() * remaining);
                 return ResponseEntity.ok().body(userStockService.save(usersStockToChange.get()));
             }
         } else {
@@ -485,9 +476,8 @@ public class StockService {
         return null;
     }
 
-    public List<UserStock> getAllUserStocks() {
-        List<UserStock> allUserStocks = userStockService.findAll();
-        return allUserStocks;
+    public List<UserStock> getAllUserStocks(long userId) {
+        return userStockService.findAllForUser(userId);
     }
 
     private List<UserStock> findStocksForSale(String stockSymbol, long buyingUserId, int amount) {
@@ -495,32 +485,16 @@ public class StockService {
         int collectedAmount = 0;
         List<UserStock> allUserStocks = userStockService.findAll();
 
-        System.out.println("all " + allUserStocks.size());
-
         for (UserStock userStock : allUserStocks) {
-            System.out.println("---");
-            System.out.println(
-                    "got " + userStock.getStock().getSymbol() + " " + userStock.getAmountForSale());
 
-            if (userStock.getStock().getSymbol().equals(stockSymbol)
-                    && userStock.getAmountForSale() != 0
-                    && userStock.getUser().getId() != buyingUserId) {
-
-                System.out.println("nasli smo ga");
-
+            if (userStock.getStock().getSymbol().equals(stockSymbol) && userStock.getAmountForSale() != 0 && userStock.getUser().getId() != buyingUserId) {
                 userStockToTryBuying.add(userStock);
                 collectedAmount += userStock.getAmountForSale();
-                System.out.println("collectedAmount " + collectedAmount);
             }
-
             if (collectedAmount >= amount) {
-                System.out.println("nasli smo dovoljno vrati " + userStockToTryBuying.size());
                 return userStockToTryBuying;
             }
         }
-
-        System.out.println("dosli smo do kraja " + userStockToTryBuying.size());
-
         return userStockToTryBuying;
     }
 
