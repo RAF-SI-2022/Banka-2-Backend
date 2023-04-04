@@ -69,8 +69,7 @@ public class FutureService implements FutureServiceInterface {
       future.get().setForSale(false);
       futureRepository.save(future.get());
       return ResponseEntity.ok().body(findById(futureRequest.getId()));
-    }
-    else {
+    } else {
       futureBuyWorker.setFuturesRequestsMap(futureRequest.getId(), futureRequest);
       return ResponseEntity.ok().body("Future is set for custom sale and is waiting for trigger");
     }

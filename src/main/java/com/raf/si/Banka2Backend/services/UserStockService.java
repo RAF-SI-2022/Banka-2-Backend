@@ -3,11 +3,10 @@ package com.raf.si.Banka2Backend.services;
 import com.raf.si.Banka2Backend.models.mariadb.UserStock;
 import com.raf.si.Banka2Backend.repositories.mariadb.UserStocksRepository;
 import com.raf.si.Banka2Backend.services.interfaces.UserStockServiceInterface;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UserStockService implements UserStockServiceInterface {
@@ -33,4 +32,18 @@ public class UserStockService implements UserStockServiceInterface {
   public List<UserStock> findAll() {
     return userStocksRepository.findAll();
   }
+
+  @Override
+  public List<UserStock> findAllForUser(long userId) {
+    return userStocksRepository.findUserStocksByUserId(userId);
+  }
+
+  @Override
+  public UserStock removeFromMarket(long userId, String stockSymbol) {
+    Optional<UserStock> userStock = userStocksRepository.findUserStockByUserIdAndStockSymbol(userId, stockSymbol);
+    userStock.get().setAmount(userStock.get().getAmount() + userStock.get().getAmountForSale());
+    userStock.get().setAmountForSale(0);
+    return  userStocksRepository.save(userStock.get());
+  }
+
 }

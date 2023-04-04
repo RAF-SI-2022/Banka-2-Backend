@@ -75,7 +75,7 @@ public class FutureController {
     Optional<User> user = userService.findByEmail(signedInUserEmail);
 
     // todo kasnije promeni (ako treba) umesto USD u nesto custom sa fronta
-    Balance usersBalance = balanceService.findBalanceByUserIdAndCurrency(1L, "USD");
+    Balance usersBalance = balanceService.findBalanceByUserIdAndCurrency(user.get().getId(), "USD");
 
     futureRequest.setUserId(user.get().getId());
     return futureService.buyFuture(futureRequest, signedInUserEmail, usersBalance.getAmount());
