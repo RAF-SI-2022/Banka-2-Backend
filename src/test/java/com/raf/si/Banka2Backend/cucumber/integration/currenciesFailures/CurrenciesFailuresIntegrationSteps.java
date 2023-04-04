@@ -1,4 +1,4 @@
-package com.raf.si.Banka2Backend.cucumber.integration.currencies;
+package com.raf.si.Banka2Backend.cucumber.integration.currenciesFailures;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
-import com.raf.si.Banka2Backend.models.mariadb.Currency;
 import com.raf.si.Banka2Backend.services.CurrencyService;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -15,21 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-public class CurrenciesIntegrationSteps extends CurrenciesIntegrationTestConfig {
+public class CurrenciesFailuresIntegrationSteps extends CurrenciesFailuresIntegrationTestConfig {
   @Autowired private CurrencyService currencyService;
 
   @Autowired protected MockMvc mockMvc;
   protected static String token;
-
-  protected static Currency testCurrency =
-      Currency.builder()
-          .id(1L)
-          .currencyName("Euro")
-          .currencyCode("EUR")
-          .currencySymbol("€")
-          .polity("European Union")
-          .inflations(null)
-          .build();
 
   @Given("user logs in")
   public void user_logs_in() {
@@ -65,53 +54,55 @@ public class CurrenciesIntegrationSteps extends CurrenciesIntegrationTestConfig 
     }
   }
 
-  @Then("user gets all currencies from database")
-  public void user_gets_currencies() {
+  @When("user is not logged in")
+  public void user_is_not_logged_in() {
+    token = null;
+  }
+
+  @Then("user can not get nonexistent currency by id")
+  public void user_can_not_get_currency_by_id() {
+    Long id = -1L;
     try {
       mockMvc
           .perform(
-              get("/api/currencies/")
+              get("/api/currencies/" + id)
                   .contentType("application/json")
                   .header("Content-Type", "application/json")
                   .header("Access-Control-Allow-Origin", "*")
                   .header("Authorization", "Bearer " + token))
-          .andExpect(status().isOk())
-          .andReturn();
+          .andExpect(status().isNotFound());
     } catch (Exception e) {
       fail(e.getMessage());
     }
   }
 
-  // Test user gets currency by id
-  @Then("user gets currency by id from database")
-  public void user_gets_currency_by_id() {
+  @Then("user can not get currency by nonexistent code from database")
+  public void user_can_not_get_currency_by_code() {
+    String currencyCode = "ERR";
     try {
       mockMvc
           .perform(
-              get("/api/currencies/" + testCurrency.getId())
+              get("/api/currencies/code/" + currencyCode)
                   .contentType("application/json")
                   .header("Content-Type", "application/json")
                   .header("Access-Control-Allow-Origin", "*")
                   .header("Authorization", "Bearer " + token))
-          .andExpect(status().isOk())
-          .andReturn();
-
+          .andExpect(status().isNotFound());
     } catch (Exception e) {
       fail(e.getMessage());
     }
   }
 
-  @Then("user gets currency by currency code from database")
-  public void user_gets_currency_by_code() {
+  @Then("user can not get currencies")
+  public void user_can_not_get_currencies() {
     try {
       mockMvc
           .perform(
-              get("/api/currencies/code/" + testCurrency.getCurrencyCode())
+              get("/api/currencies")
                   .contentType("application/json")
                   .header("Content-Type", "application/json")
-                  .header("Access-Control-Allow-Origin", "*")
-                  .header("Authorization", "Bearer " + token))
-          .andExpect(status().isOk())
+                  .header("Access-Control-Allow-Origin", "*"))
+          .andExpect(status().isForbidden())
           .andReturn();
 
     } catch (Exception e) {

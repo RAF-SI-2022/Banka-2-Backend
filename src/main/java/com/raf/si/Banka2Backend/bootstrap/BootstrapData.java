@@ -9,6 +9,7 @@ import com.raf.si.Banka2Backend.models.mariadb.Permission;
 import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
 import com.raf.si.Banka2Backend.repositories.mariadb.*;
 import com.raf.si.Banka2Backend.services.ForexService;
+import com.raf.si.Banka2Backend.services.StockService;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -60,10 +61,12 @@ public class BootstrapData implements CommandLineRunner {
   private final ExchangeRepository exchangeRepository;
   private final FutureRepository futureRepository;
   private final BalanceRepository balanceRepository;
+  private final UserStocksRepository userStocksRepository;
 
   private final ForexService forexService;
   private final StockRepository stockRepository;
   private final StockHistoryRepository stockHistoryRepository;
+  private final StockService stockService;
 
   private final EntityManagerFactory entityManagerFactory;
 
@@ -77,9 +80,11 @@ public class BootstrapData implements CommandLineRunner {
       ExchangeRepository exchangeRepository,
       FutureRepository futureRepository,
       BalanceRepository balanceRepository,
+      UserStocksRepository userStocksRepository,
       ForexService forexService,
       StockRepository stockRepository,
       StockHistoryRepository stockHistoryRepository,
+      StockService stockService,
       EntityManagerFactory entityManagerFactory) {
     this.userRepository = userRepository;
     this.permissionRepository = permissionRepository;
@@ -89,9 +94,11 @@ public class BootstrapData implements CommandLineRunner {
     this.exchangeRepository = exchangeRepository;
     this.futureRepository = futureRepository;
     this.balanceRepository = balanceRepository;
+    this.userStocksRepository = userStocksRepository;
     this.forexService = forexService;
     this.stockRepository = stockRepository;
     this.stockHistoryRepository = stockHistoryRepository;
+    this.stockService = stockService;
     this.entityManagerFactory = entityManagerFactory;
   }
 
@@ -121,7 +128,7 @@ public class BootstrapData implements CommandLineRunner {
 
     long numberOfStocks = stockRepository.count();
     if (numberOfStocks == 0) {
-      System.out.println("Added stocks");
+      System.out.println("Adding stocks");
       loadStocksTable();
     }
 
@@ -152,7 +159,7 @@ public class BootstrapData implements CommandLineRunner {
             .phone(ADMIN_PHONE)
             .jobPosition(ADMIN_JOB)
             .active(ADMIN_ACTIVE)
-            .dailyLimit(10000D)//USD
+            .dailyLimit(10000D) // USD
             .build();
 
     // Add initial perms
@@ -181,7 +188,17 @@ public class BootstrapData implements CommandLineRunner {
     this.userRepository.save(admin);
     this.balanceRepository.save(balance1);
     this.balanceRepository.save(balance2);
+    giveAdminStocks(admin);
     System.out.println("Loaded!");
+  }
+
+  private void giveAdminStocks(User user) { // todo popravi
+    Stock stock = stockService.getStockBySymbol("AAPL");
+    Stock stock2 = stockService.getStockBySymbol("GOOGL");
+    UserStock userStock = new UserStock(0L, user, stock, 100, 0);
+    UserStock userStock2 = new UserStock(0L, user, stock2, 100, 0);
+    userStocksRepository.save(userStock);
+    userStocksRepository.save(userStock2);
   }
 
   private Balance getInitialAdminBalance(User admin, String currency) {
@@ -325,7 +342,7 @@ public class BootstrapData implements CommandLineRunner {
               .lowValue(new BigDecimal(data[5]))
               .priceValue(new BigDecimal(data[6]))
               .volumeValue(Long.valueOf(data[7]))
-              .lastUpdated(LocalDate.parse(data[8]))
+              .lastUpdated(LocalDate.now())
               .previousClose(new BigDecimal(data[9]))
               .changeValue(new BigDecimal(data[10]))
               .changePercent(data[11])

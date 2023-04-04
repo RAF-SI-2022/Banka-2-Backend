@@ -133,5 +133,4 @@ public class UserService implements UserDetailsService, UserServiceInterface {
   public Double getUsersDailyLimit(String userEmail) {
     return findByEmail(userEmail).get().getDailyLimit();
   }
-
 }

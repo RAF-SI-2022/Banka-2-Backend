@@ -50,7 +50,7 @@ public class ForexService implements ForexServiceInterface {
             currentDateTime.getTime()
                 - (lastModifiedDate.getTime() + 7200000L); // vucemo sa api-a koji je 2h iza
         // todo nadaj se da nema neka druga zona
-        if (timeDiff >= 1 * 60 * 1000) { // 30 minutes have passed since last modified date
+        if (timeDiff >= 30 * 60 * 1000) { // 30 minutes have passed since last modified date
           Forex forexFromApi = getForexFromApi(fromCurrency, toCurrency);
           if (forexFromApi != null) {
             forex.get().setExchangeRate(forexFromApi.getExchangeRate());
