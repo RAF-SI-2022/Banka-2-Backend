@@ -25,7 +25,7 @@ public interface UserServiceInterface {
 
   void changePassword(User user, String newPassword, String token);
 
-  User changeUsersDailyLimit(String userEmail,Double limitChange);
+  User changeUsersDailyLimit(String userEmail, Double limitChange);
 
   Double getUsersDailyLimit(String userEmail);
 }
