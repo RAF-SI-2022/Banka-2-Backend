@@ -100,18 +100,19 @@ public class CurrenciesIntegrationSteps extends CurrenciesIntegrationTestConfig 
       fail(e.getMessage());
     }
   }
+
   @Then("user gets currency by currency code from database")
   public void user_gets_currency_by_code() {
     try {
       mockMvc
-              .perform(
-                      get("/api/currencies/code/" + testCurrency.getCurrencyCode())
-                              .contentType("application/json")
-                              .header("Content-Type", "application/json")
-                              .header("Access-Control-Allow-Origin", "*")
-                              .header("Authorization", "Bearer " + token))
-              .andExpect(status().isOk())
-              .andReturn();
+          .perform(
+              get("/api/currencies/code/" + testCurrency.getCurrencyCode())
+                  .contentType("application/json")
+                  .header("Content-Type", "application/json")
+                  .header("Access-Control-Allow-Origin", "*")
+                  .header("Authorization", "Bearer " + token))
+          .andExpect(status().isOk())
+          .andReturn();
 
     } catch (Exception e) {
       fail(e.getMessage());

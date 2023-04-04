@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
-import com.raf.si.Banka2Backend.models.mariadb.Currency;
 import com.raf.si.Banka2Backend.services.CurrencyService;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -20,6 +19,7 @@ public class CurrenciesFailuresIntegrationSteps extends CurrenciesFailuresIntegr
 
   @Autowired protected MockMvc mockMvc;
   protected static String token;
+
   @Given("user logs in")
   public void user_logs_in() {
     token = null;

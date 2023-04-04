@@ -5,7 +5,6 @@ import lombok.Data;
 @Data
 public class StockRequest {
   String stockSymbol;
-  String type; // BUY / SELL
   Integer amount;
   Integer limit;
   Integer stop;
