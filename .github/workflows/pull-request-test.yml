@@ -1,0 +1,43 @@
+name: Test service
+run-name: ${{ github.repository }}:${{ github.ref_name }}[test]
+on: [push, pull_request]
+jobs:
+  test:
+    # Enables multiple runs with every possible
+    # combination of matrix variables
+    strategy:
+      matrix:
+        # TODO debug on [ubuntu-22.04, windows-2022, macos-12]
+        os: [ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    continue-on-error: false
+    steps:
+      # Check out the current repository into the VM
+      - uses: actions/checkout@v3
+      # Set up Java version from project
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+      # Take permission of all files
+      - run: cd ${{ github.workspace }}
+      - run: chmod 777 -R .
+      # Test the repository
+      - run: make test
+      # Remove services
+      - run: docker compose -v down
+#   report:
+#     needs: test
+#     runs-on: ubuntu-latest
+#     if: github.event_name == 'pull_request'
+#     steps:
+#       - uses: actions/github-script@v6
+#         with:
+#           script: |
+#             github.rest.issues.setLabels({
+#               issue_number: context.issue.number,
+#               owner: context.repo.owner,
+#               repo: context.repo.repo,
+#               labels: ["test-${{ needs.test.result }}"]
+#             })

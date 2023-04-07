@@ -1,7 +1,7 @@
 package com.raf.si.Banka2Backend.responses;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.raf.si.Banka2Backend.models.users.Permission;
+import com.raf.si.Banka2Backend.models.mariadb.Permission;
 import java.util.List;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +18,6 @@ public class RegisterResponse {
   private String jobPosition;
   private boolean active;
   private String jmbg;
-
+  private Double dailyLimit;
   private String phone;
 }

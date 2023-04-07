@@ -1,6 +1,6 @@
 package com.raf.si.Banka2Backend.requests;
 
-import com.raf.si.Banka2Backend.models.users.PermissionName;
+import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
 import java.util.List;
 import lombok.Data;
 
@@ -14,5 +14,6 @@ public class RegisterRequest {
   private String jobPosition;
   private boolean active;
   private String jmbg;
+  private Double dailyLimit;
   private String phone;
 }

@@ -3,9 +3,9 @@ package com.raf.si.Banka2Backend.services;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-import com.raf.si.Banka2Backend.models.users.Permission;
-import com.raf.si.Banka2Backend.models.users.PermissionName;
-import com.raf.si.Banka2Backend.repositories.users.PermissionRepository;
+import com.raf.si.Banka2Backend.models.mariadb.Permission;
+import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
+import com.raf.si.Banka2Backend.repositories.mariadb.PermissionRepository;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;

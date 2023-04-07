@@ -5,10 +5,10 @@ import static org.mockito.Mockito.*;
 
 import com.raf.si.Banka2Backend.exceptions.PasswordResetTokenNotFoundException;
 import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
-import com.raf.si.Banka2Backend.models.users.PasswordResetToken;
-import com.raf.si.Banka2Backend.models.users.User;
-import com.raf.si.Banka2Backend.repositories.users.PasswordResetTokenRepository;
-import com.raf.si.Banka2Backend.repositories.users.UserRepository;
+import com.raf.si.Banka2Backend.models.mariadb.PasswordResetToken;
+import com.raf.si.Banka2Backend.models.mariadb.User;
+import com.raf.si.Banka2Backend.repositories.mariadb.PasswordResetTokenRepository;
+import com.raf.si.Banka2Backend.repositories.mariadb.UserRepository;
 import java.util.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -2,18 +2,16 @@ package com.raf.si.Banka2Backend.controllers;
 
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
+import com.raf.si.Banka2Backend.exceptions.CurrencyNotFoundException;
 import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
-import com.raf.si.Banka2Backend.models.users.Permission;
-import com.raf.si.Banka2Backend.models.users.PermissionName;
-import com.raf.si.Banka2Backend.models.users.User;
+import com.raf.si.Banka2Backend.models.mariadb.*;
 import com.raf.si.Banka2Backend.requests.ChangePasswordRequest;
 import com.raf.si.Banka2Backend.requests.RegisterRequest;
 import com.raf.si.Banka2Backend.requests.UpdateProfileRequest;
 import com.raf.si.Banka2Backend.requests.UpdateUserRequest;
 import com.raf.si.Banka2Backend.responses.RegisterResponse;
-import com.raf.si.Banka2Backend.services.AuthorisationService;
-import com.raf.si.Banka2Backend.services.PermissionService;
-import com.raf.si.Banka2Backend.services.UserService;
+import com.raf.si.Banka2Backend.services.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,17 +30,23 @@ public class UserController {
   private final PermissionService permissionService;
   private final AuthorisationService authorisationService;
   private final PasswordEncoder passwordEncoder;
+  private final CurrencyService currencyService;
+  private final BalanceService balanceService;
 
   @Autowired
   public UserController(
       UserService userService,
       PermissionService permissionService,
       AuthorisationService authorisationService,
-      PasswordEncoder passwordEncoder) {
+      PasswordEncoder passwordEncoder,
+      CurrencyService currencyService,
+      BalanceService balanceService) {
     this.userService = userService;
     this.permissionService = permissionService;
     this.authorisationService = authorisationService;
     this.passwordEncoder = passwordEncoder;
+    this.currencyService = currencyService;
+    this.balanceService = balanceService;
   }
 
   @GetMapping(value = "/permissions")
@@ -96,7 +100,11 @@ public class UserController {
             .jobPosition(user.getJobPosition())
             .active(user.isActive())
             .permissions(permissions)
+            .dailyLimit(user.getDailyLimit()) // todo limit ceka front integraciju
             .build();
+
+    userService.save(newUser); // mora duplo zbog balansa
+    setInitialUserBalance(newUser);
     userService.save(newUser);
 
     RegisterResponse response =
@@ -110,9 +118,34 @@ public class UserController {
             .jobPosition(user.getJobPosition())
             .active(user.isActive())
             .permissions(permissions)
+            .dailyLimit(user.getDailyLimit())
             .build();
 
     return ResponseEntity.ok(response);
+  }
+
+  private void setInitialUserBalance(
+      User user) { // todo ovo promeni kasnije da nemaju odmah 100.000 $
+    Balance balance = new Balance();
+    balance.setUser(user);
+    Optional<Currency> rsd = this.currencyService.findByCurrencyCode("RSD");
+    if (rsd.isEmpty()) throw new CurrencyNotFoundException("RSD");
+    balance.setCurrency(rsd.get());
+    balance.setAmount(100000f);
+
+    Balance balance2 = new Balance();
+    balance2.setUser(user);
+    Optional<Currency> usd = this.currencyService.findByCurrencyCode("USD");
+    if (usd.isEmpty()) throw new CurrencyNotFoundException("USD");
+    balance2.setCurrency(usd.get());
+    balance2.setAmount(100000f);
+
+    List<Balance> balances = new ArrayList<>();
+    balances.add(balance);
+    balances.add(balance2);
+    user.setBalances(balances);
+    this.balanceService.save(balance);
+    this.balanceService.save(balance2);
   }
 
   @GetMapping()
@@ -293,7 +326,17 @@ public class UserController {
                 .jobPosition(user.getJobPosition())
                 .active(user.isActive())
                 .permissions(permissions)
+                .dailyLimit(user.getDailyLimit())
                 .build());
     return ResponseEntity.ok().body(userService.save(updatedUser.get()));
+  }
+
+  @GetMapping(value = "/limit")
+  public ResponseEntity<?> getUserDailyLimit() {
+    String signedInUserEmail = getContext().getAuthentication().getName();
+    if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+      return ResponseEntity.status(401).body("You don't have permission to buy/sell.");
+    }
+    return ResponseEntity.ok().body(userService.getUsersDailyLimit(signedInUserEmail));
   }
 }

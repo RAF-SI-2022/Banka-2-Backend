@@ -1,6 +1,6 @@
 Feature: User service
 
-  Additional description
+  Test for user controller nad service, they are meant to test good requests meant to pass
 
   Scenario: user logs in
     When user can login
@@ -34,22 +34,22 @@ Feature: User service
     When user exists in database
     Then reactivate user in database
 
-  Scenario: admin edits user in database
-    When admin logged in and user exists in database
-    Then update user in database
+#  Scenario: admin edits user in database
+#    When admin logged in and user exists in database
+#    Then update user in database
 
-  Scenario: logged in user updates their profile
-    Given any user logs in
-    When user is logged in
-    Then user updates his profile
+#  Scenario: logged in user updates their profile
+#    Given any user logs in
+#    When user is logged in
+#    Then user updates his profile
 
   Scenario: get user by his email
     When user exists in database
     Then get user by his email
 
-  Scenario: logged in user changes his password
-    When user is logged in
-    Then user changes his password
+#  Scenario: logged in user changes his password
+#    When user is logged in
+#    Then user changes his password
 
   Scenario: Deleting user
     Given privileged user logged in

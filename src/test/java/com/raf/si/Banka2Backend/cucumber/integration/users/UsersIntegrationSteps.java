@@ -5,12 +5,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
-import com.raf.si.Banka2Backend.models.users.Permission;
-import com.raf.si.Banka2Backend.models.users.User;
+import com.raf.si.Banka2Backend.models.mariadb.Permission;
+import com.raf.si.Banka2Backend.models.mariadb.User;
 import com.raf.si.Banka2Backend.services.UserService;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,6 @@ import org.springframework.test.web.servlet.MvcResult;
 public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
 
   @Autowired private UserService userService;
-
   @Autowired protected MockMvc mockMvc;
   protected static String token;
   protected static Optional<User> loggedInUser;
@@ -131,9 +131,10 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
 
   // Test creating new user
   @When("creating new user")
-  public void creating_new_user() {
+  public void creating_new_user() throws UnsupportedEncodingException {
+    MvcResult mvcResult = null;
     try {
-      MvcResult mvcResult =
+      mvcResult =
           mockMvc
               .perform(
                   post("/api/users/register")
@@ -151,7 +152,8 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                                                               "jobPosition": "ADMINISTRATOR",
                                                               "active": true,
                                                               "jmbg": "1231231231235",
-                                                              "phone": "640601548865"
+                                                              "phone": "640601548865",
+                                                              "dailyLimit": 5000
                                                             }
                                                             """)
                       .header("Content-Type", "application/json")
@@ -162,6 +164,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
     } catch (Exception e) {
       fail(e.getMessage());
     }
+    System.out.println(mvcResult.getResponse().getContentAsString());
   }
 
   @Then("new user is saved in database")
@@ -300,7 +303,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
     try {
       mockMvc
           .perform(
-              put("/api/users/" + testUser.get().getId())
+              put("/api/users/edit-profile/" + testUser.get().getId())
                   .contentType("application/json")
                   .content(
                       """
@@ -314,7 +317,8 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                                                       "jobPosition": "NEWTESTJOB",
                                                       "active": true,
                                                       "jmbg": "1231231231235",
-                                                      "phone": "640601548865"
+                                                      "phone": "640601548865",
+                                                      "dailyLimit": 1000
                                                     }
                                                     """)
                   .header("Content-Type", "application/json")
@@ -387,6 +391,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
           .andExpect(status().isOk())
           .andReturn();
       String editedName = userService.findById(testUser.get().getId()).get().getFirstName();
+      System.out.println(editedName);
       assertEquals(editedName, "UserEditedName");
     } catch (Exception e) {
       fail(e.getMessage());
@@ -438,7 +443,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
     }
   }
 
-  // Testing deleting user todo fix
+  // Testing deleting user
   @Given("privileged user logged in")
   public void privileged_user_logged_in() {
     token = null;

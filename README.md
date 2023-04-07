@@ -36,7 +36,8 @@ The `Makefile` is the central tool for building the project. Use the following c
 - `./make dev` - compiles the Java code inside a Docker container (caching enabled!), runs all required services, but does NOT run tests. **This command is recommended for development.**
 - `./make test` - compiles the Java code inside a Docker container (caching enabled!), runs all required services, and executes app tests. Stops all services after testing. **This command is the recommended command before opening a pull request.**
 - `./make prod` - compiles the Java code inside a Docker container and runs all required services. **This command is the recommended production command.**
-- `./make reset-all` - wipes and resets all docker components, use if not working properly
+- `./make reset-all` - wipes and resets all Docker services. **Use this if you encounter errors in building/running/testing the application.**
+
 **It is strongly recommended to test the application in Docker before committing changes.** However, if you're unable to do so, please run the following command:
 
 ```shell
@@ -53,3 +54,4 @@ This project is configured to use several hooks via the `init` file which copies
 ## Resources
 
 - [Spring Data MongoDB - Reference Documentation](https://docs.spring.io/spring-data/mongodb/docs/current/reference/html/) - documentation of the Spring Data MongoDB project with examples and templates.
+- [Spring & InfluxDB Tutorial by Baeldung](https://www.baeldung.com/java-influxdb)

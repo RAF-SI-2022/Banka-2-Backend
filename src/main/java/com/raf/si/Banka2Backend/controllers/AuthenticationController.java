@@ -1,7 +1,7 @@
 package com.raf.si.Banka2Backend.controllers;
 
 import com.raf.si.Banka2Backend.dto.PasswordRecoveryDto;
-import com.raf.si.Banka2Backend.models.users.User;
+import com.raf.si.Banka2Backend.models.mariadb.User;
 import com.raf.si.Banka2Backend.requests.LoginRequest;
 import com.raf.si.Banka2Backend.responses.LoginResponse;
 import com.raf.si.Banka2Backend.services.AuthorisationService;

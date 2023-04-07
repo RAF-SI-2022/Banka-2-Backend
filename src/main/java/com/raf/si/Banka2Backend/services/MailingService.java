@@ -1,9 +1,9 @@
 package com.raf.si.Banka2Backend.services;
 
-import com.raf.si.Banka2Backend.models.users.PasswordResetToken;
-import com.raf.si.Banka2Backend.models.users.User;
-import com.raf.si.Banka2Backend.repositories.users.PasswordResetTokenRepository;
-import com.raf.si.Banka2Backend.repositories.users.UserRepository;
+import com.raf.si.Banka2Backend.models.mariadb.PasswordResetToken;
+import com.raf.si.Banka2Backend.models.mariadb.User;
+import com.raf.si.Banka2Backend.repositories.mariadb.PasswordResetTokenRepository;
+import com.raf.si.Banka2Backend.repositories.mariadb.UserRepository;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
