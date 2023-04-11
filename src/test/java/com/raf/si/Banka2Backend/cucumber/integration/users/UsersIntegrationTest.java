@@ -11,6 +11,7 @@ import org.junit.platform.suite.api.Suite;
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features/user-integration/users.feature")
 @ConfigurationParameter(
-    key = GLUE_PROPERTY_NAME,
-    value = "com.raf.si.Banka2Backend.cucumber.integration.users")
-public class UsersIntegrationTest {}
+        key = GLUE_PROPERTY_NAME,
+        value = "com.raf.si.Banka2Backend.cucumber.integration.users")
+public class UsersIntegrationTest {
+}

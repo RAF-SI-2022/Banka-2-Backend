@@ -7,4 +7,5 @@ import org.springframework.boot.test.context.SpringBootTest;
 @CucumberContextConfiguration
 @SpringBootTest()
 @AutoConfigureMockMvc
-public class UsersIntegrationTestConfig {}
+public class UsersIntegrationTestConfig {
+}

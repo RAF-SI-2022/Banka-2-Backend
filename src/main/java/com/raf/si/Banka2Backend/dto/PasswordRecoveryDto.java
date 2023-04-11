@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class PasswordRecoveryDto {
-  private String token;
-  private String newPassword;
+    private String token;
+    private String newPassword;
 }
