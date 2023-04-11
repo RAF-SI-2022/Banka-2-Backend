@@ -20,7 +20,6 @@ public class StockBuyWorker extends Thread{
     StockService stockService;
     Random random = new Random();
 
-
     public StockBuyWorker(BlockingQueue<StockRequest> blockingQueue, UserStockService userStockService, StockService stockService) {
         this.stockBuyRequestsQueue = blockingQueue;
         this.stockService = stockService;
@@ -34,31 +33,37 @@ public class StockBuyWorker extends Thread{
 
 
     //todo dodaj limit i stop kada budemo na kubernetesu sa influxDb
-    @SneakyThrows
     private void processBuyRequests(){
         while (true){
-            StockRequest stockRequest = stockBuyRequestsQueue.take();
-            Optional<UserStock> usersStockToChange = userStockService.findUserStockByUserIdAndStockSymbol(stockRequest.getUserId(), stockRequest.getStockSymbol());
+            try {
+                StockRequest stockRequest =  stockBuyRequestsQueue.take();
 
-            if (stockRequest.isAllOrNone()){
-                usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + stockRequest.getAmount());
-                //todo OVDE URADITI TRANSAKCIJU ZA USER BALANS
-            }
-            else {
-                int stockAmountSum = 0;
-                Stock stock = stockService.getStockBySymbol(stockRequest.getStockSymbol());
-                BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
+                Optional<UserStock> usersStockToChange = userStockService.findUserStockByUserIdAndStockSymbol(stockRequest.getUserId(), stockRequest.getStockSymbol());
 
-                while (stockRequest.getAmount() != stockAmountSum){
-                    int amountBought = random.nextInt(stockRequest.getAmount() - stockAmountSum) + 1;
-                    stockAmountSum += amountBought;
-
-                    //todo napravi transakciju i dodaj je u neku listu (sacuvaj u njoj koliko je kupljeno stockova i price * amountBought)
-                    usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + amountBought);
+                if (stockRequest.isAllOrNone()){
+                    usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + stockRequest.getAmount());
+                    //todo OVDE URADITI TRANSAKCIJU ZA USER BALANS
                 }
+                else {
+                    int stockAmountSum = 0;
+                    Stock stock = stockService.getStockBySymbol(stockRequest.getStockSymbol());
+                    BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
+
+                    while (stockRequest.getAmount() != stockAmountSum){
+                        int amountBought = random.nextInt(stockRequest.getAmount() - stockAmountSum) + 1;
+                        stockAmountSum += amountBought;
+
+                        //todo napravi transakciju i dodaj je u neku listu (sacuvaj u njoj koliko je kupljeno stockova i price * amountBought)
+                        usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + amountBought);
+                    }
+                }
+                userStockService.save(usersStockToChange.get());
+                //todo pozvati funkciju koja menja balans na osnovu transakcija
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-            userStockService.save(usersStockToChange.get());
-            //todo pozvati funkciju koja menja balans na osnovu transakcija
+
+
         }
     }
 
