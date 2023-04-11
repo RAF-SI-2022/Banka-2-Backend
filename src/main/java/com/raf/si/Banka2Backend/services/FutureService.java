@@ -48,8 +48,7 @@ public class FutureService implements FutureServiceInterface {
   }
 
   @Override
-  public ResponseEntity<?> buyFuture(
-      FutureRequestBuySell futureRequest, String fromUserEmail, Float usersMoneyInCurrency) {
+  public ResponseEntity<?> buyFuture(FutureRequestBuySell futureRequest, String fromUserEmail, Float usersMoneyInCurrency) {
     if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) { // regularni buy
       Optional<Future> future = futureRepository.findById(futureRequest.getId());
 
