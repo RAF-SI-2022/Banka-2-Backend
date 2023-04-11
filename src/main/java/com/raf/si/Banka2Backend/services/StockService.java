@@ -26,6 +26,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 @Service
 public class StockService {
@@ -40,6 +42,9 @@ public class StockService {
     private final StockSellWorker stockSellWorker;
     private final StockBuyWorker stockBuyWorker;
 
+    private static final BlockingQueue<StockRequest> stockBuyRequests = new LinkedBlockingQueue<>();
+    private static final BlockingQueue<StockRequest> stockSellRequests = new LinkedBlockingQueue<>();
+
 
     @Autowired
     public StockService(StockRepository stockRepository, StockHistoryRepository stockHistoryRepository,
@@ -51,9 +56,9 @@ public class StockService {
         this.userService = userService;
         this.userStockService = userStockService;
         this.balanceService = balanceService;
-        this.stockSellWorker = new StockSellWorker();
-        this.stockBuyWorker = new StockBuyWorker();
 
+        this.stockBuyWorker = new StockBuyWorker(stockBuyRequests, userStockService, this);
+        this.stockSellWorker = new StockSellWorker();
         stockBuyWorker.start();
         stockSellWorker.start();
     }
@@ -367,15 +372,21 @@ public class StockService {
 
         if (usersBalance.getAmount() < totalPrice.floatValue()) return ResponseEntity.status(500).body("Nemas doboljo para, siramasan si buraz 💀");
 
-        return ResponseEntity.ok().body(stockBuyWorker.getBuyOrders().add(stockRequest));
+        try {
+            stockBuyRequests.put(stockRequest);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return ResponseEntity.ok().body("Stock buy order has been procesed");
     }
 
 
 
     //todo FIX IF NEEDED
-    public ResponseEntity<?> sellStock(StockRequest stockRequest, User user) {
+    public ResponseEntity<?> sellStock(StockRequest stockRequest) {
         if (stockRequest.getStop() == 0 && stockRequest.getLimit() == 0) {
-            Optional<UserStock> userStock =userStockService.findUserStockByUserIdAndStockSymbol(user.getId(), stockRequest.getStockSymbol());
+            Optional<UserStock> userStock =userStockService.findUserStockByUserIdAndStockSymbol(stockRequest.getUserId(), stockRequest.getStockSymbol());
 
             // premestamo iz amount u amount_for_sale
             if ((userStock.get().getAmount() - stockRequest.getAmount()) < 0) {
