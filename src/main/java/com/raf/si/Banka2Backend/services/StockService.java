@@ -385,6 +385,12 @@ public class StockService {
     //todo FIX IF NEEDED
     public ResponseEntity<?> sellStock(StockRequest stockRequest) {
 
+        Optional<UserStock> userStock =userStockService.findUserStockByUserIdAndStockSymbol(stockRequest.getUserId(), stockRequest.getStockSymbol());
+
+        if ((userStock.get().getAmount() - stockRequest.getAmount()) < 0) {
+            return ResponseEntity.status(500).body("Internal error");
+        }
+
         try {
             stockSellRequestsQueue.put(stockRequest);
         } catch (InterruptedException e) {

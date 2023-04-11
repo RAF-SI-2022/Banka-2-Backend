@@ -40,6 +40,8 @@ public class StockBuyWorker extends Thread{
 
                 Optional<UserStock> usersStockToChange = userStockService.findUserStockByUserIdAndStockSymbol(stockRequest.getUserId(), stockRequest.getStockSymbol());
 
+                //todo DODATI CHECKOVE ZA LIMIT I STOP
+
                 if (stockRequest.isAllOrNone()){
                     usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + stockRequest.getAmount());
                     //todo OVDE URADITI TRANSAKCIJU ZA USER BALANS
@@ -52,9 +54,8 @@ public class StockBuyWorker extends Thread{
                     while (stockRequest.getAmount() != stockAmountSum){
                         int amountBought = random.nextInt(stockRequest.getAmount() - stockAmountSum) + 1;
                         stockAmountSum += amountBought;
-
-                        //todo napravi transakciju i dodaj je u neku listu (sacuvaj u njoj koliko je kupljeno stockova i price * amountBought)
                         usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + amountBought);
+                        //todo napravi transakciju i dodaj je u neku listu (sacuvaj u njoj koliko je kupljeno stockova i price * amountBought)
                     }
                 }
                 userStockService.save(usersStockToChange.get());
