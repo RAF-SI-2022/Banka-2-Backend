@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.util.Date;
 
 @Data
 @Builder
@@ -18,7 +20,11 @@ public class Option {
 
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotNull
+    private String stockSymbol;
 
     @NotNull
     private String contractSymbol;
@@ -33,7 +39,10 @@ public class Option {
     private Double impliedVolatility;
 
     @NotNull
-    private String expirationDate;
+    private Double price;
+
+    @NotNull
+    private LocalDate expirationDate;
 
     @NotNull
     private Integer openInterest;
