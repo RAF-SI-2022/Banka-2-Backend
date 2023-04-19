@@ -38,19 +38,15 @@ public class ForexService implements ForexServiceInterface {
     @Override
     public Forex getForexForCurrencies(String fromCurrency, String toCurrency) {
 
-        Optional<Forex> forex =
-                forexRepository.findForexByFromCurrencyCodeAndToCurrencyCode(fromCurrency, toCurrency);
+        Optional<Forex> forex = forexRepository.findForexByFromCurrencyCodeAndToCurrencyCode(fromCurrency, toCurrency);
         if (forex.isPresent()) {
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String systemTime = dateFormat.format(new Date());
 
             try {
-                Date lastModifiedDate =
-                        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(forex.get().getLastRefreshed());
+                Date lastModifiedDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(forex.get().getLastRefreshed());
                 Date currentDateTime = dateFormat.parse(systemTime);
-                long timeDiff =
-                        currentDateTime.getTime()
-                                - (lastModifiedDate.getTime() + 7200000L); // vucemo sa api-a koji je 2h iza
+                long timeDiff = currentDateTime.getTime() - (lastModifiedDate.getTime() + 7200000L); // vucemo sa api-a koji je 2h iza
                 // todo nadaj se da nema neka druga zona
                 if (timeDiff >= 30 * 60 * 1000) { // 30 minutes have passed since last modified date
                     Forex forexFromApi = getForexFromApi(fromCurrency, toCurrency);

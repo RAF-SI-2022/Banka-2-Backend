@@ -15,9 +15,7 @@ import lombok.*;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Entity
-@Table(
-        name = "users",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"email", "jmbg"})})
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"email", "jmbg"})})
 public class User {
 
     @Id
