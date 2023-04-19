@@ -14,6 +14,9 @@ public interface OptionServiceInterface {
 
     List<Option> findByUserId(Long userId);
 
-    List<Option> findByStock(Long userId);
+    List<Option> findByStock(String stockSymbol);
+
+
+
 
 }

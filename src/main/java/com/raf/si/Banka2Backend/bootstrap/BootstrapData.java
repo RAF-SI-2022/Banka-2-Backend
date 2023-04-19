@@ -9,6 +9,7 @@ import com.raf.si.Banka2Backend.models.mariadb.Permission;
 import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
 import com.raf.si.Banka2Backend.repositories.mariadb.*;
 import com.raf.si.Banka2Backend.services.ForexService;
+import com.raf.si.Banka2Backend.services.OptionService;
 import com.raf.si.Banka2Backend.services.StockService;
 
 import java.io.BufferedReader;
@@ -69,6 +70,8 @@ public class BootstrapData implements CommandLineRunner {
     private final StockRepository stockRepository;
     private final StockHistoryRepository stockHistoryRepository;
     private final StockService stockService;
+    private final OptionService optionService;
+    private final OptionRepository optionRepository;
 
     private final EntityManagerFactory entityManagerFactory;
 
@@ -87,7 +90,7 @@ public class BootstrapData implements CommandLineRunner {
             StockRepository stockRepository,
             StockHistoryRepository stockHistoryRepository,
             StockService stockService,
-            EntityManagerFactory entityManagerFactory) {
+            OptionService optionService, OptionRepository optionRepository, EntityManagerFactory entityManagerFactory) {
         this.userRepository = userRepository;
         this.permissionRepository = permissionRepository;
         this.currencyRepository = currencyRepository;
@@ -101,6 +104,8 @@ public class BootstrapData implements CommandLineRunner {
         this.stockRepository = stockRepository;
         this.stockHistoryRepository = stockHistoryRepository;
         this.stockService = stockService;
+        this.optionService = optionService;
+        this.optionRepository = optionRepository;
         this.entityManagerFactory = entityManagerFactory;
     }
 
@@ -133,6 +138,7 @@ public class BootstrapData implements CommandLineRunner {
             System.out.println("Adding stocks");
             loadStocksTable();
         }
+
 
         // New data introduced in V2_2, if we keep this code devs will not get proper exchanges in db
         //    long numberOfExchanges = this.exchangeRepository.count();
