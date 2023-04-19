@@ -3,6 +3,7 @@ package com.raf.si.Banka2Backend.services;
 import com.raf.si.Banka2Backend.models.mariadb.Option;
 import com.raf.si.Banka2Backend.repositories.mariadb.OptionRepository;
 import com.raf.si.Banka2Backend.services.interfaces.OptionServiceInterface;
+import com.raf.si.Banka2Backend.services.workerThreads.OptionDbWiperThread;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +14,14 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,12 +31,16 @@ public class OptionService implements OptionServiceInterface {
     private final OptionRepository optionRepository;
     private final UserService userService;
     private final StockService stockService;
+    private final OptionDbWiperThread optionDbWiperThread;
 
     @Autowired
     public OptionService(OptionRepository optionRepository, UserService userService, StockService stockService) {
         this.optionRepository = optionRepository;
         this.userService = userService;
         this.stockService = stockService;
+
+        this.optionDbWiperThread = new OptionDbWiperThread(optionRepository);
+        optionDbWiperThread.start();
     }
 
     @Override
@@ -54,10 +64,35 @@ public class OptionService implements OptionServiceInterface {
         return optionRepository.findAllByUserId(userId);
     }
 
-    @Override
+    @Override//todo TREBA POTPUNO NOVO (ZA USER-OPTION MODEL)
     public List<Option> findByStock(String stockSymbol) {
-        return optionRepository.findAllByContractSymbol(stockSymbol);
+        List<Option> requestedOptions = optionRepository.findAllByStockSymbol("AAPL");
+        if (requestedOptions.isEmpty()){
+           optionRepository.saveAll(getFromExternalApi(stockSymbol, ""));
+        }
+        return optionRepository.findAllByStockSymbol(stockSymbol.toUpperCase());
     }
+
+    @Override//todo TREBA POTPUNO NOVO (ZA USER-OPTION MODEL)
+    public List<Option> findByStockAndDate(String stockSymbol, String regularDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date = LocalDate.parse(regularDate, formatter);
+
+        List<Option> requestedOptions = optionRepository.findAllByStockSymbolAndExpirationDate(stockSymbol.toUpperCase(), date);
+        if (requestedOptions.isEmpty()){
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date dateMils = null;
+            try {
+                dateMils = dateFormat.parse(regularDate);
+            }
+            catch (ParseException e)
+            {e.printStackTrace();}
+            String parsedDate = "" + dateMils.getTime()/10000;
+            optionRepository.saveAll(getFromExternalApi(stockSymbol, parsedDate));
+        }
+        return optionRepository.findAllByStockSymbolAndExpirationDate(stockSymbol.toUpperCase(), date);
+    }
+
 
     public List<Option> getFromExternalApi(String stockSymbol, String date) {
 
@@ -152,6 +187,5 @@ public class OptionService implements OptionServiceInterface {
 
         return optionList;
     }
-
 
 }

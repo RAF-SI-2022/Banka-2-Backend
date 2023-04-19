@@ -16,7 +16,6 @@ public interface OptionServiceInterface {
 
     List<Option> findByStock(String stockSymbol);
 
-
-
+    List<Option> findByStockAndDate(String stockSymbol, String dateMils);
 
 }
