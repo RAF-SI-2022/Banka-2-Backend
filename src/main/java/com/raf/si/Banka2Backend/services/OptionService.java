@@ -1,6 +1,10 @@
 package com.raf.si.Banka2Backend.services;
 
+import com.raf.si.Banka2Backend.exceptions.OptionNotFoundException;
+import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.Option;
+import com.raf.si.Banka2Backend.models.mariadb.Stock;
+import com.raf.si.Banka2Backend.models.mariadb.User;
 import com.raf.si.Banka2Backend.repositories.mariadb.OptionRepository;
 import com.raf.si.Banka2Backend.services.interfaces.OptionServiceInterface;
 import org.json.JSONArray;
@@ -59,6 +63,60 @@ public class OptionService implements OptionServiceInterface {
         return optionRepository.findAllByContractSymbol(stockSymbol);
     }
 
+    //TODO Sell treba da radi samo postavljanje puts-a, ali radi testiranja/simulacije, odmah ce da se proda, user ciji je option dobija novac i skida se user id
+    public Option sellOption(Long optionId) throws UserNotFoundException, OptionNotFoundException{
+
+        Optional<Option> optionOptional = optionRepository.findById(optionId);
+
+        if(optionOptional.isPresent()){
+
+            Option optionFromDB = optionOptional.get();
+            Long sellerId = optionFromDB.getUser().getId();
+            Optional<User> sellerOptional = userService.findById(sellerId);
+
+            if(sellerOptional.isPresent()) {
+
+                User seller = sellerOptional.get();
+                //TODO Dodati sumu na balance seller-a (radi simulacije)
+
+                optionFromDB.setOptionType("PUT");
+                optionFromDB.setUser(null);
+            } else {
+                throw new UserNotFoundException(sellerId);
+            }
+
+            return optionRepository.save(optionFromDB);
+        } else {
+            throw new OptionNotFoundException(optionId);
+        }
+    }
+
+    //TODO Buy, skine se sa balance-a, postavi se user id
+    public Option buyOption(Long optionId, Long userId) throws UserNotFoundException, OptionNotFoundException{
+
+        Optional<Option> optionOptional = optionRepository.findById(optionId);
+        if(optionOptional.isPresent()) {
+
+            Option optionFromDB = optionOptional.get();
+
+            Optional<User> userOptional = userService.findById(userId);
+
+            if(userOptional.isPresent()){
+
+                User userFromDB = userOptional.get();
+                //TODO Skinuti user-u koji kupuje option iznos sa balance-a, i dodati seller-u
+                optionFromDB.setUser(userFromDB);
+            } else {
+                throw new UserNotFoundException(userId);
+            }
+
+            return optionRepository.save(optionFromDB);
+        } else {
+            throw new OptionNotFoundException(optionId);
+        }
+
+    }
+
     public List<Option> getFromExternalApi(String stockSymbol, String date) {
 
         String apiUrl;
@@ -82,8 +140,6 @@ public class OptionService implements OptionServiceInterface {
             JSONArray result = optionChain.getJSONArray("result");
 
             JSONObject object = result.getJSONObject(0);
-
-            String underlyingSymbol = object.getString("underlyingSymbol");
 
             JSONArray optionsArray = object.getJSONArray("options");
             JSONObject options = optionsArray.getJSONObject(0);
@@ -117,7 +173,7 @@ public class OptionService implements OptionServiceInterface {
 
             JSONArray putsArray = options.getJSONArray("puts");
 
-            for (Object o : callsArray) {
+            for (Object o : putsArray) {
 
                 JSONObject json = (JSONObject) o;
 
