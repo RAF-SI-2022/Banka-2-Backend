@@ -32,7 +32,7 @@ public class UserOption {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "stock_id")
+    @JoinColumn(name = "option_id")
     @NotNull
     private Option option;
 

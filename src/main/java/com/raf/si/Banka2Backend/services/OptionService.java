@@ -18,6 +18,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -60,13 +61,8 @@ public class OptionService implements OptionServiceInterface {
     }
 
     @Override
-    public List<Option> findByUserId(Long userId) {
-        return optionRepository.findAllByUserId(userId);
-    }
-
-    @Override
     public List<Option> findByStock(String stockSymbol) {
-        List<Option> requestedOptions = optionRepository.findAllByStockSymbol("AAPL");
+        List<Option> requestedOptions = optionRepository.findAllByStockSymbol(stockSymbol.toUpperCase());
         if (requestedOptions.isEmpty()) {
             optionRepository.saveAll(getFromExternalApi(stockSymbol, ""));
         }
@@ -75,21 +71,16 @@ public class OptionService implements OptionServiceInterface {
 
     @Override
     public List<Option> findByStockAndDate(String stockSymbol, String regularDate) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         LocalDate date = LocalDate.parse(regularDate, formatter);
+        formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        LocalDateTime dateTime = LocalDateTime.parse(regularDate + " 02:00:00", formatter);
+        long milliseconds = dateTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
 
         List<Option> requestedOptions = optionRepository.findAllByStockSymbolAndExpirationDate(stockSymbol.toUpperCase(), date);
         if (requestedOptions.isEmpty()) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date dateMils = null;
-            try {
-                dateMils = dateFormat.parse(regularDate);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            String parsedDate = "" + dateMils.getTime() / 10000;
-//            optionRepository.saveAll(getFromExternalApi(stockSymbol, parsedDate));
-            System.out.println(getFromExternalApi(stockSymbol, parsedDate));
+            String parsedDate = "" + milliseconds / 1000;
+            optionRepository.saveAll(getFromExternalApi(stockSymbol, parsedDate));
         }
         return optionRepository.findAllByStockSymbolAndExpirationDate(stockSymbol.toUpperCase(), date);
     }

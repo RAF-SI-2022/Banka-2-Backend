@@ -13,8 +13,6 @@ public interface OptionServiceInterface {
 
     Optional<Option> findById(Long id);
 
-    List<Option> findByUserId(Long userId);
-
     List<Option> findByStock(String stockSymbol);
 
     List<Option> findByStockAndDate(String stockSymbol, String dateMils);
