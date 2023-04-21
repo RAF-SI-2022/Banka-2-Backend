@@ -64,7 +64,7 @@ public class OptionService implements OptionServiceInterface {
         return optionRepository.findAllByUserId(userId);
     }
 
-    @Override//todo TREBA POTPUNO NOVO (ZA USER-OPTION MODEL)
+    @Override
     public List<Option> findByStock(String stockSymbol) {
         List<Option> requestedOptions = optionRepository.findAllByStockSymbol("AAPL");
         if (requestedOptions.isEmpty()) {
@@ -73,7 +73,7 @@ public class OptionService implements OptionServiceInterface {
         return optionRepository.findAllByStockSymbol(stockSymbol.toUpperCase());
     }
 
-    @Override//todo TREBA POTPUNO NOVO (ZA USER-OPTION MODEL)
+    @Override
     public List<Option> findByStockAndDate(String stockSymbol, String regularDate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate date = LocalDate.parse(regularDate, formatter);
@@ -88,7 +88,8 @@ public class OptionService implements OptionServiceInterface {
                 e.printStackTrace();
             }
             String parsedDate = "" + dateMils.getTime() / 10000;
-            optionRepository.saveAll(getFromExternalApi(stockSymbol, parsedDate));
+//            optionRepository.saveAll(getFromExternalApi(stockSymbol, parsedDate));
+            System.out.println(getFromExternalApi(stockSymbol, parsedDate));
         }
         return optionRepository.findAllByStockSymbolAndExpirationDate(stockSymbol.toUpperCase(), date);
     }

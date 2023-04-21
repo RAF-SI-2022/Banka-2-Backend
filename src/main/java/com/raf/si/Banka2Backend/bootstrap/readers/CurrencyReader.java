@@ -4,14 +4,11 @@ import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.raf.si.Banka2Backend.models.mariadb.Currency;
 import com.raf.si.Banka2Backend.models.mariadb.Inflation;
-import org.springframework.util.ResourceUtils;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.io.*;
+import java.util.*;
+
+import org.springframework.util.ResourceUtils;
 
 public class CurrencyReader {
     private List<Inflation> inflations = new ArrayList<>();

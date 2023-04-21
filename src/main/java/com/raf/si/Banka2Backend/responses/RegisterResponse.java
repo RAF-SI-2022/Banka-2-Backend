@@ -2,10 +2,11 @@ package com.raf.si.Banka2Backend.responses;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.raf.si.Banka2Backend.models.mariadb.Permission;
-import lombok.Builder;
-import lombok.Data;
 
 import java.util.List;
+
+import lombok.Builder;
+import lombok.Data;
 
 @Data
 @Builder
