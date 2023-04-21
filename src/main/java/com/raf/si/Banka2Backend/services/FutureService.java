@@ -7,11 +7,10 @@ import com.raf.si.Banka2Backend.requests.FutureRequestBuySell;
 import com.raf.si.Banka2Backend.services.interfaces.FutureServiceInterface;
 import com.raf.si.Banka2Backend.services.workerThreads.FutureBuyWorker;
 import com.raf.si.Banka2Backend.services.workerThreads.FutureSellWorker;
-
-import java.util.*;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 @Service
 public class FutureService implements FutureServiceInterface {

@@ -4,13 +4,12 @@ import com.raf.si.Banka2Backend.models.mariadb.Future;
 import com.raf.si.Banka2Backend.requests.FutureRequestBuySell;
 import com.raf.si.Banka2Backend.services.FutureService;
 import com.raf.si.Banka2Backend.services.UserService;
+import lombok.SneakyThrows;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import lombok.SneakyThrows;
 
 public class FutureBuyWorker extends Thread {
 

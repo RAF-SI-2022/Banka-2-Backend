@@ -8,13 +8,12 @@ import com.raf.si.Banka2Backend.models.mariadb.Balance;
 import com.raf.si.Banka2Backend.models.mariadb.Currency;
 import com.raf.si.Banka2Backend.repositories.mariadb.BalanceRepository;
 import com.raf.si.Banka2Backend.services.interfaces.BalanceServiceInterface;
-
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BalanceService implements BalanceServiceInterface {

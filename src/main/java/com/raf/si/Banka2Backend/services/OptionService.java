@@ -40,7 +40,7 @@ public class OptionService implements OptionServiceInterface {
         this.stockService = stockService;
 
         this.optionDbWiperThread = new OptionDbWiperThread(optionRepository);
-        optionDbWiperThread.start();
+//        optionDbWiperThread.start();
     }
 
     @Override
@@ -67,8 +67,8 @@ public class OptionService implements OptionServiceInterface {
     @Override//todo TREBA POTPUNO NOVO (ZA USER-OPTION MODEL)
     public List<Option> findByStock(String stockSymbol) {
         List<Option> requestedOptions = optionRepository.findAllByStockSymbol("AAPL");
-        if (requestedOptions.isEmpty()){
-           optionRepository.saveAll(getFromExternalApi(stockSymbol, ""));
+        if (requestedOptions.isEmpty()) {
+            optionRepository.saveAll(getFromExternalApi(stockSymbol, ""));
         }
         return optionRepository.findAllByStockSymbol(stockSymbol.toUpperCase());
     }
@@ -79,15 +79,15 @@ public class OptionService implements OptionServiceInterface {
         LocalDate date = LocalDate.parse(regularDate, formatter);
 
         List<Option> requestedOptions = optionRepository.findAllByStockSymbolAndExpirationDate(stockSymbol.toUpperCase(), date);
-        if (requestedOptions.isEmpty()){
+        if (requestedOptions.isEmpty()) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             Date dateMils = null;
             try {
                 dateMils = dateFormat.parse(regularDate);
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
-            catch (ParseException e)
-            {e.printStackTrace();}
-            String parsedDate = "" + dateMils.getTime()/10000;
+            String parsedDate = "" + dateMils.getTime() / 10000;
             optionRepository.saveAll(getFromExternalApi(stockSymbol, parsedDate));
         }
         return optionRepository.findAllByStockSymbolAndExpirationDate(stockSymbol.toUpperCase(), date);

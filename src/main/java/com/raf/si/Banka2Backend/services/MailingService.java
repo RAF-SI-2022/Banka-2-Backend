@@ -4,16 +4,15 @@ import com.raf.si.Banka2Backend.models.mariadb.PasswordResetToken;
 import com.raf.si.Banka2Backend.models.mariadb.User;
 import com.raf.si.Banka2Backend.repositories.mariadb.PasswordResetTokenRepository;
 import com.raf.si.Banka2Backend.repositories.mariadb.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.Properties;
-import java.util.UUID;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.UUID;
 
 @Service
 public class MailingService {

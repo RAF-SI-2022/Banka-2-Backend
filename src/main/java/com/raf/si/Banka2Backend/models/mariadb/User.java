@@ -1,14 +1,16 @@
 package com.raf.si.Banka2Backend.models.mariadb;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
-import java.util.List;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import lombok.*;
+import java.util.List;
 
 @Data
 @Builder
