@@ -10,8 +10,6 @@ import java.util.List;
 @Repository
 public interface OptionRepository extends JpaRepository<Option, Long> {
 
-    List<Option> findAllByUserId(Long userId);
-
     List<Option> findAllByStockSymbol(String symbol);
 
     List<Option> findAllByStockSymbolAndExpirationDate(String symbol, LocalDate expirationDate);
