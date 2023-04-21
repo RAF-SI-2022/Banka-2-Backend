@@ -1,9 +1,10 @@
 package com.raf.si.Banka2Backend.responses;
 
 import com.raf.si.Banka2Backend.models.mariadb.Permission;
-import lombok.Data;
 
 import java.util.List;
+
+import lombok.Data;
 
 @Data
 public class LoginResponse {

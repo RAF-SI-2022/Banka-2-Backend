@@ -7,11 +7,12 @@ import com.raf.si.Banka2Backend.models.mariadb.User;
 import com.raf.si.Banka2Backend.repositories.mariadb.PasswordResetTokenRepository;
 import com.raf.si.Banka2Backend.repositories.mariadb.PermissionRepository;
 import com.raf.si.Banka2Backend.repositories.mariadb.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class AuthorisationService {
