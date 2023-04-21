@@ -5,7 +5,6 @@ import com.raf.si.Banka2Backend.models.mariadb.UserStock;
 import com.raf.si.Banka2Backend.requests.StockRequest;
 import com.raf.si.Banka2Backend.services.StockService;
 import com.raf.si.Banka2Backend.services.UserStockService;
-import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -42,13 +41,12 @@ public class StockSellWorker extends Thread {
                     if (stockRequest.isAllOrNone()) {
                         usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() - stockRequest.getAmount());
                         //todo DODATI TRANSAKCIJU I PROMENITI BALANS
-                    }
-                    else {
+                    } else {
                         int stockAmountSum = 0;
                         Stock stock = stockService.getStockBySymbol(stockRequest.getStockSymbol());
                         BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
 
-                        while (stockRequest.getAmount() != stockAmountSum){
+                        while (stockRequest.getAmount() != stockAmountSum) {
                             int amountBought = random.nextInt(stockRequest.getAmount() - stockAmountSum) + 1;
                             stockAmountSum += amountBought;
                             usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() - amountBought);
@@ -56,8 +54,7 @@ public class StockSellWorker extends Thread {
                         }
                     }
                     userStockService.save(usersStockToChange.get());
-                }
-                else {
+                } else {
                     System.out.println("limit stop sell");
                 }
 

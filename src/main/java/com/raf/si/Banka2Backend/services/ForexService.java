@@ -4,6 +4,9 @@ import com.raf.si.Banka2Backend.bootstrap.BootstrapData;
 import com.raf.si.Banka2Backend.models.mariadb.Forex;
 import com.raf.si.Banka2Backend.repositories.mariadb.ForexRepository;
 import com.raf.si.Banka2Backend.services.interfaces.ForexServiceInterface;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -15,10 +18,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class ForexService implements ForexServiceInterface {

@@ -10,8 +10,5 @@ CREATE TABLE IF NOT EXISTS `options`
     `expiration_date`    DATE         NOT NULL,
     `open_interest`      INTEGER      NOT NULL,
     `contract_size`      INTEGER      NOT NULL,
-    `maintenance_margin` DOUBLE       NOT NULL,
-    `user_id`            BIGINT,
-
-    CONSTRAINT fk_options_users FOREIGN KEY (user_id) REFERENCES users (id)
+    `maintenance_margin` DOUBLE       NOT NULL
 );
