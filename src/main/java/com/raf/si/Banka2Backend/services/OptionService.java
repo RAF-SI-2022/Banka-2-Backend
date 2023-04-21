@@ -1,13 +1,20 @@
 package com.raf.si.Banka2Backend.services;
 
+import com.raf.si.Banka2Backend.exceptions.AmountTooHighForOptionOpenInterestException;
+import com.raf.si.Banka2Backend.exceptions.OptionNotFoundException;
+import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.Option;
+import com.raf.si.Banka2Backend.models.mariadb.User;
+import com.raf.si.Banka2Backend.models.mariadb.UserOption;
 import com.raf.si.Banka2Backend.repositories.mariadb.OptionRepository;
+import com.raf.si.Banka2Backend.repositories.mariadb.UserOptionRepository;
 import com.raf.si.Banka2Backend.services.interfaces.OptionServiceInterface;
 import com.raf.si.Banka2Backend.services.workerThreads.OptionDbWiperThread;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.net.URI;
@@ -33,15 +40,17 @@ public class OptionService implements OptionServiceInterface {
     private final UserService userService;
     private final StockService stockService;
     private final OptionDbWiperThread optionDbWiperThread;
+    private final UserOptionRepository userOptionRepository;
 
     @Autowired
-    public OptionService(OptionRepository optionRepository, UserService userService, StockService stockService) {
+    public OptionService(OptionRepository optionRepository, UserService userService, StockService stockService, UserOptionRepository userOptionRepository) {
         this.optionRepository = optionRepository;
         this.userService = userService;
         this.stockService = stockService;
 
         this.optionDbWiperThread = new OptionDbWiperThread(optionRepository);
 //        optionDbWiperThread.start();
+        this.userOptionRepository = userOptionRepository;
     }
 
     @Override
@@ -62,6 +71,7 @@ public class OptionService implements OptionServiceInterface {
 
     @Override
     public List<Option> findByStock(String stockSymbol) {
+//        List<Option> requestedOptions = optionRepository.findAllByStockSymbol(stockSymbol);
         List<Option> requestedOptions = optionRepository.findAllByStockSymbol(stockSymbol.toUpperCase());
         if (requestedOptions.isEmpty()) {
             optionRepository.saveAll(getFromExternalApi(stockSymbol, ""));
@@ -85,6 +95,93 @@ public class OptionService implements OptionServiceInterface {
         return optionRepository.findAllByStockSymbolAndExpirationDate(stockSymbol.toUpperCase(), date);
     }
 
+    public void buyStockUsingOption() {
+        //TODO Check if date expired
+        //TODO Check if in money
+        //TODO Buy stock by STRIKE price
+    }
+
+    public void sellStockUsingOption() {
+        //TODO Check if date expired
+        //TODO Check if in money
+        //TODO Sell stock by STRIKE price
+    }
+
+    public Option sellOption(Long optionId) throws UserNotFoundException, OptionNotFoundException{
+
+        //TODO Skloni iz tabele, stavi pare
+
+//        Optional<Option> optionOptional = optionRepository.findById(optionId);
+//
+//        if(optionOptional.isPresent()){
+//
+//            Option optionFromDB = optionOptional.get();
+//            Long sellerId = optionFromDB.getUser().getId();
+//            Optional<User> sellerOptional = userService.findById(sellerId);
+//
+//            if(sellerOptional.isPresent()) {
+//
+//                User seller = sellerOptional.get();
+//                //TODO Dodati sumu na balance seller-a (radi simulacije)
+//
+//                optionFromDB.setOptionType("PUT");
+//                optionFromDB.setUser(null);
+//            } else {
+//                throw new UserNotFoundException(sellerId);
+//            }
+//
+//            return optionRepository.save(optionFromDB);
+//        } else {
+//            throw new OptionNotFoundException(optionId);
+//        }
+        return null;
+    }
+
+    //TODO Buy, skine se sa balance-a, postavi se user id
+    @Transactional
+    public Option buyOption(Long optionId, Long userId, int amount, double premium) throws UserNotFoundException, OptionNotFoundException, AmountTooHighForOptionOpenInterestException {
+
+        Optional<Option> optionOptional = optionRepository.findById(optionId);
+        if(optionOptional.isPresent()) {
+
+            Option optionFromDB = optionOptional.get();
+
+            Optional<User> userOptional = userService.findById(userId);
+
+            if(userOptional.isPresent()){
+
+                User userFromDB = userOptional.get();
+                //TODO Skinuti user-u koji kupuje option iznos sa balance-a, i dodati seller-u
+
+                int updatedAmount = optionFromDB.getOpenInterest() - amount;
+
+                if(updatedAmount < 0)
+                    throw new AmountTooHighForOptionOpenInterestException(amount);
+
+                optionFromDB.setOpenInterest(updatedAmount);
+                optionRepository.save(optionFromDB);
+
+                UserOption userOption = UserOption.builder()
+                        .user(userFromDB)
+                        .option(optionFromDB)
+                        .amount(amount)
+                        .premium(premium)
+                        .expirationDate(optionFromDB.getExpirationDate())
+                        .strike(optionFromDB.getStrike())
+                        .type(optionFromDB.getOptionType())
+                        .build();
+
+                userOptionRepository.save(userOption);
+
+            } else {
+                throw new UserNotFoundException(userId);
+            }
+
+            return optionRepository.save(optionFromDB);
+        } else {
+            throw new OptionNotFoundException(optionId);
+        }
+    }
 
     public List<Option> getFromExternalApi(String stockSymbol, String date) {
 
@@ -109,8 +206,6 @@ public class OptionService implements OptionServiceInterface {
             JSONArray result = optionChain.getJSONArray("result");
 
             JSONObject object = result.getJSONObject(0);
-
-            String underlyingSymbol = object.getString("underlyingSymbol");
 
             JSONArray optionsArray = object.getJSONArray("options");
             JSONObject options = optionsArray.getJSONObject(0);
@@ -144,7 +239,7 @@ public class OptionService implements OptionServiceInterface {
 
             JSONArray putsArray = options.getJSONArray("puts");
 
-            for (Object o : callsArray) {
+            for (Object o : putsArray) {
 
                 JSONObject json = (JSONObject) o;
 

@@ -1,28 +1,21 @@
 package com.raf.si.Banka2Backend.models.mariadb;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 
 @Data
 @Builder
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "users_options")
 public class UserOption {
 
-    public UserOption(Long id, User user, Option option, Double userPrice, Integer amount) {
-        this.id = id;
-        this.user = user;
-        this.option = option;
-        this.userPrice = userPrice;
-        this.amount = amount;
-    }
-
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
@@ -36,9 +29,17 @@ public class UserOption {
     @NotNull
     private Option option;
 
-    @NotNull
-    private Double userPrice;
+    private Double premium;
 
     @NotNull
     private Integer amount;
+
+    @NotNull
+    private String type;
+
+    @NotNull
+    private LocalDate expirationDate;
+
+    @NotNull
+    private Double strike;
 }
