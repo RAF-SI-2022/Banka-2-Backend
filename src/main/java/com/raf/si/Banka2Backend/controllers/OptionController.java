@@ -1,5 +1,7 @@
 package com.raf.si.Banka2Backend.controllers;
 
+import com.raf.si.Banka2Backend.dto.OptionBuyDto;
+import com.raf.si.Banka2Backend.exceptions.AmountTooHighForOptionOpenInterestException;
 import com.raf.si.Banka2Backend.services.OptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.websocket.server.PathParam;
 import java.util.Optional;
 
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
@@ -59,15 +62,15 @@ public class OptionController {
         }
     }
 
-    @GetMapping("/{id}/buy")
-    public ResponseEntity<?> buyOption(@PathVariable Long id) {
+    @PostMapping("/buy")
+    public ResponseEntity<?> buyOption(@RequestBody OptionBuyDto optionBuyDto) {
 
         String signedInUserEmail = getContext().getAuthentication().getName();
         try{
             Optional<User> userOptional = userService.findByEmail(signedInUserEmail);
 
-            return ResponseEntity.ok().body(optionService.buyOption(id, userOptional.get().getId()));
-        } catch(UserNotFoundException | OptionNotFoundException e){
+            return ResponseEntity.ok().body(optionService.buyOption(optionBuyDto.getOptionId(), userOptional.get().getId(), optionBuyDto.getAmount(), optionBuyDto.getPremium()));
+        } catch(UserNotFoundException | OptionNotFoundException | AmountTooHighForOptionOpenInterestException e){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }
