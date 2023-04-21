@@ -9,17 +9,17 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
-// @AllArgsConstructor
 @RequiredArgsConstructor
 @Entity
 @Table(name = "users_options")
 public class UserOption {
 
-    public UserOption(Long id, User user, Option option, Double userPrice) {
+    public UserOption(Long id, User user, Option option, Double userPrice, Integer amount) {
         this.id = id;
         this.user = user;
         this.option = option;
         this.userPrice = userPrice;
+        this.amount = amount;
     }
 
     @Id
@@ -38,4 +38,7 @@ public class UserOption {
 
     @NotNull
     private Double userPrice;
+
+    @NotNull
+    private Integer amount;
 }
