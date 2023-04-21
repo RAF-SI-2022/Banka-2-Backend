@@ -9,18 +9,17 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
-// @AllArgsConstructor
 @RequiredArgsConstructor
 @Entity
-@Table(name = "users_stocks")
-public class UserStock {
+@Table(name = "users_options")
+public class UserOption {
 
-    public UserStock(Long id, User user, Stock stock, Integer amount, Integer amountForSale) {
+    public UserOption(Long id, User user, Option option, Double userPrice, Integer amount) {
         this.id = id;
         this.user = user;
-        this.stock = stock;
+        this.option = option;
+        this.userPrice = userPrice;
         this.amount = amount;
-        this.amountForSale = amountForSale;
     }
 
     @Id
@@ -35,11 +34,11 @@ public class UserStock {
     @ManyToOne
     @JoinColumn(name = "stock_id")
     @NotNull
-    private Stock stock;
+    private Option option;
+
+    @NotNull
+    private Double userPrice;
 
     @NotNull
     private Integer amount;
-
-    @NotNull
-    private Integer amountForSale;
 }

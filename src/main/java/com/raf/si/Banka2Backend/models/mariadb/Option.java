@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Data
 @Builder
@@ -54,9 +53,5 @@ public class Option {
     private Double maintenanceMargin;
 
     //todo theta
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
 
 }
