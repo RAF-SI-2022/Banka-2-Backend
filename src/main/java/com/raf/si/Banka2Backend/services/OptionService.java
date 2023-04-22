@@ -1,6 +1,5 @@
 package com.raf.si.Banka2Backend.services;
 
-import com.raf.si.Banka2Backend.exceptions.AmountTooHighForOptionOpenInterestException;
 import com.raf.si.Banka2Backend.exceptions.OptionNotFoundException;
 import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.Option;
@@ -136,7 +135,7 @@ public class OptionService implements OptionServiceInterface {
 
     //TODO Buy, skine se sa balance-a, postavi se user id
     @Transactional
-    public Option buyOption(Long optionId, Long userId, int amount, double premium) throws UserNotFoundException, OptionNotFoundException, AmountTooHighForOptionOpenInterestException {
+    public Option buyOption(Long optionId, Long userId, int amount, double premium) throws UserNotFoundException, OptionNotFoundException {
 
         Optional<Option> optionOptional = optionRepository.findById(optionId);
         if(optionOptional.isPresent()) {
@@ -149,14 +148,6 @@ public class OptionService implements OptionServiceInterface {
 
                 User userFromDB = userOptional.get();
                 //TODO Skinuti user-u koji kupuje option iznos sa balance-a, i dodati seller-u
-
-                int updatedAmount = optionFromDB.getOpenInterest() - amount;
-
-                if(updatedAmount < 0)
-                    throw new AmountTooHighForOptionOpenInterestException(amount);
-
-                optionFromDB.setOpenInterest(updatedAmount);
-                optionRepository.save(optionFromDB);
 
                 UserOption userOption = UserOption.builder()
                         .user(userFromDB)
