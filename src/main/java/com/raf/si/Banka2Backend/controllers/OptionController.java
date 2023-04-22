@@ -1,6 +1,10 @@
 package com.raf.si.Banka2Backend.controllers;
 
 import com.raf.si.Banka2Backend.dto.OptionBuyDto;
+import com.raf.si.Banka2Backend.dto.OptionSellDto;
+import com.raf.si.Banka2Backend.dto.SellStockUsingOptionDto;
+import com.raf.si.Banka2Backend.exceptions.StockNotFoundException;
+import com.raf.si.Banka2Backend.exceptions.TooLateToBuyOptionException;
 import com.raf.si.Banka2Backend.services.OptionService;
 import com.raf.si.Banka2Backend.utils.OptionDateScraper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,14 +52,11 @@ public class OptionController {
         return ResponseEntity.ok().body(optionService.findByStock(symbol));
     }
 
-
-    //TODO Izdvojiti vlasnika option-a u novi model (UserOption)
-
-    @GetMapping("/{id}/sell")
-    public ResponseEntity<?> sellOption(@PathVariable Long id) {
+    @PostMapping("/sell")
+    public ResponseEntity<?> sellOption(@RequestBody OptionSellDto optionSellDto) {
 
         try{
-            return ResponseEntity.ok().body(optionService.sellOption(id));
+            return ResponseEntity.ok().body(optionService.sellOption(optionSellDto.getUserOptionId(), optionSellDto.getPremium()));
         } catch(UserNotFoundException | OptionNotFoundException e){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
@@ -91,5 +92,29 @@ public class OptionController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
         return ResponseEntity.ok().body(dates);
+    }
+    @GetMapping("/buy-stocks/{userOptionId}")
+    public ResponseEntity<?> buyStocksByOption(@PathVariable Long userOptionId) {
+
+        String signedInUserEmail = getContext().getAuthentication().getName();
+
+        try{
+            Optional<User> userOptional = userService.findByEmail(signedInUserEmail);
+
+            return ResponseEntity.ok().body(optionService.buyStockUsingOption(userOptionId, userOptional.get().getId()));
+        } catch(UserNotFoundException | OptionNotFoundException | StockNotFoundException | TooLateToBuyOptionException e){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
+
+    }
+
+    @PostMapping("/sell-stocks")
+    public ResponseEntity<?> sellStocksByOption(@RequestBody SellStockUsingOptionDto sellStockUsingOptionDto) {
+
+        //TODO Zavrsiti sell-stocks
+        //Problem na koji sam naisao je to sto treba da se kreira UserOption, ali nemam podatak o optionId-ju
+        //Moguce resenje je dozvoliti null vrednosti za optionId u UserOption modelu i migracionoj skripti
+        //Znaci setovati samo userId - id onoga ko kreira SellStockUsingOption, a da optionId ostane null
+        return null;
     }
 }

@@ -1,12 +1,8 @@
 package com.raf.si.Banka2Backend.services;
 
-import com.raf.si.Banka2Backend.exceptions.OptionNotFoundException;
-import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
-import com.raf.si.Banka2Backend.models.mariadb.Option;
-import com.raf.si.Banka2Backend.models.mariadb.User;
-import com.raf.si.Banka2Backend.models.mariadb.UserOption;
-import com.raf.si.Banka2Backend.repositories.mariadb.OptionRepository;
-import com.raf.si.Banka2Backend.repositories.mariadb.UserOptionRepository;
+import com.raf.si.Banka2Backend.exceptions.*;
+import com.raf.si.Banka2Backend.models.mariadb.*;
+import com.raf.si.Banka2Backend.repositories.mariadb.*;
 import com.raf.si.Banka2Backend.services.interfaces.OptionServiceInterface;
 import com.raf.si.Banka2Backend.services.workerThreads.OptionDbWiperThread;
 import org.json.JSONArray;
@@ -37,9 +33,12 @@ public class OptionService implements OptionServiceInterface {
     private final StockService stockService;
     private final OptionDbWiperThread optionDbWiperThread;
     private final UserOptionRepository userOptionRepository;
+    private final UserRepository userRepository;
+    private final StockRepository stockRepository;
+    private final UserStocksRepository userStocksRepository;
 
     @Autowired
-    public OptionService(OptionRepository optionRepository, UserService userService, StockService stockService, UserOptionRepository userOptionRepository) {
+    public OptionService(OptionRepository optionRepository, UserService userService, StockService stockService, UserOptionRepository userOptionRepository, UserRepository userRepository, StockRepository stockRepository, UserStocksRepository userStocksRepository) {
         this.optionRepository = optionRepository;
         this.userService = userService;
         this.stockService = stockService;
@@ -47,6 +46,9 @@ public class OptionService implements OptionServiceInterface {
         this.optionDbWiperThread = new OptionDbWiperThread(optionRepository);
 //        optionDbWiperThread.start();
         this.userOptionRepository = userOptionRepository;
+        this.userRepository = userRepository;
+        this.stockRepository = stockRepository;
+        this.userStocksRepository = userStocksRepository;
     }
 
     @Override
@@ -91,63 +93,83 @@ public class OptionService implements OptionServiceInterface {
         return optionRepository.findAllByStockSymbolAndExpirationDate(stockSymbol.toUpperCase(), date);
     }
 
-    public void buyStockUsingOption() {
-        //TODO Check if date expired
-        //TODO Check if in money
-        //TODO Buy stock by STRIKE price
+    public UserStock buyStockUsingOption(Long userOptionId, Long userId) throws TooLateToBuyOptionException, OptionNotInTheMoneyException, OptionNotFoundException, StockNotFoundException {
+
+        Integer contractSize = 100;
+
+        Optional<UserOption> userOptionFromDBOptional = userOptionRepository.findById(userOptionId);
+
+        Optional<User> userFromDBOptional = userRepository.findById(userId);
+
+        //Ako user-opcija postoji
+        if(userOptionFromDBOptional.isPresent()){
+
+            UserOption userOptionFromDB = userOptionFromDBOptional.get();
+
+            //Proveri da li je expirationDate prosao
+            if(userOptionFromDB.getExpirationDate().isAfter(LocalDate.now())){
+
+                //Ako nije prosao
+                //Pitaj da li je lastPrice veca od strike
+                //Ako jeste to znaci da je opcija 'In the Money' i user hoce da kupi taj stock za strike
+                //TODO last Price (za sada) ili current price iz Stocka (ako se ispostavi da je to ispravno)
+                if(userOptionFromDB.getOption().getPrice() > userOptionFromDB.getStrike() && userFromDBOptional.isPresent()) {
+
+                    //Pronalazi se stock po simbolu
+                    Optional<Stock> stockFromDBOptional = stockRepository.findStockBySymbol(userOptionFromDB.getOption().getStockSymbol());
+
+                    if(stockFromDBOptional.isPresent()) {
+
+                        Stock stock = stockFromDBOptional.get();
+
+                        //Kreira se novi user-stock
+                        UserStock newUserStock = UserStock.builder()
+                                .user(userFromDBOptional.get())
+                                .stock(stock)
+                                .amount(userOptionFromDB.getAmount() * contractSize)
+                                .amountForSale(userOptionFromDB.getAmount() * contractSize)
+                                .build();
+
+                        userOptionRepository.deleteById(userOptionId);
+
+                        return userStocksRepository.save(newUserStock);
+
+                        //TODO Update user balance (buy stock by STRIKE price)
+                    } else
+                        throw new StockNotFoundException(userOptionFromDB.getOption().getStockSymbol());
+                } else {
+                    throw new OptionNotInTheMoneyException(userOptionId);
+                }
+            } else
+                throw new TooLateToBuyOptionException(userOptionFromDB.getOption().getExpirationDate(), userOptionId);
+        } else
+            throw new OptionNotFoundException(userOptionId);
     }
 
     public void sellStockUsingOption() {
+
         //TODO Check if date expired
         //TODO Check if in money
+//        price < strike
         //TODO Sell stock by STRIKE price
     }
 
-    public Option sellOption(Long optionId) throws UserNotFoundException, OptionNotFoundException{
-
-        //TODO Skloni iz tabele, stavi pare
-
-//        Optional<Option> optionOptional = optionRepository.findById(optionId);
-//
-//        if(optionOptional.isPresent()){
-//
-//            Option optionFromDB = optionOptional.get();
-//            Long sellerId = optionFromDB.getUser().getId();
-//            Optional<User> sellerOptional = userService.findById(sellerId);
-//
-//            if(sellerOptional.isPresent()) {
-//
-//                User seller = sellerOptional.get();
-//                //TODO Dodati sumu na balance seller-a (radi simulacije)
-//
-//                optionFromDB.setOptionType("PUT");
-//                optionFromDB.setUser(null);
-//            } else {
-//                throw new UserNotFoundException(sellerId);
-//            }
-//
-//            return optionRepository.save(optionFromDB);
-//        } else {
-//            throw new OptionNotFoundException(optionId);
-//        }
-        return null;
-    }
-
-    //TODO Buy, skine se sa balance-a, postavi se user id
     @Transactional
-    public Option buyOption(Long optionId, Long userId, int amount, double premium) throws UserNotFoundException, OptionNotFoundException {
+    public UserOption buyOption(Long optionId, Long userId, Integer amount, double premium) throws UserNotFoundException, OptionNotFoundException {
 
         Optional<Option> optionOptional = optionRepository.findById(optionId);
         if(optionOptional.isPresent()) {
 
             Option optionFromDB = optionOptional.get();
 
+            if(optionFromDB.getOpenInterest() < amount)
+                throw new NotEnoughOptionsAvailableException(optionFromDB.getOpenInterest(), amount);
+
             Optional<User> userOptional = userService.findById(userId);
 
             if(userOptional.isPresent()){
 
                 User userFromDB = userOptional.get();
-                //TODO Skinuti user-u koji kupuje option iznos sa balance-a, i dodati seller-u
 
                 UserOption userOption = UserOption.builder()
                         .user(userFromDB)
@@ -159,16 +181,37 @@ public class OptionService implements OptionServiceInterface {
                         .type(optionFromDB.getOptionType())
                         .build();
 
-                userOptionRepository.save(userOption);
+                optionFromDB.setOpenInterest(optionFromDB.getOpenInterest() - amount);
+                optionRepository.save(optionFromDB);
+
+                //TODO Smanjiti user balance
+                return userOptionRepository.save(userOption);
 
             } else {
                 throw new UserNotFoundException(userId);
             }
-
-            return optionRepository.save(optionFromDB);
         } else {
             throw new OptionNotFoundException(optionId);
         }
+    }
+
+    public UserOption sellOption(Long userOptionId, Double premium) throws OptionNotFoundException{
+
+        Optional<UserOption> userOptionOptional = userOptionRepository.findById(userOptionId);
+
+        if(userOptionOptional.isPresent()){
+
+            UserOption userOptionFromDB = userOptionOptional.get();
+
+            userOptionFromDB.setPremium(premium);
+            userOptionFromDB.setUser(null);
+
+            return userOptionRepository.save(userOptionFromDB);
+
+            //TODO Simulirati prodaju opcije (povecati balance user-a za premium vrednost)
+        } else
+            throw new OptionNotFoundException(userOptionId);
+
     }
 
     public List<Option> getFromExternalApi(String stockSymbol, String date) {
