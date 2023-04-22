@@ -50,10 +50,10 @@ public class FutureService implements FutureServiceInterface {
 
     @Override
     public ResponseEntity<?> buyFuture(FutureRequestBuySell futureRequest, String fromUserEmail, Float usersMoneyInCurrency) {
+        System.out.println(futureRequest);
         if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) { // regularni buy
             Optional<Future> future = futureRepository.findById(futureRequest.getId());
-
-            if (future.isEmpty()) return ResponseEntity.status(500).body("Internal server error");
+            if (future.isEmpty()) return ResponseEntity.status(500).body("Internal server error ovaj");
             if (!future.get().isForSale())
                 return ResponseEntity.status(500).body("Internal server error");
 
@@ -61,8 +61,46 @@ public class FutureService implements FutureServiceInterface {
             if (toUser != null) { // provera da li user ima dovoljno para //todo trenutno je sve preko USD
                 float amount = future.get().getMaintenanceMargin();
                 if (usersMoneyInCurrency < amount)
-                    return ResponseEntity.status(500).body("Not enough money bro >:(");
+                    return ResponseEntity.status(500).body("Not enough money in balance");
+
+                // Provera za daily limit
+//            System.out.println("Ovde sam");
+                Optional<User> optionalUser = userService.findByEmail(fromUserEmail);
+                if(optionalUser.isPresent()) {
+//                System.out.println("Sad sam ovde");
+//                    float amount = future.get().getMaintenanceMargin();
+                    Double limit = optionalUser.get().getDailyLimit();
+                    Double amountDouble = Double.valueOf(amount);
+                    Double suma = limit-amountDouble;
+//                    System.out.println("Limit " + limit + " vrednost " + amountDouble + " oduzimanje " + suma);
+                    boolean limitTestBoolean = limit-amountDouble < 0?false:true;
+                    if (!limitTestBoolean)
+                        return ResponseEntity.status(500).body("Exceeded daily limit");
+                    else {
+                        optionalUser.get().setDailyLimit(limit-amountDouble);
+                        userService.save(optionalUser.get());
+                    }
+                }
+
                 balanceService.exchangeMoney(fromUserEmail, toUser.getEmail(), amount, "USD");
+            }
+
+            // Provera za daily limit
+            Optional<User> optionalUser = userService.findByEmail(fromUserEmail);
+            if(optionalUser.isPresent() && !(optionalUser.get().getDailyLimit() == null)) {
+
+                float amount = future.get().getMaintenanceMargin();
+                Double limit = optionalUser.get().getDailyLimit();
+                Double amountDouble = Double.valueOf(amount);
+                Double suma = limit-amountDouble;
+//                System.out.println("Limit " + limit + " vrednost " + amountDouble + " oduzimanje " + suma);
+                boolean limitTestBoolean = limit-amountDouble < 0?false:true;
+                if (!limitTestBoolean)
+                    return ResponseEntity.status(500).body("Exceeded daily limit");
+                else {
+                    optionalUser.get().setDailyLimit(limit-amountDouble);
+                    userService.save(optionalUser.get());
+                }
             }
 
             future.get().setUser(userService.findById(futureRequest.getUserId()).get());

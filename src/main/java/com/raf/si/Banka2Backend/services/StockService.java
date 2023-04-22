@@ -373,6 +373,22 @@ public class StockService {
         if (usersBalance.getAmount() < totalPrice.floatValue())
             return ResponseEntity.status(500).body("Nemas doboljo para, siramasan si buraz 💀");
 
+        // todo ovo otkomentarisati ili prebaciti u stcok buy workera
+//        if(!(user.getDailyLimit() == null)) {
+//
+//            Double totalPriceDouble = totalPrice.doubleValue();
+//            Double limit = user.getDailyLimit();
+//            Double suma = limit-totalPriceDouble;
+////                System.out.println("Limit " + limit + " vrednost " + amountDouble + " oduzimanje " + suma);
+//            boolean limitTestBoolean = suma < 0?false:true;
+//            if (!limitTestBoolean)
+//                return ResponseEntity.status(500).body("Exceeded daily limit");
+//            else {
+//                user.setDailyLimit(suma);
+//                userService.save(user);
+//            }
+//        }
+
         try {
             stockBuyRequestsQueue.put(stockRequest);
         } catch (InterruptedException e) {

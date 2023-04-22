@@ -80,6 +80,8 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<UserStock> stocks;
 
-    @NotNull
+
     private Double dailyLimit;
+
+    private Double defaultDailyLimit;
 }

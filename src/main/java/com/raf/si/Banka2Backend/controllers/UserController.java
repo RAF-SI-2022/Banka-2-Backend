@@ -91,6 +91,9 @@ public class UserController {
         List<Permission> permissions =
                 this.permissionService.findByPermissionNames(user.getPermissions());
 
+
+
+
         User newUser =
                 User.builder()
                         .email(user.getEmail())
@@ -102,7 +105,13 @@ public class UserController {
                         .jobPosition(user.getJobPosition())
                         .active(user.isActive())
                         .permissions(permissions)
-                        .dailyLimit(user.getDailyLimit()) // todo limit ceka front integraciju
+                        .dailyLimit(
+                                user.getDailyLimit()
+//                                user.getDailyLimit() == -1D ? null : user.getDailyLimit()
+                        )
+                        .defaultDailyLimit(
+                                user.getDailyLimit()
+                        )
                         .build();
 
         userService.save(newUser); // mora duplo zbog balansa
@@ -120,7 +129,12 @@ public class UserController {
                         .jobPosition(user.getJobPosition())
                         .active(user.isActive())
                         .permissions(permissions)
-                        .dailyLimit(user.getDailyLimit())
+                        .dailyLimit(
+                                user.getDailyLimit()
+                        )
+                        .defaultDailyLimit(
+                                user.getDailyLimit()
+                        )
                         .build();
 
         return ResponseEntity.ok(response);
@@ -263,6 +277,8 @@ public class UserController {
                                 .jmbg(updatedUser.get().getJmbg())
                                 .jobPosition(updatedUser.get().getJobPosition())
                                 .permissions(updatedUser.get().getPermissions())
+                                .dailyLimit(updatedUser.get().getDailyLimit())
+                                .defaultDailyLimit(updatedUser.get().getDefaultDailyLimit())
                                 .build());
         return ResponseEntity.ok().body(userService.save(updatedUser.get()));
     }
@@ -296,6 +312,8 @@ public class UserController {
                                 .jobPosition(updatedUser.get().getJobPosition())
                                 .permissions(updatedUser.get().getPermissions())
                                 .phone(updatedUser.get().getPhone())
+                                .dailyLimit(updatedUser.get().getDailyLimit())
+                                .defaultDailyLimit(updatedUser.get().getDefaultDailyLimit())
                                 .build());
         return ResponseEntity.ok().body(userService.save(updatedUser.get()));
     }
@@ -315,6 +333,7 @@ public class UserController {
         List<Permission> permissions =
                 this.permissionService.findByPermissionNames(user.getPermissions());
 
+
         updatedUser =
                 Optional.ofNullable(
                         User.builder()
@@ -328,7 +347,14 @@ public class UserController {
                                 .jobPosition(user.getJobPosition())
                                 .active(user.isActive())
                                 .permissions(permissions)
-                                .dailyLimit(user.getDailyLimit())
+//                                .dailyLimit(user.getDailyLimit())
+                                .dailyLimit(
+                                        user.getDailyLimit() == null ?
+                                                null :
+                                        user.getDailyLimit() < updatedUser.get().getDailyLimit() ?
+                                        user.getDailyLimit() : updatedUser.get().getDailyLimit()
+                                )
+                                .defaultDailyLimit(user.getDailyLimit())
                                 .build());
         return ResponseEntity.ok().body(userService.save(updatedUser.get()));
     }
@@ -340,5 +366,21 @@ public class UserController {
             return ResponseEntity.status(401).body("You don't have permission to buy/sell.");
         }
         return ResponseEntity.ok().body(userService.getUsersDailyLimit(signedInUserEmail));
+    }
+
+    @PatchMapping(value = "/reset-limit/{id}")
+    public ResponseEntity<?> resetDailyLimit(@PathVariable(name = "id") Long id){
+        String signedInUserEmail = getContext().getAuthentication().getName();
+        if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+            return ResponseEntity.status(401).body("You don't have permission to buy/sell.");
+        }
+        Optional<User> userOptional = userService.findById(id);
+        if(userOptional.isPresent()){
+            userOptional.get().setDailyLimit(userOptional.get().getDefaultDailyLimit());
+            return ResponseEntity.ok().body(userService.save(userOptional.get()));
+        }
+        else{
+            return ResponseEntity.status(400).body("No such user");
+        }
     }
 }

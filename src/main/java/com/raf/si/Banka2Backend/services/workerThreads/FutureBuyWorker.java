@@ -1,13 +1,16 @@
 package com.raf.si.Banka2Backend.services.workerThreads;
 
 import com.raf.si.Banka2Backend.models.mariadb.Future;
+import com.raf.si.Banka2Backend.models.mariadb.User;
 import com.raf.si.Banka2Backend.requests.FutureRequestBuySell;
 import com.raf.si.Banka2Backend.services.FutureService;
 import com.raf.si.Banka2Backend.services.UserService;
 import lombok.SneakyThrows;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -20,11 +23,14 @@ public class FutureBuyWorker extends Thread {
     private UserService userService;
     private boolean next = false;
 
+    private List<Long> keysToRemove;
+
     public FutureBuyWorker(FutureService futureService, UserService userService) {
         requestsToRemove = new CopyOnWriteArrayList<>();
         futuresByName = new CopyOnWriteArrayList<>();
         this.futureService = futureService;
         this.userService = userService;
+        this.keysToRemove = new ArrayList<>();
     }
 
     @SneakyThrows
@@ -42,15 +48,35 @@ public class FutureBuyWorker extends Thread {
                 for (Future futureFromTable : futuresByName) {
                     if (next) continue;
 
+                    Optional<User> optionalUser =  userService.findById(request.getValue().getUserId());
+                    if(optionalUser.isPresent() && !(optionalUser.get().getDailyLimit() == null)) {
+                        Double margin = Double.valueOf(futureFromTable.getMaintenanceMargin());
+                        Double limit = optionalUser.get().getDailyLimit() - margin;
+                        if (limit < 0){
+                            continue;
+                        }
+                    }
                     if (request.getValue().getLimit() != 0) { // ako je postalvjen limit
                         if (futureFromTable.isForSale()
                                 && futureFromTable.getMaintenanceMargin() < request.getValue().getLimit()) {
                             //              System.out.println("kupljen za limit");
-                            futureFromTable.setUser(userService.findById(request.getValue().getUserId()).get());
-                            futureFromTable.setForSale(false);
-                            futureService.updateFuture(futureFromTable);
-                            futuresRequestsMap.remove(request.getKey());
-                            next = true;
+                            if(optionalUser.isPresent() && !(optionalUser.get().getDailyLimit() == null)) {
+                                futureFromTable.setUser(optionalUser.get());
+                                futureFromTable.setForSale(false);
+                                futureService.updateFuture(futureFromTable);
+                                futuresRequestsMap.remove(request.getKey());
+
+                                // smanjivanje daily limita ako je kupovina uspesna
+                                Double margin = Double.valueOf(futureFromTable.getMaintenanceMargin());
+                                Double sum = optionalUser.get().getDailyLimit() - margin;
+                                optionalUser.get().setDailyLimit(sum);
+                                userService.save(optionalUser.get());
+
+                                next = true;
+                            }
+                            else{
+                                keysToRemove.add(request.getKey());
+                            }
                         }
                     }
 
@@ -58,16 +84,33 @@ public class FutureBuyWorker extends Thread {
                         if (futureFromTable.isForSale()
                                 && futureFromTable.getMaintenanceMargin() > request.getValue().getStop()) {
                             //              System.out.println("kupljen za stop");
-                            futureFromTable.setUser(userService.findById(request.getValue().getUserId()).get());
-                            futureFromTable.setForSale(false);
-                            futureService.updateFuture(futureFromTable);
-                            futuresRequestsMap.remove(request.getKey());
-                            next = true;
+                            if(optionalUser.isPresent() && !(optionalUser.get().getDailyLimit() == null)) {
+                                futureFromTable.setUser(optionalUser.get());
+                                futureFromTable.setForSale(false);
+                                futureService.updateFuture(futureFromTable);
+                                futuresRequestsMap.remove(request.getKey());
+
+                                // smanjivanje daily limita ako je kupovina uspesna
+                                Double margin = Double.valueOf(futureFromTable.getMaintenanceMargin());
+                                Double sum = optionalUser.get().getDailyLimit() - margin;
+                                optionalUser.get().setDailyLimit(sum);
+                                userService.save(optionalUser.get());
+
+                                next = true;
+                            }
+                            else{
+                                keysToRemove.add(request.getKey());
+                            }
                         }
                     }
                 }
                 next = false;
             }
+            // u slucaju da se user izbrisao dodajemo kljuceve tih requestova i brisemo ih
+            for(Long key : this.keysToRemove){
+                futuresRequestsMap.remove(key);
+            }
+            this.keysToRemove.clear();
             Thread.sleep(10000); // todo promeni ako treba duzinu sleep-a
         }
     }

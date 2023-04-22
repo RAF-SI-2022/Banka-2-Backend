@@ -22,5 +22,6 @@ public class RegisterResponse {
     private boolean active;
     private String jmbg;
     private Double dailyLimit;
+    private Double defaultDailyLimit;
     private String phone;
 }
