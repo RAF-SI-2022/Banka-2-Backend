@@ -21,7 +21,6 @@ public class UserOption {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @NotNull
     private User user;
 
     @ManyToOne
