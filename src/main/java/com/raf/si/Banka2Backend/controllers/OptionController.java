@@ -1,26 +1,19 @@
 package com.raf.si.Banka2Backend.controllers;
 
 import com.raf.si.Banka2Backend.dto.OptionBuyDto;
-import com.raf.si.Banka2Backend.exceptions.AmountTooHighForOptionOpenInterestException;
 import com.raf.si.Banka2Backend.services.OptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.Date;
+
 import com.raf.si.Banka2Backend.exceptions.OptionNotFoundException;
 import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.User;
-import com.raf.si.Banka2Backend.services.OptionService;
 import com.raf.si.Banka2Backend.services.UserService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.websocket.server.PathParam;
 import java.util.Optional;
 
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
@@ -70,7 +63,7 @@ public class OptionController {
             Optional<User> userOptional = userService.findByEmail(signedInUserEmail);
 
             return ResponseEntity.ok().body(optionService.buyOption(optionBuyDto.getOptionId(), userOptional.get().getId(), optionBuyDto.getAmount(), optionBuyDto.getPremium()));
-        } catch(UserNotFoundException | OptionNotFoundException | AmountTooHighForOptionOpenInterestException e){
+        } catch(UserNotFoundException | OptionNotFoundException e){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }

@@ -1,6 +1,5 @@
 package com.raf.si.Banka2Backend.services;
 
-import com.raf.si.Banka2Backend.exceptions.AmountTooHighForOptionOpenInterestException;
 import com.raf.si.Banka2Backend.exceptions.OptionNotFoundException;
 import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.Option;
@@ -21,15 +20,12 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -139,7 +135,7 @@ public class OptionService implements OptionServiceInterface {
 
     //TODO Buy, skine se sa balance-a, postavi se user id
     @Transactional
-    public Option buyOption(Long optionId, Long userId, int amount, double premium) throws UserNotFoundException, OptionNotFoundException, AmountTooHighForOptionOpenInterestException {
+    public Option buyOption(Long optionId, Long userId, int amount, double premium) throws UserNotFoundException, OptionNotFoundException {
 
         Optional<Option> optionOptional = optionRepository.findById(optionId);
         if(optionOptional.isPresent()) {
@@ -152,14 +148,6 @@ public class OptionService implements OptionServiceInterface {
 
                 User userFromDB = userOptional.get();
                 //TODO Skinuti user-u koji kupuje option iznos sa balance-a, i dodati seller-u
-
-                int updatedAmount = optionFromDB.getOpenInterest() - amount;
-
-                if(updatedAmount < 0)
-                    throw new AmountTooHighForOptionOpenInterestException(amount);
-
-                optionFromDB.setOpenInterest(updatedAmount);
-                optionRepository.save(optionFromDB);
 
                 UserOption userOption = UserOption.builder()
                         .user(userFromDB)
