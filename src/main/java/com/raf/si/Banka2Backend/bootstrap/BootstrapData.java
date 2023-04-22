@@ -51,7 +51,7 @@ public class BootstrapData implements CommandLineRunner {
     private static final String ADMIN_LNAME = "Adminic";
     private static final String ADMIN_JMBG = "2902968000000";
     private static final String ADMIN_PHONE = "0657817522";
-    private static final String ADMIN_JOB = "administrator";
+    private static final String ADMIN_JOB = "ADMINISTRATOR";
     private static final boolean ADMIN_ACTIVE = true;
 
     public static final String forexApiKey = "6DL0Q8YP76H9K9T6";
@@ -167,7 +167,9 @@ public class BootstrapData implements CommandLineRunner {
                         .phone(ADMIN_PHONE)
                         .jobPosition(ADMIN_JOB)
                         .active(ADMIN_ACTIVE)
-                        .dailyLimit(10000D) // USD
+                        .dailyLimit(null) // USD
+//                        .defaultDailyLimit(10000D) // usd
+                        .defaultDailyLimit(null) // usd
                         .build();
 
         // Add initial perms

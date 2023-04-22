@@ -9,5 +9,6 @@ CREATE TABLE IF NOT EXISTS `users`
     `pozicija`      varchar(20) NOT NULL,
     `broj_telefona` varchar(20) NOT NULL,
     `aktivan`       BOOLEAN,
-    `daily_limit`   DOUBLE      NOT NULL
+    `daily_limit`   DOUBLE      ,
+    `default_daily_limit`   DOUBLE
 );
