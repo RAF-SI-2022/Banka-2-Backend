@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS `users_options`
 (
 
     `id`              BIGINT      NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `user_id`         BIGINT      NOT NULL,
+    `user_id`         BIGINT,
     `option_id`       BIGINT      NOT NULL,
     `premium`         DOUBLE,
     `amount`          INTEGER     NOT NULL,
