@@ -218,6 +218,9 @@ public class BootstrapData implements CommandLineRunner {
         if (curr.isEmpty()) throw new CurrencyNotFoundException(currency);
         balance.setCurrency(curr.get());
         balance.setAmount(100000f);
+        balance.setFree(100000f);
+        balance.setReserved(0f);
+        balance.setType(BalanceType.CASH);
         return balance;
     }
 

@@ -21,18 +21,23 @@ public class Balance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private BalanceType type;
     @NotNull
     private Float amount;
-
+    @NotNull
+    private Float reserved;
+    @NotNull
+    private Float free;
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
     @NotNull
     private User user;
-    // @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "currency_id")
     @NotNull
     private Currency currency;
+
 }

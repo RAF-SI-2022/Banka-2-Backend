@@ -1,6 +1,6 @@
 package com.raf.si.Banka2Backend.services;
 
-import com.raf.si.Banka2Backend.models.mariadb.Order;
+import com.raf.si.Banka2Backend.models.mariadb.orders.Order;
 import com.raf.si.Banka2Backend.repositories.mariadb.OrderRepository;
 import com.raf.si.Banka2Backend.services.interfaces.OrderServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;

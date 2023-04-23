@@ -57,8 +57,7 @@ public class StockSellWorker extends Thread {
                 } else {
                     System.out.println("limit stop sell");
                 }
-
-
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
