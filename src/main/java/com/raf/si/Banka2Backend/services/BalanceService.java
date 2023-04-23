@@ -40,21 +40,9 @@ public class BalanceService implements BalanceServiceInterface {
                                    String toCurrencyCode,
                                    Float exchangeRate,
                                    Integer amountOfMoney) {
-        Optional<Balance> balanceForFromCurrency =
-                this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(
-                        userEmail, fromCurrencyCode);
-
-        if (balanceForFromCurrency.isEmpty()) {
-            throw new BalanceNotFoundException(userEmail, fromCurrencyCode);
-        }
-        if (balanceForFromCurrency.get().getAmount() < amountOfMoney) {
-            throw new NotEnoughMoneyException(fromCurrencyCode, toCurrencyCode, amountOfMoney);
-        }
         // Update existing balance(for fromCurrency)
-        Float newAmountInFromCurrency = balanceForFromCurrency.get().getAmount() - amountOfMoney;
-        balanceForFromCurrency.get().setAmount(newAmountInFromCurrency);
-        this.balanceRepository.save(balanceForFromCurrency.get());
-
+        this.reserveAmount(amountOfMoney.floatValue(), userEmail, fromCurrencyCode);
+        this.decreaseBalance(userEmail, fromCurrencyCode, amountOfMoney.floatValue());
         // Check if balance for toCurrency exists. If yes update it with new amount, if not create it.
         Optional<Balance> balanceForToCurrency =
                 this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(
@@ -62,17 +50,15 @@ public class BalanceService implements BalanceServiceInterface {
         Optional<Currency> newCurrency = this.currencyService.findByCurrencyCode(toCurrencyCode);
 
         if (balanceForToCurrency.isPresent()) {
-            // update existing balance for toCurrency
-            Float newAmountInToCurrency =
-                    balanceForToCurrency.get().getAmount() + amountOfMoney * exchangeRate;
-            balanceForToCurrency.get().setAmount(newAmountInToCurrency);
-            this.balanceRepository.save(balanceForToCurrency.get());
+            this.increaseBalance(userEmail, toCurrencyCode, amountOfMoney * exchangeRate);
         } else {
             // create new balance for toCurrency
             Balance newBalanceForToCurrency = new Balance();
             newBalanceForToCurrency.setUser(this.userService.findByEmail(userEmail).get());
             newBalanceForToCurrency.setCurrency(newCurrency.get());
             newBalanceForToCurrency.setAmount(amountOfMoney * exchangeRate);
+            newBalanceForToCurrency.setReserved(0f);
+            newBalanceForToCurrency.setFree(amountOfMoney * exchangeRate);
             this.balanceRepository.save(newBalanceForToCurrency);
         }
     }
@@ -120,7 +106,6 @@ public class BalanceService implements BalanceServiceInterface {
         Optional<Balance> balance =
                 this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(
                         userEmail, currencyCode);
-
         if (balance.isPresent()) {
             balance.get().setFree(balance.get().getFree() + amount);
             balance.get().setAmount(balance.get().getAmount() + amount);
@@ -143,22 +128,16 @@ public class BalanceService implements BalanceServiceInterface {
     @Override
     public Balance decreaseBalance(String userEmail, String currencyCode, Float amount)
             throws BalanceNotFoundException, NotEnoughMoneyException {
-        Optional<Balance> balance =
-                this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(
-                        userEmail, currencyCode);
-        if (balance.isEmpty()) {
-            throw new BalanceNotFoundException(userEmail, currencyCode);
-        }
-        if (balance.get().getAmount() < amount) {
+        Balance balance = this.findBalanceByUserEmailAndCurrencyCode(userEmail, currencyCode);
+        if (balance.getAmount() < amount) {
             throw new NotEnoughMoneyException();
         }
-        if (balance.get().getReserved() < amount) {
+        if (balance.getReserved() < amount) {
             throw new NotEnoughReservedMoneyException("Not enough money has been previously reserved, so balance for user with mail" + userEmail + "and currency code: " + currencyCode + " can't be decreased.");
         }
-        balance.get().setReserved(balance.get().getReserved() - amount);
-        balance.get().setAmount(balance.get().getAmount() - amount);
-        this.balanceRepository.save(balance.get());
-        return balance.get();
+        balance.setReserved(balance.getReserved() - amount);
+        balance.setAmount(balance.getAmount() - amount);
+        return this.balanceRepository.save(balance);
     }
 
     /**

@@ -363,39 +363,29 @@ public class StockService {
 
     // todo margin buy i sell
     public ResponseEntity<?> buyStock(StockRequest stockRequest, User user) {
-        String fromUserEmail = user.getEmail();
-
         Stock stock = getStockBySymbol(stockRequest.getStockSymbol());
         BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
-        Balance usersBalance = balanceService.findBalanceByUserIdAndCurrency(user.getId(), "USD");
+        Balance usersBalance = balanceService.findBalanceByUserIdAndCurrency(user.getId(), stockRequest.getCurrencyCode());
 
         BigDecimal totalPrice = price.multiply(BigDecimal.valueOf(stockRequest.getAmount()));
         if (usersBalance.getAmount() < totalPrice.floatValue())
-            return ResponseEntity.status(500).body("Nemas doboljo para, siramasan si buraz 💀");
-
-        // todo ovo otkomentarisati ili prebaciti u stcok buy workera
-//        if(!(user.getDailyLimit() == null)) {
-//
-//            Double totalPriceDouble = totalPrice.doubleValue();
-//            Double limit = user.getDailyLimit();
-//            Double suma = limit-totalPriceDouble;
-////                System.out.println("Limit " + limit + " vrednost " + amountDouble + " oduzimanje " + suma);
-//            boolean limitTestBoolean = suma < 0?false:true;
-//            if (!limitTestBoolean)
-//                return ResponseEntity.status(500).body("Exceeded daily limit");
-//            else {
-//                user.setDailyLimit(suma);
-//                userService.save(user);
-//            }
-//        }
-
+            return ResponseEntity.status(400).body("insufficient funds for this operation.");
+        if(user.getDailyLimit() != null) {
+            if (totalPrice.doubleValue() > user.getDailyLimit())
+                return ResponseEntity.status(400).body("Exceeded daily limit");
+            else {
+                user.setDailyLimit(user.getDailyLimit() - totalPrice.doubleValue());
+                userService.save(user);
+            }
+        }
+        this.balanceService.reserveAmount(totalPrice.floatValue(), user.getEmail(), stockRequest.getCurrencyCode());
         try {
             stockBuyRequestsQueue.put(stockRequest);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        return ResponseEntity.ok().body("Stock buy order has been procesed");
+        return ResponseEntity.ok().body("Stock buy order has been processed");
     }
 
     //todo FIX IF NEEDED
@@ -403,8 +393,8 @@ public class StockService {
 
         Optional<UserStock> userStock = userStockService.findUserStockByUserIdAndStockSymbol(stockRequest.getUserId(), stockRequest.getStockSymbol());
 
-        if ((userStock.get().getAmount() - stockRequest.getAmount()) < 0) {
-            return ResponseEntity.status(500).body("Internal error");
+        if (userStock.get().getAmount() < stockRequest.getAmount()) {
+            return ResponseEntity.status(400).body("Insufficient funds for this operation.");
         }
 
         try {
@@ -413,7 +403,7 @@ public class StockService {
             e.printStackTrace();
         }
 
-        return ResponseEntity.ok().body("Stock sell order has been procesed");
+        return ResponseEntity.ok().body("Stock sell order has been processed");
     }
 
     public List<UserStock> getAllUserStocks(long userId) {

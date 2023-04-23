@@ -1,10 +1,7 @@
 package com.raf.si.Banka2Backend.controllers;
 
 import com.raf.si.Banka2Backend.dto.BalanceDto;
-import com.raf.si.Banka2Backend.exceptions.BalanceNotFoundException;
-import com.raf.si.Banka2Backend.exceptions.CurrencyNotFoundException;
-import com.raf.si.Banka2Backend.exceptions.NotEnoughMoneyException;
-import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
+import com.raf.si.Banka2Backend.exceptions.*;
 import com.raf.si.Banka2Backend.services.BalanceService;
 
 import javax.validation.Valid;
@@ -62,7 +59,10 @@ public class BalanceController {
                                     + "could not be found.");
         } catch (NotEnoughMoneyException e2) {
             return ResponseEntity.badRequest().body("You don't have enough money for this operation.");
-        } catch (Exception e3) {
+        } catch (NotEnoughReservedMoneyException e3) {
+            return ResponseEntity.badRequest().body("You don't have enough reserved money for this operation.");
+        }
+        catch (Exception e4) {
             return ResponseEntity.internalServerError().body("An unexpected error occurred.");
         }
     }
