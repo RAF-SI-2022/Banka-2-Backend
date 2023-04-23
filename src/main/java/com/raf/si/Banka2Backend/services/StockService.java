@@ -43,8 +43,8 @@ public class StockService {
     private final StockSellWorker stockSellWorker;
     private final StockBuyWorker stockBuyWorker;
 
-    private static final BlockingQueue<StockRequest> stockBuyRequestsQueue = new LinkedBlockingQueue<>();
-    private static final BlockingQueue<StockRequest> stockSellRequestsQueue = new LinkedBlockingQueue<>();
+    private static final BlockingQueue<StockRequest> stockBuyRequestsQueue = new LinkedBlockingQueue<>();//todo: zameniti sa Order
+    private static final BlockingQueue<StockRequest> stockSellRequestsQueue = new LinkedBlockingQueue<>();//todo: zameniti sa Order
 
 
     @Autowired
