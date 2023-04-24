@@ -33,7 +33,9 @@ presubmits:
               git checkout $branch
 
               # Start all microservices
-              make local-dev
+              docker compose up -d mariadb
+              docker compose up -d flyway
+              docker compose up -d mongodb
 
               mvn clean verify sonar:sonar -Pcoverage \
                 -Dsonar.host.url=https://sonar.k8s.elab.rs \
@@ -43,7 +45,8 @@ presubmits:
                 -Dsonar.pullrequest.key="$PULL_NUMBER" \
                 -Dsonar.pullrequest.branch="$PULL_HEAD_REF" \
                 -Dsonar.pullrequest.base="$PULL_BASE_REF" \
-                -Dsonar.qualitygate.wait=true
+                -Dsonar.qualitygate.wait=true \
+                -Dspring.profiles.active=test
           securityContext:
             privileged: true
           imagePullPolicy: Always
@@ -69,7 +72,9 @@ postsubmits:
               start-docker.sh
 
               # Start all microservices
-              make local-dev
+              docker compose up -d mariadb
+              docker compose up -d flyway
+              docker compose up -d mongodb
               
               ref=$(git rev-parse --abbrev-ref HEAD)
 
@@ -79,7 +84,8 @@ postsubmits:
                 -Dsonar.projectName="$SONAR_PROJECT_NAME" \
                 -Dsonar.login="$SONARQUBE_TOKEN" \
                 -Dsonar.branch.name="$ref" \
-                -Dsonar.qualitygate.wait=true
+                -Dsonar.qualitygate.wait=true \
+                -Dspring.profiles.active=test
           securityContext:
             privileged: true
           imagePullPolicy: Always
