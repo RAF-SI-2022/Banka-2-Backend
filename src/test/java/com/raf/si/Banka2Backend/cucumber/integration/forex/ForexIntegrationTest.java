@@ -11,6 +11,7 @@ import org.junit.platform.suite.api.Suite;
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features/forex-integration/forex.feature")
 @ConfigurationParameter(
-    key = GLUE_PROPERTY_NAME,
-    value = "com.raf.si.Banka2Backend.cucumber.integration.forex")
-public class ForexIntegrationTest {}
+        key = GLUE_PROPERTY_NAME,
+        value = "com.raf.si.Banka2Backend.cucumber.integration.forex")
+public class ForexIntegrationTest {
+}
