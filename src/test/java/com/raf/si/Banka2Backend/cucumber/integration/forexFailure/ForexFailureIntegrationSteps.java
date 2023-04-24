@@ -102,7 +102,7 @@ public class ForexFailureIntegrationSteps extends ForexFailureIntegrationTestCon
         BuySellForexDto dto = new BuySellForexDto();
         dto.setToCurrencyCode("ZZZFF");
         dto.setFromCurrencyCode("SSSFF");
-        dto.setAmountOfMoney(500);
+//        dto.setAmountOfMoney(500);
         MvcResult mvcResult = null;
         try {
             mvcResult =
@@ -129,7 +129,7 @@ public class ForexFailureIntegrationSteps extends ForexFailureIntegrationTestCon
         BuySellForexDto dto = new BuySellForexDto();
         dto.setFromCurrencyCode("SEK");
         dto.setToCurrencyCode("JPY");
-        dto.setAmountOfMoney(500);
+//        dto.setAmountOfMoney(500);
         MvcResult mvcResult = null;
         String body = new ObjectMapper().writeValueAsString(dto);
         try {
@@ -157,7 +157,7 @@ public class ForexFailureIntegrationSteps extends ForexFailureIntegrationTestCon
         BuySellForexDto dto = new BuySellForexDto();
         dto.setFromCurrencyCode("RSD");
         dto.setToCurrencyCode("USD");
-        dto.setAmountOfMoney(10000000);
+//        dto.setAmountOfMoney(10000000);
         MvcResult mvcResult = null;
         String body = new ObjectMapper().writeValueAsString(dto);
         try {

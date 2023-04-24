@@ -47,6 +47,7 @@ public class StockBuyWorker extends Thread {
     private void processBuyRequests() {
         while (true) {
             try {
+
                 StockOrder stockOrder = stockBuyRequestsQueue.take();
 
                 Optional<UserStock> usersStockToChange = userStockService.findUserStockByUserIdAndStockSymbol(stockOrder.getUser().getId(), stockOrder.getSymbol());
@@ -73,22 +74,22 @@ public class StockBuyWorker extends Thread {
                 }
                 userStockService.save(usersStockToChange.get());
                 this.balanceService.updateBalance(stockOrder, stockOrder.getUser().getEmail(), stockOrder.getCurrencyCode());
-                Thread.sleep(10000);
                 this.updateOrderStatus(stockOrder.getId(), OrderStatus.COMPLETE);
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
         }
     }
 
     private void updateOrderStatus(Long id, OrderStatus orderStatus) {
         Optional<Order> order = this.orderRepository.findById(id);
+
         if(order.isPresent()) {
             order.get().setStatus(orderStatus);
             this.orderRepository.save(order.get());
         }
-        throw new OrderNotFoundException(id);
+        else throw new OrderNotFoundException(id);
     }
 
 

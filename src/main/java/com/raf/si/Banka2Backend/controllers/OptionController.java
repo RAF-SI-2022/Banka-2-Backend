@@ -100,21 +100,36 @@ public class OptionController {
 
         try{
             Optional<User> userOptional = userService.findByEmail(signedInUserEmail);
-
             return ResponseEntity.ok().body(optionService.buyStockUsingOption(userOptionId, userOptional.get().getId()));
         } catch(UserNotFoundException | OptionNotFoundException | StockNotFoundException | TooLateToBuyOptionException e){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
-
     }
+
+    @GetMapping
+    public ResponseEntity<?> getUserOptions(){
+        String signedInUserEmail = getContext().getAuthentication().getName();
+        return ResponseEntity.ok().body(optionService.getUserOptions(userService.findByEmail(signedInUserEmail).get().getId()));
+    }
+
 
     @PostMapping("/sell-stocks")
     public ResponseEntity<?> sellStocksByOption(@RequestBody SellStockUsingOptionDto sellStockUsingOptionDto) {
 
-        //TODO Zavrsiti sell-stocks
+        String signedInUserEmail = getContext().getAuthentication().getName();
+
         //Problem na koji sam naisao je to sto treba da se kreira UserOption, ali nemam podatak o optionId-ju
         //Moguce resenje je dozvoliti null vrednosti za optionId u UserOption modelu i migracionoj skripti
         //Znaci setovati samo userId - id onoga ko kreira SellStockUsingOption, a da optionId ostane null
+
+//        try{
+//            Optional<User> userOptional = userService.findByEmail(signedInUserEmail);
+//            return ResponseEntity.ok().body(optionService.sellStockUsingOption();
+//        } catch(UserNotFoundException | OptionNotFoundException | StockNotFoundException | TooLateToBuyOptionException e){
+//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+//        }
         return null;
     }
+
+
 }

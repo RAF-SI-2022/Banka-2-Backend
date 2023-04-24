@@ -159,8 +159,7 @@ public class BalanceService implements BalanceServiceInterface {
      * Da bi se ova metoda uspesno izvrsila, prethodno je potrebno rezervisati sumu.
      */
     @Override
-    public Balance decreaseBalance(String userEmail, String currencyCode, Float amount)
-            throws BalanceNotFoundException, NotEnoughMoneyException {
+    public Balance decreaseBalance(String userEmail, String currencyCode, Float amount) throws BalanceNotFoundException, NotEnoughMoneyException {
         Balance balance = this.findBalanceByUserEmailAndCurrencyCode(userEmail, currencyCode);
         if (balance.getAmount() < amount) {
             throw new NotEnoughMoneyException();
