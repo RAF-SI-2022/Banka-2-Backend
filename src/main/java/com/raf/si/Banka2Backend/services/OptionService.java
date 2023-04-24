@@ -195,7 +195,7 @@ public class OptionService implements OptionServiceInterface {
         }
     }
 
-    public List<UserOption> getUserOptionsByIdAndStockSymbol(Long userId, String stockSymbol){
+    public List<UserOption> getUserOptionsByIdAndStockSymbol(Long userId, String stockSymbol) {
         return userOptionRepository.getUserOptionsByUserIdAndStockSymbol(userId, stockSymbol);
     }
 
