@@ -8,8 +8,27 @@
 # exit with non-zero status after issuing an appropriate message if
 # it wants to stop the commit.
 
-# Format all files first
+### Format before committing ###
+
+# Stage changes
+git commit --allow-empty --no-verify -m 'Save index'
+old_stash=$(git rev-parse -q --verify refs/stash)
+git stash push -m 'Unstaged changes'
+new_stash=$(git rev-parse -q --verify refs/stash)
+git reset --soft HEAD^
+
+# Format unstaged
 ./mvnw spotless:apply
+
+# Add changes and pop stash
+# If unstaged changes were stashed reapply to working tree
+git add -u
+if [ "$old_stash" != "$new_stash" ]; then
+    git stash pop
+fi
+#fi
+
+### Default pre-commit ###
 
 if git rev-parse --verify HEAD >/dev/null 2>&1
 then

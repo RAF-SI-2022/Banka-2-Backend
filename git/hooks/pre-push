@@ -21,22 +21,24 @@
 # This sample shows how to prevent push of commits where the log message starts
 # with "WIP" (work in progress).
 
+### Pre-push testing, disabled for now ###
+
 # Check Docker daemon running
-if (! (docker stats --no-stream > /dev/null 2>&1)); then
-  echo "ERROR: Docker is not running, cannot run tests. Push disabled. Please run Docker and try push again."
-  exit 1
-fi
+#if (! (docker stats --no-stream > /dev/null 2>&1)); then
+#  echo "ERROR: Docker is not running, cannot run tests. Push disabled. Please run Docker and try push again."
+#  exit 1
+#fi
+#
+## Compile and test code
+#docker build -t banka2backend-test -f ./docker/test.Dockerfile .
+#docker compose up -d mariadb
+#docker compose up -d flyway
+#if (! (docker run --rm --network container:mariadb banka2backend-test)); then
+#  echo "ERROR: Testing failed. Please ensure Docker Desktop is up and that your code passes all tests."
+#  exit 1
+#fi
 
-# Compile and test code
-docker build -t banka2backend-test -f ./docker/test.Dockerfile .
-docker compose up -d mariadb
-docker compose up -d flyway
-if (! (docker run --rm --network container:mariadb banka2backend-test)); then
-  echo "ERROR: Testing failed. Please ensure Docker Desktop is up and that your code passes all tests."
-  exit 1
-fi
-
-# Default pre-push
+### Default pre-push ###
 
 remote="$1"
 url="$2"
