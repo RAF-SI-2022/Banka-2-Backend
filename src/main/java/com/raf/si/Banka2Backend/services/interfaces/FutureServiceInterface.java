@@ -2,10 +2,9 @@ package com.raf.si.Banka2Backend.services.interfaces;
 
 import com.raf.si.Banka2Backend.models.mariadb.Future;
 import com.raf.si.Banka2Backend.requests.FutureRequestBuySell;
-import org.springframework.http.ResponseEntity;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.http.ResponseEntity;
 
 public interface FutureServiceInterface {
 

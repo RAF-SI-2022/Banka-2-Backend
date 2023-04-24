@@ -3,11 +3,10 @@ package com.raf.si.Banka2Backend.services;
 import com.raf.si.Banka2Backend.models.mariadb.orders.Order;
 import com.raf.si.Banka2Backend.repositories.mariadb.OrderRepository;
 import com.raf.si.Banka2Backend.services.interfaces.OrderServiceInterface;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class OrderService implements OrderServiceInterface {

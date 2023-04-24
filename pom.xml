@@ -208,28 +208,32 @@
             </plugin>
 
             <!-- Formatting -->
-<!--            <plugin>-->
-<!--                <groupId>com.diffplug.spotless</groupId>-->
-<!--                <artifactId>spotless-maven-plugin</artifactId>-->
-<!--                <version>2.27.2</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>spotless</id>-->
-<!--                        <phase>validate</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>check</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--                <configuration>-->
-<!--                    <java>-->
-<!--                        <googleJavaFormat>-->
-<!--                            <version>1.15.0</version>-->
-<!--                            <style>GOOGLE</style>-->
-<!--                        </googleJavaFormat>-->
-<!--                    </java>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.27.2</version>
+                <configuration>
+
+                    <!-- Java config -->
+                    <java>
+
+                        <!-- Only include Java files -->
+                        <includes>
+                            <include>src/main/java/**/*.java</include>
+                            <include>src/test/java/**/*.java</include>
+                        </includes>
+
+                        <!-- Enforce standard import order -->
+                        <importOrder />
+
+                        <!-- Better than Google formatter -->
+                        <palantirJavaFormat>
+                            <version>2.10.0</version>
+                        </palantirJavaFormat>
+                    </java>
+
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

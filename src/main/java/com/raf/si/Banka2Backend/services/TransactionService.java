@@ -5,19 +5,20 @@ import com.raf.si.Banka2Backend.models.mariadb.Transaction;
 import com.raf.si.Banka2Backend.models.mariadb.TransactionStatus;
 import com.raf.si.Banka2Backend.repositories.mariadb.TransactionRepository;
 import com.raf.si.Banka2Backend.services.interfaces.TransactionServiceInterface;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class TransactionService implements TransactionServiceInterface {
     private final TransactionRepository transactionRepository;
+
     @Autowired
     public TransactionService(TransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
     }
+
     @Override
     public Transaction create(Transaction transaction) {
         return this.transactionRepository.save(transaction);
@@ -36,14 +37,11 @@ public class TransactionService implements TransactionServiceInterface {
     @Override
     public Transaction changeTransactionStatus(Long transactionId, TransactionStatus status) {
         Optional<Transaction> transactionOptional = this.transactionRepository.findById(transactionId);
-        if(transactionOptional.isEmpty()) {
+        if (transactionOptional.isEmpty()) {
             throw new TransactionNotFoundException(transactionId);
         }
         Transaction transaction = transactionOptional.get();
         transaction.setStatus(status);
         return this.transactionRepository.save(transaction);
     }
-
-
-
 }

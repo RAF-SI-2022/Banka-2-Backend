@@ -20,5 +20,4 @@ public class OptionDbWiperThread extends Thread {
             Thread.sleep(86400000);
         }
     }
-
 }
