@@ -57,10 +57,10 @@ public class StockBuyWorker extends Thread {
                 }
                 userStockService.save(usersStockToChange.get());
                 //todo pozvati funkciju koja menja balans na osnovu transakcija
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
 
         }
     }

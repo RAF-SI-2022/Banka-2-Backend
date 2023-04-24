@@ -1,11 +1,9 @@
 package com.raf.si.Banka2Backend.services;
 
-import com.raf.si.Banka2Backend.exceptions.BalanceNotFoundException;
-import com.raf.si.Banka2Backend.exceptions.CurrencyNotFoundException;
-import com.raf.si.Banka2Backend.exceptions.NotEnoughMoneyException;
-import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
-import com.raf.si.Banka2Backend.models.mariadb.Balance;
-import com.raf.si.Banka2Backend.models.mariadb.Currency;
+import com.raf.si.Banka2Backend.exceptions.*;
+import com.raf.si.Banka2Backend.models.mariadb.*;
+import com.raf.si.Banka2Backend.models.mariadb.orders.Order;
+import com.raf.si.Banka2Backend.models.mariadb.orders.OrderTradeType;
 import com.raf.si.Banka2Backend.repositories.mariadb.BalanceRepository;
 import com.raf.si.Banka2Backend.services.interfaces.BalanceServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,28 +16,30 @@ import java.util.Optional;
 @Service
 public class BalanceService implements BalanceServiceInterface {
     private final BalanceRepository balanceRepository;
+    private final TransactionService transactionService;
     private final CurrencyService currencyService;
-
     private final UserService userService;
 
     @Autowired
     public BalanceService(
             BalanceRepository balanceRepository,
+            TransactionService transactionService,
             CurrencyService currencyService,
             UserService userService) {
         this.balanceRepository = balanceRepository;
+        this.transactionService = transactionService;
         this.currencyService = currencyService;
         this.userService = userService;
     }
 
     @Override
     @Transactional
-    public void buyOrSellCurrency(
-            String userEmail,
-            String fromCurrencyCode,
-            String toCurrencyCode,
-            Float exchangeRate,
-            Integer amountOfMoney) {
+    public void buyOrSellCurrency( // for forex
+                                   String userEmail,
+                                   String fromCurrencyCode,
+                                   String toCurrencyCode,
+                                   Float exchangeRate,
+                                   Integer amountOfMoney) {
         Optional<Balance> balanceForFromCurrency =
                 this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(
                         userEmail, fromCurrencyCode);
@@ -94,6 +94,27 @@ public class BalanceService implements BalanceServiceInterface {
     }
 
     @Override
+    public Balance findBalanceByUserEmailAndCurrencyCode(String userEmail, String currencyCode) {
+        Optional<Balance> balance = this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(userEmail, currencyCode);
+        if (balance.isEmpty()) {
+            throw new BalanceNotFoundException(userEmail, currencyCode);
+        }
+        return balance.get();
+    }
+
+    @Override
+    public Balance reserveAmount(Float amount, String userEmail, String currencyCode) {
+        Balance balance = this.findBalanceByUserEmailAndCurrencyCode(userEmail, currencyCode);
+        if (balance.getFree() < amount) {
+            throw new NotEnoughMoneyException();
+        }
+        balance.setReserved(balance.getReserved() + amount);
+        balance.setFree(balance.getFree() - amount);
+        return this.balanceRepository.save(balance);
+    }
+
+
+    @Override
     public Balance increaseBalance(String userEmail, String currencyCode, Float amount)
             throws CurrencyNotFoundException, UserNotFoundException {
         Optional<Balance> balance =
@@ -101,6 +122,7 @@ public class BalanceService implements BalanceServiceInterface {
                         userEmail, currencyCode);
 
         if (balance.isPresent()) {
+            balance.get().setFree(balance.get().getFree() + amount);
             balance.get().setAmount(balance.get().getAmount() + amount);
             this.balanceRepository.save(balance.get());
             return balance.get();
@@ -108,12 +130,16 @@ public class BalanceService implements BalanceServiceInterface {
             Balance newBalance = new Balance();
             newBalance.setUser(this.userService.findByEmail(userEmail).get());
             newBalance.setCurrency(this.currencyService.findByCurrencyCode(currencyCode).get());
+            newBalance.setReserved(0f);
+            newBalance.setFree(amount);
             newBalance.setAmount(amount);
-            this.balanceRepository.save(newBalance);
-            return newBalance;
+            return this.balanceRepository.save(newBalance);
         }
     }
 
+    /**
+     * Da bi se ova metoda uspesno izvrsila, prethodno je potrebno rezervisati sumu.
+     */
     @Override
     public Balance decreaseBalance(String userEmail, String currencyCode, Float amount)
             throws BalanceNotFoundException, NotEnoughMoneyException {
@@ -123,13 +149,41 @@ public class BalanceService implements BalanceServiceInterface {
         if (balance.isEmpty()) {
             throw new BalanceNotFoundException(userEmail, currencyCode);
         }
-        Float newAmount = balance.get().getAmount() - amount;
-        if (newAmount < 0) {
+        if (balance.get().getAmount() < amount) {
             throw new NotEnoughMoneyException();
         }
-        balance.get().setAmount(newAmount);
+        if (balance.get().getReserved() < amount) {
+            throw new NotEnoughReservedMoneyException("Not enough money has been previously reserved, so balance for user with mail" + userEmail + "and currency code: " + currencyCode + " can't be decreased.");
+        }
+        balance.get().setReserved(balance.get().getReserved() - amount);
+        balance.get().setAmount(balance.get().getAmount() - amount);
         this.balanceRepository.save(balance.get());
         return balance.get();
+    }
+
+    /**
+     * Ova metoda se zove po zavrsetku svih transakcija iz nekog ordera.
+     * */
+    @Override
+    public Balance updateBalance(Order order, String userEmail, String currencyCode) {
+        List<Transaction> orderTransactions = this.transactionService.findAllByOrderId(order.getId());
+        Float money = 0f;
+        for (Transaction transaction : orderTransactions) {
+            if (transaction.getStatus().equals(TransactionStatus.COMPLETE)) {
+                money += transaction.getAmount();
+            }
+        }
+        if (order.getTradeType().equals(OrderTradeType.BUY)) {
+            return this.decreaseBalance(userEmail, currencyCode, money);
+        } else {
+            return this.increaseBalance(userEmail, currencyCode, money);
+        }
+    }
+
+    @Override
+    public boolean hasEnoughFounds(Float amountNeeded, String userEmail, String currencyCode) {
+        Balance balance = this.findBalanceByUserEmailAndCurrencyCode(userEmail, currencyCode);
+        return balance.getFree() >= amountNeeded;
     }
 
     @Override
