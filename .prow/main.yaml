@@ -33,7 +33,7 @@ presubmits:
               git checkout $branch
 
               # Start all microservices
-              ./make local-dev
+              make local-dev
 
               mvn clean verify sonar:sonar -Pcoverage \
                 -Dsonar.host.url=https://sonar.k8s.elab.rs \
@@ -69,7 +69,7 @@ postsubmits:
               start-docker.sh
 
               # Start all microservices
-              ./make local-dev
+              make local-dev
               
               ref=$(git rev-parse --abbrev-ref HEAD)
 
