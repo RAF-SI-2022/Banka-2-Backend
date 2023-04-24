@@ -106,10 +106,16 @@ public class OptionController {
         }
     }
 
-    @GetMapping
+    @GetMapping("/user-options")
     public ResponseEntity<?> getUserOptions(){
         String signedInUserEmail = getContext().getAuthentication().getName();
         return ResponseEntity.ok().body(optionService.getUserOptions(userService.findByEmail(signedInUserEmail).get().getId()));
+    }
+
+    @GetMapping("/user-options/{stockSymbol}")
+    public ResponseEntity<?> getUserOptions(@PathVariable String stockSymbol){
+        String signedInUserEmail = getContext().getAuthentication().getName();
+        return ResponseEntity.ok().body(optionService.getUserOptionsByIdAndStockSymbol(userService.findByEmail(signedInUserEmail).get().getId(),stockSymbol));
     }
 
 
