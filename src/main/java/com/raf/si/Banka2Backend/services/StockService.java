@@ -6,6 +6,7 @@ import com.raf.si.Banka2Backend.exceptions.StockNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.*;
 import com.raf.si.Banka2Backend.models.mariadb.orders.*;
 import com.raf.si.Banka2Backend.repositories.mariadb.ExchangeRepository;
+import com.raf.si.Banka2Backend.repositories.mariadb.OrderRepository;
 import com.raf.si.Banka2Backend.repositories.mariadb.StockHistoryRepository;
 import com.raf.si.Banka2Backend.repositories.mariadb.StockRepository;
 import com.raf.si.Banka2Backend.requests.StockRequest;
@@ -18,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
@@ -45,7 +45,7 @@ public class StockService {
     private final StockSellWorker stockSellWorker;
     private final StockBuyWorker stockBuyWorker;
 
-    private final OrderService orderService;
+    private final OrderRepository orderRepository;
 
     private CurrencyService currencyService;
     private TransactionService transactionService;
@@ -57,16 +57,16 @@ public class StockService {
     @Autowired
     public StockService(StockRepository stockRepository, StockHistoryRepository stockHistoryRepository,
                         UserService userService, UserStockService userStockService, CurrencyService currencyService, TransactionService transactionService, ExchangeRepository exchangeRepository,
-                        BalanceService balanceService, OrderService orderService) {
+                        BalanceService balanceService, OrderRepository orderRepository) {
         this.stockRepository = stockRepository;
         this.exchangeRepository = exchangeRepository;
         this.stockHistoryRepository = stockHistoryRepository;
         this.userService = userService;
         this.userStockService = userStockService;
         this.balanceService = balanceService;
-        this.orderService = orderService;
-        this.stockBuyWorker = new StockBuyWorker(stockBuyRequestsQueue, userStockService, this, balanceService, currencyService, transactionService, orderService);
-        this.stockSellWorker = new StockSellWorker(stockSellRequestsQueue, userStockService, this);
+        this.orderRepository = orderRepository;
+        this.stockBuyWorker = new StockBuyWorker(stockBuyRequestsQueue, userStockService, this, balanceService, currencyService, transactionService, orderRepository);
+        this.stockSellWorker = new StockSellWorker(stockSellRequestsQueue, userStockService, this, transactionService, orderRepository, balanceService);
         stockBuyWorker.start();
         stockSellWorker.start();
     }
@@ -369,25 +369,24 @@ public class StockService {
     }
 
     // todo margin buy i sell
-    public ResponseEntity<?> buyStock(StockRequest stockRequest, User user) {
+    public ResponseEntity<?> buyStock(StockRequest stockRequest, User user, StockOrder stockOrder) {
         Stock stock = getStockBySymbol(stockRequest.getStockSymbol());
         BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
         Balance usersBalance = balanceService.findBalanceByUserIdAndCurrency(user.getId(), stockRequest.getCurrencyCode());
 
-        if (usersBalance.getAmount() < price.floatValue())
-            return ResponseEntity.status(400).body("insufficient funds for this operation.");
         StockOrder order = null;
         if(user.getDailyLimit() == null || user.getDailyLimit() <= 0) {
             return ResponseEntity.internalServerError().body("User daily limit is not present.");
         }
 
         if (price.doubleValue() > user.getDailyLimit()) {
-            order = this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.WAITING);
-            this.orderService.save(order);
+
+            order = stockOrder == null ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.WAITING, OrderTradeType.BUY): stockOrder;
+            this.orderRepository.save(order);
             return ResponseEntity.status(202).body("Daily limit exceeded, order is in status WAITING.");
         } else {
-            order = this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.IN_PROGRESS);
-            this.orderService.save(order);
+            order = stockOrder == null ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.IN_PROGRESS, OrderTradeType.BUY) : stockOrder;
+            order = (StockOrder) this.orderRepository.save(order);
             user.setDailyLimit(user.getDailyLimit() - price.doubleValue());
             userService.save(user);
         }
@@ -401,8 +400,8 @@ public class StockService {
         return ResponseEntity.ok().body("Stock buy order has been processed");
     }
 
-    private StockOrder createOrder(StockRequest request, Double price, User user, OrderStatus status) {
-        StockOrder order = new StockOrder(0L, OrderType.STOCK, OrderTradeType.BUY, status, request.getStockSymbol(), request.getAmount(),
+    private StockOrder createOrder(StockRequest request, Double price, User user, OrderStatus status, OrderTradeType orderTradeType) {
+        StockOrder order = new StockOrder(0L, OrderType.STOCK, orderTradeType, status, request.getStockSymbol(), request.getAmount(),
                 price, this.getTimestamp(), user, request.getLimit(), request.getStop(), request.isAllOrNone(), request.isMargin(), request.getCurrencyCode());
         return order;
     }
@@ -411,7 +410,7 @@ public class StockService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return currentDateTime.format(formatter);
     }
-    public ResponseEntity<?> sellStock(StockRequest stockRequest) {
+    public ResponseEntity<?> sellStock(StockRequest stockRequest, StockOrder stockOrder) {
 
         Optional<UserStock> userStock = userStockService.findUserStockByUserIdAndStockSymbol(stockRequest.getUserId(), stockRequest.getStockSymbol());
         BigDecimal price = userStock.get().getStock().getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
@@ -419,7 +418,8 @@ public class StockService {
             return ResponseEntity.status(400).body("Insufficient funds for this operation.");
         }
         try {
-            StockOrder order = this.createOrder(stockRequest, price.doubleValue(), userStock.get().getUser(), OrderStatus.WAITING);
+            StockOrder order = stockOrder == null ? this.createOrder(stockRequest, price.doubleValue(), userStock.get().getUser(), OrderStatus.WAITING, OrderTradeType.SELL) : stockOrder;
+            order = (StockOrder) this.orderRepository.save(order);
             stockSellRequestsQueue.put(order);
         } catch (InterruptedException e) {
             e.printStackTrace();

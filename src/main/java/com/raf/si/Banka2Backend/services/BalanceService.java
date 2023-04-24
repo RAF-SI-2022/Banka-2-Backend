@@ -2,14 +2,16 @@ package com.raf.si.Banka2Backend.services;
 
 import com.raf.si.Banka2Backend.exceptions.*;
 import com.raf.si.Banka2Backend.models.mariadb.*;
-import com.raf.si.Banka2Backend.models.mariadb.orders.Order;
-import com.raf.si.Banka2Backend.models.mariadb.orders.OrderTradeType;
+import com.raf.si.Banka2Backend.models.mariadb.orders.*;
 import com.raf.si.Banka2Backend.repositories.mariadb.BalanceRepository;
+import com.raf.si.Banka2Backend.repositories.mariadb.OrderRepository;
 import com.raf.si.Banka2Backend.services.interfaces.BalanceServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,47 +21,78 @@ public class BalanceService implements BalanceServiceInterface {
     private final TransactionService transactionService;
     private final CurrencyService currencyService;
     private final UserService userService;
+    private final OrderRepository orderRepository;
 
     @Autowired
     public BalanceService(
             BalanceRepository balanceRepository,
             TransactionService transactionService,
             CurrencyService currencyService,
-            UserService userService) {
+            UserService userService,
+            OrderRepository orderRepository) {
         this.balanceRepository = balanceRepository;
         this.transactionService = transactionService;
         this.currencyService = currencyService;
         this.userService = userService;
+        this.orderRepository = orderRepository;
     }
 
     @Override
     @Transactional
-    public void buyOrSellCurrency( // for forex
+    public boolean buyOrSellCurrency( // for forex
                                    String userEmail,
                                    String fromCurrencyCode,
                                    String toCurrencyCode,
                                    Float exchangeRate,
-                                   Integer amountOfMoney) {
+                                   Integer amount,
+                                   ForexOrder forexOrder) {
         // Update existing balance(for fromCurrency)
-        this.reserveAmount(amountOfMoney.floatValue(), userEmail, fromCurrencyCode);
-        this.decreaseBalance(userEmail, fromCurrencyCode, amountOfMoney.floatValue());
+        Optional<User> u = this.userService.findByEmail(userEmail);
+        if(!u.isPresent()) throw new UserNotFoundException(userEmail);
+        Balance balanceForFromCurrency = this.findBalanceByUserEmailAndCurrencyCode(userEmail, fromCurrencyCode);
+        try {
+            this.reserveAmount(amount.floatValue(), userEmail, fromCurrencyCode);
+            this.decreaseBalance(userEmail, fromCurrencyCode, amount.floatValue());
+        } catch (NotEnoughMoneyException | NotEnoughReservedMoneyException e) {
+            ForexOrder fo = forexOrder == null ? new ForexOrder(0l, OrderType.FOREX, OrderTradeType.BUY, OrderStatus.WAITING, fromCurrencyCode + " " + toCurrencyCode, amount, exchangeRate, this.getTimestamp(), u.get()) : forexOrder;
+            fo = (ForexOrder) this.orderRepository.save(fo);
+            return false;
+        }
+
         // Check if balance for toCurrency exists. If yes update it with new amount, if not create it.
         Optional<Balance> balanceForToCurrency =
                 this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(
                         userEmail, toCurrencyCode);
         Optional<Currency> newCurrency = this.currencyService.findByCurrencyCode(toCurrencyCode);
-
+        ForexOrder fo = null;
+        fo = forexOrder == null ? new ForexOrder(0l, OrderType.FOREX, OrderTradeType.BUY, OrderStatus.IN_PROGRESS, fromCurrencyCode + " " + toCurrencyCode, amount, exchangeRate, this.getTimestamp(), u.get()) : forexOrder;
+        System.out.println("FO ID: " + fo.getId());
+        fo = this.orderRepository.save(fo);
+        System.out.println("FO ID: " + fo.getId());
+        Transaction transaction = this.transactionService.createTransaction(fo, balanceForFromCurrency, (float) amount);
+        this.transactionService.save(transaction);
         if (balanceForToCurrency.isPresent()) {
-            this.increaseBalance(userEmail, toCurrencyCode, amountOfMoney * exchangeRate);
+            this.increaseBalance(userEmail, toCurrencyCode, amount * exchangeRate);
         } else {
             // create new balance for toCurrency
             Balance newBalanceForToCurrency = new Balance();
             newBalanceForToCurrency.setUser(this.userService.findByEmail(userEmail).get());
             newBalanceForToCurrency.setCurrency(newCurrency.get());
-            newBalanceForToCurrency.setAmount(amountOfMoney * exchangeRate);
+            newBalanceForToCurrency.setAmount(amount * exchangeRate);
             newBalanceForToCurrency.setReserved(0f);
-            newBalanceForToCurrency.setFree(amountOfMoney * exchangeRate);
+            newBalanceForToCurrency.setFree(amount * exchangeRate);
+            newBalanceForToCurrency.setType(BalanceType.CASH);
             this.balanceRepository.save(newBalanceForToCurrency);
+        }
+        this.updateOrderStatus(fo.getId(), OrderStatus.COMPLETE);
+        return true;
+    }
+
+    private void updateOrderStatus(Long id, OrderStatus orderStatus) {
+        Optional<Order> order = orderRepository.findById(id);
+        if(order.isPresent()) {
+            order.get().setStatus(orderStatus);
+            this.orderRepository.save(order.get());
         }
     }
 
@@ -173,5 +206,10 @@ public class BalanceService implements BalanceServiceInterface {
             String userFromEmail, String userToEmail, Float amount, String currencyCode) {
         decreaseBalance(userFromEmail, currencyCode, amount);
         increaseBalance(userToEmail, currencyCode, amount);
+    }
+    private String getTimestamp() {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return currentDateTime.format(formatter);
     }
 }
