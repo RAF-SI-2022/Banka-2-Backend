@@ -378,13 +378,16 @@ public class StockService {
         if(user.getDailyLimit() == null || user.getDailyLimit() <= 0) {
             return ResponseEntity.internalServerError().body("User daily limit is not present.");
         }
+        System.out.println("check");
+        System.out.println(price.doubleValue());
+        System.out.println(user.getDailyLimit());
 
         if (price.doubleValue() > user.getDailyLimit()) {
-
             order = stockOrder == null ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.WAITING, OrderTradeType.BUY): stockOrder;
             this.orderRepository.save(order);
             return ResponseEntity.status(202).body("Daily limit exceeded, order is in status WAITING.");
-        } else {
+        }
+        else {
             order = stockOrder == null ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.IN_PROGRESS, OrderTradeType.BUY) : stockOrder;
             order = (StockOrder) this.orderRepository.save(order);
             user.setDailyLimit(user.getDailyLimit() - price.doubleValue());

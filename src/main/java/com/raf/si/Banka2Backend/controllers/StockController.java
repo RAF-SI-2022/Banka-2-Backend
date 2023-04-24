@@ -1,7 +1,5 @@
 package com.raf.si.Banka2Backend.controllers;
 
-import static org.springframework.security.core.context.SecurityContextHolder.getContext;
-
 import com.raf.si.Banka2Backend.exceptions.ExternalAPILimitReachedException;
 import com.raf.si.Banka2Backend.exceptions.StockNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
@@ -11,14 +9,15 @@ import com.raf.si.Banka2Backend.services.AuthorisationService;
 import com.raf.si.Banka2Backend.services.StockService;
 import com.raf.si.Banka2Backend.services.UserService;
 import com.raf.si.Banka2Backend.services.UserStockService;
-
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Optional;
+
+import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 @RestController
 @CrossOrigin

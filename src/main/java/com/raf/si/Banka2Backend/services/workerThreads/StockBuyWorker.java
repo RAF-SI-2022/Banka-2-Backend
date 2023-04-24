@@ -47,6 +47,8 @@ public class StockBuyWorker extends Thread {
     private void processBuyRequests() {
         while (true) {
             try {
+                System.out.println("POCETAK");
+
                 StockOrder stockOrder = stockBuyRequestsQueue.take();
 
                 Optional<UserStock> usersStockToChange = userStockService.findUserStockByUserIdAndStockSymbol(stockOrder.getUser().getId(), stockOrder.getSymbol());
@@ -58,37 +60,41 @@ public class StockBuyWorker extends Thread {
                     Transaction transaction = this.transactionService.createTransaction(stockOrder, balance, (float) stockOrder.getPrice());
                     this.transactionService.save(transaction);
                 } else {
+                    System.out.println("usli u else");
                     int stockAmountSum = 0;
                     Stock stock = stockService.getStockBySymbol(stockOrder.getSymbol());
                     BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockOrder.getAmount()));
                     List<Transaction> transactionList = new ArrayList<>();
+                    System.out.println("pre while");
                     while (stockOrder.getAmount() != stockAmountSum) {
                         int amountBought = random.nextInt(stockOrder.getAmount() - stockAmountSum) + 1;
                         stockAmountSum += amountBought;
                         usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + amountBought);
                         Transaction transaction = this.transactionService.createTransaction(stockOrder, balance, price.floatValue()*amountBought);
                         transactionList.add(transaction);
+                        System.out.println("while :)");
                     }
+                    System.out.println("kraj while cuvamo transactiuon list");
                     this.transactionService.saveAll(transactionList);
                 }
                 userStockService.save(usersStockToChange.get());
                 this.balanceService.updateBalance(stockOrder, stockOrder.getUser().getEmail(), stockOrder.getCurrencyCode());
-                Thread.sleep(10000);
                 this.updateOrderStatus(stockOrder.getId(), OrderStatus.COMPLETE);
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
         }
     }
 
     private void updateOrderStatus(Long id, OrderStatus orderStatus) {
         Optional<Order> order = this.orderRepository.findById(id);
+
         if(order.isPresent()) {
             order.get().setStatus(orderStatus);
             this.orderRepository.save(order.get());
         }
-        throw new OrderNotFoundException(id);
+        else throw new OrderNotFoundException(id);
     }
 
 
