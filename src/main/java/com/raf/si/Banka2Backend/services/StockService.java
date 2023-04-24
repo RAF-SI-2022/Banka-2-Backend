@@ -12,13 +12,6 @@ import com.raf.si.Banka2Backend.repositories.mariadb.StockRepository;
 import com.raf.si.Banka2Backend.requests.StockRequest;
 import com.raf.si.Banka2Backend.services.workerThreads.StockBuyWorker;
 import com.raf.si.Banka2Backend.services.workerThreads.StockSellWorker;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
@@ -31,6 +24,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 @Service
 public class StockService {
@@ -53,11 +52,17 @@ public class StockService {
     private static final BlockingQueue<StockOrder> stockBuyRequestsQueue = new LinkedBlockingQueue<>();
     private static final BlockingQueue<StockOrder> stockSellRequestsQueue = new LinkedBlockingQueue<>();
 
-
     @Autowired
-    public StockService(StockRepository stockRepository, StockHistoryRepository stockHistoryRepository,
-                        UserService userService, UserStockService userStockService, CurrencyService currencyService, TransactionService transactionService, ExchangeRepository exchangeRepository,
-                        BalanceService balanceService, OrderRepository orderRepository) {
+    public StockService(
+            StockRepository stockRepository,
+            StockHistoryRepository stockHistoryRepository,
+            UserService userService,
+            UserStockService userStockService,
+            CurrencyService currencyService,
+            TransactionService transactionService,
+            ExchangeRepository exchangeRepository,
+            BalanceService balanceService,
+            OrderRepository orderRepository) {
         this.stockRepository = stockRepository;
         this.exchangeRepository = exchangeRepository;
         this.stockHistoryRepository = stockHistoryRepository;
@@ -65,8 +70,16 @@ public class StockService {
         this.userStockService = userStockService;
         this.balanceService = balanceService;
         this.orderRepository = orderRepository;
-        this.stockBuyWorker = new StockBuyWorker(stockBuyRequestsQueue, userStockService, this, balanceService, currencyService, transactionService, orderRepository);
-        this.stockSellWorker = new StockSellWorker(stockSellRequestsQueue, userStockService, this, transactionService, orderRepository, balanceService);
+        this.stockBuyWorker = new StockBuyWorker(
+                stockBuyRequestsQueue,
+                userStockService,
+                this,
+                balanceService,
+                currencyService,
+                transactionService,
+                orderRepository);
+        this.stockSellWorker = new StockSellWorker(
+                stockSellRequestsQueue, userStockService, this, transactionService, orderRepository, balanceService);
         stockBuyWorker.start();
         stockSellWorker.start();
     }
@@ -87,18 +100,23 @@ public class StockService {
 
         Optional<Stock> stockFromDB = stockRepository.findStockBySymbol(symbol);
 
-        if (stockFromDB.isPresent())
-            return stockFromDB.get();
+        if (stockFromDB.isPresent()) return stockFromDB.get();
         else {
             HttpClient client = HttpClient.newHttpClient();
 
-            String companyOverviewUrl = "https://www.alphavantage.co/query?function=OVERVIEW&symbol=" + symbol + "&apikey=" + KEY;
-            String globalQuoteUrl = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=" + symbol + "&apikey=" + KEY;
-            String websiteLinkUrl = "https://query1.finance.yahoo.com/v11/finance/quoteSummary/" + symbol + "?modules=assetProfile";
+            String companyOverviewUrl =
+                    "https://www.alphavantage.co/query?function=OVERVIEW&symbol=" + symbol + "&apikey=" + KEY;
+            String globalQuoteUrl =
+                    "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=" + symbol + "&apikey=" + KEY;
+            String websiteLinkUrl =
+                    "https://query1.finance.yahoo.com/v11/finance/quoteSummary/" + symbol + "?modules=assetProfile";
 
-            HttpRequest companyOverviewRequest = HttpRequest.newBuilder().uri(URI.create(companyOverviewUrl)).build();
-            HttpRequest globalQuoteRequest = HttpRequest.newBuilder().uri(URI.create(globalQuoteUrl)).build();
-            HttpRequest websiteLinkRequest = HttpRequest.newBuilder().uri(URI.create(websiteLinkUrl)).build();
+            HttpRequest companyOverviewRequest =
+                    HttpRequest.newBuilder().uri(URI.create(companyOverviewUrl)).build();
+            HttpRequest globalQuoteRequest =
+                    HttpRequest.newBuilder().uri(URI.create(globalQuoteUrl)).build();
+            HttpRequest websiteLinkRequest =
+                    HttpRequest.newBuilder().uri(URI.create(websiteLinkUrl)).build();
 
             HttpResponse<String> companyOverviewResponse;
             HttpResponse<String> globalQuoteResponse;
@@ -124,7 +142,8 @@ public class StockService {
                 if (companyOverview.isEmpty() || globalQuoteJson.isEmpty() || websiteLinkJson.isEmpty())
                     throw new StockNotFoundException(symbol);
 
-                Optional<Exchange> exchange = exchangeRepository.findExchangeByAcronym(companyOverview.getString("Exchange"));
+                Optional<Exchange> exchange =
+                        exchangeRepository.findExchangeByAcronym(companyOverview.getString("Exchange"));
 
                 if (exchange.isPresent()) {
                     stock = Stock.builder()
@@ -180,8 +199,7 @@ public class StockService {
             case "ONE_MONTH" -> period = 30;
         }
 
-        if (period != null)
-            return stockHistoryRepository.getStockHistoryByStockIdAndHistoryType(id, period);
+        if (period != null) return stockHistoryRepository.getStockHistoryByStockIdAndHistoryType(id, period);
         else return stockHistoryRepository.getStockHistoryByStockIdAndHistoryType(id, type);
     }
 
@@ -258,11 +276,13 @@ public class StockService {
 
         switch (type) {
             case "ONE_DAY" -> {
-                LocalDateTime latestTimestamp = LocalDateTime.parse(listTimestamps.get(0), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                LocalDateTime latestTimestamp =
+                        LocalDateTime.parse(listTimestamps.get(0), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
                 for (int i = 1; i < listTimestamps.size() - 1; i++) {
 
-                    LocalDateTime localDateTime = LocalDateTime.parse(listTimestamps.get(i), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                    LocalDateTime localDateTime = LocalDateTime.parse(
+                            listTimestamps.get(i), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
                     JSONObject data = timeSeries.getJSONObject(listTimestamps.get(i));
 
@@ -289,7 +309,8 @@ public class StockService {
                 stockHistoryRepository.saveAll(stockHistoryList);
             }
             case "FIVE_DAYS" -> {
-                LocalDateTime initiallocalDateTime = LocalDateTime.parse(listTimestamps.get(0), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                LocalDateTime initiallocalDateTime =
+                        LocalDateTime.parse(listTimestamps.get(0), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
                 int dayCounter = 0;
 
@@ -297,7 +318,8 @@ public class StockService {
 
                     if (dayCounter == 5 * 16) break;
 
-                    LocalDateTime localDateTime = LocalDateTime.parse(listTimestamps.get(i), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                    LocalDateTime localDateTime = LocalDateTime.parse(
+                            listTimestamps.get(i), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
                     if (!initiallocalDateTime.toLocalDate().equals(localDateTime.toLocalDate())) dayCounter++;
 
@@ -323,21 +345,21 @@ public class StockService {
             case "ONE_MONTH", "SIX_MONTHS", "ONE_YEAR", "YTD" -> {
                 for (int i = 0; i < limit; i++) {
 
-                    LocalDateTime localDateTime = LocalDateTime.parse(listTimestamps.get(i) + " 00:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                    LocalDateTime localDateTime = LocalDateTime.parse(
+                            listTimestamps.get(i) + " 00:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
                     JSONObject data = timeSeries.getJSONObject(listTimestamps.get(i));
 
-                    StockHistory stockHistory =
-                            StockHistory.builder()
-                                    .openValue(data.getBigDecimal("1. open"))
-                                    .highValue(data.getBigDecimal("2. high"))
-                                    .lowValue(data.getBigDecimal("3. low"))
-                                    .closeValue(data.getBigDecimal("4. close"))
-                                    .volumeValue(data.getLong("6. volume"))
-                                    .stock(stock)
-                                    .onDate(localDateTime)
-                                    .type(StockHistoryType.DAILY)
-                                    .build();
+                    StockHistory stockHistory = StockHistory.builder()
+                            .openValue(data.getBigDecimal("1. open"))
+                            .highValue(data.getBigDecimal("2. high"))
+                            .lowValue(data.getBigDecimal("3. low"))
+                            .closeValue(data.getBigDecimal("4. close"))
+                            .volumeValue(data.getLong("6. volume"))
+                            .stock(stock)
+                            .onDate(localDateTime)
+                            .type(StockHistoryType.DAILY)
+                            .build();
 
                     stockHistoryList.add(stockHistory);
                 }
@@ -355,7 +377,10 @@ public class StockService {
             case "YTD" -> {
                 List<StockHistory> stockHistoryListYTD = new ArrayList<>();
 
-                int yearToLookUp = stockHistoryList.get(stockHistoryList.size() - 1).getOnDate().getYear();
+                int yearToLookUp = stockHistoryList
+                        .get(stockHistoryList.size() - 1)
+                        .getOnDate()
+                        .getYear();
 
                 for (StockHistory sh : stockHistoryList) {
 
@@ -372,23 +397,28 @@ public class StockService {
     public ResponseEntity<?> buyStock(StockRequest stockRequest, User user, StockOrder stockOrder) {
         Stock stock = getStockBySymbol(stockRequest.getStockSymbol());
         BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
-        Balance usersBalance = balanceService.findBalanceByUserIdAndCurrency(user.getId(), stockRequest.getCurrencyCode());
+        Balance usersBalance =
+                balanceService.findBalanceByUserIdAndCurrency(user.getId(), stockRequest.getCurrencyCode());
 
         StockOrder order = null;
-        if(user.getDailyLimit() == null || user.getDailyLimit() <= 0) {
+        if (user.getDailyLimit() == null || user.getDailyLimit() <= 0) {
             return ResponseEntity.internalServerError().body("User daily limit is not present.");
         }
-//        System.out.println("check");
-//        System.out.println(price.doubleValue());
-//        System.out.println(user.getDailyLimit());
+        //        System.out.println("check");
+        //        System.out.println(price.doubleValue());
+        //        System.out.println(user.getDailyLimit());
 
         if (price.doubleValue() > user.getDailyLimit()) {
-            order = stockOrder == null ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.WAITING, OrderTradeType.BUY): stockOrder;
+            order = stockOrder == null
+                    ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.WAITING, OrderTradeType.BUY)
+                    : stockOrder;
             this.orderRepository.save(order);
             return ResponseEntity.status(202).body("Daily limit exceeded, order is in status WAITING.");
-        }
-        else {
-            order = stockOrder == null ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.IN_PROGRESS, OrderTradeType.BUY) : stockOrder;
+        } else {
+            order = stockOrder == null
+                    ? this.createOrder(
+                            stockRequest, price.doubleValue(), user, OrderStatus.IN_PROGRESS, OrderTradeType.BUY)
+                    : stockOrder;
             order = (StockOrder) this.orderRepository.save(order);
             user.setDailyLimit(user.getDailyLimit() - price.doubleValue());
             userService.save(user);
@@ -403,25 +433,50 @@ public class StockService {
         return ResponseEntity.ok().body("Stock buy order has been processed");
     }
 
-    private StockOrder createOrder(StockRequest request, Double price, User user, OrderStatus status, OrderTradeType orderTradeType) {
-        StockOrder order = new StockOrder(0L, OrderType.STOCK, orderTradeType, status, request.getStockSymbol(), request.getAmount(),
-                price, this.getTimestamp(), user, request.getLimit(), request.getStop(), request.isAllOrNone(), request.isMargin(), request.getCurrencyCode());
+    private StockOrder createOrder(
+            StockRequest request, Double price, User user, OrderStatus status, OrderTradeType orderTradeType) {
+        StockOrder order = new StockOrder(
+                0L,
+                OrderType.STOCK,
+                orderTradeType,
+                status,
+                request.getStockSymbol(),
+                request.getAmount(),
+                price,
+                this.getTimestamp(),
+                user,
+                request.getLimit(),
+                request.getStop(),
+                request.isAllOrNone(),
+                request.isMargin(),
+                request.getCurrencyCode());
         return order;
     }
+
     private String getTimestamp() {
         LocalDateTime currentDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return currentDateTime.format(formatter);
     }
+
     public ResponseEntity<?> sellStock(StockRequest stockRequest, StockOrder stockOrder) {
 
-        Optional<UserStock> userStock = userStockService.findUserStockByUserIdAndStockSymbol(stockRequest.getUserId(), stockRequest.getStockSymbol());
-        BigDecimal price = userStock.get().getStock().getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
+        Optional<UserStock> userStock = userStockService.findUserStockByUserIdAndStockSymbol(
+                stockRequest.getUserId(), stockRequest.getStockSymbol());
+        BigDecimal price =
+                userStock.get().getStock().getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
         if (userStock.get().getAmount() < stockRequest.getAmount()) {
             return ResponseEntity.status(400).body("Insufficient funds for this operation.");
         }
         try {
-            StockOrder order = stockOrder == null ? this.createOrder(stockRequest, price.doubleValue(), userStock.get().getUser(), OrderStatus.WAITING, OrderTradeType.SELL) : stockOrder;
+            StockOrder order = stockOrder == null
+                    ? this.createOrder(
+                            stockRequest,
+                            price.doubleValue(),
+                            userStock.get().getUser(),
+                            OrderStatus.WAITING,
+                            OrderTradeType.SELL)
+                    : stockOrder;
             order = (StockOrder) this.orderRepository.save(order);
             stockSellRequestsQueue.put(order);
         } catch (InterruptedException e) {
@@ -434,5 +489,4 @@ public class StockService {
     public List<UserStock> getAllUserStocks(long userId) {
         return userStockService.findAllForUser(userId);
     }
-
 }

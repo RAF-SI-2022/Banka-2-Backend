@@ -4,11 +4,10 @@ import com.raf.si.Banka2Backend.exceptions.CurrencyNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.Currency;
 import com.raf.si.Banka2Backend.repositories.mariadb.CurrencyRepository;
 import com.raf.si.Banka2Backend.services.interfaces.CurrencyServiceInterface;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class CurrencyService implements CurrencyServiceInterface {

@@ -7,10 +7,9 @@ import com.raf.si.Banka2Backend.requests.FutureRequestBuySell;
 import com.raf.si.Banka2Backend.services.interfaces.FutureServiceInterface;
 import com.raf.si.Banka2Backend.services.workerThreads.FutureBuyWorker;
 import com.raf.si.Banka2Backend.services.workerThreads.FutureSellWorker;
+import java.util.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
 
 @Service
 public class FutureService implements FutureServiceInterface {
@@ -21,8 +20,7 @@ public class FutureService implements FutureServiceInterface {
     private final FutureBuyWorker futureBuyWorker;
     private final BalanceService balanceService;
 
-    public FutureService(
-            UserService userService, FutureRepository futureRepository, BalanceService balanceService) {
+    public FutureService(UserService userService, FutureRepository futureRepository, BalanceService balanceService) {
         this.futureRepository = futureRepository;
         this.userService = userService;
         this.balanceService = balanceService;
@@ -49,13 +47,13 @@ public class FutureService implements FutureServiceInterface {
     }
 
     @Override
-    public ResponseEntity<?> buyFuture(FutureRequestBuySell futureRequest, String fromUserEmail, Float usersMoneyInCurrency) {
+    public ResponseEntity<?> buyFuture(
+            FutureRequestBuySell futureRequest, String fromUserEmail, Float usersMoneyInCurrency) {
         System.out.println(futureRequest);
         if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) { // regularni buy
             Optional<Future> future = futureRepository.findById(futureRequest.getId());
             if (future.isEmpty()) return ResponseEntity.status(500).body("Internal server error ovaj");
-            if (!future.get().isForSale())
-                return ResponseEntity.status(500).body("Internal server error");
+            if (!future.get().isForSale()) return ResponseEntity.status(500).body("Internal server error");
 
             User toUser = future.get().getUser();
             if (toUser != null) { // provera da li user ima dovoljno para //todo trenutno je sve preko USD
@@ -64,20 +62,20 @@ public class FutureService implements FutureServiceInterface {
                     return ResponseEntity.status(500).body("Not enough money in balance");
 
                 // Provera za daily limit
-//            System.out.println("Ovde sam");
+                //            System.out.println("Ovde sam");
                 Optional<User> optionalUser = userService.findByEmail(fromUserEmail);
-                if(optionalUser.isPresent()) {
-//                System.out.println("Sad sam ovde");
-//                    float amount = future.get().getMaintenanceMargin();
+                if (optionalUser.isPresent()) {
+                    //                System.out.println("Sad sam ovde");
+                    //                    float amount = future.get().getMaintenanceMargin();
                     Double limit = optionalUser.get().getDailyLimit();
                     Double amountDouble = Double.valueOf(amount);
-                    Double suma = limit-amountDouble;
-//                    System.out.println("Limit " + limit + " vrednost " + amountDouble + " oduzimanje " + suma);
-                    boolean limitTestBoolean = limit-amountDouble < 0?false:true;
-                    if (!limitTestBoolean)
-                        return ResponseEntity.status(500).body("Exceeded daily limit");
+                    Double suma = limit - amountDouble;
+                    //                    System.out.println("Limit " + limit + " vrednost " + amountDouble + "
+                    // oduzimanje " + suma);
+                    boolean limitTestBoolean = limit - amountDouble < 0 ? false : true;
+                    if (!limitTestBoolean) return ResponseEntity.status(500).body("Exceeded daily limit");
                     else {
-                        optionalUser.get().setDailyLimit(limit-amountDouble);
+                        optionalUser.get().setDailyLimit(limit - amountDouble);
                         userService.save(optionalUser.get());
                     }
                 }
@@ -87,18 +85,18 @@ public class FutureService implements FutureServiceInterface {
 
             // Provera za daily limit
             Optional<User> optionalUser = userService.findByEmail(fromUserEmail);
-            if(optionalUser.isPresent() && !(optionalUser.get().getDailyLimit() == null)) {
+            if (optionalUser.isPresent() && !(optionalUser.get().getDailyLimit() == null)) {
 
                 float amount = future.get().getMaintenanceMargin();
                 Double limit = optionalUser.get().getDailyLimit();
                 Double amountDouble = Double.valueOf(amount);
-                Double suma = limit-amountDouble;
-//                System.out.println("Limit " + limit + " vrednost " + amountDouble + " oduzimanje " + suma);
-                boolean limitTestBoolean = limit-amountDouble < 0?false:true;
-                if (!limitTestBoolean)
-                    return ResponseEntity.status(500).body("Exceeded daily limit");
+                Double suma = limit - amountDouble;
+                //                System.out.println("Limit " + limit + " vrednost " + amountDouble + " oduzimanje " +
+                // suma);
+                boolean limitTestBoolean = limit - amountDouble < 0 ? false : true;
+                if (!limitTestBoolean) return ResponseEntity.status(500).body("Exceeded daily limit");
                 else {
-                    optionalUser.get().setDailyLimit(limit-amountDouble);
+                    optionalUser.get().setDailyLimit(limit - amountDouble);
                     userService.save(optionalUser.get());
                 }
             }

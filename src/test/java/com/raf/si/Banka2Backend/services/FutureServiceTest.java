@@ -5,11 +5,9 @@ import static org.mockito.Mockito.when;
 
 import com.raf.si.Banka2Backend.models.mariadb.Future;
 import com.raf.si.Banka2Backend.repositories.mariadb.FutureRepository;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -20,6 +18,7 @@ public class FutureServiceTest {
 
     @Mock
     private FutureRepository futureRepository;
+
     @Mock
     private UserService userService;
 

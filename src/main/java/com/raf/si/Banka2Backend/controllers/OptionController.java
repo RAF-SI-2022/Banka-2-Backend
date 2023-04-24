@@ -1,31 +1,27 @@
 package com.raf.si.Banka2Backend.controllers;
 
+import static org.springframework.security.core.context.SecurityContextHolder.getContext;
+
 import com.raf.si.Banka2Backend.dto.OptionBuyDto;
 import com.raf.si.Banka2Backend.dto.OptionSellDto;
 import com.raf.si.Banka2Backend.dto.SellStockUsingOptionDto;
+import com.raf.si.Banka2Backend.exceptions.OptionNotFoundException;
 import com.raf.si.Banka2Backend.exceptions.StockNotFoundException;
 import com.raf.si.Banka2Backend.exceptions.TooLateToBuyOptionException;
-import com.raf.si.Banka2Backend.services.OptionService;
-import com.raf.si.Banka2Backend.utils.OptionDateScraper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import java.text.ParseException;
-
-import com.raf.si.Banka2Backend.exceptions.OptionNotFoundException;
 import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.User;
+import com.raf.si.Banka2Backend.services.OptionService;
 import com.raf.si.Banka2Backend.services.UserService;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
-
-
+import com.raf.si.Banka2Backend.utils.OptionDateScraper;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.List;
-
 import java.util.Optional;
-
-import static org.springframework.security.core.context.SecurityContextHolder.getContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @CrossOrigin
@@ -44,9 +40,11 @@ public class OptionController {
     }
 
     @GetMapping("/{symbol}/{dateString}")
-    public ResponseEntity<?> getStockBySymbol(@PathVariable String symbol, @PathVariable String dateString) throws ParseException {
+    public ResponseEntity<?> getStockBySymbol(@PathVariable String symbol, @PathVariable String dateString)
+            throws ParseException {
         return ResponseEntity.ok().body(optionService.findByStockAndDate(symbol, dateString));
     }
+
     @GetMapping("/{symbol}")
     public ResponseEntity<?> getStockBySymbol(@PathVariable String symbol) throws ParseException {
         return ResponseEntity.ok().body(optionService.findByStock(symbol));
@@ -55,9 +53,10 @@ public class OptionController {
     @PostMapping("/sell")
     public ResponseEntity<?> sellOption(@RequestBody OptionSellDto optionSellDto) {
 
-        try{
-            return ResponseEntity.ok().body(optionService.sellOption(optionSellDto.getUserOptionId(), optionSellDto.getPremium()));
-        } catch(UserNotFoundException | OptionNotFoundException e){
+        try {
+            return ResponseEntity.ok()
+                    .body(optionService.sellOption(optionSellDto.getUserOptionId(), optionSellDto.getPremium()));
+        } catch (UserNotFoundException | OptionNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }
@@ -66,70 +65,80 @@ public class OptionController {
     public ResponseEntity<?> buyOption(@RequestBody OptionBuyDto optionBuyDto) {
 
         String signedInUserEmail = getContext().getAuthentication().getName();
-        try{
+        try {
             Optional<User> userOptional = userService.findByEmail(signedInUserEmail);
 
-            return ResponseEntity.ok().body(optionService.buyOption(optionBuyDto.getOptionId(), userOptional.get().getId(), optionBuyDto.getAmount(), optionBuyDto.getPremium()));
-        } catch(UserNotFoundException | OptionNotFoundException e){
+            return ResponseEntity.ok()
+                    .body(optionService.buyOption(
+                            optionBuyDto.getOptionId(),
+                            userOptional.get().getId(),
+                            optionBuyDto.getAmount(),
+                            optionBuyDto.getPremium()));
+        } catch (UserNotFoundException | OptionNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }
 
     @GetMapping(value = "/dates")
-    public ResponseEntity<?> getDates(){
+    public ResponseEntity<?> getDates() {
         String signedInUserEmail = getContext().getAuthentication().getName();
         List<LocalDate> dates;
 
         try {
             Optional<User> userOptional = userService.findByEmail(signedInUserEmail);
-            if(userOptional.isPresent()){
+            if (userOptional.isPresent()) {
                 dates = this.optionDateScraper.scrape();
-            }
-            else{
+            } else {
                 return ResponseEntity.status(400).body("Internal error");
             }
-        } catch(UserNotFoundException | OptionNotFoundException e){
+        } catch (UserNotFoundException | OptionNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
         return ResponseEntity.ok().body(dates);
     }
+
     @GetMapping("/buy-stocks/{userOptionId}")
     public ResponseEntity<?> buyStocksByOption(@PathVariable Long userOptionId) {
 
         String signedInUserEmail = getContext().getAuthentication().getName();
 
-        try{
+        try {
             Optional<User> userOptional = userService.findByEmail(signedInUserEmail);
-            return ResponseEntity.ok().body(optionService.buyStockUsingOption(userOptionId, userOptional.get().getId()));
-        } catch(UserNotFoundException | OptionNotFoundException | StockNotFoundException | TooLateToBuyOptionException e){
+            return ResponseEntity.ok()
+                    .body(optionService.buyStockUsingOption(
+                            userOptionId, userOptional.get().getId()));
+        } catch (UserNotFoundException
+                | OptionNotFoundException
+                | StockNotFoundException
+                | TooLateToBuyOptionException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }
 
     @GetMapping
-    public ResponseEntity<?> getUserOptions(){
+    public ResponseEntity<?> getUserOptions() {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        return ResponseEntity.ok().body(optionService.getUserOptions(userService.findByEmail(signedInUserEmail).get().getId()));
+        return ResponseEntity.ok()
+                .body(optionService.getUserOptions(
+                        userService.findByEmail(signedInUserEmail).get().getId()));
     }
-
 
     @PostMapping("/sell-stocks")
     public ResponseEntity<?> sellStocksByOption(@RequestBody SellStockUsingOptionDto sellStockUsingOptionDto) {
 
         String signedInUserEmail = getContext().getAuthentication().getName();
 
-        //Problem na koji sam naisao je to sto treba da se kreira UserOption, ali nemam podatak o optionId-ju
-        //Moguce resenje je dozvoliti null vrednosti za optionId u UserOption modelu i migracionoj skripti
-        //Znaci setovati samo userId - id onoga ko kreira SellStockUsingOption, a da optionId ostane null
+        // Problem na koji sam naisao je to sto treba da se kreira UserOption, ali nemam podatak o optionId-ju
+        // Moguce resenje je dozvoliti null vrednosti za optionId u UserOption modelu i migracionoj skripti
+        // Znaci setovati samo userId - id onoga ko kreira SellStockUsingOption, a da optionId ostane null
 
-//        try{
-//            Optional<User> userOptional = userService.findByEmail(signedInUserEmail);
-//            return ResponseEntity.ok().body(optionService.sellStockUsingOption();
-//        } catch(UserNotFoundException | OptionNotFoundException | StockNotFoundException | TooLateToBuyOptionException e){
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
-//        }
+        //        try{
+        //            Optional<User> userOptional = userService.findByEmail(signedInUserEmail);
+        //            return ResponseEntity.ok().body(optionService.sellStockUsingOption();
+        //        } catch(UserNotFoundException | OptionNotFoundException | StockNotFoundException |
+        // TooLateToBuyOptionException e){
+        //            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        //        }
         return null;
     }
-
-
 }

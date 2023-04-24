@@ -11,9 +11,7 @@ import com.raf.si.Banka2Backend.services.AuthorisationService;
 import com.raf.si.Banka2Backend.services.BalanceService;
 import com.raf.si.Banka2Backend.services.FutureService;
 import com.raf.si.Banka2Backend.services.UserService;
-
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -77,7 +75,8 @@ public class FutureController {
         Optional<User> user = userService.findByEmail(signedInUserEmail);
 
         // todo kasnije promeni (ako treba) umesto USD u nesto custom sa fronta
-        Balance usersBalance = balanceService.findBalanceByUserIdAndCurrency(user.get().getId(), "USD");
+        Balance usersBalance =
+                balanceService.findBalanceByUserIdAndCurrency(user.get().getId(), "USD");
 
         futureRequest.setUserId(user.get().getId());
         return futureService.buyFuture(futureRequest, signedInUserEmail, usersBalance.getAmount());
@@ -93,8 +92,7 @@ public class FutureController {
         Optional<User> user = userService.findByEmail(signedInUserEmail);
         Optional<Future> future = futureService.findById(futureRequest.getId());
         if (future.get().getUser().getId() != user.get().getId()) {
-            return ResponseEntity.status(401)
-                    .body("You don't have permission to modify this future contract.");
+            return ResponseEntity.status(401).body("You don't have permission to modify this future contract.");
         }
 
         futureRequest.setUserId(user.get().getId());
@@ -111,8 +109,7 @@ public class FutureController {
         Optional<User> user = userService.findByEmail(signedInUserEmail);
         Optional<Future> future = futureService.findById(id);
         if (future.get().getUser().getId() != user.get().getId()) {
-            return ResponseEntity.status(401)
-                    .body("You don't have permission to modify this future contract.");
+            return ResponseEntity.status(401).body("You don't have permission to modify this future contract.");
         }
 
         return futureService.removeFromMarket(id);
@@ -140,8 +137,7 @@ public class FutureController {
 
     @GetMapping(value = "waiting-futures/{type}/{futureName}")
     public ResponseEntity<?> getAllWaitingFuturesForUser(
-            @PathVariable(name = "type") String type,
-            @PathVariable(name = "futureName") String futureName) {
+            @PathVariable(name = "type") String type, @PathVariable(name = "futureName") String futureName) {
         String signedInUserEmail = getContext().getAuthentication().getName(); // todo dodaj nove perms
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("You don't have permission to read users.");

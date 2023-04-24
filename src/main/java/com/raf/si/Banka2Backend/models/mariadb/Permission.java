@@ -1,13 +1,12 @@
 package com.raf.si.Banka2Backend.models.mariadb;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
-import org.hibernate.Hibernate;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Objects;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import lombok.*;
+import org.hibernate.Hibernate;
 
 @Getter
 @Setter

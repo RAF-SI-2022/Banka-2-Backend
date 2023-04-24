@@ -7,11 +7,9 @@ import static org.mockito.Mockito.when;
 import com.raf.si.Banka2Backend.exceptions.CurrencyNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.Currency;
 import com.raf.si.Banka2Backend.repositories.mariadb.CurrencyRepository;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class CurrencyServiceTest {
     @Mock
     CurrencyRepository currencyRepository;
+
     @InjectMocks
     CurrencyService currencyService;
 
@@ -30,24 +29,23 @@ public class CurrencyServiceTest {
 
         long id = 1L;
 
-        List<Currency> currencyList =
-                Arrays.asList(
-                        Currency.builder()
-                                .id(id++)
-                                .currencyName("Euro")
-                                .currencyCode("EUR")
-                                .currencySymbol("€")
-                                .polity("European Union")
-                                .inflations(null)
-                                .build(),
-                        Currency.builder()
-                                .id(id++)
-                                .currencyName("Serbian Dinar")
-                                .currencyCode("RSD")
-                                .currencySymbol("RSD")
-                                .polity("Serbia")
-                                .inflations(null)
-                                .build());
+        List<Currency> currencyList = Arrays.asList(
+                Currency.builder()
+                        .id(id++)
+                        .currencyName("Euro")
+                        .currencyCode("EUR")
+                        .currencySymbol("€")
+                        .polity("European Union")
+                        .inflations(null)
+                        .build(),
+                Currency.builder()
+                        .id(id++)
+                        .currencyName("Serbian Dinar")
+                        .currencyCode("RSD")
+                        .currencySymbol("RSD")
+                        .polity("Serbia")
+                        .inflations(null)
+                        .build());
 
         when(currencyRepository.findAll()).thenReturn(currencyList);
 
@@ -60,15 +58,14 @@ public class CurrencyServiceTest {
 
         long id = 1L;
 
-        Currency currency =
-                Currency.builder()
-                        .id(id++)
-                        .currencyName("Euro")
-                        .currencyCode("EUR")
-                        .currencySymbol("€")
-                        .polity("European Union")
-                        .inflations(null)
-                        .build();
+        Currency currency = Currency.builder()
+                .id(id++)
+                .currencyName("Euro")
+                .currencyCode("EUR")
+                .currencySymbol("€")
+                .polity("European Union")
+                .inflations(null)
+                .build();
 
         when(currencyRepository.findById(id)).thenReturn(Optional.of(currency));
 

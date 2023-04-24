@@ -6,13 +6,11 @@ import static org.mockito.Mockito.when;
 import com.raf.si.Banka2Backend.exceptions.ExchangeNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.Exchange;
 import com.raf.si.Banka2Backend.repositories.mariadb.ExchangeRepository;
-
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -23,6 +21,7 @@ class ExchangeServiceTest {
 
     @Mock
     private ExchangeRepository exchangeRepository;
+
     @Mock
     private UserService userService;
 

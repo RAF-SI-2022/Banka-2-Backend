@@ -4,13 +4,10 @@ import static org.springframework.security.core.context.SecurityContextHolder.ge
 
 import com.raf.si.Banka2Backend.dto.BuySellForexDto;
 import com.raf.si.Banka2Backend.exceptions.BalanceNotFoundException;
-import com.raf.si.Banka2Backend.exceptions.NotEnoughMoneyException;
 import com.raf.si.Banka2Backend.models.mariadb.Forex;
 import com.raf.si.Banka2Backend.services.BalanceService;
 import com.raf.si.Banka2Backend.services.ForexService;
-
 import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,8 +40,7 @@ public class ForexController {
 
     @PostMapping("/buy-sell")
     public ResponseEntity<?> buyOrSell(@RequestBody @Valid BuySellForexDto dto) {
-        Forex forex =
-                forexService.getForexForCurrencies(dto.getFromCurrencyCode(), dto.getToCurrencyCode());
+        Forex forex = forexService.getForexForCurrencies(dto.getFromCurrencyCode(), dto.getToCurrencyCode());
         if (forex == null) {
             return ResponseEntity.notFound().build();
         }
@@ -57,28 +53,26 @@ public class ForexController {
                     Float.parseFloat(forex.getExchangeRate()),
                     dto.getAmount(),
                     null);
-            if(!success)
+            if (!success)
                 return ResponseEntity.badRequest()
-                    .body(
-                            "User with email "
-                                    + signedInUserEmail
-                                    + ", doesn't have enough money in currency "
-                                    + forex.getFromCurrencyName()
-                                    + " for buying "
-                                    + dto.getAmount()
-                                    + " "
-                                    + dto.getToCurrencyCode()
-                                    + "("
-                                    + forex.getToCurrencyName()
-                                    + ")");
+                        .body("User with email "
+                                + signedInUserEmail
+                                + ", doesn't have enough money in currency "
+                                + forex.getFromCurrencyName()
+                                + " for buying "
+                                + dto.getAmount()
+                                + " "
+                                + dto.getToCurrencyCode()
+                                + "("
+                                + forex.getToCurrencyName()
+                                + ")");
             return ResponseEntity.ok(forex);
         } catch (BalanceNotFoundException e1) {
             return ResponseEntity.badRequest()
-                    .body(
-                            "User with email "
-                                    + signedInUserEmail
-                                    + ", doesn't have balance in currency "
-                                    + forex.getFromCurrencyName());
+                    .body("User with email "
+                            + signedInUserEmail
+                            + ", doesn't have balance in currency "
+                            + forex.getFromCurrencyName());
         } catch (Exception e3) {
             e3.printStackTrace();
             return ResponseEntity.internalServerError().body("An unexpected error occurred.");

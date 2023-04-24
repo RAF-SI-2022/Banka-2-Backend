@@ -3,7 +3,6 @@ package com.raf.si.Banka2Backend.services.interfaces;
 import com.raf.si.Banka2Backend.models.mariadb.Balance;
 import com.raf.si.Banka2Backend.models.mariadb.orders.ForexOrder;
 import com.raf.si.Banka2Backend.models.mariadb.orders.Order;
-
 import java.util.List;
 
 public interface BalanceServiceInterface {
@@ -40,5 +39,4 @@ public interface BalanceServiceInterface {
      * Kada se izvrse sve transakcije iz ordera, order sa stavlja u status complete i tada treba da se zove ova metoda updateBalance.
      */
     Balance updateBalance(Order order, String userEmail, String currencyCode);
-
 }

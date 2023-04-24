@@ -1,6 +1,5 @@
 package com.raf.si.Banka2Backend.services;
 
-import com.raf.si.Banka2Backend.exceptions.CurrencyNotFoundException;
 import com.raf.si.Banka2Backend.exceptions.TransactionNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.Balance;
 import com.raf.si.Banka2Backend.models.mariadb.Currency;
@@ -10,22 +9,23 @@ import com.raf.si.Banka2Backend.models.mariadb.orders.Order;
 import com.raf.si.Banka2Backend.models.mariadb.orders.StockOrder;
 import com.raf.si.Banka2Backend.repositories.mariadb.TransactionRepository;
 import com.raf.si.Banka2Backend.services.interfaces.TransactionServiceInterface;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class TransactionService implements TransactionServiceInterface {
     private final TransactionRepository transactionRepository;
     private final CurrencyService currencyService;
+
     @Autowired
     public TransactionService(TransactionRepository transactionRepository, CurrencyService currencyService) {
         this.transactionRepository = transactionRepository;
         this.currencyService = currencyService;
     }
+
     @Override
     public Transaction save(Transaction transaction) {
         return this.transactionRepository.save(transaction);
@@ -44,7 +44,7 @@ public class TransactionService implements TransactionServiceInterface {
     @Override
     public Transaction changeTransactionStatus(Long transactionId, TransactionStatus status) {
         Optional<Transaction> transactionOptional = this.transactionRepository.findById(transactionId);
-        if(transactionOptional.isEmpty()) {
+        if (transactionOptional.isEmpty()) {
             throw new TransactionNotFoundException(transactionId);
         }
         Transaction transaction = transactionOptional.get();
@@ -60,7 +60,7 @@ public class TransactionService implements TransactionServiceInterface {
     @Override
     public Transaction createTransaction(Order order, Balance balance, Float amount) {
         String currencyCode = "RSD";
-        if(order instanceof StockOrder) currencyCode = ((StockOrder) order).getCurrencyCode();
+        if (order instanceof StockOrder) currencyCode = ((StockOrder) order).getCurrencyCode();
         Currency c;
         Optional<Currency> currency = this.currencyService.findByCurrencyCode(currencyCode);
         c = currency.get();
@@ -76,5 +76,4 @@ public class TransactionService implements TransactionServiceInterface {
                 .status(TransactionStatus.WAITING)
                 .build();
     }
-
 }

@@ -13,13 +13,6 @@ public class CurrencyCSV {
 
     @Override
     public String toString() {
-        return "CurrencyCSV{"
-                + "currencyCode='"
-                + currencyCode
-                + '\''
-                + ", currencyName='"
-                + currencyName
-                + '\''
-                + '}';
+        return "CurrencyCSV{" + "currencyCode='" + currencyCode + '\'' + ", currencyName='" + currencyName + '\'' + '}';
     }
 }

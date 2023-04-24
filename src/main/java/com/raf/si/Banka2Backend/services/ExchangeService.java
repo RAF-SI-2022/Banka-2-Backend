@@ -4,12 +4,10 @@ import com.raf.si.Banka2Backend.exceptions.ExchangeNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.Exchange;
 import com.raf.si.Banka2Backend.repositories.mariadb.ExchangeRepository;
 import com.raf.si.Banka2Backend.services.interfaces.ExchangeServiceInterface;
-
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

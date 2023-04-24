@@ -10,6 +10,6 @@ public class StockRequest {
     Integer stop;
     boolean allOrNone;
     boolean margin;
-    Long userId; //null sa fronta, stavi se u servisima
+    Long userId; // null sa fronta, stavi se u servisima
     String currencyCode;
 }
