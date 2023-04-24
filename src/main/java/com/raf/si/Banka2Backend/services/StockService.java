@@ -378,9 +378,9 @@ public class StockService {
         if(user.getDailyLimit() == null || user.getDailyLimit() <= 0) {
             return ResponseEntity.internalServerError().body("User daily limit is not present.");
         }
-        System.out.println("check");
-        System.out.println(price.doubleValue());
-        System.out.println(user.getDailyLimit());
+//        System.out.println("check");
+//        System.out.println(price.doubleValue());
+//        System.out.println(user.getDailyLimit());
 
         if (price.doubleValue() > user.getDailyLimit()) {
             order = stockOrder == null ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.WAITING, OrderTradeType.BUY): stockOrder;
