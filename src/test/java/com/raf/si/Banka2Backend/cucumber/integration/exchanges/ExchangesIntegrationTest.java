@@ -11,6 +11,7 @@ import org.junit.platform.suite.api.Suite;
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features/exchange-integration/exchange.feature")
 @ConfigurationParameter(
-    key = GLUE_PROPERTY_NAME,
-    value = "com.raf.si.Banka2Backend.cucumber.integration.exchanges")
-public class ExchangesIntegrationTest {}
+        key = GLUE_PROPERTY_NAME,
+        value = "com.raf.si.Banka2Backend.cucumber.integration.exchanges")
+public class ExchangesIntegrationTest {
+}
