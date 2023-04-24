@@ -212,6 +212,13 @@
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
                 <version>2.27.2</version>
+                <executions>
+                    <!-- Never execute automatically -->
+                    <execution>
+                        <id>spotless</id>
+                        <phase/>
+                    </execution>
+                </executions>
                 <configuration>
 
                     <!-- Java config -->
