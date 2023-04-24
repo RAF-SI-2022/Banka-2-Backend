@@ -26,7 +26,6 @@ git add -u
 if [ "$old_stash" != "$new_stash" ]; then
     git stash pop
 fi
-#fi
 
 ### Default pre-commit ###
 
