@@ -3,12 +3,11 @@ package com.raf.si.Banka2Backend.controllers;
 import com.raf.si.Banka2Backend.models.mariadb.orders.Order;
 import com.raf.si.Banka2Backend.models.mariadb.orders.OrderStatus;
 import com.raf.si.Banka2Backend.services.OrderService;
+import java.text.ParseException;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.text.ParseException;
-import java.util.Optional;
 
 @RestController
 @CrossOrigin
@@ -34,9 +33,8 @@ public class OrderController {
     @PatchMapping("approve/{id}")
     public ResponseEntity<?> approveOrder(@PathVariable Long id) {
         Optional<Order> order = this.orderService.findById(id);
-        if(!order.isPresent())
-            return ResponseEntity.badRequest().body("Order not found");
-        if(order.get().getStatus() == OrderStatus.DENIED)
+        if (!order.isPresent()) return ResponseEntity.badRequest().body("Order not found");
+        if (order.get().getStatus() == OrderStatus.DENIED)
             return ResponseEntity.badRequest().body("Order is denied ");
         return this.orderService.startOrder(id);
     }

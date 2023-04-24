@@ -1,19 +1,21 @@
 package com.raf.si.Banka2Backend.dto;
 
-import lombok.Data;
-
 import javax.validation.constraints.NotNull;
+import lombok.Data;
 
 @Data
 public class BuySellForexDto {
     /**
      * base currency
      */
-    @NotNull String fromCurrencyCode;
+    @NotNull
+    String fromCurrencyCode;
     /**
      * quote currency
      */
-    @NotNull String toCurrencyCode;
+    @NotNull
+    String toCurrencyCode;
 
-    @NotNull Integer amount;
+    @NotNull
+    Integer amount;
 }

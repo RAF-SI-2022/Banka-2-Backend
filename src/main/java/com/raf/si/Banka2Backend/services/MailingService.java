@@ -4,15 +4,14 @@ import com.raf.si.Banka2Backend.models.mariadb.PasswordResetToken;
 import com.raf.si.Banka2Backend.models.mariadb.User;
 import com.raf.si.Banka2Backend.repositories.mariadb.PasswordResetTokenRepository;
 import com.raf.si.Banka2Backend.repositories.mariadb.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class MailingService {
@@ -22,8 +21,7 @@ public class MailingService {
     private PasswordResetTokenRepository passwordResetTokenRepo;
 
     @Autowired
-    public MailingService(
-            UserRepository userRepo, PasswordResetTokenRepository passwordResetTokenRepo) {
+    public MailingService(UserRepository userRepo, PasswordResetTokenRepository passwordResetTokenRepo) {
         this.userRepo = userRepo;
         this.passwordResetTokenRepo = passwordResetTokenRepo;
     }
@@ -47,12 +45,10 @@ public class MailingService {
     }
 
     private String composeResetPasswordMail(String token) {
-        return "To reset password please visit: http://localhost:4200/auth/change-password?token="
-                + token;
+        return "To reset password please visit: http://localhost:4200/auth/change-password?token=" + token;
     }
 
-    private void sendMail(String recipient, String subject, String content)
-            throws MessagingException {
+    private void sendMail(String recipient, String subject, String content) throws MessagingException {
         // Setting up STMP server
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.gmail.com");
@@ -62,15 +58,12 @@ public class MailingService {
         props.put("mail.smtp.ssl.protocols", "TLSv1.2");
         props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
 
-        Session session =
-                Session.getDefaultInstance(
-                        props,
-                        new Authenticator() {
-                            @Override
-                            protected PasswordAuthentication getPasswordAuthentication() {
-                                return new PasswordAuthentication(from, password);
-                            }
-                        });
+        Session session = Session.getDefaultInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(from, password);
+            }
+        });
 
         MimeMessage email = new MimeMessage(session);
 

@@ -5,14 +5,13 @@ import com.raf.si.Banka2Backend.models.mariadb.User;
 import com.raf.si.Banka2Backend.requests.FutureRequestBuySell;
 import com.raf.si.Banka2Backend.services.FutureService;
 import com.raf.si.Banka2Backend.services.UserService;
-import lombok.SneakyThrows;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import lombok.SneakyThrows;
 
 public class FutureBuyWorker extends Thread {
 
@@ -42,25 +41,28 @@ public class FutureBuyWorker extends Thread {
             //      System.out.println("prvi "  + futuresRequestsMap);
 
             for (Map.Entry<Long, FutureRequestBuySell> request : futuresRequestsMap.entrySet()) {
-                futuresByName =
-                        futureService.findFuturesByFutureName(request.getValue().getFutureName()).get();
+                futuresByName = futureService
+                        .findFuturesByFutureName(request.getValue().getFutureName())
+                        .get();
 
                 for (Future futureFromTable : futuresByName) {
                     if (next) continue;
 
-                    Optional<User> optionalUser =  userService.findById(request.getValue().getUserId());
-                    if(optionalUser.isPresent() && !(optionalUser.get().getDailyLimit() == null)) {
+                    Optional<User> optionalUser =
+                            userService.findById(request.getValue().getUserId());
+                    if (optionalUser.isPresent() && !(optionalUser.get().getDailyLimit() == null)) {
                         Double margin = Double.valueOf(futureFromTable.getMaintenanceMargin());
                         Double limit = optionalUser.get().getDailyLimit() - margin;
-                        if (limit < 0){
+                        if (limit < 0) {
                             continue;
                         }
                     }
                     if (request.getValue().getLimit() != 0) { // ako je postalvjen limit
                         if (futureFromTable.isForSale()
-                                && futureFromTable.getMaintenanceMargin() < request.getValue().getLimit()) {
+                                && futureFromTable.getMaintenanceMargin()
+                                        < request.getValue().getLimit()) {
                             //              System.out.println("kupljen za limit");
-                            if(optionalUser.isPresent() && !(optionalUser.get().getDailyLimit() == null)) {
+                            if (optionalUser.isPresent() && !(optionalUser.get().getDailyLimit() == null)) {
                                 futureFromTable.setUser(optionalUser.get());
                                 futureFromTable.setForSale(false);
                                 futureService.updateFuture(futureFromTable);
@@ -73,8 +75,7 @@ public class FutureBuyWorker extends Thread {
                                 userService.save(optionalUser.get());
 
                                 next = true;
-                            }
-                            else{
+                            } else {
                                 keysToRemove.add(request.getKey());
                             }
                         }
@@ -82,9 +83,10 @@ public class FutureBuyWorker extends Thread {
 
                     if (request.getValue().getStop() != 0) { // ako je postalvjen stop
                         if (futureFromTable.isForSale()
-                                && futureFromTable.getMaintenanceMargin() > request.getValue().getStop()) {
+                                && futureFromTable.getMaintenanceMargin()
+                                        > request.getValue().getStop()) {
                             //              System.out.println("kupljen za stop");
-                            if(optionalUser.isPresent() && !(optionalUser.get().getDailyLimit() == null)) {
+                            if (optionalUser.isPresent() && !(optionalUser.get().getDailyLimit() == null)) {
                                 futureFromTable.setUser(optionalUser.get());
                                 futureFromTable.setForSale(false);
                                 futureService.updateFuture(futureFromTable);
@@ -97,8 +99,7 @@ public class FutureBuyWorker extends Thread {
                                 userService.save(optionalUser.get());
 
                                 next = true;
-                            }
-                            else{
+                            } else {
                                 keysToRemove.add(request.getKey());
                             }
                         }
@@ -107,7 +108,7 @@ public class FutureBuyWorker extends Thread {
                 next = false;
             }
             // u slucaju da se user izbrisao dodajemo kljuceve tih requestova i brisemo ih
-            for(Long key : this.keysToRemove){
+            for (Long key : this.keysToRemove) {
                 futuresRequestsMap.remove(key);
             }
             this.keysToRemove.clear();

@@ -8,10 +8,8 @@ import com.raf.si.Banka2Backend.services.AuthorisationService;
 import com.raf.si.Banka2Backend.services.MailingService;
 import com.raf.si.Banka2Backend.services.UserService;
 import com.raf.si.Banka2Backend.utils.JwtUtil;
-
 import java.util.HashMap;
 import java.util.Optional;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -49,16 +47,14 @@ public class AuthenticationController {
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginRequest.getEmail(), loginRequest.getPassword()));
+                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(401).body("Bad credentials.");
         }
-        LoginResponse responseDto =
-                new LoginResponse(
-                        jwtUtil.generateToken(loginRequest.getEmail()),
-                        userService.getUserPermissions(loginRequest.getEmail()));
+        LoginResponse responseDto = new LoginResponse(
+                jwtUtil.generateToken(loginRequest.getEmail()),
+                userService.getUserPermissions(loginRequest.getEmail()));
         // TokenResponseDto responseDto = new
         // TokenResponseDto(jwtUtil.generateToken(tokenRequestDto.getEmail()),
         // userService.getUserPermissions(tokenRequestDto.getEmail()));
@@ -81,15 +77,12 @@ public class AuthenticationController {
     }
 
     @PostMapping("/change-user-password")
-    public ResponseEntity<?> changeUserPassword(
-            @RequestBody PasswordRecoveryDto passwordRecoveryDto) {
-        String result =
-                this.authorisationService.validatePasswordResetToken(passwordRecoveryDto.getToken());
+    public ResponseEntity<?> changeUserPassword(@RequestBody PasswordRecoveryDto passwordRecoveryDto) {
+        String result = this.authorisationService.validatePasswordResetToken(passwordRecoveryDto.getToken());
         if (result.equals("Token not found")) return ResponseEntity.status(405).body("Token not found");
         if (result.equals("Token expired")) return ResponseEntity.status(405).body("Token expired");
 
-        Optional<User> user =
-                this.userService.getUserByPasswordResetToken(passwordRecoveryDto.getToken());
+        Optional<User> user = this.userService.getUserByPasswordResetToken(passwordRecoveryDto.getToken());
         if (user.isEmpty()) return ResponseEntity.status(405).body("Could not change user password");
 
         this.userService.changePassword(

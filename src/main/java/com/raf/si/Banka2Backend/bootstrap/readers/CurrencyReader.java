@@ -4,10 +4,8 @@ import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.raf.si.Banka2Backend.models.mariadb.Currency;
 import com.raf.si.Banka2Backend.models.mariadb.Inflation;
-
 import java.io.*;
 import java.util.*;
-
 import org.springframework.util.ResourceUtils;
 
 public class CurrencyReader {
@@ -15,7 +13,7 @@ public class CurrencyReader {
 
     public List<CurrencyCSV> getCurrenciesFromCsv() throws FileNotFoundException {
         return new CsvToBeanBuilder<CurrencyCSV>(
-                new FileReader(ResourceUtils.getFile("src/main/resources/currencies/currencies.csv")))
+                        new FileReader(ResourceUtils.getFile("src/main/resources/currencies/currencies.csv")))
                 .withType(CurrencyCSV.class)
                 .withSkipLines(1)
                 .build()

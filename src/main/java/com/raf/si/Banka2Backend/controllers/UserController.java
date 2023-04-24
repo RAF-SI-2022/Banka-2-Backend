@@ -11,11 +11,9 @@ import com.raf.si.Banka2Backend.requests.UpdateProfileRequest;
 import com.raf.si.Banka2Backend.requests.UpdateUserRequest;
 import com.raf.si.Banka2Backend.responses.RegisterResponse;
 import com.raf.si.Banka2Backend.services.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -88,60 +86,47 @@ public class UserController {
             return ResponseEntity.status(400).body("User with that email already exists.");
         }
 
-        List<Permission> permissions =
-                this.permissionService.findByPermissionNames(user.getPermissions());
+        List<Permission> permissions = this.permissionService.findByPermissionNames(user.getPermissions());
 
-
-
-
-        User newUser =
-                User.builder()
-                        .email(user.getEmail())
-                        .firstName(user.getFirstName())
-                        .lastName(user.getLastName())
-                        .password(this.passwordEncoder.encode(user.getPassword()))
-                        .jmbg(user.getJmbg())
-                        .phone(user.getPhone())
-                        .jobPosition(user.getJobPosition())
-                        .active(user.isActive())
-                        .permissions(permissions)
-                        .dailyLimit(
-                                user.getDailyLimit()
-//                                user.getDailyLimit() == -1D ? null : user.getDailyLimit()
+        User newUser = User.builder()
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .password(this.passwordEncoder.encode(user.getPassword()))
+                .jmbg(user.getJmbg())
+                .phone(user.getPhone())
+                .jobPosition(user.getJobPosition())
+                .active(user.isActive())
+                .permissions(permissions)
+                .dailyLimit(
+                        user.getDailyLimit()
+                        //                                user.getDailyLimit() == -1D ? null : user.getDailyLimit()
                         )
-                        .defaultDailyLimit(
-                                user.getDailyLimit()
-                        )
-                        .build();
+                .defaultDailyLimit(user.getDailyLimit())
+                .build();
 
         userService.save(newUser); // mora duplo zbog balansa
         setInitialUserBalance(newUser);
         userService.save(newUser);
 
-        RegisterResponse response =
-                RegisterResponse.builder()
-                        .id(newUser.getId())
-                        .email(user.getEmail())
-                        .firstName(user.getFirstName())
-                        .lastName(user.getLastName())
-                        .jmbg(user.getJmbg())
-                        .phone(user.getPhone())
-                        .jobPosition(user.getJobPosition())
-                        .active(user.isActive())
-                        .permissions(permissions)
-                        .dailyLimit(
-                                user.getDailyLimit()
-                        )
-                        .defaultDailyLimit(
-                                user.getDailyLimit()
-                        )
-                        .build();
+        RegisterResponse response = RegisterResponse.builder()
+                .id(newUser.getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .jmbg(user.getJmbg())
+                .phone(user.getPhone())
+                .jobPosition(user.getJobPosition())
+                .active(user.isActive())
+                .permissions(permissions)
+                .dailyLimit(user.getDailyLimit())
+                .defaultDailyLimit(user.getDailyLimit())
+                .build();
 
         return ResponseEntity.ok(response);
     }
 
-    private void setInitialUserBalance(
-            User user) { // todo ovo promeni kasnije da nemaju odmah 100.000 $
+    private void setInitialUserBalance(User user) { // todo ovo promeni kasnije da nemaju odmah 100.000 $
         Balance balance = new Balance();
         balance.setUser(user);
         Optional<Currency> rsd = this.currencyService.findByCurrencyCode("RSD");
@@ -247,8 +232,7 @@ public class UserController {
     }
 
     @PutMapping("/edit-profile/{id}")
-    public ResponseEntity<?> updateProfile(
-            @PathVariable(name = "id") Long id, @RequestBody UpdateProfileRequest user) {
+    public ResponseEntity<?> updateProfile(@PathVariable(name = "id") Long id, @RequestBody UpdateProfileRequest user) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         Optional<User> logovan = userService.findByEmail(signedInUserEmail);
 
@@ -264,22 +248,20 @@ public class UserController {
             return ResponseEntity.status(400).body("Can't find user with id " + id);
         }
 
-        updatedUser =
-                Optional.ofNullable(
-                        User.builder()
-                                .id(updatedUser.get().getId())
-                                .email(user.getEmail())
-                                .firstName(user.getFirstName())
-                                .active(updatedUser.get().isActive())
-                                .lastName(user.getLastName())
-                                .phone(user.getPhone())
-                                .password(updatedUser.get().getPassword())
-                                .jmbg(updatedUser.get().getJmbg())
-                                .jobPosition(updatedUser.get().getJobPosition())
-                                .permissions(updatedUser.get().getPermissions())
-                                .dailyLimit(updatedUser.get().getDailyLimit())
-                                .defaultDailyLimit(updatedUser.get().getDefaultDailyLimit())
-                                .build());
+        updatedUser = Optional.ofNullable(User.builder()
+                .id(updatedUser.get().getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .active(updatedUser.get().isActive())
+                .lastName(user.getLastName())
+                .phone(user.getPhone())
+                .password(updatedUser.get().getPassword())
+                .jmbg(updatedUser.get().getJmbg())
+                .jobPosition(updatedUser.get().getJobPosition())
+                .permissions(updatedUser.get().getPermissions())
+                .dailyLimit(updatedUser.get().getDailyLimit())
+                .defaultDailyLimit(updatedUser.get().getDefaultDailyLimit())
+                .build());
         return ResponseEntity.ok().body(userService.save(updatedUser.get()));
     }
 
@@ -299,28 +281,25 @@ public class UserController {
             return ResponseEntity.status(400).body("Can't find user with id " + id);
         }
 
-        updatedUser =
-                Optional.ofNullable(
-                        User.builder()
-                                .id(updatedUser.get().getId())
-                                .firstName(updatedUser.get().getFirstName())
-                                .lastName(updatedUser.get().getLastName())
-                                .password(this.passwordEncoder.encode(user.getPassword()))
-                                .email(updatedUser.get().getEmail())
-                                .jmbg(updatedUser.get().getJmbg())
-                                .active(updatedUser.get().isActive())
-                                .jobPosition(updatedUser.get().getJobPosition())
-                                .permissions(updatedUser.get().getPermissions())
-                                .phone(updatedUser.get().getPhone())
-                                .dailyLimit(updatedUser.get().getDailyLimit())
-                                .defaultDailyLimit(updatedUser.get().getDefaultDailyLimit())
-                                .build());
+        updatedUser = Optional.ofNullable(User.builder()
+                .id(updatedUser.get().getId())
+                .firstName(updatedUser.get().getFirstName())
+                .lastName(updatedUser.get().getLastName())
+                .password(this.passwordEncoder.encode(user.getPassword()))
+                .email(updatedUser.get().getEmail())
+                .jmbg(updatedUser.get().getJmbg())
+                .active(updatedUser.get().isActive())
+                .jobPosition(updatedUser.get().getJobPosition())
+                .permissions(updatedUser.get().getPermissions())
+                .phone(updatedUser.get().getPhone())
+                .dailyLimit(updatedUser.get().getDailyLimit())
+                .defaultDailyLimit(updatedUser.get().getDefaultDailyLimit())
+                .build());
         return ResponseEntity.ok().body(userService.save(updatedUser.get()));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(
-            @PathVariable(name = "id") Long id, @RequestBody UpdateUserRequest user) {
+    public ResponseEntity<?> updateUser(@PathVariable(name = "id") Long id, @RequestBody UpdateUserRequest user) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.UPDATE_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("You don't have permission to update users.");
@@ -330,32 +309,28 @@ public class UserController {
             return ResponseEntity.status(400).body("Can't find user with id " + id);
         }
 
-        List<Permission> permissions =
-                this.permissionService.findByPermissionNames(user.getPermissions());
+        List<Permission> permissions = this.permissionService.findByPermissionNames(user.getPermissions());
 
-
-        updatedUser =
-                Optional.ofNullable(
-                        User.builder()
-                                .id(updatedUser.get().getId())
-                                .email(user.getEmail())
-                                .firstName(user.getFirstName())
-                                .lastName(user.getLastName())
-                                .password(updatedUser.get().getPassword())
-                                .jmbg(updatedUser.get().getJmbg())
-                                .phone(user.getPhone())
-                                .jobPosition(user.getJobPosition())
-                                .active(user.isActive())
-                                .permissions(permissions)
-//                                .dailyLimit(user.getDailyLimit())
-                                .dailyLimit(
-                                        user.getDailyLimit() == null ?
-                                                null :
-                                        user.getDailyLimit() < updatedUser.get().getDailyLimit() ?
-                                        user.getDailyLimit() : updatedUser.get().getDailyLimit()
-                                )
-                                .defaultDailyLimit(user.getDailyLimit())
-                                .build());
+        updatedUser = Optional.ofNullable(User.builder()
+                .id(updatedUser.get().getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .password(updatedUser.get().getPassword())
+                .jmbg(updatedUser.get().getJmbg())
+                .phone(user.getPhone())
+                .jobPosition(user.getJobPosition())
+                .active(user.isActive())
+                .permissions(permissions)
+                //                                .dailyLimit(user.getDailyLimit())
+                .dailyLimit(
+                        user.getDailyLimit() == null
+                                ? null
+                                : user.getDailyLimit() < updatedUser.get().getDailyLimit()
+                                        ? user.getDailyLimit()
+                                        : updatedUser.get().getDailyLimit())
+                .defaultDailyLimit(user.getDailyLimit())
+                .build());
         return ResponseEntity.ok().body(userService.save(updatedUser.get()));
     }
 
@@ -369,17 +344,16 @@ public class UserController {
     }
 
     @PatchMapping(value = "/reset-limit/{id}")
-    public ResponseEntity<?> resetDailyLimit(@PathVariable(name = "id") Long id){
+    public ResponseEntity<?> resetDailyLimit(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("You don't have permission to buy/sell.");
         }
         Optional<User> userOptional = userService.findById(id);
-        if(userOptional.isPresent()){
+        if (userOptional.isPresent()) {
             userOptional.get().setDailyLimit(userOptional.get().getDefaultDailyLimit());
             return ResponseEntity.ok().body(userService.save(userOptional.get()));
-        }
-        else{
+        } else {
             return ResponseEntity.status(400).body("No such user");
         }
     }

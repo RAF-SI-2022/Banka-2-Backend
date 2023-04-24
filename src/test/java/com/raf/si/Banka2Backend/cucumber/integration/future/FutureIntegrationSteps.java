@@ -26,26 +26,23 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
 
     protected static String token;
 
-    protected static Future testFuture =
-            new Future(1L, "corn", 8000, "bushel", 2100, "AGRICULTURE", null, true, null);
+    protected static Future testFuture = new Future(1L, "corn", 8000, "bushel", 2100, "AGRICULTURE", null, true, null);
 
     @Given("user logs in")
     public void user_logs_in() {
         try {
-            MvcResult mvcResult =
-                    mockMvc
-                            .perform(
-                                    post("/auth/login")
-                                            .contentType("application/json")
-                                            .content(
-                                                    """
+            MvcResult mvcResult = mockMvc.perform(
+                            post("/auth/login")
+                                    .contentType("application/json")
+                                    .content(
+                                            """
                                                             {
                                                               "email": "anesic3119rn+banka2backend+admin@raf.rs",
                                                               "password": "admin"
                                                             }
                                                             """))
-                            .andExpect(status().isOk())
-                            .andReturn();
+                    .andExpect(status().isOk())
+                    .andReturn();
             token = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.token");
         } catch (Exception e) {
             fail("User failed to login");
@@ -65,13 +62,11 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
     @Then("user gets all futures from database")
     public void user_gets_futures() {
         try {
-            mockMvc
-                    .perform(
-                            get("/api/futures")
-                                    .contentType("application/json")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            mockMvc.perform(get("/api/futures")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isOk())
                     .andReturn();
         } catch (Exception e) {
@@ -83,13 +78,11 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
     @Then("user gets future by id from database")
     public void user_gets_future_by_id() {
         try {
-            mockMvc
-                    .perform(
-                            get("/api/futures/" + testFuture.getId())
-                                    .contentType("application/json")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            mockMvc.perform(get("/api/futures/" + testFuture.getId())
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -101,13 +94,11 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
     @Then("user gets future by name from database")
     public void user_gets_future_by_name() {
         try {
-            mockMvc
-                    .perform(
-                            get("/api/futures/name/" + testFuture.getFutureName())
-                                    .contentType("application/json")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            mockMvc.perform(get("/api/futures/name/" + testFuture.getFutureName())
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isOk())
                     .andReturn();
 
