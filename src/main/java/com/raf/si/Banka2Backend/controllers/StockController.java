@@ -86,9 +86,9 @@ public class StockController {
         }
 
         Optional<User> user = userService.findByEmail(signedInUserEmail);
-        if (user.isEmpty()) return ResponseEntity.status(500).body("Non existent user");
+        if (user.isEmpty()) return ResponseEntity.status(400).body("Non existent user");
         stockRequest.setUserId(user.get().getId());
-        return stockService.buyStock(stockRequest, user.get());
+        return stockService.buyStock(stockRequest, user.get(), null);
     }
 
     @PostMapping(value = "/sell")
@@ -98,9 +98,9 @@ public class StockController {
             return ResponseEntity.status(401).body("You don't have permission to buy/sell.");
         }
         Optional<User> user = userService.findByEmail(signedInUserEmail);
-        if (user.isEmpty()) return ResponseEntity.status(500).body("Non existent user");
+        if (user.isEmpty()) return ResponseEntity.status(400).body("Non existent user");
         stockRequest.setUserId(user.get().getId());
-        return stockService.sellStock(stockRequest);
+        return stockService.sellStock(stockRequest, null);
     }
 
     @GetMapping(value = "/user-stocks")

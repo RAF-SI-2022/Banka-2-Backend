@@ -50,12 +50,27 @@ public class ForexController {
         }
         String signedInUserEmail = getContext().getAuthentication().getName();
         try {
-            this.balanceService.buyOrSellCurrency(
+            boolean success = this.balanceService.buyOrSellCurrency(
                     signedInUserEmail,
                     forex.getFromCurrencyCode(),
                     forex.getToCurrencyCode(),
                     Float.parseFloat(forex.getExchangeRate()),
-                    dto.getAmountOfMoney());
+                    dto.getAmount(),
+                    null);
+            if(!success)
+                return ResponseEntity.badRequest()
+                    .body(
+                            "User with email "
+                                    + signedInUserEmail
+                                    + ", doesn't have enough money in currency "
+                                    + forex.getFromCurrencyName()
+                                    + " for buying "
+                                    + dto.getAmount()
+                                    + " "
+                                    + dto.getToCurrencyCode()
+                                    + "("
+                                    + forex.getToCurrencyName()
+                                    + ")");
             return ResponseEntity.ok(forex);
         } catch (BalanceNotFoundException e1) {
             return ResponseEntity.badRequest()
@@ -64,21 +79,8 @@ public class ForexController {
                                     + signedInUserEmail
                                     + ", doesn't have balance in currency "
                                     + forex.getFromCurrencyName());
-        } catch (NotEnoughMoneyException e2) {
-            return ResponseEntity.badRequest()
-                    .body(
-                            "User with email "
-                                    + signedInUserEmail
-                                    + ", doesn't have enough money in currency "
-                                    + forex.getFromCurrencyName()
-                                    + " for buying "
-                                    + dto.getAmountOfMoney()
-                                    + " "
-                                    + dto.getToCurrencyCode()
-                                    + "("
-                                    + forex.getToCurrencyName()
-                                    + ")");
         } catch (Exception e3) {
+            e3.printStackTrace();
             return ResponseEntity.internalServerError().body("An unexpected error occurred.");
         }
     }
