@@ -10,4 +10,7 @@ import java.util.List;
 public interface UserOptionRepository extends JpaRepository<UserOption, Long> {
 
     List<UserOption> getUserOptionsByUserId(Long userId);
+
+    List<UserOption> getUserOptionsByUserIdAndStockSymbol(Long userId, String stockSymbol);
+
 }

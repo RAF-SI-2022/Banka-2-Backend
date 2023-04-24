@@ -161,6 +161,7 @@ public class OptionService implements OptionServiceInterface {
                         .expirationDate(optionFromDB.getExpirationDate())
                         .strike(optionFromDB.getStrike())
                         .type(optionFromDB.getOptionType())
+                        .stockSymbol(optionFromDB.getStockSymbol())
                         .build();
 
                 optionFromDB.setOpenInterest(optionFromDB.getOpenInterest() - amount);
@@ -175,6 +176,10 @@ public class OptionService implements OptionServiceInterface {
         } else {
             throw new OptionNotFoundException(optionId);
         }
+    }
+
+    public List<UserOption> getUserOptionsByIdAndStockSymbol(Long userId, String stockSymbol){
+        return userOptionRepository.getUserOptionsByUserIdAndStockSymbol(userId, stockSymbol);
     }
 
     public UserOption sellOption(Long userOptionId, Double premium) throws OptionNotFoundException {
