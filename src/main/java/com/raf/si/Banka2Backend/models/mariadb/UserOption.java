@@ -40,4 +40,7 @@ public class UserOption {
 
     @NotNull
     private Double strike;
+
+    @NotNull
+    private String stockSymbol;
 }
