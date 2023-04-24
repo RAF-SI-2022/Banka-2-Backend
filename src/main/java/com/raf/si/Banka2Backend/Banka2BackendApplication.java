@@ -12,12 +12,5 @@ public class Banka2BackendApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(Banka2BackendApplication.class, args);
-        String t = "" + "xxasas";
-
-        {
-            String x = new String("yyyy") + "yooo";
-        }
-
-        ;
     }
 }
