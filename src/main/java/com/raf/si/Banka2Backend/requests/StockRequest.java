@@ -11,5 +11,5 @@ public class StockRequest {
     boolean allOrNone;
     boolean margin;
 
-    Long userId; //null sa fronta, stavi se u servisima
+    Long userId; // null sa fronta, stavi se u servisima
 }

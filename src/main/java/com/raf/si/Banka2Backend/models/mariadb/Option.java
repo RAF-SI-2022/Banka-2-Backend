@@ -1,13 +1,12 @@
 package com.raf.si.Banka2Backend.models.mariadb;
 
+import java.time.LocalDate;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 
 @Data
 @Builder
@@ -52,6 +51,6 @@ public class Option {
     @NotNull
     private Double maintenanceMargin;
 
-    //todo theta
+    // todo theta
 
 }

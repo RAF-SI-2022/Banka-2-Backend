@@ -5,12 +5,6 @@ import com.raf.si.Banka2Backend.models.mariadb.*;
 import com.raf.si.Banka2Backend.repositories.mariadb.*;
 import com.raf.si.Banka2Backend.services.interfaces.OptionServiceInterface;
 import com.raf.si.Banka2Backend.services.workerThreads.OptionDbWiperThread;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -24,6 +18,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class OptionService implements OptionServiceInterface {
@@ -38,13 +37,20 @@ public class OptionService implements OptionServiceInterface {
     private final UserStocksRepository userStocksRepository;
 
     @Autowired
-    public OptionService(OptionRepository optionRepository, UserService userService, StockService stockService, UserOptionRepository userOptionRepository, UserRepository userRepository, StockRepository stockRepository, UserStocksRepository userStocksRepository) {
+    public OptionService(
+            OptionRepository optionRepository,
+            UserService userService,
+            StockService stockService,
+            UserOptionRepository userOptionRepository,
+            UserRepository userRepository,
+            StockRepository stockRepository,
+            UserStocksRepository userStocksRepository) {
         this.optionRepository = optionRepository;
         this.userService = userService;
         this.stockService = stockService;
 
         this.optionDbWiperThread = new OptionDbWiperThread(optionRepository);
-//        optionDbWiperThread.start();
+        //        optionDbWiperThread.start();
         this.userOptionRepository = userOptionRepository;
         this.userRepository = userRepository;
         this.stockRepository = stockRepository;
@@ -61,7 +67,6 @@ public class OptionService implements OptionServiceInterface {
         return optionRepository.save(option);
     }
 
-
     @Override
     public Optional<Option> findById(Long id) {
         return optionRepository.findById(id);
@@ -69,7 +74,7 @@ public class OptionService implements OptionServiceInterface {
 
     @Override
     public List<Option> findByStock(String stockSymbol) {
-//        List<Option> requestedOptions = optionRepository.findAllByStockSymbol(stockSymbol);
+        //        List<Option> requestedOptions = optionRepository.findAllByStockSymbol(stockSymbol);
         List<Option> requestedOptions = optionRepository.findAllByStockSymbol(stockSymbol.toUpperCase());
         if (requestedOptions.isEmpty()) {
             optionRepository.saveAll(getFromExternalApi(stockSymbol, ""));
@@ -83,9 +88,11 @@ public class OptionService implements OptionServiceInterface {
         LocalDate date = LocalDate.parse(regularDate, formatter);
         formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
         LocalDateTime dateTime = LocalDateTime.parse(regularDate + " 02:00:00", formatter);
-        long milliseconds = dateTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
+        long milliseconds =
+                dateTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-        List<Option> requestedOptions = optionRepository.findAllByStockSymbolAndExpirationDate(stockSymbol.toUpperCase(), date);
+        List<Option> requestedOptions =
+                optionRepository.findAllByStockSymbolAndExpirationDate(stockSymbol.toUpperCase(), date);
         if (requestedOptions.isEmpty()) {
             String parsedDate = "" + milliseconds / 1000;
             optionRepository.saveAll(getFromExternalApi(stockSymbol, parsedDate));
@@ -93,7 +100,9 @@ public class OptionService implements OptionServiceInterface {
         return optionRepository.findAllByStockSymbolAndExpirationDate(stockSymbol.toUpperCase(), date);
     }
 
-    public UserStock buyStockUsingOption(Long userOptionId, Long userId) throws TooLateToBuyOptionException, OptionNotInTheMoneyException, OptionNotFoundException, StockNotFoundException {
+    public UserStock buyStockUsingOption(Long userOptionId, Long userId)
+            throws TooLateToBuyOptionException, OptionNotInTheMoneyException, OptionNotFoundException,
+                    StockNotFoundException {
 
         Integer contractSize = 100;
 
@@ -101,28 +110,30 @@ public class OptionService implements OptionServiceInterface {
 
         Optional<User> userFromDBOptional = userRepository.findById(userId);
 
-        //Ako user-opcija postoji
-        if(userOptionFromDBOptional.isPresent()){
+        // Ako user-opcija postoji
+        if (userOptionFromDBOptional.isPresent()) {
 
             UserOption userOptionFromDB = userOptionFromDBOptional.get();
 
-            //Proveri da li je expirationDate prosao
-            if(userOptionFromDB.getExpirationDate().isAfter(LocalDate.now())){
+            // Proveri da li je expirationDate prosao
+            if (userOptionFromDB.getExpirationDate().isAfter(LocalDate.now())) {
 
-                //Ako nije prosao
-                //Pitaj da li je lastPrice veca od strike
-                //Ako jeste to znaci da je opcija 'In the Money' i user hoce da kupi taj stock za strike
-                //TODO last Price (za sada) ili current price iz Stocka (ako se ispostavi da je to ispravno)
-                if(userOptionFromDB.getOption().getPrice() > userOptionFromDB.getStrike() && userFromDBOptional.isPresent()) {
+                // Ako nije prosao
+                // Pitaj da li je lastPrice veca od strike
+                // Ako jeste to znaci da je opcija 'In the Money' i user hoce da kupi taj stock za strike
+                // TODO last Price (za sada) ili current price iz Stocka (ako se ispostavi da je to ispravno)
+                if (userOptionFromDB.getOption().getPrice() > userOptionFromDB.getStrike()
+                        && userFromDBOptional.isPresent()) {
 
-                    //Pronalazi se stock po simbolu
-                    Optional<Stock> stockFromDBOptional = stockRepository.findStockBySymbol(userOptionFromDB.getOption().getStockSymbol());
+                    // Pronalazi se stock po simbolu
+                    Optional<Stock> stockFromDBOptional = stockRepository.findStockBySymbol(
+                            userOptionFromDB.getOption().getStockSymbol());
 
-                    if(stockFromDBOptional.isPresent()) {
+                    if (stockFromDBOptional.isPresent()) {
 
                         Stock stock = stockFromDBOptional.get();
 
-                        //Kreira se novi user-stock
+                        // Kreira se novi user-stock
                         UserStock newUserStock = UserStock.builder()
                                 .user(userFromDBOptional.get())
                                 .stock(stock)
@@ -134,40 +145,42 @@ public class OptionService implements OptionServiceInterface {
 
                         return userStocksRepository.save(newUserStock);
 
-                        //TODO Update user balance (buy stock by STRIKE price)
+                        // TODO Update user balance (buy stock by STRIKE price)
                     } else
-                        throw new StockNotFoundException(userOptionFromDB.getOption().getStockSymbol());
+                        throw new StockNotFoundException(
+                                userOptionFromDB.getOption().getStockSymbol());
                 } else {
                     throw new OptionNotInTheMoneyException(userOptionId);
                 }
             } else
-                throw new TooLateToBuyOptionException(userOptionFromDB.getOption().getExpirationDate(), userOptionId);
-        } else
-            throw new OptionNotFoundException(userOptionId);
+                throw new TooLateToBuyOptionException(
+                        userOptionFromDB.getOption().getExpirationDate(), userOptionId);
+        } else throw new OptionNotFoundException(userOptionId);
     }
 
     public void sellStockUsingOption() {
 
-        //TODO Check if date expired
-        //TODO Check if in money
-//        price < strike
-        //TODO Sell stock by STRIKE price
+        // TODO Check if date expired
+        // TODO Check if in money
+        //        price < strike
+        // TODO Sell stock by STRIKE price
     }
 
     @Transactional
-    public UserOption buyOption(Long optionId, Long userId, Integer amount, double premium) throws UserNotFoundException, OptionNotFoundException {
+    public UserOption buyOption(Long optionId, Long userId, Integer amount, double premium)
+            throws UserNotFoundException, OptionNotFoundException {
 
         Optional<Option> optionOptional = optionRepository.findById(optionId);
-        if(optionOptional.isPresent()) {
+        if (optionOptional.isPresent()) {
 
             Option optionFromDB = optionOptional.get();
 
-            if(optionFromDB.getOpenInterest() < amount)
+            if (optionFromDB.getOpenInterest() < amount)
                 throw new NotEnoughOptionsAvailableException(optionFromDB.getOpenInterest(), amount);
 
             Optional<User> userOptional = userService.findById(userId);
 
-            if(userOptional.isPresent()){
+            if (userOptional.isPresent()) {
 
                 User userFromDB = userOptional.get();
 
@@ -184,7 +197,7 @@ public class OptionService implements OptionServiceInterface {
                 optionFromDB.setOpenInterest(optionFromDB.getOpenInterest() - amount);
                 optionRepository.save(optionFromDB);
 
-                //TODO Smanjiti user balance
+                // TODO Smanjiti user balance
                 return userOptionRepository.save(userOption);
 
             } else {
@@ -195,11 +208,11 @@ public class OptionService implements OptionServiceInterface {
         }
     }
 
-    public UserOption sellOption(Long userOptionId, Double premium) throws OptionNotFoundException{
+    public UserOption sellOption(Long userOptionId, Double premium) throws OptionNotFoundException {
 
         Optional<UserOption> userOptionOptional = userOptionRepository.findById(userOptionId);
 
-        if(userOptionOptional.isPresent()){
+        if (userOptionOptional.isPresent()) {
 
             UserOption userOptionFromDB = userOptionOptional.get();
 
@@ -208,10 +221,8 @@ public class OptionService implements OptionServiceInterface {
 
             return userOptionRepository.save(userOptionFromDB);
 
-            //TODO Simulirati prodaju opcije (povecati balance user-a za premium vrednost)
-        } else
-            throw new OptionNotFoundException(userOptionId);
-
+            // TODO Simulirati prodaju opcije (povecati balance user-a za premium vrednost)
+        } else throw new OptionNotFoundException(userOptionId);
     }
 
     public List<Option> getFromExternalApi(String stockSymbol, String date) {
@@ -219,15 +230,12 @@ public class OptionService implements OptionServiceInterface {
         String apiUrl;
         List<Option> optionList = new ArrayList<>();
 
-        if (date == null)
-            apiUrl = "https://query1.finance.yahoo.com/v7/finance/options/aapl";
-        else
-            apiUrl = "https://query1.finance.yahoo.com/v7/finance/options/" + stockSymbol + "?date=" + date;
+        if (date == null) apiUrl = "https://query1.finance.yahoo.com/v7/finance/options/aapl";
+        else apiUrl = "https://query1.finance.yahoo.com/v7/finance/options/" + stockSymbol + "?date=" + date;
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(apiUrl)).build();
         HttpResponse<String> response;
-
 
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -258,7 +266,9 @@ public class OptionService implements OptionServiceInterface {
                         .optionType("CALL")
                         .strike(json.getDouble("strike"))
                         .impliedVolatility(json.getDouble("impliedVolatility"))
-                        .expirationDate(Instant.ofEpochMilli(json.getInt("expiration") * 1000L).atZone(ZoneId.systemDefault()).toLocalDate())
+                        .expirationDate(Instant.ofEpochMilli(json.getInt("expiration") * 1000L)
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate())
                         .openInterest(json.getInt("openInterest"))
                         .contractSize(contractSize)
                         .price(price)
@@ -285,7 +295,9 @@ public class OptionService implements OptionServiceInterface {
                         .optionType("PUT")
                         .strike(json.getDouble("strike"))
                         .impliedVolatility(json.getDouble("impliedVolatility"))
-                        .expirationDate(Instant.ofEpochMilli(json.getInt("expiration") * 1000L).atZone(ZoneId.systemDefault()).toLocalDate())
+                        .expirationDate(Instant.ofEpochMilli(json.getInt("expiration") * 1000L)
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate())
                         .openInterest(json.getInt("openInterest"))
                         .contractSize(contractSize)
                         .price(price)
@@ -305,5 +317,4 @@ public class OptionService implements OptionServiceInterface {
 
         return optionList;
     }
-
 }

@@ -6,9 +6,7 @@ import com.raf.si.Banka2Backend.exceptions.CurrencyNotFoundException;
 import com.raf.si.Banka2Backend.exceptions.NotEnoughMoneyException;
 import com.raf.si.Banka2Backend.exceptions.UserNotFoundException;
 import com.raf.si.Banka2Backend.services.BalanceService;
-
 import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,14 +31,12 @@ public class BalanceController {
     public ResponseEntity<?> increaseBalance(@RequestBody @Valid BalanceDto dto) {
         try {
             return ResponseEntity.ok(
-                    this.balanceService.increaseBalance(
-                            dto.getUserEmail(), dto.getCurrencyCode(), dto.getAmount()));
+                    this.balanceService.increaseBalance(dto.getUserEmail(), dto.getCurrencyCode(), dto.getAmount()));
         } catch (CurrencyNotFoundException e1) {
             return ResponseEntity.badRequest()
                     .body("Currency with code " + dto.getCurrencyCode() + " could not be found.");
         } catch (UserNotFoundException e2) {
-            return ResponseEntity.badRequest()
-                    .body("User with email " + dto.getUserEmail() + " could not be found.");
+            return ResponseEntity.badRequest().body("User with email " + dto.getUserEmail() + " could not be found.");
         } catch (Exception e3) {
             return ResponseEntity.internalServerError().body("An unexpected error occurred.");
         }
@@ -50,16 +46,14 @@ public class BalanceController {
     public ResponseEntity<?> decreaseBalance(@RequestBody @Valid BalanceDto dto) {
         try {
             return ResponseEntity.ok(
-                    this.balanceService.decreaseBalance(
-                            dto.getUserEmail(), dto.getCurrencyCode(), dto.getAmount()));
+                    this.balanceService.decreaseBalance(dto.getUserEmail(), dto.getCurrencyCode(), dto.getAmount()));
         } catch (BalanceNotFoundException e1) {
             return ResponseEntity.badRequest()
-                    .body(
-                            "Balance for user with email "
-                                    + dto.getUserEmail()
-                                    + " and currency code "
-                                    + dto.getCurrencyCode()
-                                    + "could not be found.");
+                    .body("Balance for user with email "
+                            + dto.getUserEmail()
+                            + " and currency code "
+                            + dto.getCurrencyCode()
+                            + "could not be found.");
         } catch (NotEnoughMoneyException e2) {
             return ResponseEntity.badRequest().body("You don't have enough money for this operation.");
         } catch (Exception e3) {

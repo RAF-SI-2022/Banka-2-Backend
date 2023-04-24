@@ -11,9 +11,7 @@ import com.raf.si.Banka2Backend.services.AuthorisationService;
 import com.raf.si.Banka2Backend.services.StockService;
 import com.raf.si.Banka2Backend.services.UserService;
 import com.raf.si.Banka2Backend.services.UserStockService;
-
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -66,11 +64,9 @@ public class StockController {
     }
 
     @GetMapping("/{id}/history/{type}")
-    public ResponseEntity<?> getStockHistoryByStockIdAndTimePeriod(
-            @PathVariable Long id, @PathVariable String type) {
+    public ResponseEntity<?> getStockHistoryByStockIdAndTimePeriod(@PathVariable Long id, @PathVariable String type) {
         try {
-            return ResponseEntity.ok()
-                    .body(stockService.getStockHistoryForStockByIdAndType(id, type.toUpperCase()));
+            return ResponseEntity.ok().body(stockService.getStockHistoryForStockByIdAndType(id, type.toUpperCase()));
         } catch (StockNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         } catch (ExternalAPILimitReachedException e) {
@@ -107,26 +103,22 @@ public class StockController {
     public ResponseEntity<?> getAllUserStocks() {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401)
-                    .body("You don't have permission to remove stock from market.");
+            return ResponseEntity.status(401).body("You don't have permission to remove stock from market.");
         }
 
         return ResponseEntity.ok()
-                .body(
-                        this.stockService.getAllUserStocks(
-                                userService.findByEmail(signedInUserEmail).get().getId()));
+                .body(this.stockService.getAllUserStocks(
+                        userService.findByEmail(signedInUserEmail).get().getId()));
     }
 
     @PostMapping(value = "/remove/{symbol}")
     public ResponseEntity<?> removeStockFromMarket(@PathVariable String symbol) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401)
-                    .body("You don't have permission to remove stock from market.");
+            return ResponseEntity.status(401).body("You don't have permission to remove stock from market.");
         }
         return ResponseEntity.ok()
-                .body(
-                        userStockService.removeFromMarket(
-                                userService.findByEmail(signedInUserEmail).get().getId(), symbol));
+                .body(userStockService.removeFromMarket(
+                        userService.findByEmail(signedInUserEmail).get().getId(), symbol));
     }
 }

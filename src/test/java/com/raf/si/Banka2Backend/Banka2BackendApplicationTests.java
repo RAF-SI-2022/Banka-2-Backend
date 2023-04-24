@@ -14,29 +14,30 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration
 public class Banka2BackendApplicationTests {
 
-  /** Document to be used in these tests. */
-  private static final Map<String, Object> TEST_DOC = new HashMap<>();
+    /** Document to be used in these tests. */
+    private static final Map<String, Object> TEST_DOC = new HashMap<>();
 
-  /** The collection to run tests on. */
-  private static final String TEST_COL = "tests";
+    /** The collection to run tests on. */
+    private static final String TEST_COL = "tests";
 
-  @Autowired private MongoTemplate mongo;
+    @Autowired
+    private MongoTemplate mongo;
 
-  @BeforeAll
-  static void init() {
-    TEST_DOC.put("firstName", "John");
-    TEST_DOC.put("lastName", "Doe");
-    TEST_DOC.put("age", 25);
-    TEST_DOC.put("cool", true);
-  }
+    @BeforeAll
+    static void init() {
+        TEST_DOC.put("firstName", "John");
+        TEST_DOC.put("lastName", "Doe");
+        TEST_DOC.put("age", 25);
+        TEST_DOC.put("cool", true);
+    }
 
-  //  @Test
-  //  void givenApplicationProperties_whenAppRun_thenMongoDbInsertSucceeds() {
-  //    Map<String, Object> inserted = mongo.insert(TEST_DOC, TEST_COL);
-  //    assertNotNull(inserted.get("_id"));
-  //    TEST_DOC.forEach(
-  //        (k, v) -> {
-  //          assertEquals(inserted.get(k), v);
-  //        });
-  //  }
+    //  @Test
+    //  void givenApplicationProperties_whenAppRun_thenMongoDbInsertSucceeds() {
+    //    Map<String, Object> inserted = mongo.insert(TEST_DOC, TEST_COL);
+    //    assertNotNull(inserted.get("_id"));
+    //    TEST_DOC.forEach(
+    //        (k, v) -> {
+    //          assertEquals(inserted.get(k), v);
+    //        });
+    //  }
 }

@@ -11,7 +11,6 @@ import com.raf.si.Banka2Backend.repositories.mariadb.*;
 import com.raf.si.Banka2Backend.services.ForexService;
 import com.raf.si.Banka2Backend.services.OptionService;
 import com.raf.si.Banka2Backend.services.StockService;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -25,7 +24,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import javax.persistence.EntityManagerFactory;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,7 +88,9 @@ public class BootstrapData implements CommandLineRunner {
             StockRepository stockRepository,
             StockHistoryRepository stockHistoryRepository,
             StockService stockService,
-            OptionService optionService, OptionRepository optionRepository, EntityManagerFactory entityManagerFactory) {
+            OptionService optionService,
+            OptionRepository optionRepository,
+            EntityManagerFactory entityManagerFactory) {
         this.userRepository = userRepository;
         this.permissionRepository = permissionRepository;
         this.currencyRepository = currencyRepository;
@@ -139,7 +139,6 @@ public class BootstrapData implements CommandLineRunner {
             loadStocksTable();
         }
 
-
         // New data introduced in V2_2, if we keep this code devs will not get proper exchanges in db
         //    long numberOfExchanges = this.exchangeRepository.count();
         //    if (numberOfExchanges == 0) {
@@ -157,20 +156,19 @@ public class BootstrapData implements CommandLineRunner {
         }
 
         // Add admin
-        User admin =
-                User.builder()
-                        .email(ADMIN_EMAIL)
-                        .firstName(ADMIN_FNAME)
-                        .lastName(ADMIN_LNAME)
-                        .password(this.passwordEncoder.encode(ADMIN_PASS))
-                        .jmbg(ADMIN_JMBG)
-                        .phone(ADMIN_PHONE)
-                        .jobPosition(ADMIN_JOB)
-                        .active(ADMIN_ACTIVE)
-                        .dailyLimit(null) // USD
-//                        .defaultDailyLimit(10000D) // usd
-                        .defaultDailyLimit(null) // usd
-                        .build();
+        User admin = User.builder()
+                .email(ADMIN_EMAIL)
+                .firstName(ADMIN_FNAME)
+                .lastName(ADMIN_LNAME)
+                .password(this.passwordEncoder.encode(ADMIN_PASS))
+                .jmbg(ADMIN_JMBG)
+                .phone(ADMIN_PHONE)
+                .jobPosition(ADMIN_JOB)
+                .active(ADMIN_ACTIVE)
+                .dailyLimit(null) // USD
+                //                        .defaultDailyLimit(10000D) // usd
+                .defaultDailyLimit(null) // usd
+                .build();
 
         // Add initial perms
         List<Permission> permissions = new ArrayList<>();
@@ -235,26 +233,28 @@ public class BootstrapData implements CommandLineRunner {
     private void loadExchangeMarkets() throws IOException {
         // Do this only on the first ever run of the app.
         // read from file
-        List<Exchange> exchanges =
-                Files.lines(Paths.get("src/main/resources/csvs/exchange.csv"))
-                        .parallel()
-                        .skip(1)
-                        .map(line -> line.split(","))
-                        .filter(data -> exchangeRepository.findExchangeByMicCode(data[2]).isEmpty())
-                        .map(
-                                data ->
-                                        new Exchange(
-                                                data[0],
-                                                data[1],
-                                                data[2],
-                                                data[3],
-                                                this.currencyRepository.findCurrencyByCurrencyCode(data[4]).isPresent()
-                                                        ? this.currencyRepository.findCurrencyByCurrencyCode(data[4]).get()
-                                                        : null,
-                                                data[5],
-                                                data[6],
-                                                data[7]))
-                        .toList();
+        List<Exchange> exchanges = Files.lines(Paths.get("src/main/resources/csvs/exchange.csv"))
+                .parallel()
+                .skip(1)
+                .map(line -> line.split(","))
+                .filter(data ->
+                        exchangeRepository.findExchangeByMicCode(data[2]).isEmpty())
+                .map(data -> new Exchange(
+                        data[0],
+                        data[1],
+                        data[2],
+                        data[3],
+                        this.currencyRepository
+                                        .findCurrencyByCurrencyCode(data[4])
+                                        .isPresent()
+                                ? this.currencyRepository
+                                        .findCurrencyByCurrencyCode(data[4])
+                                        .get()
+                                : null,
+                        data[5],
+                        data[6],
+                        data[7]))
+                .toList();
 
         // save into repository
         for (int i = 0; i < exchanges.size() - 1; i++) {
@@ -269,36 +269,31 @@ public class BootstrapData implements CommandLineRunner {
         exchangeRepository.saveAll(exchanges);
     }
 
-    private void loadFutureTable()
-            throws IOException, ParseException { // todo promeni da ucitava sa id
+    private void loadFutureTable() throws IOException, ParseException { // todo promeni da ucitava sa id
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yyyy");
         String formattedDate = dateFormat.format(new Date());
 
-        List<Future> futures =
-                Files.lines(Paths.get("src/main/resources/csvs/future_data.csv"))
-                        .parallel()
-                        .skip(1)
-                        .map(line -> line.split(","))
-                        .filter(data -> futureRepository.findFutureByFutureName(data[0]).isEmpty())
-                        .map(
-                                data ->
-                                        new Future(
-                                                data[0],
-                                                Integer.parseInt(data[1]),
-                                                data[2],
-                                                Integer.parseInt(data[3]),
-                                                data[4],
-                                                formattedDate,
-                                                true))
-                        .toList();
+        List<Future> futures = Files.lines(Paths.get("src/main/resources/csvs/future_data.csv"))
+                .parallel()
+                .skip(1)
+                .map(line -> line.split(","))
+                .filter(data -> futureRepository.findFutureByFutureName(data[0]).isEmpty())
+                .map(data -> new Future(
+                        data[0],
+                        Integer.parseInt(data[1]),
+                        data[2],
+                        Integer.parseInt(data[3]),
+                        data[4],
+                        formattedDate,
+                        true))
+                .toList();
 
         futureRepository.saveAll(futures);
 
         randomiseFutureTableData();
     }
 
-    private void randomiseFutureTableData()
-            throws ParseException { // calendar.add(Calendar.MONTH, 1);
+    private void randomiseFutureTableData() throws ParseException { // calendar.add(Calendar.MONTH, 1);
         List<Future> allFutures = futureRepository.findAll();
         List<Future> newRandomisedFutures = new ArrayList<>();
         Random randomGenerator = new Random();
@@ -345,24 +340,23 @@ public class BootstrapData implements CommandLineRunner {
             Optional<Exchange> exchange = exchangeRepository.findExchangeByAcronym(data[12]);
             Exchange mergedExchange = (Exchange) session.merge(exchange.get());
 
-            Stock stock =
-                    Stock.builder()
-                            .companyName(data[0])
-                            .outstandingShares(Long.valueOf(data[1]))
-                            .dividendYield(new BigDecimal(data[2]))
-                            .openValue(new BigDecimal(data[3]))
-                            .highValue(new BigDecimal(data[4]))
-                            .lowValue(new BigDecimal(data[5]))
-                            .priceValue(new BigDecimal(data[6]))
-                            .volumeValue(Long.valueOf(data[7]))
-                            .lastUpdated(LocalDate.now())
-                            .previousClose(new BigDecimal(data[9]))
-                            .changeValue(new BigDecimal(data[10]))
-                            .changePercent(data[11])
-                            .exchange(mergedExchange)
-                            .symbol(data[13])
-                            .websiteUrl(data[14])
-                            .build();
+            Stock stock = Stock.builder()
+                    .companyName(data[0])
+                    .outstandingShares(Long.valueOf(data[1]))
+                    .dividendYield(new BigDecimal(data[2]))
+                    .openValue(new BigDecimal(data[3]))
+                    .highValue(new BigDecimal(data[4]))
+                    .lowValue(new BigDecimal(data[5]))
+                    .priceValue(new BigDecimal(data[6]))
+                    .volumeValue(Long.valueOf(data[7]))
+                    .lastUpdated(LocalDate.now())
+                    .previousClose(new BigDecimal(data[9]))
+                    .changeValue(new BigDecimal(data[10]))
+                    .changePercent(data[11])
+                    .exchange(mergedExchange)
+                    .symbol(data[13])
+                    .websiteUrl(data[14])
+                    .build();
 
             session.beginTransaction();
             session.persist(stock);
@@ -376,8 +370,7 @@ public class BootstrapData implements CommandLineRunner {
         for (Stock s : stockRepository.findAll()) {
 
             Stock mergedStock = (Stock) session.merge(s);
-            BufferedReader br1 =
-                    new BufferedReader(new FileReader("src/main/resources/stock_history.csv"));
+            BufferedReader br1 = new BufferedReader(new FileReader("src/main/resources/stock_history.csv"));
 
             String header1 = br1.readLine();
             String line1 = br1.readLine();
@@ -388,23 +381,22 @@ public class BootstrapData implements CommandLineRunner {
                 String symbol = data[6];
 
                 if (symbol.equals(s.getSymbol())) {
-                    StockHistory stockHistory =
-                            StockHistory.builder()
-                                    .openValue(new BigDecimal(data[0]))
-                                    .highValue(new BigDecimal(data[1]))
-                                    .lowValue(new BigDecimal(data[2]))
-                                    .closeValue(new BigDecimal(data[3]))
-                                    .volumeValue(Long.valueOf(data[4]))
-                                    .onDate(
-                                            data[5].contains(" ")
-                                                    ? LocalDateTime.parse(
+                    StockHistory stockHistory = StockHistory.builder()
+                            .openValue(new BigDecimal(data[0]))
+                            .highValue(new BigDecimal(data[1]))
+                            .lowValue(new BigDecimal(data[2]))
+                            .closeValue(new BigDecimal(data[3]))
+                            .volumeValue(Long.valueOf(data[4]))
+                            .onDate(
+                                    data[5].contains(" ")
+                                            ? LocalDateTime.parse(
                                                     data[5], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                                                    : LocalDateTime.parse(
+                                            : LocalDateTime.parse(
                                                     data[5] + " 00:00:00",
                                                     DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-                                    .stock(mergedStock)
-                                    .type(StockHistoryType.valueOf(data[7]))
-                                    .build();
+                            .stock(mergedStock)
+                            .type(StockHistoryType.valueOf(data[7]))
+                            .build();
 
                     session.beginTransaction();
                     session.persist(stockHistory);

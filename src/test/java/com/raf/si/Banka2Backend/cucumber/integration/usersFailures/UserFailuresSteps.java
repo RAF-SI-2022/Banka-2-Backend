@@ -11,10 +11,8 @@ import com.raf.si.Banka2Backend.services.UserService;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -23,8 +21,10 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
 
     @Autowired
     private UserService userService;
+
     @Autowired
     protected MockMvc mockMvc;
+
     protected static String token;
     protected static Optional<User> loggedInUser;
 
@@ -37,20 +37,15 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
     @Then("user accesses endpoint")
     public void user_accesses_endpoint() {
         try {
-            Exception exception =
-                    assertThrows(
-                            Exception.class,
-                            () -> {
-                                mockMvc
-                                        .perform(
-                                                get("/api/users")
-                                                        .contentType("application/json")
-                                                        .header("Content-Type", "application/json")
-                                                        .header("Access-Control-Allow-Origin", "*")
-                                                        .header("Authorization", "Bearer " + token))
-                                        .andExpect(status().isOk())
-                                        .andReturn();
-                            });
+            Exception exception = assertThrows(Exception.class, () -> {
+                mockMvc.perform(get("/api/users")
+                                .contentType("application/json")
+                                .header("Content-Type", "application/json")
+                                .header("Access-Control-Allow-Origin", "*")
+                                .header("Authorization", "Bearer " + token))
+                        .andExpect(status().isOk())
+                        .andReturn();
+            });
 
             String expectedMessage = "JWT String argument cannot be null or empty.";
             String actualMessage = exception.getMessage();
@@ -70,20 +65,18 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
             assertEquals("anesic3119rn+banka2backend+admin@raf.rs", user.get().getEmail());
             loggedInUser = user;
 
-            MvcResult mvcResult =
-                    mockMvc
-                            .perform(
-                                    post("/auth/login")
-                                            .contentType("application/json")
-                                            .content(
-                                                    """
+            MvcResult mvcResult = mockMvc.perform(
+                            post("/auth/login")
+                                    .contentType("application/json")
+                                    .content(
+                                            """
                                                             {
                                                               "email": "anesic3119rn+banka2backend+admin@raf.rs",
                                                               "password": "admin"
                                                             }
                                                             """))
-                            .andExpect(status().isOk())
-                            .andReturn();
+                    .andExpect(status().isOk())
+                    .andReturn();
             token = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.token");
         } catch (Exception e) {
             fail(e.getMessage());
@@ -103,13 +96,11 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
     @Then("is not found")
     public void is_not_found() {
         try {
-            mockMvc
-                    .perform(
-                            get("/api/bad")
-                                    .contentType("application/json")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            mockMvc.perform(get("/api/bad")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isNotFound())
                     .andReturn();
 
@@ -122,20 +113,15 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
     @When("user doesnt exist in database")
     public void user_doesnt_exist_in_database() {
         try {
-            Exception exception =
-                    assertThrows(
-                            Exception.class,
-                            () -> {
-                                mockMvc
-                                        .perform(
-                                                get("/api/users/" + -1L)
-                                                        .contentType("application/json")
-                                                        .header("Content-Type", "application/json")
-                                                        .header("Access-Control-Allow-Origin", "*")
-                                                        .header("Authorization", "Bearer " + token))
-                                        .andExpect(status().isOk())
-                                        .andReturn();
-                            });
+            Exception exception = assertThrows(Exception.class, () -> {
+                mockMvc.perform(get("/api/users/" + -1L)
+                                .contentType("application/json")
+                                .header("Content-Type", "application/json")
+                                .header("Access-Control-Allow-Origin", "*")
+                                .header("Authorization", "Bearer " + token))
+                        .andExpect(status().isOk())
+                        .andReturn();
+            });
 
             String expectedMessage =
                     "Request processing failed; nested exception is com.raf.si.Banka2Backend.exceptions.UserNotFoundException: User with id <-1> not found.";
@@ -149,20 +135,15 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
     @Then("get perms form nonexistent user")
     public void get_perms_form_nonexistent_user() {
         try {
-            Exception exception =
-                    assertThrows(
-                            Exception.class,
-                            () -> {
-                                mockMvc
-                                        .perform(
-                                                get("/api/users/permissions/" + -1L)
-                                                        .contentType("application/json")
-                                                        .header("Content-Type", "application/json")
-                                                        .header("Access-Control-Allow-Origin", "*")
-                                                        .header("Authorization", "Bearer " + token))
-                                        .andExpect(status().isOk())
-                                        .andReturn();
-                            });
+            Exception exception = assertThrows(Exception.class, () -> {
+                mockMvc.perform(get("/api/users/permissions/" + -1L)
+                                .contentType("application/json")
+                                .header("Content-Type", "application/json")
+                                .header("Access-Control-Allow-Origin", "*")
+                                .header("Authorization", "Bearer " + token))
+                        .andExpect(status().isOk())
+                        .andReturn();
+            });
 
             String expectedMessage =
                     "Request processing failed; nested exception is com.raf.si.Banka2Backend.exceptions.UserNotFoundException: User with id <-1> not found.";
@@ -177,20 +158,15 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
     @Then("get nonexistent user by id")
     public void get_nonexistent_user_by_id() {
         try {
-            Exception exception =
-                    assertThrows(
-                            Exception.class,
-                            () -> {
-                                mockMvc
-                                        .perform(
-                                                get("/api/users/" + -1L)
-                                                        .contentType("application/json")
-                                                        .header("Content-Type", "application/json")
-                                                        .header("Access-Control-Allow-Origin", "*")
-                                                        .header("Authorization", "Bearer " + token))
-                                        .andExpect(status().isOk())
-                                        .andReturn();
-                            });
+            Exception exception = assertThrows(Exception.class, () -> {
+                mockMvc.perform(get("/api/users/" + -1L)
+                                .contentType("application/json")
+                                .header("Content-Type", "application/json")
+                                .header("Access-Control-Allow-Origin", "*")
+                                .header("Authorization", "Bearer " + token))
+                        .andExpect(status().isOk())
+                        .andReturn();
+            });
 
             String expectedMessage =
                     "Request processing failed; nested exception is com.raf.si.Banka2Backend.exceptions.UserNotFoundException: User with id <-1> not found.";
@@ -205,20 +181,15 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
     @Then("deactivate nonexistent user")
     public void deactivate_nonexistent_user() {
         try {
-            Exception exception =
-                    assertThrows(
-                            Exception.class,
-                            () -> {
-                                mockMvc
-                                        .perform(
-                                                post("/api/users/deactivate/" + -1L)
-                                                        .contentType("application/json")
-                                                        .header("Content-Type", "application/json")
-                                                        .header("Access-Control-Allow-Origin", "*")
-                                                        .header("Authorization", "Bearer " + token))
-                                        .andExpect(status().isOk())
-                                        .andReturn();
-                            });
+            Exception exception = assertThrows(Exception.class, () -> {
+                mockMvc.perform(post("/api/users/deactivate/" + -1L)
+                                .contentType("application/json")
+                                .header("Content-Type", "application/json")
+                                .header("Access-Control-Allow-Origin", "*")
+                                .header("Authorization", "Bearer " + token))
+                        .andExpect(status().isOk())
+                        .andReturn();
+            });
 
             String expectedMessage =
                     "Request processing failed; nested exception is com.raf.si.Banka2Backend.exceptions.UserNotFoundException: User with id <-1> not found.";
@@ -233,20 +204,15 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
     @Then("reactivate nonexistent user")
     public void reactivate_nonexistent_user() {
         try {
-            Exception exception =
-                    assertThrows(
-                            Exception.class,
-                            () -> {
-                                mockMvc
-                                        .perform(
-                                                post("/api/users/reactivate/" + -1L)
-                                                        .contentType("application/json")
-                                                        .header("Content-Type", "application/json")
-                                                        .header("Access-Control-Allow-Origin", "*")
-                                                        .header("Authorization", "Bearer " + token))
-                                        .andExpect(status().isOk())
-                                        .andReturn();
-                            });
+            Exception exception = assertThrows(Exception.class, () -> {
+                mockMvc.perform(post("/api/users/reactivate/" + -1L)
+                                .contentType("application/json")
+                                .header("Content-Type", "application/json")
+                                .header("Access-Control-Allow-Origin", "*")
+                                .header("Authorization", "Bearer " + token))
+                        .andExpect(status().isOk())
+                        .andReturn();
+            });
 
             String expectedMessage =
                     "Request processing failed; nested exception is com.raf.si.Banka2Backend.exceptions.UserNotFoundException: User with id <-1> not found.";
@@ -261,16 +227,11 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
     @Then("update nonexistent user in database")
     public void update_nonexistent_user_in_database() {
         try {
-            Exception exception =
-                    assertThrows(
-                            Exception.class,
-                            () -> {
-                                mockMvc
-                                        .perform(
-                                                put("/api/users/" + -1L)
-                                                        .contentType("application/json")
-                                                        .content(
-                                                                """
+            Exception exception = assertThrows(Exception.class, () -> {
+                mockMvc.perform(put("/api/users/" + -1L)
+                                .contentType("application/json")
+                                .content(
+                                        """
                                                                         {
                                                                           "firstName": "NewTestUser",
                                                                           "lastName": "NewTestUser",
@@ -284,12 +245,12 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
                                                                           "phone": "640601548865"
                                                                         }
                                                                         """)
-                                                        .header("Content-Type", "application/json")
-                                                        .header("Access-Control-Allow-Origin", "*")
-                                                        .header("Authorization", "Bearer " + token))
-                                        .andExpect(status().isOk())
-                                        .andReturn();
-                            });
+                                .header("Content-Type", "application/json")
+                                .header("Access-Control-Allow-Origin", "*")
+                                .header("Authorization", "Bearer " + token))
+                        .andExpect(status().isOk())
+                        .andReturn();
+            });
 
             String expectedMessage =
                     "Request processing failed; nested exception is com.raf.si.Banka2Backend.exceptions.UserNotFoundException: User with id <-1> not found.";
@@ -304,20 +265,15 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
     @Then("deleting nonexistent user from database")
     public void deleting_nonexistent_user_from_database() {
         try {
-            Exception exception =
-                    assertThrows(
-                            Exception.class,
-                            () -> {
-                                mockMvc
-                                        .perform(
-                                                delete("/api/users/" + -1L)
-                                                        .contentType("application/json")
-                                                        .header("Content-Type", "application/json")
-                                                        .header("Access-Control-Allow-Origin", "*")
-                                                        .header("Authorization", "Bearer " + token))
-                                        .andExpect(status().isNoContent())
-                                        .andReturn();
-                            });
+            Exception exception = assertThrows(Exception.class, () -> {
+                mockMvc.perform(delete("/api/users/" + -1L)
+                                .contentType("application/json")
+                                .header("Content-Type", "application/json")
+                                .header("Access-Control-Allow-Origin", "*")
+                                .header("Authorization", "Bearer " + token))
+                        .andExpect(status().isNoContent())
+                        .andReturn();
+            });
 
             String expectedMessage =
                     "Request processing failed; nested exception is org.springframework.dao.EmptyResultDataAccessException: No class com.raf.si.Banka2Backend.models.users.User entity with id -1 exists!";
@@ -333,12 +289,10 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
     public void non_privileged_user_logs_in() {
         try {
             // pravimo test usera
-            mockMvc
-                    .perform(
-                            post("/api/users/register")
-                                    .contentType("application/json")
-                                    .content(
-                                            """
+            mockMvc.perform(post("/api/users/register")
+                            .contentType("application/json")
+                            .content(
+                                    """
                                                     {
                                                       "firstName": "nonPrivUser",
                                                       "lastName": "nonPrivUserLn",
@@ -352,27 +306,25 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
                                                       "dailyLimit": 5000
                                                     }
                                                     """)
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isOk())
                     .andReturn();
 
             // logujemo se kao test user
-            MvcResult mvcResult =
-                    mockMvc
-                            .perform(
-                                    post("/auth/login")
-                                            .contentType("application/json")
-                                            .content(
-                                                    """
+            MvcResult mvcResult = mockMvc.perform(
+                            post("/auth/login")
+                                    .contentType("application/json")
+                                    .content(
+                                            """
                                                             {
                                                               "email": "nonpriv@gmail.com",
                                                               "password": "1234"
                                                             }
                                                             """))
-                            .andExpect(status().isOk())
-                            .andReturn();
+                    .andExpect(status().isOk())
+                    .andReturn();
             token = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.token");
 
             Optional<User> user = userService.findByEmail("nonpriv@gmail.com");
@@ -398,13 +350,11 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
     @Then("user doesnt get all permission names")
     public void user_doesnt_get_all_permission_names() {
         try {
-            mockMvc
-                    .perform(
-                            get("/api/users/permissions")
-                                    .contentType("application/json")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            mockMvc.perform(get("/api/users/permissions")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isUnauthorized())
                     .andReturn();
         } catch (Exception e) {
@@ -431,13 +381,11 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
     @Then("user doesnt gets users permissions")
     public void user_doesnt_gets_users_permissions() {
         try {
-            mockMvc
-                    .perform(
-                            get("/api/users/permissions/" + loggedInUser.get().getId())
-                                    .contentType("application/json")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            mockMvc.perform(get("/api/users/permissions/" + loggedInUser.get().getId())
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isUnauthorized())
                     .andReturn();
         } catch (Exception e) {
@@ -449,13 +397,11 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
     @Then("user doesnt get user by id")
     public void user_doesnt_get_user_by_id() {
         try {
-            mockMvc
-                    .perform(
-                            get("/api/users/" + loggedInUser.get().getId())
-                                    .contentType("application/json")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            mockMvc.perform(get("/api/users/" + loggedInUser.get().getId())
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isUnauthorized())
                     .andReturn();
         } catch (Exception e) {
@@ -467,13 +413,11 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
     @Then("user doesnt deactivate user")
     public void user_doesnt_deactivate_user() {
         try {
-            mockMvc
-                    .perform(
-                            post("/api/users/deactivate/" + loggedInUser.get().getId())
-                                    .contentType("application/json")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            mockMvc.perform(post("/api/users/deactivate/" + loggedInUser.get().getId())
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isUnauthorized())
                     .andReturn();
         } catch (Exception e) {
@@ -485,13 +429,11 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
     @Then("user doesnt reactivate user")
     public void user_doesnt_reactivate_user() {
         try {
-            mockMvc
-                    .perform(
-                            post("/api/users/reactivate/" + loggedInUser.get().getId())
-                                    .contentType("application/json")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            mockMvc.perform(post("/api/users/reactivate/" + loggedInUser.get().getId())
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isUnauthorized())
                     .andReturn();
         } catch (Exception e) {
@@ -503,12 +445,10 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
     @Then("user not updated")
     public void user_not_updated() {
         try {
-            mockMvc
-                    .perform(
-                            put("/api/users/" + loggedInUser.get().getId())
-                                    .contentType("application/json")
-                                    .content(
-                                            """
+            mockMvc.perform(put("/api/users/" + loggedInUser.get().getId())
+                            .contentType("application/json")
+                            .content(
+                                    """
                                                     {
                                                       "firstName": "NewTestUser",
                                                       "lastName": "NewTestUser",
@@ -522,9 +462,9 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
                                                       "phone": "640601548865"
                                                     }
                                                     """)
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isUnauthorized())
                     .andReturn();
         } catch (Exception e) {
@@ -536,13 +476,11 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
     @Then("user doesnt user by his email")
     public void user_doesnt_user_by_his_email() {
         try {
-            mockMvc
-                    .perform(
-                            get("/api/users/email")
-                                    .contentType("application/json")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            mockMvc.perform(get("/api/users/email")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isUnauthorized())
                     .andReturn();
         } catch (Exception e) {
@@ -554,13 +492,11 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
     @Then("user still in database")
     public void user_still_in_database() {
         try {
-            mockMvc
-                    .perform(
-                            delete("/api/users/" + loggedInUser.get().getId())
-                                    .contentType("application/json")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            mockMvc.perform(delete("/api/users/" + loggedInUser.get().getId())
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isUnauthorized())
                     .andReturn();
         } catch (Exception e) {
@@ -573,13 +509,10 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
     @Then("user not created")
     public void user_not_created() {
         try {
-            MvcResult mvcResult =
-                    mockMvc
-                            .perform(
-                                    post("/api/users/register")
-                                            .contentType("application/json")
-                                            .content(
-                                                    """
+            MvcResult mvcResult = mockMvc.perform(post("/api/users/register")
+                            .contentType("application/json")
+                            .content(
+                                    """
                                                             {
                                                               "firstName": "TestUser",
                                                               "lastName": "TestUser",
@@ -594,11 +527,11 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
                                                               "phone": "640601548865"
                                                             }
                                                             """)
-                                            .header("Content-Type", "application/json")
-                                            .header("Access-Control-Allow-Origin", "*")
-                                            .header("Authorization", "Bearer " + token))
-                            .andExpect(status().isUnauthorized())
-                            .andReturn();
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isUnauthorized())
+                    .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -620,13 +553,11 @@ public class UserFailuresSteps extends UsersIntegrationTestConfig {
     public void user_doesnt_get_all_users_from_database() {
         try {
             System.err.println(loggedInUser);
-            mockMvc
-                    .perform(
-                            get("/api/users")
-                                    .contentType("application/json")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            mockMvc.perform(get("/api/users")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isUnauthorized())
                     .andReturn();
         } catch (Exception e) {

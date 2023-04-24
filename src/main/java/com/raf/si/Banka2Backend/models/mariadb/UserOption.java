@@ -1,10 +1,9 @@
 package com.raf.si.Banka2Backend.models.mariadb;
 
-import lombok.*;
-
+import java.time.LocalDate;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
+import lombok.*;
 
 @Data
 @Builder

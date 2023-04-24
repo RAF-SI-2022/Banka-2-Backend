@@ -17,9 +17,7 @@ public class ExchangeController {
 
     @Autowired
     public ExchangeController(
-            AuthorisationService authorisationService,
-            ExchangeService exchangeService,
-            UserService userService) {
+            AuthorisationService authorisationService, ExchangeService exchangeService, UserService userService) {
         this.authorisationService = authorisationService;
         this.exchangeService = exchangeService;
         this.userService = userService;
