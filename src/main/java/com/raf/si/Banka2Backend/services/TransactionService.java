@@ -44,6 +44,10 @@ public class TransactionService implements TransactionServiceInterface {
         return this.transactionRepository.save(transaction);
     }
 
+    @Override
+    public List<Transaction> createAll(List<Transaction> transactionList) {
+        return this.transactionRepository.saveAll(transactionList);
+    }
 
 
 }

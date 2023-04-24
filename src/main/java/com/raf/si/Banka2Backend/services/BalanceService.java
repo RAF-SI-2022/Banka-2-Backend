@@ -148,9 +148,7 @@ public class BalanceService implements BalanceServiceInterface {
         List<Transaction> orderTransactions = this.transactionService.findAllByOrderId(order.getId());
         Float money = 0f;
         for (Transaction transaction : orderTransactions) {
-            if (transaction.getStatus().equals(TransactionStatus.COMPLETE)) {
-                money += transaction.getAmount();
-            }
+            money += transaction.getAmount();
         }
         if (order.getTradeType().equals(OrderTradeType.BUY)) {
             return this.decreaseBalance(userEmail, currencyCode, money);

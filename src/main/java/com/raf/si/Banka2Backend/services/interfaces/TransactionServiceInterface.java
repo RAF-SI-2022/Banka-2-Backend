@@ -9,4 +9,6 @@ public interface TransactionServiceInterface {
     List<Transaction> findAllByOrderId(Long orderId);
     List<Transaction> findAllByUserEmailAndCurrencyCode(String userEmail, String currencyCode);
     Transaction changeTransactionStatus(Long transactionId, TransactionStatus status);
+
+    List<Transaction> createAll(List<Transaction> transactionList);
 }

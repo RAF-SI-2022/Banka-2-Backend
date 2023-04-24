@@ -1,6 +1,8 @@
 package com.raf.si.Banka2Backend.services;
 
+import com.raf.si.Banka2Backend.exceptions.OrderNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.orders.Order;
+import com.raf.si.Banka2Backend.models.mariadb.orders.OrderStatus;
 import com.raf.si.Banka2Backend.repositories.mariadb.OrderRepository;
 import com.raf.si.Banka2Backend.services.interfaces.OrderServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,16 +22,31 @@ public class OrderService implements OrderServiceInterface {
 
     @Override
     public List<Order> findAll() {
-        return null;
+        return this.orderRepository.findAll();
     }
 
     @Override
-    public Optional<Order> findById() {
-        return Optional.empty();
+    public Optional<Order> findById(Long id) {
+        return this.orderRepository.findById(id);
     }
 
     @Override
     public List<Order> findByType() {
         return null;
+    }
+
+    @Override
+    public Order save(Order order) {
+        return this.orderRepository.save(order);
+    }
+
+    @Override
+    public Order updateOrderStatus(Long orderId, OrderStatus status) {
+        Optional<Order> order = this.findById(orderId);
+        if(order.isPresent()) {
+            order.get().setStatus(status);
+            return this.orderRepository.save(order.get());
+        }
+        throw new OrderNotFoundException(orderId);
     }
 }
