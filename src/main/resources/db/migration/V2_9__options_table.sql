@@ -10,5 +10,10 @@ CREATE TABLE IF NOT EXISTS `options`
     `expiration_date`    DATE         NOT NULL,
     `open_interest`      INTEGER      NOT NULL,
     `contract_size`      INTEGER      NOT NULL,
-    `maintenance_margin` DOUBLE       NOT NULL
+    `maintenance_margin` DOUBLE       NOT NULL,
+    `bid`                DOUBLE       NOT NULL,
+    `ask`                DOUBLE       NOT NULL,
+    `change_price`       DOUBLE       NOT NULL,
+    `percent_change`     DOUBLE       NOT NULL,
+    `in_the_money`       BOOLEAN      NOT NULL
 );

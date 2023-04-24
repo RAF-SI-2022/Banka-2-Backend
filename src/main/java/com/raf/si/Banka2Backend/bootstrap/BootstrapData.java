@@ -165,9 +165,9 @@ public class BootstrapData implements CommandLineRunner {
                 .phone(ADMIN_PHONE)
                 .jobPosition(ADMIN_JOB)
                 .active(ADMIN_ACTIVE)
-                .dailyLimit(null) // USD
+                .dailyLimit(1000000d) // USD
                 //                        .defaultDailyLimit(10000D) // usd
-                .defaultDailyLimit(null) // usd
+                .defaultDailyLimit(1000000d) // usd
                 .build();
 
         // Add initial perms

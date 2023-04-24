@@ -1,16 +1,18 @@
 package com.raf.si.Banka2Backend.services.interfaces;
 
 import com.raf.si.Banka2Backend.models.mariadb.Balance;
+import com.raf.si.Banka2Backend.models.mariadb.orders.ForexOrder;
 import com.raf.si.Banka2Backend.models.mariadb.orders.Order;
 import java.util.List;
 
 public interface BalanceServiceInterface {
-    void buyOrSellCurrency(
+    boolean buyOrSellCurrency(
             String userEmail,
             String fromCurrencyCode,
             String toCurrencyCode,
             Float exchangeRate,
-            Integer amountOfMoney);
+            Integer amountOfMoney,
+            ForexOrder forexOrder);
 
     List<Balance> findAllByUserId(Long userId);
 

@@ -15,10 +15,7 @@ public class BuySellForexDto {
      */
     @NotNull
     String toCurrencyCode;
-    /**
-     * Pri kupovini: koliko korisnik zeli da potrosi na kupovinu (a ne koliko zeli da kupi druge
-     * valute). Pri prodaji: koliko korisnik zeli da proda od trenutne valute koju ima
-     */
+
     @NotNull
-    Integer amountOfMoney;
+    Integer amount;
 }
