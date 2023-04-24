@@ -54,6 +54,10 @@ public class StockBuyWorker extends Thread {
 
                 //todo DODATI CHECKOVE ZA LIMIT I STOP
                 Balance balance = this.balanceService.findBalanceByUserIdAndCurrency(stockOrder.getUser().getId(), stockOrder.getCurrencyCode());
+
+                this.balanceService.reserveAmount((float)(stockOrder.getAmount()*stockOrder.getPrice()), stockOrder.getUser().getEmail(), stockOrder.getCurrencyCode());
+
+
                 if (stockOrder.isAllOrNone()) {
                     usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + stockOrder.getAmount());
                     Transaction transaction = this.transactionService.createTransaction(stockOrder, balance, (float) stockOrder.getPrice());
