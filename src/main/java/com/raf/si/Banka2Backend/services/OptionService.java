@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -220,7 +221,7 @@ public class OptionService implements OptionServiceInterface {
         List<Option> optionList = new ArrayList<>();
 
         if (date == null)
-            apiUrl = "https://query1.finance.yahoo.com/v7/finance/options/aapl";
+            apiUrl = "https://query1.finance.yahoo.com/v7/finance/options/" + stockSymbol;
         else
             apiUrl = "https://query1.finance.yahoo.com/v7/finance/options/" + stockSymbol + "?date=" + date;
 
@@ -246,6 +247,9 @@ public class OptionService implements OptionServiceInterface {
             for (Object o : callsArray) {
 
                 JSONObject json = (JSONObject) o;
+                System.out.println(json);
+//                System.out.println(json.length() + " ovo je velicina");
+                System.out.println(json.getDouble("change") + " bidovi ");
 
                 Integer contractSize = 100;
                 Double price = json.getDouble("lastPrice");
@@ -263,10 +267,16 @@ public class OptionService implements OptionServiceInterface {
                         .contractSize(contractSize)
                         .price(price)
                         .maintenanceMargin(maintenanceMargin)
+                        .bid(json.getDouble("bid"))
+                        .ask(json.getDouble("ask"))
+                        .changePrice(json.getDouble("change"))
+                        .percentChange(json.getDouble("percentChange"))
+                        .inTheMoney(json.getBoolean("inTheMoney"))
                         .build();
 
                 optionList.add(newOption);
             }
+
 
             JSONArray putsArray = options.getJSONArray("puts");
 
@@ -290,6 +300,11 @@ public class OptionService implements OptionServiceInterface {
                         .contractSize(contractSize)
                         .price(price)
                         .maintenanceMargin(maintenanceMargin)
+                        .bid(json.getDouble("bid"))
+                        .ask(json.getDouble("ask"))
+                        .changePrice(json.getDouble("change"))
+                        .percentChange(json.getDouble("percentChange"))
+                        .inTheMoney(json.getBoolean("inTheMoney"))
                         .build();
 
                 optionList.add(newOption);

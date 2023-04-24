@@ -52,6 +52,21 @@ public class Option {
     @NotNull
     private Double maintenanceMargin;
 
+    @NotNull
+    private Double bid;
+
+    @NotNull
+    private Double ask;
+
+    @NotNull
+    private Double changePrice;
+
+    @NotNull
+    private Double percentChange;
+
+    @NotNull
+    private Boolean inTheMoney;
+
     //todo theta
 
 }
