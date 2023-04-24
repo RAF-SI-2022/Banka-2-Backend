@@ -14,6 +14,8 @@ import javax.validation.constraints.NotNull;
 @RequiredArgsConstructor
 @Entity
 @Table(name = "orders")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "dtype")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

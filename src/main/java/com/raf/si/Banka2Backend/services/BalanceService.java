@@ -2,14 +2,16 @@ package com.raf.si.Banka2Backend.services;
 
 import com.raf.si.Banka2Backend.exceptions.*;
 import com.raf.si.Banka2Backend.models.mariadb.*;
-import com.raf.si.Banka2Backend.models.mariadb.orders.Order;
-import com.raf.si.Banka2Backend.models.mariadb.orders.OrderTradeType;
+import com.raf.si.Banka2Backend.models.mariadb.orders.*;
 import com.raf.si.Banka2Backend.repositories.mariadb.BalanceRepository;
+import com.raf.si.Banka2Backend.repositories.mariadb.OrderRepository;
 import com.raf.si.Banka2Backend.services.interfaces.BalanceServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,61 +21,78 @@ public class BalanceService implements BalanceServiceInterface {
     private final TransactionService transactionService;
     private final CurrencyService currencyService;
     private final UserService userService;
+    private final OrderRepository orderRepository;
 
     @Autowired
     public BalanceService(
             BalanceRepository balanceRepository,
             TransactionService transactionService,
             CurrencyService currencyService,
-            UserService userService) {
+            UserService userService,
+            OrderRepository orderRepository) {
         this.balanceRepository = balanceRepository;
         this.transactionService = transactionService;
         this.currencyService = currencyService;
         this.userService = userService;
+        this.orderRepository = orderRepository;
     }
 
     @Override
     @Transactional
-    public void buyOrSellCurrency( // for forex
+    public boolean buyOrSellCurrency( // for forex
                                    String userEmail,
                                    String fromCurrencyCode,
                                    String toCurrencyCode,
                                    Float exchangeRate,
-                                   Integer amountOfMoney) {
-        Optional<Balance> balanceForFromCurrency =
-                this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(
-                        userEmail, fromCurrencyCode);
-
-        if (balanceForFromCurrency.isEmpty()) {
-            throw new BalanceNotFoundException(userEmail, fromCurrencyCode);
-        }
-        if (balanceForFromCurrency.get().getAmount() < amountOfMoney) {
-            throw new NotEnoughMoneyException(fromCurrencyCode, toCurrencyCode, amountOfMoney);
-        }
+                                   Integer amount,
+                                   ForexOrder forexOrder) {
         // Update existing balance(for fromCurrency)
-        Float newAmountInFromCurrency = balanceForFromCurrency.get().getAmount() - amountOfMoney;
-        balanceForFromCurrency.get().setAmount(newAmountInFromCurrency);
-        this.balanceRepository.save(balanceForFromCurrency.get());
+        Optional<User> u = this.userService.findByEmail(userEmail);
+        if(!u.isPresent()) throw new UserNotFoundException(userEmail);
+        Balance balanceForFromCurrency = this.findBalanceByUserEmailAndCurrencyCode(userEmail, fromCurrencyCode);
+        try {
+            this.reserveAmount(amount.floatValue(), userEmail, fromCurrencyCode);
+            this.decreaseBalance(userEmail, fromCurrencyCode, amount.floatValue());
+        } catch (NotEnoughMoneyException | NotEnoughReservedMoneyException e) {
+            ForexOrder fo = forexOrder == null ? new ForexOrder(0l, OrderType.FOREX, OrderTradeType.BUY, OrderStatus.WAITING, fromCurrencyCode + " " + toCurrencyCode, amount, exchangeRate, this.getTimestamp(), u.get()) : forexOrder;
+            fo = (ForexOrder) this.orderRepository.save(fo);
+            return false;
+        }
 
         // Check if balance for toCurrency exists. If yes update it with new amount, if not create it.
         Optional<Balance> balanceForToCurrency =
                 this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(
                         userEmail, toCurrencyCode);
         Optional<Currency> newCurrency = this.currencyService.findByCurrencyCode(toCurrencyCode);
-
+        ForexOrder fo = null;
+        fo = forexOrder == null ? new ForexOrder(0l, OrderType.FOREX, OrderTradeType.BUY, OrderStatus.IN_PROGRESS, fromCurrencyCode + " " + toCurrencyCode, amount, exchangeRate, this.getTimestamp(), u.get()) : forexOrder;
+        System.out.println("FO ID: " + fo.getId());
+        fo = this.orderRepository.save(fo);
+        System.out.println("FO ID: " + fo.getId());
+        Transaction transaction = this.transactionService.createTransaction(fo, balanceForFromCurrency, (float) amount);
+        this.transactionService.save(transaction);
         if (balanceForToCurrency.isPresent()) {
-            // update existing balance for toCurrency
-            Float newAmountInToCurrency =
-                    balanceForToCurrency.get().getAmount() + amountOfMoney * exchangeRate;
-            balanceForToCurrency.get().setAmount(newAmountInToCurrency);
-            this.balanceRepository.save(balanceForToCurrency.get());
+            this.increaseBalance(userEmail, toCurrencyCode, amount * exchangeRate);
         } else {
             // create new balance for toCurrency
             Balance newBalanceForToCurrency = new Balance();
             newBalanceForToCurrency.setUser(this.userService.findByEmail(userEmail).get());
             newBalanceForToCurrency.setCurrency(newCurrency.get());
-            newBalanceForToCurrency.setAmount(amountOfMoney * exchangeRate);
+            newBalanceForToCurrency.setAmount(amount * exchangeRate);
+            newBalanceForToCurrency.setReserved(0f);
+            newBalanceForToCurrency.setFree(amount * exchangeRate);
+            newBalanceForToCurrency.setType(BalanceType.CASH);
             this.balanceRepository.save(newBalanceForToCurrency);
+        }
+        this.updateOrderStatus(fo.getId(), OrderStatus.COMPLETE);
+        return true;
+    }
+
+    private void updateOrderStatus(Long id, OrderStatus orderStatus) {
+        Optional<Order> order = orderRepository.findById(id);
+        if(order.isPresent()) {
+            order.get().setStatus(orderStatus);
+            this.orderRepository.save(order.get());
         }
     }
 
@@ -120,7 +139,6 @@ public class BalanceService implements BalanceServiceInterface {
         Optional<Balance> balance =
                 this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(
                         userEmail, currencyCode);
-
         if (balance.isPresent()) {
             balance.get().setFree(balance.get().getFree() + amount);
             balance.get().setAmount(balance.get().getAmount() + amount);
@@ -141,24 +159,17 @@ public class BalanceService implements BalanceServiceInterface {
      * Da bi se ova metoda uspesno izvrsila, prethodno je potrebno rezervisati sumu.
      */
     @Override
-    public Balance decreaseBalance(String userEmail, String currencyCode, Float amount)
-            throws BalanceNotFoundException, NotEnoughMoneyException {
-        Optional<Balance> balance =
-                this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(
-                        userEmail, currencyCode);
-        if (balance.isEmpty()) {
-            throw new BalanceNotFoundException(userEmail, currencyCode);
-        }
-        if (balance.get().getAmount() < amount) {
+    public Balance decreaseBalance(String userEmail, String currencyCode, Float amount) throws BalanceNotFoundException, NotEnoughMoneyException {
+        Balance balance = this.findBalanceByUserEmailAndCurrencyCode(userEmail, currencyCode);
+        if (balance.getAmount() < amount) {
             throw new NotEnoughMoneyException();
         }
-        if (balance.get().getReserved() < amount) {
+        if (balance.getReserved() < amount) {
             throw new NotEnoughReservedMoneyException("Not enough money has been previously reserved, so balance for user with mail" + userEmail + "and currency code: " + currencyCode + " can't be decreased.");
         }
-        balance.get().setReserved(balance.get().getReserved() - amount);
-        balance.get().setAmount(balance.get().getAmount() - amount);
-        this.balanceRepository.save(balance.get());
-        return balance.get();
+        balance.setReserved(balance.getReserved() - amount);
+        balance.setAmount(balance.getAmount() - amount);
+        return this.balanceRepository.save(balance);
     }
 
     /**
@@ -169,9 +180,7 @@ public class BalanceService implements BalanceServiceInterface {
         List<Transaction> orderTransactions = this.transactionService.findAllByOrderId(order.getId());
         Float money = 0f;
         for (Transaction transaction : orderTransactions) {
-            if (transaction.getStatus().equals(TransactionStatus.COMPLETE)) {
-                money += transaction.getAmount();
-            }
+            money += transaction.getAmount();
         }
         if (order.getTradeType().equals(OrderTradeType.BUY)) {
             return this.decreaseBalance(userEmail, currencyCode, money);
@@ -196,5 +205,10 @@ public class BalanceService implements BalanceServiceInterface {
             String userFromEmail, String userToEmail, Float amount, String currencyCode) {
         decreaseBalance(userFromEmail, currencyCode, amount);
         increaseBalance(userToEmail, currencyCode, amount);
+    }
+    private String getTimestamp() {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return currentDateTime.format(formatter);
     }
 }

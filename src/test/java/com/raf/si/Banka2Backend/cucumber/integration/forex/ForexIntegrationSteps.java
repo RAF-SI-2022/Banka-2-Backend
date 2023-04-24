@@ -160,7 +160,7 @@ public class ForexIntegrationSteps extends ForexIntegrationTestConfig {
         BuySellForexDto dto = new BuySellForexDto();
         dto.setFromCurrencyCode("USD");
         dto.setToCurrencyCode("AUD");
-        dto.setAmountOfMoney(500);
+//        dto.setAmountOfMoney(500);
         MvcResult mvcResult = null;
         String body = new ObjectMapper().writeValueAsString(dto);
         try {
@@ -238,7 +238,7 @@ public class ForexIntegrationSteps extends ForexIntegrationTestConfig {
         BuySellForexDto dto = new BuySellForexDto();
         dto.setFromCurrencyCode("RSD");
         dto.setToCurrencyCode("GBP");
-        dto.setAmountOfMoney(500);
+//        dto.setAmountOfMoney(500);
         MvcResult mvcResult = null;
         String body = new ObjectMapper().writeValueAsString(dto);
         try {
