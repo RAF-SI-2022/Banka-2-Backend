@@ -42,7 +42,6 @@ public class TransactionService implements TransactionServiceInterface {
 
         for (Transaction trans: allTransactions){
             if (trans.getCurrency().getId().equals(test)) {
-                System.out.println("kurac " + test);
                 toReturnTrans.add(trans);
             }
         }
