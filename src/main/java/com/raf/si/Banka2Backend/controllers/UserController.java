@@ -132,6 +132,9 @@ public class UserController {
         Optional<Currency> rsd = this.currencyService.findByCurrencyCode("RSD");
         if (rsd.isEmpty()) throw new CurrencyNotFoundException("RSD");
         balance.setCurrency(rsd.get());
+        balance.setFree(100000f);
+        balance.setType(BalanceType.CASH);
+        balance.setReserved(0f);
         balance.setAmount(100000f);
 
         Balance balance2 = new Balance();
@@ -140,6 +143,9 @@ public class UserController {
         if (usd.isEmpty()) throw new CurrencyNotFoundException("USD");
         balance2.setCurrency(usd.get());
         balance2.setAmount(100000f);
+        balance2.setFree(100000f);
+        balance2.setType(BalanceType.CASH);
+        balance2.setReserved(0f);
 
         List<Balance> balances = new ArrayList<>();
         balances.add(balance);
