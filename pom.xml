@@ -8,16 +8,15 @@
         <version>2.6.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.raf.si</groupId>
+    <groupId>rs.edu.raf.si.bank2</groupId>
     <artifactId>Banka2Backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>Banka2Backend</name>
-    <description>Backend projekat za tim Banka2</description>
+    <name>Bank2Backend</name>
+    <description>Backend projekat za tim Banka-2</description>
     <properties>
         <java.version>17</java.version>
-        <!-- TODO update groupId to correct -->
-        <exec.mainClass>com.raf.si.Banka2Backend.Banka2BackendApplication</exec.mainClass>
+        <exec.mainClass>rs.edu.raf.si.bank2.Bank2Backend.Bank2BackendApplication</exec.mainClass>
         <spotless.check.skip>true</spotless.check.skip>
         <version.spotless>2.35.0</version.spotless>
         <revision>${project.version}</revision>
@@ -44,11 +43,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20230227</version>
         </dependency>
         <!-- Security -->
         <dependency>
