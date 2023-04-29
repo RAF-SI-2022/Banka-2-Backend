@@ -430,7 +430,9 @@ public class StockService {
             e.printStackTrace();
         }
 
-        return ResponseEntity.ok().body("Stock buy order has been processed");
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Stock buy order has been processed");
+        return ResponseEntity.ok().body(response);
     }
 
     private StockOrder createOrder(
@@ -483,7 +485,9 @@ public class StockService {
             e.printStackTrace();
         }
 
-        return ResponseEntity.ok().body("Stock sell order has been processed");
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Stock sell order has been processed");
+        return ResponseEntity.ok().body(response);
     }
 
     public List<UserStock> getAllUserStocks(long userId) {
