@@ -1,0 +1,214 @@
+#!/bin/bash
+
+# Initializes the repository on the local machine: sets up
+# the .git folder and downloads the correct JDK.
+init() {
+	# Disable auto-modification of CR/LF endings
+	echo "Disabling git config core.autocrlf (this repo)..."
+	-git config core.autocrlf false
+	echo "Done"
+
+	# Copy git hooks
+	echo "Copying git hooks..."
+	cp -a ./git/hooks/. ./.git/hooks
+	echo "Done"
+
+	# Download the package
+	echo "Downloading Amazon Corretto JDK..."
+	curl -L -o ./lib/$targetJdk $sourceJdk
+
+	# Download the checksum
+	curl -L -o ./lib/$targetSha $sourceSha
+	echo "Done"
+
+	# Check SHA256
+	echo "Verifying JDK checksum..."
+	cd lib
+	echo "  $targetJdk" >> $targetSha
+  if [[ "$os" == "linux" ]]; then
+    sha256sum -c $targetSha
+  fi
+  if [[ "$os" == "macos" ]]; then
+    shasum -a 256 -c $targetSha
+  fi
+  cd ..
+	echo "Done"
+
+	# Unpack
+	echo "Unpacking JDK..."
+	mkdir -p $jdk
+	tar -xf ./lib/amazon-corretto-$ver-$arch-$os-jdk.$ext -C $jdk
+
+	# Remove residue
+	rm -f ./lib/$targetJdk
+	rm -f ./lib/$targetSha
+
+	# Move files directly into current dir
+	mv $jdk/amazon-* ./lib/extracted
+	rm -rf $jdk
+	mkdir -p $jdk
+	mv ./lib/extracted/* $jdk
+	rm -rf ./lib/extracted
+	echo "Done"
+	echo "Init complete"
+}
+
+exportJavaHome() {
+  cd $jdk
+  JAVA_HOME=$(pwd)
+  export JAVA_HOME
+  cd ..
+}
+
+dockerServiceBuild() {
+	exportJavaHome
+  cd $1
+	./mvnw spotless:apply
+  docker build -t $1-$2 -f ./docker/$2.Dockerfile .
+  cd ..
+}
+
+localServiceExec() {
+  exportJavaHome
+  cd $1
+	./mvnw spotless:apply clean compile $2
+  cd ..
+}
+
+# Builds the dev image and starts the required services. Can be run locally
+# or via Docker.
+dev() {
+  if [[ "$1" == "FALSE" ]]; then
+    for s in "${services[@]}"; do
+      dockerServiceBuild $s "dev"
+    done
+    docker compose up -d mariadb
+    docker compose up -d flyway
+    docker compose up -d mongodb
+    for s in "${services[@]}"; do
+      docker compose up -d $s-dev
+    done
+	else
+    docker compose up -d mariadb
+    docker compose up -d flyway
+    docker compose up -d mongodb
+    for s in "${services[@]}"; do
+      localServiceExec $s "exec:java"
+    done
+  fi
+}
+
+# Builds the test image and starts the required services. Can be run locally
+# or via Docker.
+test() {
+  if [[ "$1" == "FALSE" ]]; then
+    for s in "${services[@]}"; do
+      docker compose rm -s -f $s-test
+      dockerServiceBuild $s "test"
+    done
+    docker compose up -d mariadb
+    docker compose up -d flyway
+    docker compose up -d mongodb
+    for s in "${services[@]}"; do
+      docker run --rm --network container:mariadb $s-test
+    done
+    for s in "${services[@]}"; do
+      call docker compose rm -s -f $s-test
+    done
+	else
+    docker compose up -d mariadb
+    docker compose up -d flyway
+    docker compose up -d mongodb
+    for s in "${services[@]}"; do
+      localServiceExec $s "test"
+    done
+  fi
+}
+
+# Builds the production image and pushes it to the harbor.
+prod() {
+  for s in "${services[@]}"; do
+    dockerServiceBuild $s "prod"
+    # TODO add docker login and push to harbor
+  done
+}
+
+# Restarts all auxiliary Docker services.
+stack() {
+	docker compose restart mariadb
+	docker compose restart mongodb
+	docker compose restart flyway
+}
+
+# Removes and rebuilds all Docker auxiliary services. Use this command if
+# encountering errors in your build process.
+reset() {
+	docker compose -v down
+	docker compose up -d mariadb
+	docker compose up -d flyway
+	docker compose up -d mongodb
+}
+
+# DANGER!!! For testing the development environment. Executes Docker
+# containers in privileged mode. Do NOT use for app development!
+devenv() {
+	# TODO add windows images
+	docker build -t test-devenv-ubuntu-x64 -f ./docker/test-devenv.ubuntu.x64.Dockerfile .
+	docker run --rm -it --cap-add=NET_ADMIN --privileged --entrypoint /home/project/docker/test-devenv.sh test-devenv-ubuntu-x64
+	docker build -t test-devenv-ubuntu-aarch64 -f ./docker/test-devenv.ubuntu.aarch64.Dockerfile .
+	docker run --rm -it --cap-add=NET_ADMIN --privileged --entrypoint /home/project/docker/test-devenv.sh test-devenv-ubuntu-aarch64
+}
+
+main() {
+  ver=17
+  os=$(uname)
+  ext=tar.gz
+  # Get architecture; if egrep returns nothing, then it's arm64
+  if [[ -z $(uname -m | egrep "^(arm.*)|(aarch.*)") ]]; then
+    arch="x64"
+  else
+    arch="aarch64"
+  fi
+  # Get os and sha commands for each os
+  if [[ "$os" == "Linux" ]]; then
+    os="linux"
+  fi
+  if [[ "$os" == "Darwin" ]]; then
+    os="macos"
+  fi
+
+  # File/dir names
+  targetJdk=amazon-corretto-$ver-$arch-$os-jdk.$ext
+  sourceJdk=https://corretto.aws/downloads/latest/$targetJdk
+  targetSha=amazon-corretto-$ver-$arch-$os-jdk.$ext.checksum
+  sourceSha=https://corretto.aws/downloads/latest_sha256/$targetJdk
+  jdk=./lib/jdk-amazon-corretto-$ver-$arch-$os
+
+  # Parameters
+  local=FALSE
+  if [[ "$*" =~ [^\-]*--local.* ]]; then
+    local=TRUE
+  fi
+
+  services=("users")
+
+  if [[ -z "$1" ]]; then
+    dev $local
+  elif [[ "$1" == "init" ]]; then
+    init
+  elif [[ "$1" == "dev" ]]; then
+    dev $local
+  elif [[ "$1" == "test" ]]; then
+    test $local
+  elif [[ "$1" == "prod" ]]; then
+    prod
+  elif [[ "$1" == "stack" ]]; then
+    stack
+  elif [[ "$1" == "reset" ]]; then
+    reset
+  elif [[ "$1" == "devenv" ]]; then
+    devenv
+  fi
+}
+
+main "$@"
