@@ -77,8 +77,6 @@ local-dev:
 	docker compose up -d flyway
 	docker compose up -d mongodb
 	cd ${jdk} && export JAVA_HOME=$(pwd)#TODO test this!
-	${jdk}/bin/javac.exe ./lib/FixLineEndings.java
-	${jdk}/bin/java.exe -cp lib FixLineEndings
 	./mvnw spotless:apply clean compile exec:java
 
 # Builds the app locally and starts the required services
@@ -88,8 +86,6 @@ local-test:
 	docker compose up -d flyway
 	docker compose up -d mongodb
 	cd ${jdk} && export JAVA_HOME=$(pwd)#TODO test this!
-	${jdk}/bin/javac.exe ./lib/FixLineEndings.java
-	${jdk}/bin/java.exe -cp lib FixLineEndings
 	./mvnw spotless:apply clean compile test
 
 # Builds the dev image and starts the required services.

@@ -59,17 +59,17 @@ services:
               -url=jdbc:mariadb://mariadb:3306/test -schemas=users -user=root -password=root -connectRetries=60 migrate &&
               -url=jdbc:mariadb://mariadb:3306/prod -schemas=users -user=root -password=root -connectRetries=60 migrate"
     volumes:
-      - ./src/main/resources/db/migration:/flyway/sql
-      - ./flywayConfig:/flyway/conf
+      - ./flyway/migrations:/flyway/sql
+      - ./flyway/config:/flyway/conf
     depends_on:
       mariadb:
         condition: service_healthy
     networks:
       - net_all
 
-  banka2backend-dev:
-    container_name: banka2backend-dev
-    image: banka2backend-dev
+  users:
+    container_name: users
+    image: users
     expose:
       - "8080"
     ports:
@@ -81,42 +81,6 @@ services:
         condition: service_healthy
       flyway:
         condition: service_completed_successfully
-    networks:
-      - net_all
-
-  banka2backend-prod:
-    container_name: banka2backend-prod
-    image: banka2backend-prod
-    expose:
-      - "8080"
-    ports:
-      - "8080:8080"
-    depends_on:
-      mariadb:
-        condition: service_healthy
-      mongodb:
-        condition: service_healthy
-      flyway:
-        condition: service_completed_successfully
-    networks:
-      - net_all
-
-  phpmyadmin:
-    image: phpmyadmin
-    restart: always
-    expose:
-      - "8081"
-    ports:
-      - "8081:80"
-    environment:
-      PMA_HOST: mariadb
-      PMA_PORT: 3306
-      MYSQL_ROOT_USER: root
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
-    depends_on:
-      mariadb:
-        condition: service_healthy
     networks:
       - net_all
 
