@@ -59,7 +59,7 @@ services:
               -url=jdbc:mariadb://mariadb:3306/test -schemas=users -user=root -password=root -connectRetries=60 migrate &&
               -url=jdbc:mariadb://mariadb:3306/prod -schemas=users -user=root -password=root -connectRetries=60 migrate"
     volumes:
-      - ./flyway/migrations:/flyway/sql
+      - ./flyway/migration:/flyway/sql
       - ./flyway/config:/flyway/conf
     depends_on:
       mariadb:
@@ -67,9 +67,26 @@ services:
     networks:
       - net_all
 
-  users:
-    container_name: users
-    image: users
+  users-dev:
+    container_name: users-dev
+    image: users-dev
+    expose:
+      - "8080"
+    ports:
+      - "8080:8080"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
+    networks:
+      - net_all
+
+  users-prod:
+    container_name: users-prod
+    image: users-prod
     expose:
       - "8080"
     ports:

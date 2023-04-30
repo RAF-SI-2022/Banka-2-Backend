@@ -105,7 +105,7 @@ rem Builds the dev image and starts the required services. Can be run locally
 rem or via Docker.
 :dev
     setlocal
-        if %1 == FALSE (
+        if "%~1" == "FALSE" (
             set "i=0"
             :loopDev0
             if defined services[!i!] (
@@ -123,7 +123,9 @@ rem or via Docker.
                 set /a "i+=1"
                 call :loopDev1
             )
-        ) else (
+        )
+
+        if "%~1" == "TRUE" (
             call docker compose up -d mariadb
             call docker compose up -d flyway
             call docker compose up -d mongodb
@@ -144,7 +146,7 @@ rem Builds the test image and starts the required services. Can be run locally
 rem or via Docker.
 :test
     setlocal
-        if %1 == FALSE (
+        if "%~1" == "FALSE" (
             set "i=0"
             :loopTest0
             if defined services[!i!] (
@@ -164,7 +166,9 @@ rem or via Docker.
                 set /a "i+=1"
                 call :loopTest1
             )
-        ) else (
+        )
+
+        if "%~1" == "TRUE" (
             call docker compose up -d mariadb
             call docker compose up -d flyway
             call docker compose up -d mongodb

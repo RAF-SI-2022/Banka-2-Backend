@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
@@ -122,7 +123,13 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
             fail(e.getMessage());
         }
 
-        JSONObject actualStockJson = new JSONObject(mvcResult.getResponse().getContentAsString());
+        // TODO exception nije obradjen!!!!!!!!!!!
+        JSONObject actualStockJson = null;
+        try {
+            actualStockJson = new JSONObject(mvcResult.getResponse().getContentAsString());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
 
         assertNotNull(actualStockJson, "Json is not null");
     }
@@ -143,7 +150,13 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
             fail(e.getMessage());
         }
 
-        JSONObject actualStockJson = new JSONObject(mvcResult.getResponse().getContentAsString());
+        // TODO exception nije obradjen!!!!!!!!!!!
+        JSONObject actualStockJson = null;
+        try {
+            actualStockJson = new JSONObject(mvcResult.getResponse().getContentAsString());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
 
         assertNotNull(actualStockJson, "Json is not null");
     }
