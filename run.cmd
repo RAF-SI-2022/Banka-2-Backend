@@ -1,9 +1,11 @@
 @echo off
+
+set services[0]="users"
+
 goto :main
 
 
 
-rem #TODO remove functions and use for-loops instead
 :docker-service-build
     setlocal
         set JAVA_HOME=%projectHome%\lib\%jdk%
@@ -35,16 +37,19 @@ rem environemnt.
         echo "Disabling git config core.autocrlf (this repo)..."
         call git config core.autocrlf false
         echo "Done"
+
         rem Copy git hooks
         echo "Copying git hooks..."
         xcopy "git\hooks" ".git\hooks" /E /C /H /R /K /Y
         echo "Done"
+
         rem Download the package
         echo "Downloading Amazon Corretto JDK..."
         curl -Lo ./lib/%targetJdk% %sourceJdk%
         rem Download the checksum
         curl -Lo ./lib/%targetSha% %sourceSha%
         echo "Done"
+
         rem Check SHA256
         cd lib
         echo "Verifying JDK checksum..."
@@ -66,24 +71,27 @@ rem environemnt.
           SET /a count=!count!+1
         )
         if "!shacomputed1!"=="" (
-            echo "Bad SHA, do make init again"
+            echo "Bad SHA, do ./run init again"
             exit 1
         )
         if not "!shadownload!"=="!shacomputed1!" (
-            echo "Bad SHA, do make init again"
+            echo "Bad SHA, do ./run init again"
             exit 1
         )
         del shacomputed0.txt >NUL
         del shacomputed1.txt >NUL
         echo "Done"
+
         rem Unpack
         echo "Unpacking JDK..."
         cd lib
         rmdir %jdk% /s /q
         tar -xf %targetJdk%
+
         rem Remove residue
         del %targetJdk%
         del %targetSha%
+
         rem Move files directly into current dir
         move /y jdk* %jdk%
         echo "Done"
@@ -98,17 +106,34 @@ rem or via Docker.
 :dev
     setlocal
         if %1 == FALSE (
-            call docker compose rm -s -f users-test
-            call :docker-service-build "users" "dev"
+            set "i=0"
+            :loopDev0
+            if defined services[!i!] (
+                call :docker-service-build %%services[!i!]%% "dev"
+                set /a "i+=1"
+                call :loopDev0
+            )
             call docker compose up -d mariadb
             call docker compose up -d flyway
             call docker compose up -d mongodb
-            call docker compose up -d users
+            set "i=0"
+            :loopDev1
+            if defined services[!i!] (
+                call docker compose up -d %%services[!i!]%%-dev
+                set /a "i+=1"
+                call :loopDev1
+            )
         ) else (
             call docker compose up -d mariadb
             call docker compose up -d flyway
             call docker compose up -d mongodb
-            call :local-service-exec "users" "exec:java"
+            set "i=0"
+            :loopDev2
+            if defined services[!i!] (
+                call :local-service-exec %%services[!i!]%% "exec:java"
+                set /a "i+=1"
+                call :loopDev2
+            )
         )
     endlocal
 exit /B 0
@@ -120,18 +145,36 @@ rem or via Docker.
 :test
     setlocal
         if %1 == FALSE (
-            call docker compose rm -s -f users-test
-            call :docker-service-build "users" "test"
+            set "i=0"
+            :loopTest0
+            if defined services[!i!] (
+                call docker compose rm -s -f %%services[!i!]%%-test
+                call :docker-service-build %%services[!i!]%% "test"
+                set /a "i+=1"
+                call :loopTest0
+            )
             call docker compose up -d mariadb
             call docker compose up -d flyway
             call docker compose up -d mongodb
-            call docker run --rm --network container:mariadb users-test
-            call docker compose rm -s -f users-test
+            set "i=0"
+            :loopTest1
+            if defined services[!i!] (
+                call docker run --rm --network container:mariadb %%services[!i!]%%-test
+                call docker compose rm -s -f %%services[!i!]%%-test
+                set /a "i+=1"
+                call :loopTest1
+            )
         ) else (
             call docker compose up -d mariadb
             call docker compose up -d flyway
             call docker compose up -d mongodb
-            call :local-service-exec "users" "test"
+            set "i=0"
+            :loopTest2
+            if defined services[!i!] (
+                call :local-service-exec %%services[!i!]%% "test"
+                set /a "i+=1"
+                call :loopTest2
+            )
         )
     endlocal
 exit /B 0
@@ -141,15 +184,21 @@ exit /B 0
 rem Builds the production image and pushes it to the harbor.
 :prod
     setlocal
-        call :docker-service-build "users" "prod"
-        rem add docker login and push to harbor
+        set "i=0"
+        :loopProd0
+        if defined services[!i!] (
+            call :docker-service-build %%services[!i!]%% "prod"
+            rem TODO add docker login and push to harbor
+            set /a "i+=1"
+            call :loopProd0
+        )
     endlocal
 exit /B 0
 
 
 
 rem Restarts all auxiliary Docker services.
-:services
+:stack
     setlocal
         call docker compose restart mariadb
         call docker compose restart mongodb
@@ -191,10 +240,13 @@ rem Main script logic.
     setlocal enableextensions enabledelayedexpansion
 
         rem If local execution (not Docker) requested.
-        if "%2" == "--local" (
-            set local=TRUE
-        ) else (
+        echo "%*"|findstr /R "^[^\-]*--local.*$" > reg.temp
+        set /p reg=<reg.temp
+        del reg.temp
+        if [%reg%] == [] (
             set local=FALSE
+        ) else (
+            set local=TRUE
         )
 
         rem Initializes the repository on the local machine: sets up
@@ -211,7 +263,7 @@ rem Main script logic.
         if "%1" == "dev" call :dev %local%
         if "%1" == "test" call :test %local%
         if "%1" == "prod" call :prod %local%
-        if "%1" == "services" call :services
+        if "%1" == "stack" call :stack
         if "%1" == "reset" call :reset
         if "%1" == "devenv" call :devenv
     endlocal

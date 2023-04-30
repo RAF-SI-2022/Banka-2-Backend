@@ -24,7 +24,7 @@ jobs:
       - run: cd ${{ github.workspace }}
       - run: chmod 777 -R .
       # Test the repository
-      - run: make test
+      - run: run test
       # Remove services
       - run: docker compose -v down
 #   report:
