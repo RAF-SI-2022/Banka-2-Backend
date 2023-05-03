@@ -139,9 +139,6 @@ public class StockService {
                 JSONObject assetProfile = result.getJSONObject(0).getJSONObject("assetProfile");
                 String website = assetProfile.getString("website");
 
-                if (companyOverview.isEmpty() || globalQuoteJson.isEmpty() || websiteLinkJson.isEmpty())
-                    throw new StockNotFoundException(symbol);
-
                 Optional<Exchange> exchange =
                         exchangeRepository.findExchangeByAcronym(companyOverview.getString("Exchange"));
 

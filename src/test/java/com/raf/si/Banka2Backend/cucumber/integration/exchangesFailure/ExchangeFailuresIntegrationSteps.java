@@ -119,8 +119,10 @@ public class ExchangeFailuresIntegrationSteps extends ExchangeFailuresIntegratio
             });
 
             String expectedMessage =
-                    "Request processing failed; nested exception is com.raf.si.Banka2Backend.exceptions.ExchangeNotFoundException";
+                    "Request processing failed; nested exception is com.raf.si.Banka2Backend.exceptions.ExchangeNotFoundException: Requested exchange not found in the database.";
             String actualMessage = exception.getMessage();
+            System.out.println("EVOOOOOOOOOO");
+            System.out.println(actualMessage);
             assertEquals(actualMessage, expectedMessage);
         } catch (Exception e) {
             fail(e.getMessage());
@@ -141,8 +143,10 @@ public class ExchangeFailuresIntegrationSteps extends ExchangeFailuresIntegratio
             });
 
             String expectedMessage =
-                    "Request processing failed; nested exception is com.raf.si.Banka2Backend.exceptions.ExchangeNotFoundException";
+                    "Request processing failed; nested exception is com.raf.si.Banka2Backend.exceptions.ExchangeNotFoundException: Requested exchange not found in the database.";
             String actualMessage = exception.getMessage();
+            System.out.println("EVOOOOOOOOOO");
+            System.out.println(actualMessage);
             assertEquals(actualMessage, expectedMessage);
         } catch (Exception e) {
             fail(e.getMessage());
@@ -163,7 +167,7 @@ public class ExchangeFailuresIntegrationSteps extends ExchangeFailuresIntegratio
             });
 
             String expectedMessage =
-                    "Request processing failed; nested exception is com.raf.si.Banka2Backend.exceptions.ExchangeNotFoundException";
+                    "Request processing failed; nested exception is com.raf.si.Banka2Backend.exceptions.ExchangeNotFoundException: Requested exchange not found in the database.";
             String actualMessage = exception.getMessage();
             assertEquals(actualMessage, expectedMessage);
         } catch (Exception e) {
