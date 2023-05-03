@@ -41,9 +41,9 @@ public class ForexController {
     @PostMapping("/buy-sell")
     public ResponseEntity<?> buyOrSell(@RequestBody @Valid BuySellForexDto dto) {
         Forex forex = forexService.getForexForCurrencies(dto.getFromCurrencyCode(), dto.getToCurrencyCode());
-        if (forex == null) {
-            return ResponseEntity.notFound().build();
-        }
+//        if (forex == null) {
+//            return ResponseEntity.notFound().build();
+//        }
         String signedInUserEmail = getContext().getAuthentication().getName();
         try {
             boolean success = this.balanceService.buyOrSellCurrency(

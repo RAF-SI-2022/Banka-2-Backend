@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
@@ -106,7 +107,7 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
     }
 
     @Then("user gets stock by id from database")
-    public void userGetsStockByIdFromDatabase() throws IOException {
+    public void userGetsStockByIdFromDatabase() throws IOException, JSONException {
 
         MvcResult mvcResult = null;
         try {
@@ -128,7 +129,7 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
     }
 
     @Then("user gets stock by symbol from database")
-    public void userGetsStockBySymbolFromDatabase() throws UnsupportedEncodingException {
+    public void userGetsStockBySymbolFromDatabase() throws UnsupportedEncodingException, JSONException {
         MvcResult mvcResult = null;
         try {
             mvcResult = mockMvc.perform(get("/api/stock/symbol/" + testStock.getSymbol())
