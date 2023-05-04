@@ -18,7 +18,13 @@
         <java.version>17</java.version>
         <!-- TODO update groupId to correct -->
         <exec.mainClass>com.raf.si.Banka2Backend.Banka2BackendApplication</exec.mainClass>
+        <spotless.check.skip>true</spotless.check.skip>
         <version.spotless>2.35.0</version.spotless>
+        <revision>${project.version}</revision>
+        <finalName>${project.artifactId}-${revision}</finalName>
+        <jacoco.version>0.8.8</jacoco.version>
+        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+        <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
     </properties>
     <dependencies>
         <!-- Core server dependencies -->
@@ -176,6 +182,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Code coverage -->
+        <dependency>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${jacoco.version}</version>
+        </dependency>
+
         <!-- JSONObject -->
         <!-- https://mvnrepository.com/artifact/org.json/json -->
         <dependency>
@@ -208,6 +221,19 @@
                 </configuration>
             </plugin>
 
+            <!-- Reports -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.12.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>3.4.3</version>
+            </plugin>
+
+            <!-- Formatting -->
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
@@ -261,5 +287,35 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${jacoco.version}</version>
+                        <executions>
+                            <execution>
+                                <id>jacoco-initialize</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>jacoco-site</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
