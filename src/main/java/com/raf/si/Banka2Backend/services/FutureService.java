@@ -52,14 +52,14 @@ public class FutureService implements FutureServiceInterface {
         System.out.println(futureRequest);
         if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) { // regularni buy
             Optional<Future> future = futureRepository.findById(futureRequest.getId());
-            if (future.isEmpty()) return ResponseEntity.status(500).body("Internal server error ovaj");
-            if (!future.get().isForSale()) return ResponseEntity.status(500).body("Internal server error");
+            if (future.isEmpty()) return ResponseEntity.status(500).body("Doslo je do neocekivane greske.");
+            if (!future.get().isForSale()) return ResponseEntity.status(500).body("Doslo je do neocekivane greske.");
 
             User toUser = future.get().getUser();
             if (toUser != null) { // provera da li user ima dovoljno para //todo trenutno je sve preko USD
                 float amount = future.get().getMaintenanceMargin();
                 if (usersMoneyInCurrency < amount)
-                    return ResponseEntity.status(500).body("Not enough money in balance");
+                    return ResponseEntity.status(500).body("Nemate dovoljno novca na balansu.");
 
                 // Provera za daily limit
                 //            System.out.println("Ovde sam");
@@ -73,7 +73,7 @@ public class FutureService implements FutureServiceInterface {
                     //                    System.out.println("Limit " + limit + " vrednost " + amountDouble + "
                     // oduzimanje " + suma);
                     boolean limitTestBoolean = limit - amountDouble < 0 ? false : true;
-                    if (!limitTestBoolean) return ResponseEntity.status(500).body("Exceeded daily limit");
+                    if (!limitTestBoolean) return ResponseEntity.status(500).body("Prekoracili ste dozvoljeni dnevni limit. Kontaktirajte administratora.");
                     else {
                         optionalUser.get().setDailyLimit(limit - amountDouble);
                         userService.save(optionalUser.get());
@@ -94,7 +94,7 @@ public class FutureService implements FutureServiceInterface {
                 //                System.out.println("Limit " + limit + " vrednost " + amountDouble + " oduzimanje " +
                 // suma);
                 boolean limitTestBoolean = limit - amountDouble < 0 ? false : true;
-                if (!limitTestBoolean) return ResponseEntity.status(500).body("Exceeded daily limit");
+                if (!limitTestBoolean) return ResponseEntity.status(500).body("Prekoracili ste dozvoljeni dnevni limit. Kontaktirajte administratora.");
                 else {
                     optionalUser.get().setDailyLimit(limit - amountDouble);
                     userService.save(optionalUser.get());
@@ -107,7 +107,11 @@ public class FutureService implements FutureServiceInterface {
             return ResponseEntity.ok().body(findById(futureRequest.getId()));
         } else {
             futureBuyWorker.setFuturesRequestsMap(futureRequest.getId(), futureRequest);
-            return ResponseEntity.ok().body("Future is set for custom sale and is waiting for trigger");
+//            return ResponseEntity.ok().body("Future is set for custom sale and is waiting for trigger");
+
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Terminski ugovor je uspesno postavljen na prodaju sa limitom.");
+            return ResponseEntity.ok().body(response);
         }
     }
 
@@ -119,8 +123,8 @@ public class FutureService implements FutureServiceInterface {
     public ResponseEntity<?> sellFuture(FutureRequestBuySell futureRequest) {
         if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) {
             Optional<Future> future = futureRepository.findById(futureRequest.getId());
-            if (future.isEmpty()) return ResponseEntity.status(500).body("Internal server error");
-            if (future.get().isForSale()) return ResponseEntity.status(500).body("Internal server error");
+            if (future.isEmpty()) return ResponseEntity.status(500).body("Doslo je do neocekivane greske.");
+            if (future.get().isForSale()) return ResponseEntity.status(500).body("Doslo je do neocekivane greske.");
             future.get().setForSale(true);
             future.get().setMaintenanceMargin(futureRequest.getPrice());
             futureRepository.save(future.get());
@@ -134,17 +138,17 @@ public class FutureService implements FutureServiceInterface {
     @Override
     public ResponseEntity<?> removeFromMarket(Long futureId) {
         Optional<Future> future = findById(futureId);
-        if (future.isEmpty()) return ResponseEntity.status(500).body("Internal server error");
+        if (future.isEmpty()) return ResponseEntity.status(500).body("Doslo je do neocekivane greske.");
 
         if (!future.get().isForSale()) {
-            return ResponseEntity.status(500).body("This isnt for sale");
+            return ResponseEntity.status(500).body("Ne mozete skinuti terminski ugovor sa prodaje, zato sto ugovor nije na prodaji.");
         }
 
         future.get().setForSale(false);
         updateFuture(future.get());
 
         if (!findById(futureId).get().isForSale()) return ResponseEntity.ok().body(findById(futureId));
-        return ResponseEntity.status(500).body("Internal server error");
+        return ResponseEntity.status(500).body("Doslo je do neocekivane greske.");
     }
 
     @Override
@@ -163,11 +167,11 @@ public class FutureService implements FutureServiceInterface {
         }
 
         if (error) {
-            return ResponseEntity.status(500).body("Internal server error");
+            return ResponseEntity.status(500).body("Doslo je do neocekivane greske.");
         }
 
         Map<String, String> response = new HashMap<>();
-        response.put("message", "Uspesno skinut");
+        response.put("message", "Uspesno skinut terminski ugovor sa prodaje.");
         return ResponseEntity.ok().body(response);
     }
 
@@ -187,11 +191,11 @@ public class FutureService implements FutureServiceInterface {
         }
 
         if (error) {
-            return ResponseEntity.status(500).body("Internal server error");
+            return ResponseEntity.status(500).body("Doslo je do neocekivane greske.");
         }
 
         Map<String, String> response = new HashMap<>();
-        response.put("message", "Uspesno skinut");
+        response.put("message", "Uspesno skinuto cekanje za kupovinu ugovora.");
         return ResponseEntity.ok().body(response);
     }
 

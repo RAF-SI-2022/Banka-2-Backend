@@ -32,7 +32,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> myUser = this.findByEmail(username);
         if (myUser.isEmpty()) {
-            throw new UsernameNotFoundException("User with email: " + username + " not found");
+            throw new UsernameNotFoundException("Korisnik sa email-om: " + username + " nije pronadjen.");
         }
 
         return new org.springframework.security.core.userdetails.User(

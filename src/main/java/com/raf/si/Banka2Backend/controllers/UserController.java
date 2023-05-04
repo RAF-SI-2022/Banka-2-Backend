@@ -53,7 +53,7 @@ public class UserController {
     public ResponseEntity<?> getAllPermissions() {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.ADMIN_USER, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("Only admin can read all permissions in data base.");
+            return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
         return ResponseEntity.ok(this.permissionService.findAll());
     }
@@ -62,11 +62,11 @@ public class UserController {
     public ResponseEntity<?> getAllUserPermissions(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't read permission.");
+            return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
         Optional<User> userOptional = this.userService.findById(id);
         if (userOptional.isEmpty()) {
-            return ResponseEntity.status(400).body("User with that id doesn't exist.");
+            return ResponseEntity.status(400).body("User sa id-em " + id + " nije pronadjen.");
         }
         return ResponseEntity.ok(userOptional.get().getPermissions());
     }
@@ -79,11 +79,11 @@ public class UserController {
 
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.CREATE_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to create users.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da kreirate korisnike.");
         }
         Optional<User> existingUser = userService.findByEmail(user.getEmail());
         if (existingUser.isPresent()) {
-            return ResponseEntity.status(400).body("User with that email already exists.");
+            return ResponseEntity.status(400).body("Korisnik sa email-om " + user.getEmail() + " vec postoji.");
         }
 
         List<Permission> permissions = this.permissionService.findByPermissionNames(user.getPermissions());
@@ -159,7 +159,7 @@ public class UserController {
     public ResponseEntity<?> findAll() {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to read users.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da pristupite korisnicima.");
         }
         return ResponseEntity.ok().body(userService.findAll());
     }
@@ -168,7 +168,7 @@ public class UserController {
     public ResponseEntity<?> findById(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to read users.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da pristupite korisnicima.");
         }
         return ResponseEntity.ok().body(userService.findById(id));
     }
@@ -177,7 +177,7 @@ public class UserController {
     public ResponseEntity<?> findByEmail() {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to read users.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da pristupite korisnicima.");
         }
         return ResponseEntity.ok().body(userService.findByEmail(signedInUserEmail));
     }
@@ -186,7 +186,7 @@ public class UserController {
     public ResponseEntity<?> deleteById(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.DELETE_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to delete users.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da brisete korisnike.");
         }
         try {
             userService.deleteById(id);
@@ -200,16 +200,16 @@ public class UserController {
     public ResponseEntity<?> reactivateUser(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.ADMIN_USER, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to reactivate users.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da aktivirate korisnika.");
         }
         Optional<User> userOptional = this.userService.findById(id);
         if (userOptional.isEmpty()) {
             return ResponseEntity.status(400)
-                    .body("Can't reactivate user with id " + id + ", because it doesn't exist");
+                    .body("Ne mozete aktivirati korisnika sa id-om  " + id + ", zato sto ne postoji");
         }
         if (userOptional.get().isActive()) {
             return ResponseEntity.status(400)
-                    .body("Can't reactivate user with id " + id + ", because it is already active");
+                    .body("Ne mozete aktivirati korisnika sa id-om " + id + ", zato sto je vec aktiviran");
         }
         // Reactivating user after delete - setting active to true
         User user = userOptional.get();
@@ -221,16 +221,16 @@ public class UserController {
     public ResponseEntity<?> deactivateUser(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.ADMIN_USER, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to deactivate users.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da deaktivirate korisnika.");
         }
         Optional<User> userOptional = this.userService.findById(id);
         if (userOptional.isEmpty()) {
             return ResponseEntity.status(400)
-                    .body("Can't deactivate user with id " + id + ", because it doesn't exist");
+                    .body("Ne mozete deaktivirati korisnika sa id-om  " + id + ", zato sto ne postoji");
         }
         if (!userOptional.get().isActive()) {
             return ResponseEntity.status(400)
-                    .body("Can't deactivate user with id " + id + ", because it is already active");
+                    .body("Ne mozete deaktivirati korisnika sa id-om " + id + ", zato sto je vec deaktiviran");
         }
         User user = userOptional.get();
         user.setActive(false);
@@ -244,14 +244,14 @@ public class UserController {
 
         if (logovan.isPresent()) {
             if (!logovan.get().getId().equals(id)) {
-                return ResponseEntity.status(401).body("You don't have permission to update this user.");
+                return ResponseEntity.status(401).body("Nemate dozvolu da modifikujete korisnika.");
             }
         } else {
-            return ResponseEntity.status(401).body("Internal error");
+            return ResponseEntity.status(401).body("Doslo je do neocekivane greske.");
         }
         Optional<User> updatedUser = userService.findById(id);
         if (updatedUser.isEmpty()) {
-            return ResponseEntity.status(400).body("Can't find user with id " + id);
+            return ResponseEntity.status(400).body("Doslo je do greske pri trazenju korisnika sa id-em " + id);
         }
 
         updatedUser = Optional.ofNullable(User.builder()
@@ -279,12 +279,12 @@ public class UserController {
 
         if (logovan.isPresent()) {
             if (!logovan.get().getId().equals(id)) {
-                return ResponseEntity.status(401).body("You don't have permission to update this user.");
+                return ResponseEntity.status(401).body("Nemate dozvolu da mofidikujete korisnika.");
             }
         }
         Optional<User> updatedUser = userService.findById(id);
         if (updatedUser.isEmpty()) {
-            return ResponseEntity.status(400).body("Can't find user with id " + id);
+            return ResponseEntity.status(400).body("Doslo je do greske pri trazenju korisnika sa id-em " + id);
         }
 
         updatedUser = Optional.ofNullable(User.builder()
@@ -308,11 +308,11 @@ public class UserController {
     public ResponseEntity<?> updateUser(@PathVariable(name = "id") Long id, @RequestBody UpdateUserRequest user) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.UPDATE_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to update users.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da mofidikujete korisnika.");
         }
         Optional<User> updatedUser = userService.findById(id);
         if (updatedUser.isEmpty()) {
-            return ResponseEntity.status(400).body("Can't find user with id " + id);
+            return ResponseEntity.status(400).body("Doslo je do greske pri trazenju korisnika sa id-em  " + id);
         }
 
         List<Permission> permissions = this.permissionService.findByPermissionNames(user.getPermissions());
@@ -344,7 +344,7 @@ public class UserController {
     public ResponseEntity<?> getUserDailyLimit() {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to buy/sell.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da pristupite korisnicima.");
         }
         return ResponseEntity.ok().body(userService.getUsersDailyLimit(signedInUserEmail));
     }
@@ -353,14 +353,14 @@ public class UserController {
     public ResponseEntity<?> resetDailyLimit(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to buy/sell.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da resetujete limit korisnika.");
         }
         Optional<User> userOptional = userService.findById(id);
         if (userOptional.isPresent()) {
             userOptional.get().setDailyLimit(userOptional.get().getDefaultDailyLimit());
             return ResponseEntity.ok().body(userService.save(userOptional.get()));
         } else {
-            return ResponseEntity.status(400).body("No such user");
+            return ResponseEntity.status(400).body("Korisnik ne postoji");
         }
     }
 }

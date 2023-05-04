@@ -86,7 +86,7 @@ public class OrderService implements OrderServiceInterface {
                             o.get().getAmount(),
                             (ForexOrder) o.get());
                     if (result) return ResponseEntity.status(HttpStatus.OK).body("Order executed");
-                    else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("user doesn't have funds");
+                    else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Kornisnik nema dovoljno novca");
                 case FUTURE:
                     System.out.println("Under construction");
                     return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
