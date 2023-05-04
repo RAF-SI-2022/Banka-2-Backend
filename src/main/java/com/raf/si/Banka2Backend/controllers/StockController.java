@@ -78,11 +78,11 @@ public class StockController {
     public ResponseEntity<?> buyStock(@RequestBody StockRequest stockRequest) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to buy/sell.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da kupujete akcije.");
         }
 
         Optional<User> user = userService.findByEmail(signedInUserEmail);
-        if (user.isEmpty()) return ResponseEntity.status(400).body("Non existent user");
+        if (user.isEmpty()) return ResponseEntity.status(400).body("Korisnik ne postoji.");
         stockRequest.setUserId(user.get().getId());
         return stockService.buyStock(stockRequest, user.get(), null);
     }
@@ -91,10 +91,10 @@ public class StockController {
     public ResponseEntity<?> sellStock(@RequestBody StockRequest stockRequest) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to buy/sell.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da prodajete akcije.");
         }
         Optional<User> user = userService.findByEmail(signedInUserEmail);
-        if (user.isEmpty()) return ResponseEntity.status(400).body("Non existent user");
+        if (user.isEmpty()) return ResponseEntity.status(400).body("Korisnik ne postoji.");
         stockRequest.setUserId(user.get().getId());
         return stockService.sellStock(stockRequest, null);
     }
@@ -103,7 +103,7 @@ public class StockController {
     public ResponseEntity<?> getAllUserStocks() {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to remove stock from market.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da pristupite svojim akcijama");
         }
 
         return ResponseEntity.ok()
@@ -115,7 +115,7 @@ public class StockController {
     public ResponseEntity<?> removeStockFromMarket(@PathVariable String symbol) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to remove stock from market.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da skinete akciju sa marketa.");
         }
         return ResponseEntity.ok()
                 .body(userStockService.removeFromMarket(
