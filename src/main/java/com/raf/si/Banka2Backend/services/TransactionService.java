@@ -10,6 +10,7 @@ import com.raf.si.Banka2Backend.models.mariadb.orders.StockOrder;
 import com.raf.si.Banka2Backend.repositories.mariadb.TransactionRepository;
 import com.raf.si.Banka2Backend.services.interfaces.TransactionServiceInterface;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,25 @@ public class TransactionService implements TransactionServiceInterface {
     public TransactionService(TransactionRepository transactionRepository, CurrencyService currencyService) {
         this.transactionRepository = transactionRepository;
         this.currencyService = currencyService;
+    }
+
+    public List<Transaction> getAll() {
+        return transactionRepository.findAll();
+    }
+
+    public List<Transaction> getTransactionsByCurrencyValue(String currencyCode) {
+        List<Transaction> allTransactions = getAll();
+        List<Transaction> toReturnTrans = new ArrayList<>();
+
+        Optional<Currency> currency = currencyService.findByCurrencyCode(currencyCode);
+        long test = currency.get().getId();
+
+        for (Transaction trans : allTransactions) {
+            if (trans.getCurrency().getId().equals(test)) {
+                toReturnTrans.add(trans);
+            }
+        }
+        return toReturnTrans;
     }
 
     @Override

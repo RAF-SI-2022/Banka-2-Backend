@@ -89,7 +89,7 @@ public class OptionController {
             if (userOptional.isPresent()) {
                 dates = this.optionDateScraper.scrape();
             } else {
-                return ResponseEntity.status(400).body("Internal error");
+                return ResponseEntity.status(400).body("Doslo je do neocekivane greske.");
             }
         } catch (UserNotFoundException | OptionNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);

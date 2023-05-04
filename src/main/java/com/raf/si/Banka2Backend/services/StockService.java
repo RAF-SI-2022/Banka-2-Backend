@@ -139,9 +139,6 @@ public class StockService {
                 JSONObject assetProfile = result.getJSONObject(0).getJSONObject("assetProfile");
                 String website = assetProfile.getString("website");
 
-                if (companyOverview.isEmpty() || globalQuoteJson.isEmpty() || websiteLinkJson.isEmpty())
-                    throw new StockNotFoundException(symbol);
-
                 Optional<Exchange> exchange =
                         exchangeRepository.findExchangeByAcronym(companyOverview.getString("Exchange"));
 
@@ -402,7 +399,7 @@ public class StockService {
 
         StockOrder order = null;
         if (user.getDailyLimit() == null || user.getDailyLimit() <= 0) {
-            return ResponseEntity.internalServerError().body("User daily limit is not present.");
+            return ResponseEntity.internalServerError().body("Doslo je do neocekivane greske.");
         }
         //        System.out.println("check");
         //        System.out.println(price.doubleValue());
@@ -413,7 +410,7 @@ public class StockService {
                     ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.WAITING, OrderTradeType.BUY)
                     : stockOrder;
             this.orderRepository.save(order);
-            return ResponseEntity.status(202).body("Daily limit exceeded, order is in status WAITING.");
+            return ResponseEntity.status(202).body("Dnevni limit je prekoracen, porudzbina je na cekanju (WAITING).");
         } else {
             order = stockOrder == null
                     ? this.createOrder(
@@ -430,7 +427,9 @@ public class StockService {
             e.printStackTrace();
         }
 
-        return ResponseEntity.ok().body("Stock buy order has been processed");
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Kupovina akcije je uspesna.");
+        return ResponseEntity.ok().body(response);
     }
 
     private StockOrder createOrder(
@@ -466,7 +465,7 @@ public class StockService {
         BigDecimal price =
                 userStock.get().getStock().getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
         if (userStock.get().getAmount() < stockRequest.getAmount()) {
-            return ResponseEntity.status(400).body("Insufficient funds for this operation.");
+            return ResponseEntity.status(400).body("Nemate dovoljno novca za ovu operaciju.");
         }
         try {
             StockOrder order = stockOrder == null
@@ -483,7 +482,9 @@ public class StockService {
             e.printStackTrace();
         }
 
-        return ResponseEntity.ok().body("Stock sell order has been processed");
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Akcija je uspesno postavljena na prodaju");
+        return ResponseEntity.ok().body(response);
     }
 
     public List<UserStock> getAllUserStocks(long userId) {

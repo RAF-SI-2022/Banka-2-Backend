@@ -33,9 +33,9 @@ public class OrderController {
     @PatchMapping("approve/{id}")
     public ResponseEntity<?> approveOrder(@PathVariable Long id) {
         Optional<Order> order = this.orderService.findById(id);
-        if (!order.isPresent()) return ResponseEntity.badRequest().body("Order not found");
+        if (!order.isPresent()) return ResponseEntity.badRequest().body("Porudzbina nije pronadjena");
         if (order.get().getStatus() == OrderStatus.DENIED)
-            return ResponseEntity.badRequest().body("Order is denied ");
+            return ResponseEntity.badRequest().body("Porudzbina je odbijena.");
         return this.orderService.startOrder(id);
     }
 
