@@ -4,12 +4,11 @@ import com.raf.si.Banka2Backend.models.mariadb.orders.Order;
 import java.sql.Timestamp;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+
+import lombok.*;
 
 @Data
+@ToString(exclude = {"currency", "user"})
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor

@@ -5,16 +5,16 @@ import com.raf.si.Banka2Backend.models.mariadb.Balance;
 import com.raf.si.Banka2Backend.models.mariadb.Currency;
 import com.raf.si.Banka2Backend.models.mariadb.Transaction;
 import com.raf.si.Banka2Backend.models.mariadb.TransactionStatus;
+import com.raf.si.Banka2Backend.models.mariadb.orders.FutureOrder;
 import com.raf.si.Banka2Backend.models.mariadb.orders.Order;
 import com.raf.si.Banka2Backend.models.mariadb.orders.StockOrder;
 import com.raf.si.Banka2Backend.repositories.mariadb.TransactionRepository;
+import com.raf.si.Banka2Backend.requests.FutureRequestBuySell;
 import com.raf.si.Banka2Backend.services.interfaces.TransactionServiceInterface;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,18 +29,18 @@ public class TransactionService implements TransactionServiceInterface {
         this.currencyService = currencyService;
     }
 
-    public List<Transaction> getAll(){
+    public List<Transaction> getAll() {
         return transactionRepository.findAll();
     }
 
-    public List<Transaction> getTransactionsByCurrencyValue(String currencyCode){
+    public List<Transaction> getTransactionsByCurrencyValue(String currencyCode) {
         List<Transaction> allTransactions = getAll();
         List<Transaction> toReturnTrans = new ArrayList<>();
 
         Optional<Currency> currency = currencyService.findByCurrencyCode(currencyCode);
         long test = currency.get().getId();
 
-        for (Transaction trans: allTransactions){
+        for (Transaction trans : allTransactions) {
             if (trans.getCurrency().getId().equals(test)) {
                 toReturnTrans.add(trans);
             }
@@ -98,4 +98,21 @@ public class TransactionService implements TransactionServiceInterface {
                 .status(TransactionStatus.WAITING)
                 .build();
     }
+
+    @Override
+    public Transaction createFutureOrderTransaction(FutureOrder futureOrder, Balance balance, Float amount, FutureRequestBuySell request, TransactionStatus status) {
+        Optional<Currency> currency = this.currencyService.findByCurrencyCode(request.getCurrencyCode());
+        return Transaction.builder()
+                .balance(balance)
+                .timestamp(new Timestamp(System.currentTimeMillis()))
+                .order(futureOrder)
+                .user(futureOrder.getUser())
+                .description(futureOrder.getOrderType() + " " + futureOrder.getTradeType().toString() + " transaction")
+                .currency(currency.get())
+                .amount(amount)
+                .reserved((float) futureOrder.getPrice())
+                .status(status)
+                .build();
+    }
+
 }
