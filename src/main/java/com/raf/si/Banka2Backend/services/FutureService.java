@@ -84,17 +84,17 @@ public class FutureService implements FutureServiceInterface {
     @Override
     public ResponseEntity<?> removeFromMarket(Long futureId) {
         Optional<Future> future = findById(futureId);
-        if (future.isEmpty()) return ResponseEntity.status(500).body("Internal server error");
+        if (future.isEmpty()) return ResponseEntity.status(500).body("Doslo je do neocekivane greske.");
 
         if (!future.get().isForSale()) {
-            return ResponseEntity.status(500).body("This isnt for sale");
+            return ResponseEntity.status(500).body("Ne mozete skinuti terminski ugovor sa prodaje, zato sto ugovor nije na prodaji.");
         }
 
         future.get().setForSale(false);
         saveFuture(future.get());
 
         if (!findById(futureId).get().isForSale()) return ResponseEntity.ok().body(findById(futureId));
-        return ResponseEntity.status(500).body("Internal server error");
+        return ResponseEntity.status(500).body("Doslo je do neocekivane greske.");
     }
 
     @Override
@@ -113,11 +113,11 @@ public class FutureService implements FutureServiceInterface {
         }
 
         if (error) {
-            return ResponseEntity.status(500).body("Internal server error");
+            return ResponseEntity.status(500).body("Doslo je do neocekivane greske.");
         }
 
         Map<String, String> response = new HashMap<>();
-        response.put("message", "Uspesno skinut");
+        response.put("message", "Uspesno skinut terminski ugovor sa prodaje.");
         return ResponseEntity.ok().body(response);
     }
 
@@ -137,11 +137,11 @@ public class FutureService implements FutureServiceInterface {
         }
 
         if (error) {
-            return ResponseEntity.status(500).body("Internal server error");
+            return ResponseEntity.status(500).body("Doslo je do neocekivane greske.");
         }
 
         Map<String, String> response = new HashMap<>();
-        response.put("message", "Uspesno skinut");
+        response.put("message", "Uspesno skinuto cekanje za kupovinu ugovora.");
         return ResponseEntity.ok().body(response);
     }
 
@@ -172,8 +172,8 @@ public class FutureService implements FutureServiceInterface {
 
     private ResponseEntity<?> regularSell(FutureRequestBuySell futureRequest) {
         Optional<Future> future = futureRepository.findById(futureRequest.getId());
-        if (future.isEmpty()) return ResponseEntity.status(500).body("Internal server error. Future" + futureRequest.getFutureName() + " has not been found.");
-        if (future.get().isForSale()) return ResponseEntity.status(400).body("Future" + futureRequest.getFutureName() + " can't be sold because it has previously already been set on sale.");
+        if (future.isEmpty()) return ResponseEntity.status(500).body("Interna serverska greska. Terminski ugovor" + futureRequest.getFutureName() + " nije pronadjen.");
+        if (future.get().isForSale()) return ResponseEntity.status(400).body("Terminski ugovor" + futureRequest.getFutureName() + " ne moze biti prodat zato sto je vec ranije postavljen na prodaju.");
         future.get().setForSale(true);
         future.get().setMaintenanceMargin(futureRequest.getPrice());
         futureRepository.save(future.get());
@@ -181,8 +181,8 @@ public class FutureService implements FutureServiceInterface {
     }
     private ResponseEntity<?> regularBuy(FutureRequestBuySell futureRequest, String userBuyerEmail, Float usersMoneyInCurrency) {
         Optional<Future> future = futureRepository.findById(futureRequest.getId());
-        if (future.isEmpty()) return ResponseEntity.status(500).body("Future" + futureRequest.getFutureName() + " has not been found.");
-        if (!future.get().isForSale()) return ResponseEntity.status(400).body("Future" + futureRequest.getFutureName() + " is not for sale.");
+        if (future.isEmpty()) return ResponseEntity.status(500).body("Interna serverska greska. Terminski ugovor" + futureRequest.getFutureName() + " nije pronadjen.");
+        if (!future.get().isForSale()) return ResponseEntity.status(400).body("Terminski ugovor" + futureRequest.getFutureName() + " nije na prodaju.");
         Optional<User> userBuyerOptional = this.userService.findByEmail(userBuyerEmail);
         if (userBuyerOptional.isEmpty())
             return ResponseEntity.status(400).body("The buyer, i.e. the user making the purchase has not been found");

@@ -50,7 +50,7 @@ public class AuthenticationController {
                     new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(401).body("Bad credentials.");
+            return ResponseEntity.status(401).body("Pogresni kredencijali.");
         }
         LoginResponse responseDto = new LoginResponse(
                 jwtUtil.generateToken(loginRequest.getEmail()),
@@ -70,20 +70,20 @@ public class AuthenticationController {
     @GetMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestParam String token) {
         String result = this.authorisationService.validatePasswordResetToken(token);
-        if (result.equals("Token not found")) return ResponseEntity.status(405).body("Token not found");
-        if (result.equals("Token expired")) return ResponseEntity.status(405).body("Token expired");
+        if (result.equals("Token not found")) return ResponseEntity.status(405).body("Token nije pronadjen.");
+        if (result.equals("Token expired")) return ResponseEntity.status(405).body("Token je istekao.");
 
-        return ResponseEntity.ok("Token valid");
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/change-user-password")
     public ResponseEntity<?> changeUserPassword(@RequestBody PasswordRecoveryDto passwordRecoveryDto) {
         String result = this.authorisationService.validatePasswordResetToken(passwordRecoveryDto.getToken());
-        if (result.equals("Token not found")) return ResponseEntity.status(405).body("Token not found");
-        if (result.equals("Token expired")) return ResponseEntity.status(405).body("Token expired");
+        if (result.equals("Token not found")) return ResponseEntity.status(405).body("Token nije pronadjen.");
+        if (result.equals("Token expired")) return ResponseEntity.status(405).body("Token je istekao.");
 
         Optional<User> user = this.userService.getUserByPasswordResetToken(passwordRecoveryDto.getToken());
-        if (user.isEmpty()) return ResponseEntity.status(405).body("Could not change user password");
+        if (user.isEmpty()) return ResponseEntity.status(405).body("Nije moguce promeniti sifru.");
 
         this.userService.changePassword(
                 user.get(),
