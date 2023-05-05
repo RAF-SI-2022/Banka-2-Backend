@@ -40,7 +40,7 @@ public class FutureSellWorker extends Thread {
 
                     if (request.getValue().getLimit() != 0) { // ako je postalvjen limit
                         // ako se pojavio neki koji triggeruje limit
-                        if (futureFromTable.isForSale() && futureFromTable.getMaintenanceMargin() > request.getValue().getLimit() && !futureFromTable.getId().equals(request.getValue().getId())) {
+                        if (!futureFromTable.isForSale() && futureFromTable.getMaintenanceMargin() > request.getValue().getLimit() && !futureFromTable.getId().equals(request.getValue().getId())) {
                             Future futureFromRequest = futureService.findById(request.getValue().getId()).get();
                             futureFromRequest.setMaintenanceMargin(request.getValue().getPrice());
                             futureFromRequest.setForSale(true);
@@ -51,7 +51,7 @@ public class FutureSellWorker extends Thread {
                     }
                     if (request.getValue().getStop() != 0) { // ako je postalvjen stop
                         // ako se pojavio neki koji triggeruje stop
-                        if (futureFromTable.isForSale() && futureFromTable.getMaintenanceMargin() < request.getValue().getStop() && !futureFromTable.getId().equals(request.getValue().getId())) {
+                        if (!futureFromTable.isForSale() && futureFromTable.getMaintenanceMargin() < request.getValue().getStop() && !futureFromTable.getId().equals(request.getValue().getId())) {
                             Future futureFromRequest = futureService.findById(request.getValue().getId()).get();
                             futureFromRequest.setMaintenanceMargin(request.getValue().getPrice());
                             futureFromRequest.setForSale(true);

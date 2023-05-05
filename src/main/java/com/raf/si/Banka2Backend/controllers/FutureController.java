@@ -75,7 +75,9 @@ public class FutureController {
             return ResponseEntity.status(401).body("Nemate dozvolu da kupujete terminske ugovore.");
         }
         Optional<User> user = userService.findByEmail(signedInUserEmail);
-        futureRequest.setCurrencyCode("USD"); // TODO: this is only for testing because front doesn't send currencyCode yet - remove this line later.
+        if (futureRequest.getCurrencyCode() == null || futureRequest.getCurrencyCode().equals("")) {
+            futureRequest.setCurrencyCode("USD"); // TODO: this is only for testing because front doesn't send currencyCode yet - remove this if later.
+        }
         Balance usersBalance =
                 balanceService.findBalanceByUserIdAndCurrency(user.get().getId(), futureRequest.getCurrencyCode());
         if (usersBalance == null) {
