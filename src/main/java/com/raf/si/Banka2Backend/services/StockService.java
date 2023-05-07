@@ -394,8 +394,7 @@ public class StockService {
     public ResponseEntity<?> buyStock(StockRequest stockRequest, User user, StockOrder stockOrder) {
         Stock stock = getStockBySymbol(stockRequest.getStockSymbol());
         BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
-        Balance usersBalance =
-                balanceService.findBalanceByUserIdAndCurrency(user.getId(), stockRequest.getCurrencyCode());
+        Balance usersBalance = balanceService.findBalanceByUserIdAndCurrency(user.getId(), stockRequest.getCurrencyCode());
 
         StockOrder order = null;
         if (user.getDailyLimit() == null || user.getDailyLimit() <= 0) {
@@ -405,25 +404,27 @@ public class StockService {
         //        System.out.println(price.doubleValue());
         //        System.out.println(user.getDailyLimit());
 
+        if (usersBalance.getAmount() < price.doubleValue()){
+            return ResponseEntity.status(400).body("Nemate dovoljno novca za ovu operaciju.");
+        }
+
         if (price.doubleValue() > user.getDailyLimit()) {
-            order = stockOrder == null
-                    ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.WAITING, OrderTradeType.BUY)
-                    : stockOrder;
+            order = stockOrder == null ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.WAITING, OrderTradeType.BUY) : stockOrder;
             this.orderRepository.save(order);
-            return ResponseEntity.status(202).body("Dnevni limit je prekoracen, porudzbina je na cekanju (WAITING).");
-        } else {
-            order = stockOrder == null
-                    ? this.createOrder(
-                            stockRequest, price.doubleValue(), user, OrderStatus.IN_PROGRESS, OrderTradeType.BUY)
-                    : stockOrder;
+            return ResponseEntity.status(400).body("Dnevni limit je prekoracen, porudzbina je na cekanju (WAITING).");
+        }
+        else {
+            order = stockOrder == null ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.IN_PROGRESS, OrderTradeType.BUY): stockOrder;
             order = (StockOrder) this.orderRepository.save(order);
             user.setDailyLimit(user.getDailyLimit() - price.doubleValue());
             userService.save(user);
         }
         this.balanceService.reserveAmount(price.floatValue(), user.getEmail(), stockRequest.getCurrencyCode());
+
         try {
             stockBuyRequestsQueue.put(order);
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             e.printStackTrace();
         }
 
@@ -460,13 +461,13 @@ public class StockService {
 
     public ResponseEntity<?> sellStock(StockRequest stockRequest, StockOrder stockOrder) {
 
-        Optional<UserStock> userStock = userStockService.findUserStockByUserIdAndStockSymbol(
-                stockRequest.getUserId(), stockRequest.getStockSymbol());
-        BigDecimal price =
-                userStock.get().getStock().getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
+        Optional<UserStock> userStock = userStockService.findUserStockByUserIdAndStockSymbol(stockRequest.getUserId(), stockRequest.getStockSymbol());
+        BigDecimal price = userStock.get().getStock().getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
+
         if (userStock.get().getAmount() < stockRequest.getAmount()) {
-            return ResponseEntity.status(400).body("Nemate dovoljno novca za ovu operaciju.");
+            return ResponseEntity.status(400).body("Nemate dovoljno hartija za ovu operaciju.");
         }
+
         try {
             StockOrder order = stockOrder == null
                     ? this.createOrder(
