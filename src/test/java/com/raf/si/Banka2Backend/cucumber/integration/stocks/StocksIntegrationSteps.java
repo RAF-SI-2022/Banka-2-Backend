@@ -45,11 +45,11 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
                                     .contentType("application/json")
                                     .content(
                                             """
-                                                            {
-                                                              "email": "anesic3119rn+banka2backend+admin@raf.rs",
-                                                              "password": "admin"
-                                                            }
-                                                            """))
+                                                    {
+                                                      "email": "anesic3119rn+banka2backend+admin@raf.rs",
+                                                      "password": "admin"
+                                                    }
+                                                    """))
                     .andExpect(status().isOk())
                     .andReturn();
             token = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.token");
@@ -145,7 +145,112 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
         }
 
         JSONObject actualStockJson = new JSONObject(mvcResult.getResponse().getContentAsString());
-
         assertNotNull(actualStockJson, "Json is not null");
+    }
+
+    @Then("user gets his user stocks")
+    public void user_gets_his_user_stocks() {
+        MvcResult mvcResult = null;
+        try {
+            mvcResult = mockMvc.perform(get("/api/stock/user-stocks")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+        assertNotNull(mvcResult);
+    }
+
+    @Then("user  buys stock")
+    public void user_buys_stock() {
+        try {
+            mockMvc.perform(post("/api/stock/buy")
+                            .contentType("application/json")
+                            .content(
+                                    """
+                                            {
+                                            "stockSymbol": "AAPL",
+                                            "amount":"10",
+                                            "limit":"0",
+                                            "stop":"0",
+                                            "allOrNone":false,
+                                            "margin":false,
+                                            "userId":"1",
+                                            "currencyCode":"USD"
+                                            }
+                                            """)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    //    @Then("user gets stock history")
+    //    public void user_gets_stock_history() {
+    //        try {
+    //            MvcResult mvcResult = mockMvc.perform(get("/api/stock/1/history/ONE_DAY")
+    //                            .contentType("application/json")
+    //                            .header("Content-Type", "application/json")
+    //                            .header("Access-Control-Allow-Origin", "*")
+    //                            .header("Authorization", "Bearer " + token))
+    //                    .andExpect(status().isOk())
+    //                    .andReturn();
+    //            assertNotNull(mvcResult);
+    //        } catch (Exception e) {
+    //            fail(e.getMessage());
+    //        }
+    //    }
+    //
+
+    @Then("user sells stock")
+    public void user_sells_stock() {
+        try {
+            mockMvc.perform(post("/api/stock/sell")
+                            .contentType("application/json")
+                            .content(
+                                    """
+                                            {
+                                            "stockSymbol": "AAPL",
+                                            "amount":"10",
+                                            "limit":"0",
+                                            "stop":"0",
+                                            "allOrNone":false,
+                                            "margin":false,
+                                            "userId":"1",
+                                            "currencyCode":"USD"
+                                            }
+                                            """)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Then("user removes stock")
+    public void user_removes_stock() {
+        try {
+            mockMvc.perform(post("/api/stock/remove/AAPL")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
     }
 }

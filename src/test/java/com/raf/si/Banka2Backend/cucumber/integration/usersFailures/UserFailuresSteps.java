@@ -69,11 +69,11 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
                                     .contentType("application/json")
                                     .content(
                                             """
-                                                            {
-                                                              "email": "anesic3119rn+banka2backend+admin@raf.rs",
-                                                              "password": "admin"
-                                                            }
-                                                            """))
+                                                    {
+                                                      "email": "anesic3119rn+banka2backend+admin@raf.rs",
+                                                      "password": "admin"
+                                                    }
+                                                    """))
                     .andExpect(status().isOk())
                     .andReturn();
             token = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.token");
@@ -231,19 +231,19 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
                                 .contentType("application/json")
                                 .content(
                                         """
-                                                                        {
-                                                                          "firstName": "NewTestUser",
-                                                                          "lastName": "NewTestUser",
-                                                                          "email": "testUser@gmail.com",
-                                                                          "permissions": [
-                                                                            "READ_USERS"
-                                                                          ],
-                                                                          "jobPosition": "NEWTESTJOB",
-                                                                          "active": true,
-                                                                          "jmbg": "1231231231235",
-                                                                          "phone": "640601548865"
-                                                                        }
-                                                                        """)
+                                                {
+                                                  "firstName": "NewTestUser",
+                                                  "lastName": "NewTestUser",
+                                                  "email": "testUser@gmail.com",
+                                                  "permissions": [
+                                                    "READ_USERS"
+                                                  ],
+                                                  "jobPosition": "NEWTESTJOB",
+                                                  "active": true,
+                                                  "jmbg": "1231231231235",
+                                                  "phone": "640601548865"
+                                                }
+                                                """)
                                 .header("Content-Type", "application/json")
                                 .header("Access-Control-Allow-Origin", "*")
                                 .header("Authorization", "Bearer " + token))
@@ -287,41 +287,43 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
     @Given("non privileged user logs in")
     public void non_privileged_user_logs_in() {
         try {
-            // pravimo test usera
-            mockMvc.perform(post("/api/users/register")
-                            .contentType("application/json")
-                            .content(
-                                    """
-                                                    {
-                                                      "firstName": "nonPrivUser",
-                                                      "lastName": "nonPrivUserLn",
-                                                      "email": "nonpriv@gmail.com",
-                                                      "password": "1234",
-                                                      "permissions": [],
-                                                      "jobPosition": "TEST",
-                                                      "active": true,
-                                                      "jmbg": "1231231231235",
-                                                      "phone": "640601548865",
-                                                      "dailyLimit": 5000
-                                                    }
-                                                    """)
-                            .header("Content-Type", "application/json")
-                            .header("Access-Control-Allow-Origin", "*")
-                            .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isOk())
-                    .andReturn();
+            if (userService.findByEmail("nonpriv@gmail.com").isEmpty()) {
 
+                // pravimo test usera
+                mockMvc.perform(post("/api/users/register")
+                                .contentType("application/json")
+                                .content(
+                                        """
+                                                {
+                                                  "firstName": "nonPrivUser",
+                                                  "lastName": "nonPrivUserLn",
+                                                  "email": "nonpriv@gmail.com",
+                                                  "password": "1234",
+                                                  "permissions": [],
+                                                  "jobPosition": "TEST",
+                                                  "active": true,
+                                                  "jmbg": "1231231231235",
+                                                  "phone": "640601548865",
+                                                  "dailyLimit": 5000
+                                                }
+                                                """)
+                                .header("Content-Type", "application/json")
+                                .header("Access-Control-Allow-Origin", "*")
+                                .header("Authorization", "Bearer " + token))
+                        .andExpect(status().isOk())
+                        .andReturn();
+            }
             // logujemo se kao test user
             MvcResult mvcResult = mockMvc.perform(
                             post("/auth/login")
                                     .contentType("application/json")
                                     .content(
                                             """
-                                                            {
-                                                              "email": "nonpriv@gmail.com",
-                                                              "password": "1234"
-                                                            }
-                                                            """))
+                                                    {
+                                                      "email": "nonpriv@gmail.com",
+                                                      "password": "1234"
+                                                    }
+                                                    """))
                     .andExpect(status().isOk())
                     .andReturn();
             token = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.token");
@@ -448,19 +450,19 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
                             .contentType("application/json")
                             .content(
                                     """
-                                                    {
-                                                      "firstName": "NewTestUser",
-                                                      "lastName": "NewTestUser",
-                                                      "email": "testUser@gmail.com",
-                                                      "permissions": [
-                                                        "READ_USERS"
-                                                      ],
-                                                      "jobPosition": "NEWTESTJOB",
-                                                      "active": true,
-                                                      "jmbg": "1231231231235",
-                                                      "phone": "640601548865"
-                                                    }
-                                                    """)
+                                            {
+                                              "firstName": "NewTestUser",
+                                              "lastName": "NewTestUser",
+                                              "email": "testUser@gmail.com",
+                                              "permissions": [
+                                                "READ_USERS"
+                                              ],
+                                              "jobPosition": "NEWTESTJOB",
+                                              "active": true,
+                                              "jmbg": "1231231231235",
+                                              "phone": "640601548865"
+                                            }
+                                            """)
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
@@ -508,29 +510,32 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
     @Then("user not created")
     public void user_not_created() {
         try {
-            MvcResult mvcResult = mockMvc.perform(post("/api/users/register")
-                            .contentType("application/json")
-                            .content(
-                                    """
-                                                            {
-                                                              "firstName": "TestUser",
-                                                              "lastName": "TestUser",
-                                                              "email": "testUser@gmail.com",
-                                                              "password": "admin",
-                                                              "permissions": [
-                                                                "ADMIN_USER"
-                                                              ],
-                                                              "jobPosition": "ADMINISTRATOR",
-                                                              "active": true,
-                                                              "jmbg": "1231231231235",
-                                                              "phone": "640601548865"
-                                                            }
-                                                            """)
-                            .header("Content-Type", "application/json")
-                            .header("Access-Control-Allow-Origin", "*")
-                            .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
-                    .andReturn();
+            if (userService.findByEmail("testUser@gmail.com").isEmpty()) {
+
+                MvcResult mvcResult = mockMvc.perform(post("/api/users/register")
+                                .contentType("application/json")
+                                .content(
+                                        """
+                                                {
+                                                  "firstName": "TestUser",
+                                                  "lastName": "TestUser",
+                                                  "email": "testUser@gmail.com",
+                                                  "password": "admin",
+                                                  "permissions": [
+                                                    "ADMIN_USER"
+                                                  ],
+                                                  "jobPosition": "ADMINISTRATOR",
+                                                  "active": true,
+                                                  "jmbg": "1231231231235",
+                                                  "phone": "640601548865"
+                                                }
+                                                """)
+                                .header("Content-Type", "application/json")
+                                .header("Access-Control-Allow-Origin", "*")
+                                .header("Authorization", "Bearer " + token))
+                        .andExpect(status().isUnauthorized())
+                        .andReturn();
+            }
         } catch (Exception e) {
             fail(e.getMessage());
         }

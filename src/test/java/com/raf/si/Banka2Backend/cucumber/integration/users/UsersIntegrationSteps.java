@@ -52,11 +52,11 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                                     .contentType("application/json")
                                     .content(
                                             """
-                                                            {
-                                                              "email": "anesic3119rn+banka2backend+admin@raf.rs",
-                                                              "password": "admin"
-                                                            }
-                                                            """))
+                                                    {
+                                                      "email": "anesic3119rn+banka2backend+admin@raf.rs",
+                                                      "password": "admin"
+                                                    }
+                                                    """))
                     .andExpect(status().isOk())
                     .andReturn();
             token = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.token");
@@ -132,33 +132,37 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
     public void creating_new_user() throws UnsupportedEncodingException {
         MvcResult mvcResult = null;
         try {
-            mvcResult = mockMvc.perform(post("/api/users/register")
-                            .contentType("application/json")
-                            .content(
-                                    """
-                                                            {
-                                                              "firstName": "TestUser",
-                                                              "lastName": "TestUser",
-                                                              "email": "testUser@gmail.com",
-                                                              "password": "admin",
-                                                              "permissions": [
-                                                                "ADMIN_USER"
-                                                              ],
-                                                              "jobPosition": "ADMINISTRATOR",
-                                                              "active": true,
-                                                              "jmbg": "1231231231235",
-                                                              "phone": "640601548865",
-                                                              "dailyLimit": 5000
-                                                            }
-                                                            """)
-                            .header("Content-Type", "application/json")
-                            .header("Access-Control-Allow-Origin", "*")
-                            .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isOk())
-                    .andReturn();
+            if (userService.findByEmail("testUser@gmail.com").isEmpty()) {
+
+                mvcResult = mockMvc.perform(post("/api/users/register")
+                                .contentType("application/json")
+                                .content(
+                                        """
+                                                {
+                                                  "firstName": "TestUser",
+                                                  "lastName": "TestUser",
+                                                  "email": "testUser@gmail.com",
+                                                  "password": "admin",
+                                                  "permissions": [
+                                                    "ADMIN_USER"
+                                                  ],
+                                                  "jobPosition": "ADMINISTRATOR",
+                                                  "active": true,
+                                                  "jmbg": "1231231231235",
+                                                  "phone": "640601548865",
+                                                  "dailyLimit": 5000
+                                                }
+                                                """)
+                                .header("Content-Type", "application/json")
+                                .header("Access-Control-Allow-Origin", "*")
+                                .header("Authorization", "Bearer " + token))
+                        .andExpect(status().isOk())
+                        .andReturn();
+            }
         } catch (Exception e) {
             fail(e.getMessage());
         }
+
         System.out.println(mvcResult.getResponse().getContentAsString());
     }
 
@@ -294,20 +298,20 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                             .contentType("application/json")
                             .content(
                                     """
-                                                    {
-                                                      "firstName": "NewTestUser",
-                                                      "lastName": "NewTestUser",
-                                                      "email": "testUser@gmail.com",
-                                                      "permissions": [
-                                                        "READ_USERS"
-                                                      ],
-                                                      "jobPosition": "NEWTESTJOB",
-                                                      "active": true,
-                                                      "jmbg": "1231231231235",
-                                                      "phone": "640601548865",
-                                                      "dailyLimit": 1000
-                                                    }
-                                                    """)
+                                            {
+                                              "firstName": "NewTestUser",
+                                              "lastName": "NewTestUser",
+                                              "email": "testUser@gmail.com",
+                                              "permissions": [
+                                                "READ_USERS"
+                                              ],
+                                              "jobPosition": "NEWTESTJOB",
+                                              "active": true,
+                                              "jmbg": "1231231231235",
+                                              "phone": "640601548865",
+                                              "dailyLimit": 1000
+                                            }
+                                            """)
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
@@ -332,11 +336,11 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                                     .contentType("application/json")
                                     .content(
                                             """
-                                                            {
-                                                              "email": "testUser@gmail.com",
-                                                              "password": "admin"
-                                                            }
-                                                            """))
+                                                    {
+                                                      "email": "testUser@gmail.com",
+                                                      "password": "admin"
+                                                    }
+                                                    """))
                     .andExpect(status().isOk())
                     .andReturn();
             token = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.token");
@@ -362,13 +366,13 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                             .contentType("application/json")
                             .content(
                                     """
-                                                      {
-                                                        "email": "testUser@gmail.com",
-                                                        "firstName": "UserEditedName",
-                                                        "lastName": "UserEditedLName",
-                                                        "phone": "666666666"
-                                                      }
-                                                    """)
+                                              {
+                                                "email": "testUser@gmail.com",
+                                                "firstName": "UserEditedName",
+                                                "lastName": "UserEditedLName",
+                                                "phone": "666666666"
+                                              }
+                                            """)
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
@@ -407,10 +411,10 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                             .contentType("application/json")
                             .content(
                                     """
-                                                      {
-                                                          "password": "testPass"
-                                                      }
-                                                    """)
+                                              {
+                                                  "password": "testPass"
+                                              }
+                                            """)
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
@@ -436,11 +440,11 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                                     .contentType("application/json")
                                     .content(
                                             """
-                                                            {
-                                                              "email": "anesic3119rn+banka2backend+admin@raf.rs",
-                                                              "password": "admin"
-                                                            }
-                                                            """))
+                                                    {
+                                                      "email": "anesic3119rn+banka2backend+admin@raf.rs",
+                                                      "password": "admin"
+                                                    }
+                                                    """))
                     .andExpect(status().isOk())
                     .andReturn();
             token = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.token");
@@ -493,7 +497,6 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                 + testUser.get().getId()
                 + "> not found.";
         String actualMessage = exception.getMessage();
-
         assertEquals(expectedMessage, actualMessage);
     }
 }
