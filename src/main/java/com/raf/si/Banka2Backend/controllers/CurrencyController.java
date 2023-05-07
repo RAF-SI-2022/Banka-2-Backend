@@ -63,14 +63,15 @@ public class CurrencyController {
     @PostMapping(value = "/inflation/add")
     public ResponseEntity<?> addInflation(@RequestBody @Valid InflationDto inflationDto, BindingResult result) {
         if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body("Body is not valid. Should have inflationRate, year, currencyId");
+            return ResponseEntity.badRequest()
+                    .body("Nepravilno uneti podaci. Potrebni su inflationRate, godina, currencyId");
         }
         Optional<Currency> currency;
         try {
             currency = this.currencyService.findById(inflationDto.getCurrencyId());
         } catch (CurrencyNotFoundException e) {
             return ResponseEntity.badRequest()
-                    .body("Currency with id: " + inflationDto.getCurrencyId() + " can not be found");
+                    .body("Valuta sa id-em: " + inflationDto.getCurrencyId() + " nije pronadjena");
         }
         Inflation inflation = Inflation.builder()
                 .inflationRate(inflationDto.getInflationRate())
