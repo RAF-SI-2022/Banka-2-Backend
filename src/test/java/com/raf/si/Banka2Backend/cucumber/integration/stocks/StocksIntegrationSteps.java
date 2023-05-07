@@ -70,7 +70,6 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
 
     @Then("user gets all stocks from database")
     public void userGetsAllStocksFromDatabase() {
-
         try {
             mockMvc.perform(get("/api/stock")
                             .contentType("application/json")
