@@ -16,11 +16,13 @@ import io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -39,18 +41,7 @@ public class ForexFailureIntegrationSteps extends ForexFailureIntegrationTestCon
 
     protected static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     protected static String systemTime = dateFormat.format(new Date());
-    protected static Forex testForex = Forex.builder()
-            .id(1L)
-            .fromCurrencyName("ZZZSS")
-            .toCurrencyName("ZZZSS")
-            .fromCurrencyCode("SSSHHH#@")
-            .toCurrencyCode("SSSSDSD#@")
-            .bidPrice("5")
-            .askPrice("5")
-            .exchangeRate("AAA")
-            .timeZone("UTC")
-            .lastRefreshed(systemTime)
-            .build();
+    protected static Forex testForex = Forex.builder().id(1L).fromCurrencyName("ZZZSS").toCurrencyName("ZZZSS").fromCurrencyCode("SSSHHH#@").toCurrencyCode("SSSSDSD#@").bidPrice("5").askPrice("5").exchangeRate("AAA").timeZone("UTC").lastRefreshed(systemTime).build();
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -60,23 +51,17 @@ public class ForexFailureIntegrationSteps extends ForexFailureIntegrationTestCon
     @Given("user logs in")
     public void user_logs_in() {
         try {
-            MvcResult mvcResult = mockMvc.perform(post("/auth/login")
-                            .contentType("application/json")
-                            .content(
-                                    """
+            MvcResult mvcResult = mockMvc.perform(post("/auth/login").contentType("application/json").content("""
 
-                                                            {
+                    {
 
-                                                              "email": "%s",
+                      "email": "%s",
 
-                                                              "password": "%s"
+                      "password": "%s"
 
-                                                            }
+                    }
 
-                                                            """
-                                            .formatted(email, password)))
-                    .andExpect(status().isOk())
-                    .andReturn();
+                    """.formatted(email, password))).andExpect(status().isOk()).andReturn();
             token = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.token");
         } catch (Exception e) {
             fail("User failed to login");
@@ -101,22 +86,14 @@ public class ForexFailureIntegrationSteps extends ForexFailureIntegrationTestCon
         //        dto.setAmountOfMoney(500);
         MvcResult mvcResult = null;
         try {
-            mvcResult = mockMvc.perform(
-                            get("/api/forex/" + testForex.getFromCurrencyCode() + "/" + testForex.getToCurrencyCode())
-                                    .contentType("application/json")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
-                    .andExpect(status().is(404))
-                    .andReturn();
+            mvcResult = mockMvc.perform(get("/api/forex/" + testForex.getFromCurrencyCode() + "/" + testForex.getToCurrencyCode()).contentType("application/json").header("Content-Type", "application/json").header("Access-Control-Allow-Origin", "*").header("Authorization", "Bearer " + token)).andExpect(status().is(404)).andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
         }
     }
 
     @Then("user doesn't have balance in currency he requested to convert from")
-    public void user_doesn_t_have_balance_in_currency_he_requested_to_convert_from()
-            throws UnsupportedEncodingException, JsonProcessingException {
+    public void user_doesn_t_have_balance_in_currency_he_requested_to_convert_from() throws UnsupportedEncodingException, JsonProcessingException {
         BuySellForexDto dto = new BuySellForexDto();
         dto.setFromCurrencyCode("SEK");
         dto.setToCurrencyCode("JPY");
@@ -124,23 +101,16 @@ public class ForexFailureIntegrationSteps extends ForexFailureIntegrationTestCon
         MvcResult mvcResult = null;
         String body = new ObjectMapper().writeValueAsString(dto);
         try {
-            mvcResult = mockMvc.perform(post("/api/forex/buy-sell")
-                            .header("Authorization", "Bearer " + token)
-                            .header("Content-Type", "application/json")
-                            .header("Access-Control-Allow-Origin", "*")
-                            .content(body))
-                    .andExpect(status().is(400))
-                    .andReturn();
+            mvcResult = mockMvc.perform(post("/api/forex/buy-sell").header("Authorization", "Bearer " + token).header("Content-Type", "application/json").header("Access-Control-Allow-Origin", "*").content(body)).andExpect(status().is(400)).andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
         }
         String errorMsg = mvcResult.getResponse().getContentAsString();
-        assertEquals("User with email " + email + ", doesn't have balance in currency Swedish Krona", errorMsg);
+        assertEquals("Korisnik sa email-om " + email + ", nema dovoljno balansa u valuti Swedish Krona", errorMsg);
     }
 
     @Then("user doesn't have enough balance in currency he requested to convert from")
-    public void user_doesn_t_have_enough_balance_in_currency_he_requested_to_convert_from()
-            throws JsonProcessingException, UnsupportedEncodingException {
+    public void user_doesn_t_have_enough_balance_in_currency_he_requested_to_convert_from() throws JsonProcessingException, UnsupportedEncodingException {
         BuySellForexDto dto = new BuySellForexDto();
         dto.setFromCurrencyCode("RSD");
         dto.setToCurrencyCode("USD");
@@ -148,22 +118,12 @@ public class ForexFailureIntegrationSteps extends ForexFailureIntegrationTestCon
         MvcResult mvcResult = null;
         String body = new ObjectMapper().writeValueAsString(dto);
         try {
-            mvcResult = mockMvc.perform(post("/api/forex/buy-sell")
-                            .header("Authorization", "Bearer " + token)
-                            .header("Content-Type", "application/json")
-                            .header("Access-Control-Allow-Origin", "*")
-                            .content(body))
-                    .andExpect(status().is(400))
-                    .andReturn();
+            mvcResult = mockMvc.perform(post("/api/forex/buy-sell").header("Authorization", "Bearer " + token).header("Content-Type", "application/json").header("Access-Control-Allow-Origin", "*").content(body)).andExpect(status().is(400)).andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
         }
         String errorMsg = mvcResult.getResponse().getContentAsString();
         System.out.println(errorMsg);
-        assertEquals(
-                "User with email "
-                        + email
-                        + ", doesn't have enough money in currency Serbian Dinar for buying 10000000 USD(United States Dollar)",
-                errorMsg);
+        assertEquals("Korisnik sa email-om " + email + ", nema dovoljno novca u valuti Serbian Dinar za kupovinu 10000000 USD(United States Dollar)", errorMsg);
     }
 }

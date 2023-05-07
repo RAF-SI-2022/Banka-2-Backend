@@ -1,13 +1,19 @@
 package com.raf.si.Banka2Backend.services;
 
-import com.raf.si.Banka2Backend.models.mariadb.Future;
-import com.raf.si.Banka2Backend.models.mariadb.User;
+import com.raf.si.Banka2Backend.exceptions.BalanceNotFoundException;
+import com.raf.si.Banka2Backend.models.mariadb.*;
+import com.raf.si.Banka2Backend.models.mariadb.orders.*;
 import com.raf.si.Banka2Backend.repositories.mariadb.FutureRepository;
+import com.raf.si.Banka2Backend.repositories.mariadb.OrderRepository;
 import com.raf.si.Banka2Backend.requests.FutureRequestBuySell;
 import com.raf.si.Banka2Backend.services.interfaces.FutureServiceInterface;
 import com.raf.si.Banka2Backend.services.workerThreads.FutureBuyWorker;
 import com.raf.si.Banka2Backend.services.workerThreads.FutureSellWorker;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -19,13 +25,18 @@ public class FutureService implements FutureServiceInterface {
     private final FutureSellWorker futureSellWorker;
     private final FutureBuyWorker futureBuyWorker;
     private final BalanceService balanceService;
+    private final OrderRepository orderRepository;
+    private final TransactionService transactionService;
 
-    public FutureService(UserService userService, FutureRepository futureRepository, BalanceService balanceService) {
+    public FutureService(UserService userService, FutureRepository futureRepository, BalanceService balanceService, OrderRepository orderRepository, TransactionService transactionService) {
         this.futureRepository = futureRepository;
         this.userService = userService;
         this.balanceService = balanceService;
+        this.orderRepository = orderRepository;
+        this.transactionService = transactionService;
+
         futureSellWorker = new FutureSellWorker(this);
-        futureBuyWorker = new FutureBuyWorker(this, userService);
+        futureBuyWorker = new FutureBuyWorker(this, userService, orderRepository, balanceService);
 
         futureSellWorker.start();
         futureBuyWorker.start();
@@ -45,92 +56,27 @@ public class FutureService implements FutureServiceInterface {
     public Optional<List<Future>> findFuturesByFutureName(String futureName) {
         return futureRepository.findFuturesByFutureName(futureName);
     }
-
-    @Override
-    public ResponseEntity<?> buyFuture(
-            FutureRequestBuySell futureRequest, String fromUserEmail, Float usersMoneyInCurrency) {
-        System.out.println(futureRequest);
-        if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) { // regularni buy
-            Optional<Future> future = futureRepository.findById(futureRequest.getId());
-            if (future.isEmpty()) return ResponseEntity.status(500).body("Doslo je do neocekivane greske.");
-            if (!future.get().isForSale()) return ResponseEntity.status(500).body("Doslo je do neocekivane greske.");
-
-            User toUser = future.get().getUser();
-            if (toUser != null) { // provera da li user ima dovoljno para //todo trenutno je sve preko USD
-                float amount = future.get().getMaintenanceMargin();
-                if (usersMoneyInCurrency < amount)
-                    return ResponseEntity.status(500).body("Nemate dovoljno novca na balansu.");
-
-                // Provera za daily limit
-                //            System.out.println("Ovde sam");
-                Optional<User> optionalUser = userService.findByEmail(fromUserEmail);
-                if (optionalUser.isPresent()) {
-                    //                System.out.println("Sad sam ovde");
-                    //                    float amount = future.get().getMaintenanceMargin();
-                    Double limit = optionalUser.get().getDailyLimit();
-                    Double amountDouble = Double.valueOf(amount);
-                    Double suma = limit - amountDouble;
-                    //                    System.out.println("Limit " + limit + " vrednost " + amountDouble + "
-                    // oduzimanje " + suma);
-                    boolean limitTestBoolean = limit - amountDouble < 0 ? false : true;
-                    if (!limitTestBoolean) return ResponseEntity.status(500).body("Prekoracili ste dozvoljeni dnevni limit. Kontaktirajte administratora.");
-                    else {
-                        optionalUser.get().setDailyLimit(limit - amountDouble);
-                        userService.save(optionalUser.get());
-                    }
-                }
-
-                balanceService.exchangeMoney(fromUserEmail, toUser.getEmail(), amount, "USD");
-            }
-
-            // Provera za daily limit
-            Optional<User> optionalUser = userService.findByEmail(fromUserEmail);
-            if (optionalUser.isPresent() && !(optionalUser.get().getDailyLimit() == null)) {
-
-                float amount = future.get().getMaintenanceMargin();
-                Double limit = optionalUser.get().getDailyLimit();
-                Double amountDouble = Double.valueOf(amount);
-                Double suma = limit - amountDouble;
-                //                System.out.println("Limit " + limit + " vrednost " + amountDouble + " oduzimanje " +
-                // suma);
-                boolean limitTestBoolean = limit - amountDouble < 0 ? false : true;
-                if (!limitTestBoolean) return ResponseEntity.status(500).body("Prekoracili ste dozvoljeni dnevni limit. Kontaktirajte administratora.");
-                else {
-                    optionalUser.get().setDailyLimit(limit - amountDouble);
-                    userService.save(optionalUser.get());
-                }
-            }
-
-            future.get().setUser(userService.findById(futureRequest.getUserId()).get());
-            future.get().setForSale(false);
-            futureRepository.save(future.get());
-            return ResponseEntity.ok().body(findById(futureRequest.getId()));
-        } else {
-            futureBuyWorker.setFuturesRequestsMap(futureRequest.getId(), futureRequest);
-//            return ResponseEntity.ok().body("Future is set for custom sale and is waiting for trigger");
-
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Terminski ugovor je uspesno postavljen na prodaju sa limitom.");
-            return ResponseEntity.ok().body(response);
-        }
-    }
-
-    public void updateFuture(Future future) {
+    public void saveFuture(Future future) {
         futureRepository.save(future);
     }
 
     @Override
+    public ResponseEntity<?> buyFuture(
+            FutureRequestBuySell futureRequest, String userBuyerEmail, Float usersMoneyInCurrency) {
+        if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) { // regular buy - kupuje se odmah, ne ceka se nista;
+            return this.regularBuy(futureRequest, userBuyerEmail, usersMoneyInCurrency);
+        }
+        futureBuyWorker.putInFuturesRequestsMap(futureRequest.getId(), futureRequest);
+        return ResponseEntity.ok().body("Future is set for custom sale and is waiting for trigger.");
+    }
+
+
+    @Override
     public ResponseEntity<?> sellFuture(FutureRequestBuySell futureRequest) {
         if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) {
-            Optional<Future> future = futureRepository.findById(futureRequest.getId());
-            if (future.isEmpty()) return ResponseEntity.status(500).body("Doslo je do neocekivane greske.");
-            if (future.get().isForSale()) return ResponseEntity.status(500).body("Doslo je do neocekivane greske.");
-            future.get().setForSale(true);
-            future.get().setMaintenanceMargin(futureRequest.getPrice());
-            futureRepository.save(future.get());
-            return ResponseEntity.ok().body(findById(futureRequest.getId()));
+            return this.regularSell(futureRequest);
         } else {
-            futureSellWorker.setFuturesRequestsMap(futureRequest.getId(), futureRequest);
+            futureSellWorker.putInFuturesRequestsMap(futureRequest.getId(), futureRequest);
             return ResponseEntity.ok().body(findById(futureRequest.getId()));
         }
     }
@@ -145,7 +91,7 @@ public class FutureService implements FutureServiceInterface {
         }
 
         future.get().setForSale(false);
-        updateFuture(future.get());
+        saveFuture(future.get());
 
         if (!findById(futureId).get().isForSale()) return ResponseEntity.ok().body(findById(futureId));
         return ResponseEntity.status(500).body("Doslo je do neocekivane greske.");
@@ -222,5 +168,105 @@ public class FutureService implements FutureServiceInterface {
     @Override
     public Optional<Future> findByName(String futureName) {
         return futureRepository.findFutureByFutureName(futureName);
+    }
+
+    private ResponseEntity<?> regularSell(FutureRequestBuySell futureRequest) {
+        Optional<Future> future = futureRepository.findById(futureRequest.getId());
+        if (future.isEmpty()) return ResponseEntity.status(500).body("Interna serverska greska. Terminski ugovor" + futureRequest.getFutureName() + " nije pronadjen.");
+        if (future.get().isForSale()) return ResponseEntity.status(400).body("Terminski ugovor" + futureRequest.getFutureName() + " ne moze biti prodat zato sto je vec ranije postavljen na prodaju.");
+        future.get().setForSale(true);
+        future.get().setMaintenanceMargin(futureRequest.getPrice());
+        futureRepository.save(future.get());
+        return ResponseEntity.ok().body(findById(futureRequest.getId()));
+    }
+    private ResponseEntity<?> regularBuy(FutureRequestBuySell futureRequest, String userBuyerEmail, Float usersMoneyInCurrency) {
+        Optional<Future> future = futureRepository.findById(futureRequest.getId());
+        if (future.isEmpty()) return ResponseEntity.status(500).body("Interna serverska greska. Terminski ugovor" + futureRequest.getFutureName() + " nije pronadjen.");
+        if (!future.get().isForSale()) return ResponseEntity.status(400).body("Terminski ugovor" + futureRequest.getFutureName() + " nije na prodaju.");
+        Optional<User> userBuyerOptional = this.userService.findByEmail(userBuyerEmail);
+        if (userBuyerOptional.isEmpty())
+            return ResponseEntity.status(400).body("The buyer, i.e. the user making the purchase has not been found");
+        User userBuyer = userBuyerOptional.get();
+
+        // Provera da li user koji kupuje ima dovoljno para
+        float price = future.get().getMaintenanceMargin();
+        if (usersMoneyInCurrency < price) {
+            return ResponseEntity.status(400).body("You don't have enough money in balance.");
+        }
+
+        // Provera za daily limit user-a koji kupuje future
+        Double limit = userBuyer.getDailyLimit();
+        Double priceDouble = (double) price;
+        if (limit == null || priceDouble > limit) {
+            return ResponseEntity.status(400).body("User making the purchase exceeded daily limit OR daily limit is not defined.");
+        }
+
+        // Trazimo balance da bi mogli da napravimo transakciju
+        Balance balance;
+        try {
+           balance = this.balanceService.findBalanceByUserEmailAndCurrencyCode(userBuyerEmail, futureRequest.getCurrencyCode());
+        } catch (BalanceNotFoundException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
+        Future processedFuture = this.processFutureBuyRequest(futureRequest, priceDouble, userBuyer, limit, future.get(), balance);
+        return ResponseEntity.ok().body(processedFuture);
+    }
+    public FutureOrder createFutureOrder(
+            FutureRequestBuySell request, Double price, User user, OrderStatus status, OrderTradeType orderTradeType, Integer amount) {
+        long seed = System.currentTimeMillis();
+        Random random = new Random(seed);
+        long id = random.nextLong();
+
+        return new FutureOrder(
+                id,
+                OrderType.FUTURE,
+                orderTradeType,
+                status,
+                request.getFutureName().substring(0,3),
+                amount,
+                price,
+                this.getTimestamp(),
+                user,
+                request.getFutureName(),
+                request.getStop());
+    }
+    private String getTimestamp() {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return currentDateTime.format(formatter);
+    }
+    public Future processFutureBuyRequest(FutureRequestBuySell futureRequest, Double priceDouble, User userBuyer, Double limit, Future future, Balance balance) {
+        // Kreiramo order za kupovinu
+        FutureOrder order = this.createFutureOrder(futureRequest, priceDouble, userBuyer, OrderStatus.IN_PROGRESS, OrderTradeType.BUY, 1);
+        order = this.orderRepository.save(order); // moramo da sacuvamo ponovo order zato sto mu se u bazi dodeli genericni id koji nam je posle potreban za kreiranje transakcije
+
+        // Update-ovanje daily limita
+        userBuyer.setDailyLimit(limit - priceDouble);
+        userService.save(userBuyer);
+
+        // Rezervisanje novca za skidanje sa racuna
+        balanceService.reserveAmount(priceDouble.floatValue(), userBuyer.getEmail(), futureRequest.getCurrencyCode());
+
+        // Kreiramo transakciju za kupovinu
+        Transaction transaction = this.transactionService.createFutureOrderTransaction(order, balance, priceDouble.floatValue(), futureRequest, TransactionStatus.IN_PROGRESS);
+        this.transactionService.save(transaction);
+
+        User userSeller = future.getUser();
+        if (userSeller == null) { // Ako je vlasnik future-a null, to znaci da je vlasnik neka "kompanija" tj. ne radimo exchange novca nego samo skidamo novac sa buyer-ovog balance-a.
+            balanceService.decreaseBalance(userBuyer.getEmail(), futureRequest.getCurrencyCode(), priceDouble.floatValue());
+        } else { // Ako vlasnik nije null, to znaci da jedan user kupuje future od nekog drugog user-a.
+            balanceService.exchangeMoney(userSeller.getEmail(), userBuyer.getEmail(), priceDouble.floatValue(), futureRequest.getCurrencyCode());
+        }
+
+        // Setovanje order i transaction statusa na complete
+        order.setStatus(OrderStatus.COMPLETE);
+        this.orderRepository.save(order);
+        transaction.setStatus(TransactionStatus.COMPLETE);
+        this.transactionService.save(transaction);
+
+        // Update-ovanje future-a
+        future.setUser(userBuyer);
+        future.setForSale(false);
+        return futureRepository.save(future);
     }
 }
