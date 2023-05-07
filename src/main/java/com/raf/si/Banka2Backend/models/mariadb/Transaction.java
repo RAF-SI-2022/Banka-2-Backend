@@ -4,7 +4,6 @@ import com.raf.si.Banka2Backend.models.mariadb.orders.Order;
 import java.sql.Timestamp;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-
 import lombok.*;
 
 @Data

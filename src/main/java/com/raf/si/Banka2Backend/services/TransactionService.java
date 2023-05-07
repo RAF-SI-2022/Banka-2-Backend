@@ -100,19 +100,24 @@ public class TransactionService implements TransactionServiceInterface {
     }
 
     @Override
-    public Transaction createFutureOrderTransaction(FutureOrder futureOrder, Balance balance, Float amount, FutureRequestBuySell request, TransactionStatus status) {
+    public Transaction createFutureOrderTransaction(
+            FutureOrder futureOrder,
+            Balance balance,
+            Float amount,
+            FutureRequestBuySell request,
+            TransactionStatus status) {
         Optional<Currency> currency = this.currencyService.findByCurrencyCode(request.getCurrencyCode());
         return Transaction.builder()
                 .balance(balance)
                 .timestamp(new Timestamp(System.currentTimeMillis()))
                 .order(futureOrder)
                 .user(futureOrder.getUser())
-                .description(futureOrder.getOrderType() + " " + futureOrder.getTradeType().toString() + " transaction")
+                .description(futureOrder.getOrderType() + " "
+                        + futureOrder.getTradeType().toString() + " transaction")
                 .currency(currency.get())
                 .amount(amount)
                 .reserved((float) futureOrder.getPrice())
                 .status(status)
                 .build();
     }
-
 }

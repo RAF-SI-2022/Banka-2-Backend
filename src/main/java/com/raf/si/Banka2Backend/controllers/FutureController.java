@@ -11,9 +11,7 @@ import com.raf.si.Banka2Backend.services.AuthorisationService;
 import com.raf.si.Banka2Backend.services.BalanceService;
 import com.raf.si.Banka2Backend.services.FutureService;
 import com.raf.si.Banka2Backend.services.UserService;
-
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -75,13 +73,18 @@ public class FutureController {
             return ResponseEntity.status(401).body("Nemate dozvolu da kupujete terminske ugovore.");
         }
         Optional<User> user = userService.findByEmail(signedInUserEmail);
-        if (futureRequest.getCurrencyCode() == null || futureRequest.getCurrencyCode().equals("")) {
-            futureRequest.setCurrencyCode("USD"); // TODO: this is only for testing because front doesn't send currencyCode yet - remove this if later.
+        if (futureRequest.getCurrencyCode() == null
+                || futureRequest.getCurrencyCode().equals("")) {
+            futureRequest.setCurrencyCode(
+                    "USD"); // TODO: this is only for testing because front doesn't send currencyCode yet - remove this
+            // if later.
         }
         Balance usersBalance =
                 balanceService.findBalanceByUserIdAndCurrency(user.get().getId(), futureRequest.getCurrencyCode());
         if (usersBalance == null) {
-            return ResponseEntity.badRequest().body("Balance for user with id <" + user.get().getId() + "> and currency code " + futureRequest.getCurrencyCode() + " has not been found.");
+            return ResponseEntity.badRequest()
+                    .body("Balance for user with id <" + user.get().getId() + "> and currency code "
+                            + futureRequest.getCurrencyCode() + " has not been found.");
         }
         futureRequest.setUserId(user.get().getId());
         return futureService.buyFuture(futureRequest, signedInUserEmail, usersBalance.getFree());

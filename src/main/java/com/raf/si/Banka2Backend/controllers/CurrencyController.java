@@ -63,7 +63,8 @@ public class CurrencyController {
     @PostMapping(value = "/inflation/add")
     public ResponseEntity<?> addInflation(@RequestBody @Valid InflationDto inflationDto, BindingResult result) {
         if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body("Nepravilno uneti podaci. Potrebni su inflationRate, godina, currencyId");
+            return ResponseEntity.badRequest()
+                    .body("Nepravilno uneti podaci. Potrebni su inflationRate, godina, currencyId");
         }
         Optional<Currency> currency;
         try {
