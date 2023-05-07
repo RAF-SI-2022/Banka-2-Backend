@@ -1,10 +1,5 @@
 package com.raf.si.Banka2Backend.cucumber.integration.forex;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.jayway.jsonpath.JsonPath;
 import com.raf.si.Banka2Backend.dto.BuySellForexDto;
 import com.raf.si.Banka2Backend.models.mariadb.Forex;
@@ -16,15 +11,21 @@ import io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class ForexIntegrationSteps extends ForexIntegrationTestConfig {
     @Autowired
@@ -54,15 +55,15 @@ public class ForexIntegrationSteps extends ForexIntegrationTestConfig {
                             .content(
                                     """
 
-                                                            {
+                                            {
 
-                                                              "email": "%s",
+                                              "email": "%s",
 
-                                                              "password": "%s"
+                                              "password": "%s"
 
-                                                            }
+                                            }
 
-                                                            """
+                                            """
                                             .formatted(email, password)))
                     .andExpect(status().isOk())
                     .andReturn();
@@ -170,10 +171,10 @@ public class ForexIntegrationSteps extends ForexIntegrationTestConfig {
         String matrixTime = dateFormat.format(new Date(1999, 5, 31, 0, 0));
         testForex = Forex.builder()
                 .id(1L)
-                .fromCurrencyName("Serbian Dinar")
-                .toCurrencyName("British Pound Sterling")
-                .fromCurrencyCode("RSD")
-                .toCurrencyCode("GBP")
+                .fromCurrencyName("United States Dollar")
+                .toCurrencyName("Danish Krone")
+                .fromCurrencyCode("USD")
+                .toCurrencyCode("DKK")
                 .bidPrice("1000")
                 .askPrice("500")
                 .exchangeRate("2")
@@ -214,8 +215,8 @@ public class ForexIntegrationSteps extends ForexIntegrationTestConfig {
     public void user_converts_from_one_currency_to_another_with_api()
             throws JsonProcessingException, UnsupportedEncodingException {
         BuySellForexDto dto = new BuySellForexDto();
-        dto.setFromCurrencyCode("RSD");
-        dto.setToCurrencyCode("GBP");
+        dto.setFromCurrencyCode("USD");
+        dto.setToCurrencyCode("DKK");
         dto.setAmount(112);
         MvcResult mvcResult = null;
         String body = new ObjectMapper().writeValueAsString(dto);
