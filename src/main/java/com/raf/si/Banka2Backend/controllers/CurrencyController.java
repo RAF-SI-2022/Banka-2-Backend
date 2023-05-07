@@ -60,25 +60,27 @@ public class CurrencyController {
         return ResponseEntity.ok(this.inflationService.findByYear(id, year));
     }
 
-    @PostMapping(value = "/inflation/add")
-    public ResponseEntity<?> addInflation(@RequestBody @Valid InflationDto inflationDto, BindingResult result) {
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest()
-                    .body("Nepravilno uneti podaci. Potrebni su inflationRate, godina, currencyId");
-        }
-        Optional<Currency> currency;
-        try {
-            currency = this.currencyService.findById(inflationDto.getCurrencyId());
-        } catch (CurrencyNotFoundException e) {
-            return ResponseEntity.badRequest()
-                    .body("Valuta sa id-em: " + inflationDto.getCurrencyId() + " nije pronadjena");
-        }
-        Inflation inflation = Inflation.builder()
-                .inflationRate(inflationDto.getInflationRate())
-                .year(inflationDto.getYear())
-                .currency(currency.get())
-                .build();
-        this.inflationService.save(inflation);
-        return ResponseEntity.ok(inflation);
-    }
+    //todo addInflation odkomentarisati ako bude zatrebalo :)
+//    @PostMapping(value = "/inflation/add")
+//    public ResponseEntity<?> addInflation(@RequestBody @Valid InflationDto inflationDto, BindingResult result) {
+//        if (result.hasErrors()) {
+//            return ResponseEntity.badRequest()
+//                    .body("Nepravilno uneti podaci. Potrebni su inflationRate, godina, currencyId");
+//        }
+//        Optional<Currency> currency;
+//        try {
+//            currency = this.currencyService.findById(inflationDto.getCurrencyId());
+//        } catch (CurrencyNotFoundException e) {
+//            return ResponseEntity.badRequest()
+//                    .body("Valuta sa id-em: " + inflationDto.getCurrencyId() + " nije pronadjena");
+//        }
+//        Inflation inflation = Inflation.builder()
+//                .inflationRate(inflationDto.getInflationRate())
+//                .year(inflationDto.getYear())
+//                .currency(currency.get())
+//                .build();
+//        this.inflationService.save(inflation);
+//        return ResponseEntity.ok(inflation);
+//    }
+
 }
