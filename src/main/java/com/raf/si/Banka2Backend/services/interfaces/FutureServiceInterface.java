@@ -14,6 +14,8 @@ public interface FutureServiceInterface {
 
     Optional<List<Future>> findFuturesByFutureName(String futureName);
 
+    Optional<List<Future>> findFuturesByUserId(Long id);
+
     ResponseEntity<?> buyFuture(FutureRequestBuySell futureRequest, String fromUserEmail, Float usersMoneyInCurrency);
 
     ResponseEntity<?> sellFuture(FutureRequestBuySell futureRequest);

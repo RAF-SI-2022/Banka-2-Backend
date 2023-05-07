@@ -66,6 +66,16 @@ public class FutureController {
         return ResponseEntity.ok().body(futureService.findFuturesByFutureName(futureName));
     }
 
+    @GetMapping(value = "/user/{userId}")
+    public ResponseEntity<?> findByUserId(@PathVariable(name = "userId") Long id) {
+        String signedInUserEmail = getContext().getAuthentication().getName();
+        if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+            return ResponseEntity.status(401).body("Nemate dozvolu da pristupite terminskeim ugovorima.");
+        }
+
+        return ResponseEntity.ok().body(futureService.findFuturesByUserId(id));
+    }
+
     @PostMapping(value = "/buy")
     public ResponseEntity<?> buyFuture(@RequestBody FutureRequestBuySell futureRequest) {
         String signedInUserEmail = getContext().getAuthentication().getName();

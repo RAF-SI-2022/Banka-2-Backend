@@ -60,6 +60,11 @@ public class FutureService implements FutureServiceInterface {
         return futureRepository.findFuturesByFutureName(futureName);
     }
 
+    @Override
+    public Optional<List<Future>> findFuturesByUserId(Long id) {
+        return futureRepository.findFuturesByUserId(id);
+    }
+
     public void saveFuture(Future future) {
         futureRepository.save(future);
     }
