@@ -5,9 +5,6 @@ import static org.mockito.Mockito.when;
 
 import com.raf.si.Banka2Backend.models.mariadb.Future;
 import com.raf.si.Banka2Backend.repositories.mariadb.FutureRepository;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +46,6 @@ public class FutureServiceTest {
         assertEquals(future1, result.get(0));
         assertEquals(future2, result.get(1));
     }
-
 
     @Test
     void testFindById() {
@@ -97,57 +93,37 @@ public class FutureServiceTest {
     }
 
     @Test
-    void testBuyFuture(){
+    void testBuyFuture() {}
 
+    @Test
+    void testSellFuture() {}
+
+    @Test
+    void testRemoveFromMarket() {}
+
+    @Test
+    void testRemoveWaitingSellFuture() {}
+
+    @Test // ovo vrv ne
+    void testWaitingFuturesForUser() {}
+
+    @Test
+    void testRegularSell() {}
+
+    @Test
+    void testRegularBuy() {}
+
+    @Test
+    void testCreateFutureOrder() {}
+
+    @Test
+    void testGetTimeStamp() {
+        //        LocalDateTime currentDateTime = LocalDateTime.now();
+        //        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        //
+        //        when(futureService)
     }
 
     @Test
-    void testSellFuture(){
-
-    }
-
-    @Test
-    void testRemoveFromMarket(){
-
-    }
-
-    @Test
-    void testRemoveWaitingSellFuture(){
-
-    }
-
-    @Test//ovo vrv ne
-    void testWaitingFuturesForUser(){
-
-    }
-
-    @Test
-    void testRegularSell(){
-
-    }
-
-    @Test
-    void testRegularBuy(){
-
-    }
-
-    @Test
-    void testCreateFutureOrder(){
-
-    }
-
-    @Test
-    void testGetTimeStamp(){
-//        LocalDateTime currentDateTime = LocalDateTime.now();
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-//
-//        when(futureService)
-    }
-
-    @Test
-    void testProcessFutureBuyRequest(){
-
-    }
-
-
+    void testProcessFutureBuyRequest() {}
 }
