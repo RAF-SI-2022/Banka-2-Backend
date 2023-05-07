@@ -171,9 +171,9 @@ public class ForexIntegrationSteps extends ForexIntegrationTestConfig {
         testForex = Forex.builder()
                 .id(1L)
                 .fromCurrencyName("United States Dollar")
-                .toCurrencyName("Danish Krone")
+                .toCurrencyName("Russian Ruble")
                 .fromCurrencyCode("USD")
-                .toCurrencyCode("DKK")
+                .toCurrencyCode("RUB")
                 .bidPrice("1000")
                 .askPrice("500")
                 .exchangeRate("2")
@@ -215,7 +215,7 @@ public class ForexIntegrationSteps extends ForexIntegrationTestConfig {
             throws JsonProcessingException, UnsupportedEncodingException {
         BuySellForexDto dto = new BuySellForexDto();
         dto.setFromCurrencyCode("USD");
-        dto.setToCurrencyCode("DKK");
+        dto.setToCurrencyCode("RUB");
         dto.setAmount(112);
         MvcResult mvcResult = null;
         String body = new ObjectMapper().writeValueAsString(dto);
