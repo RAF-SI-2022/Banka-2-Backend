@@ -10,7 +10,6 @@ import com.raf.si.Banka2Backend.models.mariadb.orders.OrderStatus;
 import com.raf.si.Banka2Backend.models.mariadb.orders.StockOrder;
 import com.raf.si.Banka2Backend.repositories.mariadb.OrderRepository;
 import com.raf.si.Banka2Backend.services.*;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,28 +57,35 @@ public class StockBuyWorker extends Thread {
 
                 StockOrder stockOrder = stockBuyRequestsQueue.take();
 
-                Optional<UserStock> usersStockToChange = userStockService.findUserStockByUserIdAndStockSymbol(stockOrder.getUser().getId(), stockOrder.getSymbol());
+                Optional<UserStock> usersStockToChange = userStockService.findUserStockByUserIdAndStockSymbol(
+                        stockOrder.getUser().getId(), stockOrder.getSymbol());
 
-                //prvi put kupujemo stock
-                if (usersStockToChange.isEmpty() && !stockOrder.getSymbol().isBlank()){
+                // prvi put kupujemo stock
+                if (usersStockToChange.isEmpty() && !stockOrder.getSymbol().isBlank()) {
                     Stock stock = stockService.getStockBySymbol(stockOrder.getSymbol());
                     UserStock userStock = new UserStock(0L, stockOrder.getUser(), stock, 0, 0);
                     userStockService.save(userStock);
-                    usersStockToChange = userStockService.findUserStockByUserIdAndStockSymbol(stockOrder.getUser().getId(), stockOrder.getSymbol());
+                    usersStockToChange = userStockService.findUserStockByUserIdAndStockSymbol(
+                            stockOrder.getUser().getId(), stockOrder.getSymbol());
                 }
 
                 // todo DODATI CHECKOVE ZA LIMIT I STOP
-                Balance balance = this.balanceService.findBalanceByUserIdAndCurrency(stockOrder.getUser().getId(), stockOrder.getCurrencyCode());
-//
-//                if (balance.getAmount() < (stockOrder.getAmount() * stockOrder.getPrice()){
-//
-//                }
+                Balance balance = this.balanceService.findBalanceByUserIdAndCurrency(
+                        stockOrder.getUser().getId(), stockOrder.getCurrencyCode());
+                //
+                //                if (balance.getAmount() < (stockOrder.getAmount() * stockOrder.getPrice()){
+                //
+                //                }
 
-                this.balanceService.reserveAmount((float) (stockOrder.getAmount() * stockOrder.getPrice()), stockOrder.getUser().getEmail(), stockOrder.getCurrencyCode());
+                this.balanceService.reserveAmount(
+                        (float) (stockOrder.getAmount() * stockOrder.getPrice()),
+                        stockOrder.getUser().getEmail(),
+                        stockOrder.getCurrencyCode());
 
                 if (stockOrder.isAllOrNone()) {
                     usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + stockOrder.getAmount());
-                    Transaction transaction = this.transactionService.createTransaction(stockOrder, balance, (float) stockOrder.getPrice());
+                    Transaction transaction = this.transactionService.createTransaction(
+                            stockOrder, balance, (float) stockOrder.getPrice());
                     this.transactionService.save(transaction);
                 } else {
                     int stockAmountSum = 0;
@@ -89,14 +95,18 @@ public class StockBuyWorker extends Thread {
                     while (stockOrder.getAmount() != stockAmountSum) {
                         int amountBought = random.nextInt(stockOrder.getAmount() - stockAmountSum) + 1;
                         stockAmountSum += amountBought;
-                        usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + amountBought);
-                        Transaction transaction = this.transactionService.createTransaction(stockOrder, balance, price.floatValue() * amountBought);
+                        usersStockToChange
+                                .get()
+                                .setAmount(usersStockToChange.get().getAmount() + amountBought);
+                        Transaction transaction = this.transactionService.createTransaction(
+                                stockOrder, balance, price.floatValue() * amountBought);
                         transactionList.add(transaction);
                     }
                     this.transactionService.saveAll(transactionList);
                 }
                 userStockService.save(usersStockToChange.get());
-                this.balanceService.updateBalance(stockOrder, stockOrder.getUser().getEmail(), stockOrder.getCurrencyCode());
+                this.balanceService.updateBalance(
+                        stockOrder, stockOrder.getUser().getEmail(), stockOrder.getCurrencyCode());
                 this.updateOrderStatus(stockOrder.getId(), OrderStatus.COMPLETE);
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
