@@ -5,6 +5,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 
 @CucumberContextConfiguration
-@SpringBootTest()
+@SpringBootTest
 @AutoConfigureMockMvc
-public class UsersIntegrationTestConfig {}
+public class UsersFailureIntegrationTestConfig {}

@@ -405,12 +405,16 @@ public class StockService {
         //        System.out.println(price.doubleValue());
         //        System.out.println(user.getDailyLimit());
 
+        if (usersBalance.getAmount() < price.doubleValue()) {
+            return ResponseEntity.status(400).body("Nemate dovoljno novca za ovu operaciju.");
+        }
+
         if (price.doubleValue() > user.getDailyLimit()) {
             order = stockOrder == null
                     ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.WAITING, OrderTradeType.BUY)
                     : stockOrder;
             this.orderRepository.save(order);
-            return ResponseEntity.status(202).body("Dnevni limit je prekoracen, porudzbina je na cekanju (WAITING).");
+            return ResponseEntity.status(400).body("Dnevni limit je prekoracen, porudzbina je na cekanju (WAITING).");
         } else {
             order = stockOrder == null
                     ? this.createOrder(
@@ -421,6 +425,7 @@ public class StockService {
             userService.save(user);
         }
         this.balanceService.reserveAmount(price.floatValue(), user.getEmail(), stockRequest.getCurrencyCode());
+
         try {
             stockBuyRequestsQueue.put(order);
         } catch (InterruptedException e) {
@@ -464,9 +469,11 @@ public class StockService {
                 stockRequest.getUserId(), stockRequest.getStockSymbol());
         BigDecimal price =
                 userStock.get().getStock().getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
+
         if (userStock.get().getAmount() < stockRequest.getAmount()) {
-            return ResponseEntity.status(400).body("Nemate dovoljno novca za ovu operaciju.");
+            return ResponseEntity.status(400).body("Nemate dovoljno hartija za ovu operaciju.");
         }
+
         try {
             StockOrder order = stockOrder == null
                     ? this.createOrder(

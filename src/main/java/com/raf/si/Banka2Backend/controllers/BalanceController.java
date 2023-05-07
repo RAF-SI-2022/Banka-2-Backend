@@ -30,8 +30,7 @@ public class BalanceController {
             return ResponseEntity.ok(
                     this.balanceService.increaseBalance(dto.getUserEmail(), dto.getCurrencyCode(), dto.getAmount()));
         } catch (CurrencyNotFoundException e1) {
-            return ResponseEntity.badRequest()
-                    .body("Valuta sa kodom " + dto.getCurrencyCode() + " nije pronadjena.");
+            return ResponseEntity.badRequest().body("Valuta sa kodom " + dto.getCurrencyCode() + " nije pronadjena.");
         } catch (UserNotFoundException e2) {
             return ResponseEntity.badRequest().body("Korisnik sa emial-om " + dto.getUserEmail() + " nije pronadjen.");
         } catch (Exception e3) {
@@ -54,7 +53,8 @@ public class BalanceController {
         } catch (NotEnoughMoneyException e2) {
             return ResponseEntity.badRequest().body("Nemate dovoljno novca da biste izvrsili ovu operaciju.");
         } catch (NotEnoughReservedMoneyException e3) {
-            return ResponseEntity.badRequest().body("Nemate dovoljno rezervisanog novca da biste izvrsili ovu operaciju.");
+            return ResponseEntity.badRequest()
+                    .body("Nemate dovoljno rezervisanog novca da biste izvrsili ovu operaciju.");
         } catch (Exception e4) {
             return ResponseEntity.internalServerError().body("Doslo je do neocekivane greske.");
         }
