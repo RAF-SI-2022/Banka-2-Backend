@@ -1,15 +1,14 @@
 package com.raf.si.Banka2Backend.models.mariadb;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Data
 @Builder
@@ -26,12 +25,16 @@ public class Stock {
 
     @NotBlank
     private String symbol;
+
     @NotBlank
     private String companyName;
+
     @NotNull
     private Long outstandingShares;
+
     @NotNull
     private BigDecimal dividendYield;
+
     private BigDecimal priceValue;
     private BigDecimal openValue;
     private BigDecimal lowValue;

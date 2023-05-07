@@ -1,13 +1,14 @@
 package com.raf.si.Banka2Backend.models.mariadb;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import lombok.ToString;
 
 @Data
+@ToString(exclude = "user")
 @Builder
 @AllArgsConstructor
 // @RequiredArgsConstructor
@@ -19,8 +20,7 @@ public class Future {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    public Future() {
-    }
+    public Future() {}
 
     public Future(
             String futureName,
@@ -70,5 +70,5 @@ public class Future {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
-    private User user;
+    private User user; // owner of this future
 }

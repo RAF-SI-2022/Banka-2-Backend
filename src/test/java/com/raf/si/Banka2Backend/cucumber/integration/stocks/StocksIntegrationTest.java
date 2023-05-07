@@ -10,8 +10,5 @@ import org.junit.platform.suite.api.Suite;
 @Suite
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features/stock-integration/stocks.feature")
-@ConfigurationParameter(
-        key = GLUE_PROPERTY_NAME,
-        value = "com.raf.si.Banka2Backend.cucumber.integration.stocks")
-public class StocksIntegrationTest {
-}
+@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.raf.si.Banka2Backend.cucumber.integration.stocks")
+public class StocksIntegrationTest {}

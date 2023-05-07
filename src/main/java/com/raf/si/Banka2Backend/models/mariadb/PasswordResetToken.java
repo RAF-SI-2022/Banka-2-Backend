@@ -1,12 +1,11 @@
 package com.raf.si.Banka2Backend.models.mariadb;
 
-import lombok.Data;
-
-import javax.persistence.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import javax.persistence.*;
+import lombok.Data;
 
 @Data
 @Entity
@@ -32,9 +31,9 @@ public class PasswordResetToken {
         LocalDateTime expiration = LocalDateTime.now().plus(Duration.ofMinutes(this.EXPIRATION));
         this.token = token;
         this.user = client;
-        this.expirationDate = Date.from(expiration.atZone(ZoneId.systemDefault()).toInstant());
+        this.expirationDate =
+                Date.from(expiration.atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    public PasswordResetToken() {
-    }
+    public PasswordResetToken() {}
 }

@@ -5,11 +5,9 @@ import static org.mockito.Mockito.when;
 
 import com.raf.si.Banka2Backend.models.mariadb.Future;
 import com.raf.si.Banka2Backend.repositories.mariadb.FutureRepository;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -20,6 +18,7 @@ public class FutureServiceTest {
 
     @Mock
     private FutureRepository futureRepository;
+
     @Mock
     private UserService userService;
 
@@ -92,4 +91,39 @@ public class FutureServiceTest {
 
         assertNotEquals(future2, result.get());
     }
+
+    @Test
+    void testBuyFuture() {}
+
+    @Test
+    void testSellFuture() {}
+
+    @Test
+    void testRemoveFromMarket() {}
+
+    @Test
+    void testRemoveWaitingSellFuture() {}
+
+    @Test // ovo vrv ne
+    void testWaitingFuturesForUser() {}
+
+    @Test
+    void testRegularSell() {}
+
+    @Test
+    void testRegularBuy() {}
+
+    @Test
+    void testCreateFutureOrder() {}
+
+    @Test
+    void testGetTimeStamp() {
+        //        LocalDateTime currentDateTime = LocalDateTime.now();
+        //        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        //
+        //        when(futureService)
+    }
+
+    @Test
+    void testProcessFutureBuyRequest() {}
 }

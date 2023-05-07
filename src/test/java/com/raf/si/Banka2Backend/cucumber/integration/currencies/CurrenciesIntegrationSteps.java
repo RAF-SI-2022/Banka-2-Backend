@@ -21,36 +21,34 @@ public class CurrenciesIntegrationSteps extends CurrenciesIntegrationTestConfig 
 
     @Autowired
     protected MockMvc mockMvc;
+
     protected static String token;
 
-    protected static Currency testCurrency =
-            Currency.builder()
-                    .id(1L)
-                    .currencyName("Euro")
-                    .currencyCode("EUR")
-                    .currencySymbol("€")
-                    .polity("European Union")
-                    .inflations(null)
-                    .build();
+    protected static Currency testCurrency = Currency.builder()
+            .id(1L)
+            .currencyName("Euro")
+            .currencyCode("EUR")
+            .currencySymbol("€")
+            .polity("European Union")
+            .inflations(null)
+            .build();
 
     @Given("user logs in")
     public void user_logs_in() {
         token = null;
         try {
-            MvcResult mvcResult =
-                    mockMvc
-                            .perform(
-                                    post("/auth/login")
-                                            .contentType("application/json")
-                                            .content(
-                                                    """
+            MvcResult mvcResult = mockMvc.perform(
+                            post("/auth/login")
+                                    .contentType("application/json")
+                                    .content(
+                                            """
                                                             {
                                                               "email": "anesic3119rn+banka2backend+admin@raf.rs",
                                                               "password": "admin"
                                                             }
                                                             """))
-                            .andExpect(status().isOk())
-                            .andReturn();
+                    .andExpect(status().isOk())
+                    .andReturn();
             token = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.token");
         } catch (Exception e) {
             fail("Test user failed to login");
@@ -70,13 +68,11 @@ public class CurrenciesIntegrationSteps extends CurrenciesIntegrationTestConfig 
     @Then("user gets all currencies from database")
     public void user_gets_currencies() {
         try {
-            mockMvc
-                    .perform(
-                            get("/api/currencies/")
-                                    .contentType("application/json")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            mockMvc.perform(get("/api/currencies/")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isOk())
                     .andReturn();
         } catch (Exception e) {
@@ -88,13 +84,11 @@ public class CurrenciesIntegrationSteps extends CurrenciesIntegrationTestConfig 
     @Then("user gets currency by id from database")
     public void user_gets_currency_by_id() {
         try {
-            mockMvc
-                    .perform(
-                            get("/api/currencies/" + testCurrency.getId())
-                                    .contentType("application/json")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            mockMvc.perform(get("/api/currencies/" + testCurrency.getId())
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -106,13 +100,11 @@ public class CurrenciesIntegrationSteps extends CurrenciesIntegrationTestConfig 
     @Then("user gets currency by currency code from database")
     public void user_gets_currency_by_code() {
         try {
-            mockMvc
-                    .perform(
-                            get("/api/currencies/code/" + testCurrency.getCurrencyCode())
-                                    .contentType("application/json")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            mockMvc.perform(get("/api/currencies/code/" + testCurrency.getCurrencyCode())
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isOk())
                     .andReturn();
 

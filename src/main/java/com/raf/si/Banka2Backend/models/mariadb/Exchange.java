@@ -1,11 +1,10 @@
 package com.raf.si.Banka2Backend.models.mariadb;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
+import java.util.Collection;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.Collection;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 @Data
 // @Builder
@@ -16,7 +15,7 @@ import java.util.Collection;
 @Table(
         name = "exchange",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"acronym", "micCode"}),
+            @UniqueConstraint(columnNames = {"acronym", "micCode"}),
         })
 public class Exchange {
 
@@ -24,8 +23,7 @@ public class Exchange {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    public Exchange() {
-    }
+    public Exchange() {}
 
     public Exchange(
             String exchangeName,

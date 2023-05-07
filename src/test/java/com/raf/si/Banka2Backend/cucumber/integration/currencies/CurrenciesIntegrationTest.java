@@ -10,8 +10,5 @@ import org.junit.platform.suite.api.Suite;
 @Suite
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features/currency-integration/currencies.feature")
-@ConfigurationParameter(
-        key = GLUE_PROPERTY_NAME,
-        value = "com.raf.si.Banka2Backend.cucumber.integration.currencies")
-public class CurrenciesIntegrationTest {
-}
+@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.raf.si.Banka2Backend.cucumber.integration.currencies")
+public class CurrenciesIntegrationTest {}

@@ -6,5 +6,4 @@ import lombok.Data;
 public class OptionSellDto {
     private Long userOptionId;
     private double premium;
-
 }

@@ -4,13 +4,12 @@ import com.raf.si.Banka2Backend.exceptions.OrderNotFoundException;
 import com.raf.si.Banka2Backend.models.mariadb.orders.*;
 import com.raf.si.Banka2Backend.requests.StockRequest;
 import com.raf.si.Banka2Backend.services.interfaces.OrderServiceInterface;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class OrderService implements OrderServiceInterface {
@@ -19,7 +18,10 @@ public class OrderService implements OrderServiceInterface {
     private final BalanceService balanceService;
 
     @Autowired
-    public OrderService(com.raf.si.Banka2Backend.repositories.mariadb.OrderRepository orderRepository, StockService stockService, BalanceService balanceService) {
+    public OrderService(
+            com.raf.si.Banka2Backend.repositories.mariadb.OrderRepository orderRepository,
+            StockService stockService,
+            BalanceService balanceService) {
         this.orderRepository = orderRepository;
         this.stockService = stockService;
         this.balanceService = balanceService;
@@ -48,7 +50,7 @@ public class OrderService implements OrderServiceInterface {
     @Override
     public Order updateOrderStatus(Long orderId, OrderStatus status) {
         Optional<Order> order = this.findById(orderId);
-        if(order.isPresent()) {
+        if (order.isPresent()) {
             order.get().setStatus(status);
             return this.orderRepository.save(order.get());
         }
@@ -63,25 +65,28 @@ public class OrderService implements OrderServiceInterface {
     @Override
     public ResponseEntity<?> startOrder(Long id) {
         Optional<Order> o = this.orderRepository.findById(id);
-        if(o.isPresent()) {
+        if (o.isPresent()) {
             switch (o.get().getOrderType()) {
                 case STOCK:
-                    if(o.get().getTradeType() == OrderTradeType.BUY) {
-                        return this.stockService.buyStock(this.orderToStockRequest((StockOrder) o.get()), o.get().getUser(), (StockOrder) o.get());
+                    if (o.get().getTradeType() == OrderTradeType.BUY) {
+                        return this.stockService.buyStock(
+                                this.orderToStockRequest((StockOrder) o.get()),
+                                o.get().getUser(),
+                                (StockOrder) o.get());
                     } else {
-                        return this.stockService.sellStock(this.orderToStockRequest((StockOrder) o.get()), (StockOrder) o.get());
+                        return this.stockService.sellStock(
+                                this.orderToStockRequest((StockOrder) o.get()), (StockOrder) o.get());
                     }
                 case FOREX:
-                     boolean result = this.balanceService.buyOrSellCurrency(
+                    boolean result = this.balanceService.buyOrSellCurrency(
                             o.get().getUser().getEmail(),
                             o.get().getSymbol().split(" ")[0],
                             o.get().getSymbol().split(" ")[1],
                             (float) o.get().getPrice(),
                             o.get().getAmount(),
-                            (ForexOrder) o.get()
-                    );
-                     if(result)  return ResponseEntity.status(HttpStatus.OK).body("Order executed");
-                     else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("user doesn't have funds");
+                            (ForexOrder) o.get());
+                    if (result) return ResponseEntity.status(HttpStatus.OK).body("Order executed");
+                    else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Kornisnik nema dovoljno novca");
                 case FUTURE:
                     System.out.println("Under construction");
                     return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -108,12 +113,12 @@ public class OrderService implements OrderServiceInterface {
         return stockRequest;
     }
 
-//    String stockSymbol;
-//    Integer amount;
-//    Integer limit;
-//    Integer stop;
-//    boolean allOrNone;
-//    boolean margin;
-//    Long userId; //null sa fronta, stavi se u servisima
-//    String currencyCode;
+    //    String stockSymbol;
+    //    Integer amount;
+    //    Integer limit;
+    //    Integer stop;
+    //    boolean allOrNone;
+    //    boolean margin;
+    //    Long userId; //null sa fronta, stavi se u servisima
+    //    String currencyCode;
 }

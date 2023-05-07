@@ -1,23 +1,22 @@
 package com.raf.si.Banka2Backend.models.mariadb;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-
+import java.util.List;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.List;
+import lombok.*;
 
 @Data
+@ToString(exclude = "balances")
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Entity
-@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"email", "jmbg"})})
+@Table(
+        name = "users",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"email", "jmbg"})})
 public class User {
 
     @Id
@@ -79,7 +78,6 @@ public class User {
     @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<UserStock> stocks;
-
 
     private Double dailyLimit;
 

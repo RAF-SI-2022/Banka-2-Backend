@@ -7,11 +7,6 @@ public class BalanceNotFoundException extends RuntimeException {
     }
 
     public BalanceNotFoundException(String userEmail, String currencyCode) {
-        super(
-                "Balance for user with email <"
-                        + userEmail
-                        + "> and currencyCode <"
-                        + currencyCode
-                        + "> not found.");
+        super("Balance for user with email <" + userEmail + "> and currencyCode <" + currencyCode + "> not found.");
     }
 }

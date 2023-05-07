@@ -1,9 +1,8 @@
 package com.raf.si.Banka2Backend.requests;
 
 import com.raf.si.Banka2Backend.models.mariadb.PermissionName;
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class RegisterRequest {

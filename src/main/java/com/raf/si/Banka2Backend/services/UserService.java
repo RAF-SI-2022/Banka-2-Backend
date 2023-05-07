@@ -8,15 +8,14 @@ import com.raf.si.Banka2Backend.models.mariadb.User;
 import com.raf.si.Banka2Backend.repositories.mariadb.PasswordResetTokenRepository;
 import com.raf.si.Banka2Backend.repositories.mariadb.UserRepository;
 import com.raf.si.Banka2Backend.services.interfaces.UserServiceInterface;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService, UserServiceInterface {
@@ -24,8 +23,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Autowired
-    public UserService(
-            UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository) {
+    public UserService(UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository) {
         this.userRepository = userRepository;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
@@ -34,7 +32,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> myUser = this.findByEmail(username);
         if (myUser.isEmpty()) {
-            throw new UsernameNotFoundException("User with email: " + username + " not found");
+            throw new UsernameNotFoundException("Korisnik sa email-om: " + username + " nije pronadjen.");
         }
 
         return new org.springframework.security.core.userdetails.User(

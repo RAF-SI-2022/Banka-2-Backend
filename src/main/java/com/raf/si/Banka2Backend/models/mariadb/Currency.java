@@ -1,12 +1,11 @@
 package com.raf.si.Banka2Backend.models.mariadb;
 
+import java.util.List;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-
-import javax.persistence.*;
-import java.util.List;
 
 @Data
 @Builder

@@ -1,10 +1,11 @@
 package com.raf.si.Banka2Backend.services.interfaces;
+
 import com.raf.si.Banka2Backend.models.mariadb.Balance;
 import com.raf.si.Banka2Backend.models.mariadb.Transaction;
 import com.raf.si.Banka2Backend.models.mariadb.TransactionStatus;
+import com.raf.si.Banka2Backend.models.mariadb.orders.FutureOrder;
 import com.raf.si.Banka2Backend.models.mariadb.orders.Order;
-import com.raf.si.Banka2Backend.models.mariadb.orders.StockOrder;
-
+import com.raf.si.Banka2Backend.requests.FutureRequestBuySell;
 import java.util.List;
 
 public interface TransactionServiceInterface {
@@ -19,4 +20,11 @@ public interface TransactionServiceInterface {
     List<Transaction> saveAll(List<Transaction> transactionList);
 
     Transaction createTransaction(Order order, Balance balance, Float amount);
+
+    Transaction createFutureOrderTransaction(
+            FutureOrder futureOrder,
+            Balance balance,
+            Float amount,
+            FutureRequestBuySell request,
+            TransactionStatus status);
 }

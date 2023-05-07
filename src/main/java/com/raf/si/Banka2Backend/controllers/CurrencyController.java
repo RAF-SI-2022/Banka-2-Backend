@@ -6,10 +6,8 @@ import com.raf.si.Banka2Backend.models.mariadb.Currency;
 import com.raf.si.Banka2Backend.models.mariadb.Inflation;
 import com.raf.si.Banka2Backend.services.CurrencyService;
 import com.raf.si.Banka2Backend.services.InflationService;
-
 import java.util.Optional;
 import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -63,25 +61,23 @@ public class CurrencyController {
     }
 
     @PostMapping(value = "/inflation/add")
-    public ResponseEntity<?> addInflation(
-            @RequestBody @Valid InflationDto inflationDto, BindingResult result) {
+    public ResponseEntity<?> addInflation(@RequestBody @Valid InflationDto inflationDto, BindingResult result) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest()
-                    .body("Body is not valid. Should have inflationRate, year, currencyId");
+                    .body("Nepravilno uneti podaci. Potrebni su inflationRate, godina, currencyId");
         }
         Optional<Currency> currency;
         try {
             currency = this.currencyService.findById(inflationDto.getCurrencyId());
         } catch (CurrencyNotFoundException e) {
             return ResponseEntity.badRequest()
-                    .body("Currency with id: " + inflationDto.getCurrencyId() + " can not be found");
+                    .body("Valuta sa id-em: " + inflationDto.getCurrencyId() + " nije pronadjena");
         }
-        Inflation inflation =
-                Inflation.builder()
-                        .inflationRate(inflationDto.getInflationRate())
-                        .year(inflationDto.getYear())
-                        .currency(currency.get())
-                        .build();
+        Inflation inflation = Inflation.builder()
+                .inflationRate(inflationDto.getInflationRate())
+                .year(inflationDto.getYear())
+                .currency(currency.get())
+                .build();
         this.inflationService.save(inflation);
         return ResponseEntity.ok(inflation);
     }

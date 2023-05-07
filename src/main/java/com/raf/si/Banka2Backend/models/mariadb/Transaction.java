@@ -1,16 +1,13 @@
 package com.raf.si.Banka2Backend.models.mariadb;
 
 import com.raf.si.Banka2Backend.models.mariadb.orders.Order;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-
+import java.sql.Timestamp;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
+import lombok.*;
 
 @Data
+@ToString(exclude = {"currency", "user"})
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
@@ -22,22 +19,28 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne
     @JoinColumn(name = "balance_id")
     @NotNull
     private Balance balance;
+
     @NotNull
     private Timestamp timestamp;
+
     @ManyToOne
     @JoinColumn(name = "order_id")
     @NotNull
     private Order order;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     @NotNull
     private User user;
+
     @NotNull
     private String description;
+
     @ManyToOne
     @JoinColumn(name = "currency_id")
     @NotNull
