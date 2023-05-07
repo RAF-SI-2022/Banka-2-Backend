@@ -59,7 +59,8 @@ public class StockController {
         try {
             return ResponseEntity.ok().body(stockService.getStockBySymbol(symbol));
         } catch (StockNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+            return ResponseEntity.status(500).body("Doslo je do neockivane greske");
         }
     }
 

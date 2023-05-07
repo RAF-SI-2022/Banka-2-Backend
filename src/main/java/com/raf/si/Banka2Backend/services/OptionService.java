@@ -270,7 +270,7 @@ public class OptionService implements OptionServiceInterface {
                         .bid(json.getDouble("bid"))
                         .ask(json.getDouble("ask"))
                         .changePrice(json.getDouble("change"))
-                        .percentChange(json.getDouble("percentChange"))
+                        .percentChange(!json.isNull("percentChange")?json.getDouble("percentChange"):0D)
                         .inTheMoney(json.getBoolean("inTheMoney"))
                         .build();
 
@@ -304,7 +304,7 @@ public class OptionService implements OptionServiceInterface {
                         .bid(json.getDouble("bid"))
                         .ask(json.getDouble("ask"))
                         .changePrice(json.getDouble("change"))
-                        .percentChange(json.getDouble("percentChange"))
+                        .percentChange(!json.isNull("percentChange")?json.getDouble("percentChange"):0D)
                         .inTheMoney(json.getBoolean("inTheMoney"))
                         .build();
 
