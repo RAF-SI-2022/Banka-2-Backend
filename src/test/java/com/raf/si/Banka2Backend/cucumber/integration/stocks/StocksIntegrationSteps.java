@@ -8,7 +8,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.jayway.jsonpath.JsonPath;
 import com.raf.si.Banka2Backend.models.mariadb.Exchange;
 import com.raf.si.Banka2Backend.models.mariadb.Stock;
+import com.raf.si.Banka2Backend.models.mariadb.UserStock;
 import com.raf.si.Banka2Backend.services.StockService;
+import com.raf.si.Banka2Backend.services.UserStockService;
 import io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -18,6 +20,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Optional;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +31,9 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
 
     @Autowired
     private StockService stockService;
+
+    @Autowired
+    private UserStockService userStockService;
 
     @Autowired
     protected MockMvc mockMvc;
@@ -45,11 +51,11 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
                                     .contentType("application/json")
                                     .content(
                                             """
-                                                            {
-                                                              "email": "anesic3119rn+banka2backend+admin@raf.rs",
-                                                              "password": "admin"
-                                                            }
-                                                            """))
+                                                    {
+                                                      "email": "anesic3119rn+banka2backend+admin@raf.rs",
+                                                      "password": "admin"
+                                                    }
+                                                    """))
                     .andExpect(status().isOk())
                     .andReturn();
             token = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.token");
@@ -70,7 +76,6 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
 
     @Then("user gets all stocks from database")
     public void userGetsAllStocksFromDatabase() {
-
         try {
             mockMvc.perform(get("/api/stock")
                             .contentType("application/json")
@@ -145,7 +150,119 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
         }
 
         JSONObject actualStockJson = new JSONObject(mvcResult.getResponse().getContentAsString());
-
         assertNotNull(actualStockJson, "Json is not null");
+    }
+
+    @Then("user gets his user stocks")
+    public void user_gets_his_user_stocks() {
+        MvcResult mvcResult = null;
+        try {
+            mvcResult = mockMvc.perform(get("/api/stock/user-stocks")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+        assertNotNull(mvcResult);
+    }
+
+    @Then("user  buys stock")
+    public void user_buys_stock() {
+        try {
+            mockMvc.perform(post("/api/stock/buy")
+                            .contentType("application/json")
+                            .content(
+                                    """
+                                            {
+                                            "stockSymbol": "AAPL",
+                                            "amount":"10",
+                                            "limit":"0",
+                                            "stop":"0",
+                                            "allOrNone":false,
+                                            "margin":false,
+                                            "userId":"1",
+                                            "currencyCode":"USD"
+                                            }
+                                            """)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    //    @Then("user gets stock history")
+    //    public void user_gets_stock_history() {
+    //        try {
+    //            MvcResult mvcResult = mockMvc.perform(get("/api/stock/1/history/ONE_DAY")
+    //                            .contentType("application/json")
+    //                            .header("Content-Type", "application/json")
+    //                            .header("Access-Control-Allow-Origin", "*")
+    //                            .header("Authorization", "Bearer " + token))
+    //                    .andExpect(status().isOk())
+    //                    .andReturn();
+    //            assertNotNull(mvcResult);
+    //        } catch (Exception e) {
+    //            fail(e.getMessage());
+    //        }
+    //    }
+    //
+
+    @Then("user sells stock")
+    public void user_sells_stock() {
+        try {
+            Optional<UserStock> userStockTest = userStockService.findUserStockByUserIdAndStockSymbol(1, "AAPL");
+            if (userStockTest.get().getAmount() < 10) {
+                userStockTest.get().setAmount(100);
+                userStockService.save(userStockTest.get());
+                System.out.println("Dodato extra");
+            }
+
+            mockMvc.perform(post("/api/stock/sell")
+                            .contentType("application/json")
+                            .content(
+                                    """
+                                            {
+                                            "stockSymbol": "AAPL",
+                                            "amount":"10",
+                                            "limit":"0",
+                                            "stop":"0",
+                                            "allOrNone":false,
+                                            "margin":false,
+                                            "userId":"1",
+                                            "currencyCode":"USD"
+                                            }
+                                            """)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Then("user removes stock")
+    public void user_removes_stock() {
+        try {
+            mockMvc.perform(post("/api/stock/remove/AAPL")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
     }
 }

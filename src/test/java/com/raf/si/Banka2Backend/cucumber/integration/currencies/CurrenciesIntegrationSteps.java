@@ -42,11 +42,11 @@ public class CurrenciesIntegrationSteps extends CurrenciesIntegrationTestConfig 
                                     .contentType("application/json")
                                     .content(
                                             """
-                                                            {
-                                                              "email": "anesic3119rn+banka2backend+admin@raf.rs",
-                                                              "password": "admin"
-                                                            }
-                                                            """))
+                                                    {
+                                                      "email": "anesic3119rn+banka2backend+admin@raf.rs",
+                                                      "password": "admin"
+                                                    }
+                                                    """))
                     .andExpect(status().isOk())
                     .andReturn();
             token = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.token");
@@ -97,11 +97,55 @@ public class CurrenciesIntegrationSteps extends CurrenciesIntegrationTestConfig 
         }
     }
 
+    @Then("user gets inflation by id")
+    public void user_gets_inflation_by_id() {
+        MvcResult mvcResult = null;
+        try {
+            mvcResult = mockMvc.perform(get("/api/currencies/1/inflation")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+        assertNotNull(mvcResult);
+    }
+
+    @Then("user gets inflation by id and year")
+    public void user_gets_inflation_by_id_and_year() {
+        MvcResult mvcResult = null;
+        try {
+            mvcResult = mockMvc.perform(get("/api/currencies/1/inflation/1970")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+        assertNotNull(mvcResult);
+    }
+
     @Then("user gets currency by currency code from database")
     public void user_gets_currency_by_code() {
         try {
             mockMvc.perform(get("/api/currencies/code/" + testCurrency.getCurrencyCode())
                             .contentType("application/json")
+                            .content(
+                                    """
+                                    {
+                                      "year": "0000",
+                                      "inflationRate": "0.0",
+                                      "currencyId": "admin"
+                                    }
+                                    """)
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
