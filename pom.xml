@@ -19,14 +19,13 @@
         <!-- TODO update groupId to correct -->
         <exec.mainClass>com.raf.si.Banka2Backend.Banka2BackendApplication</exec.mainClass>
         <version.spotless>2.35.0</version.spotless>
-
         <!-- JaCoCo Properties -->
         <jacoco.version>0.8.8</jacoco.version>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
+        <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/../target/jacoco.exec</sonar.coverage.jacoco.xmlReportPaths>
         <sonar.language>java</sonar.language>
-
         <sonar.coverage.exclusions>
             **/bootstrap/**,
             **/dto/**,
@@ -35,9 +34,9 @@
             **/repositories/**,
             **/requests/**,
             **/responses/**,
-            **/utils/**
+            **/utils/**,
+            **/ServletInitializer.java
         </sonar.coverage.exclusions>
-
     </properties>
 
     <dependencies>
