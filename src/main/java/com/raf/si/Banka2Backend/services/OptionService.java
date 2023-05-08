@@ -242,7 +242,12 @@ public class OptionService implements OptionServiceInterface {
 
             JSONArray callsArray = options.getJSONArray("calls");
 
-            for (Object o : callsArray) {
+            System.out.println("TU SAM");
+            System.out.println(callsArray);
+
+            for(int i=0;i<callsArray.length();i++) {
+
+                Object o = callsArray.get(i);
 
                 JSONObject json = (JSONObject) o;
                 System.out.println(json);
@@ -270,7 +275,7 @@ public class OptionService implements OptionServiceInterface {
                         .bid(json.getDouble("bid"))
                         .ask(json.getDouble("ask"))
                         .changePrice(json.getDouble("change"))
-                        .percentChange(json.getDouble("percentChange"))
+                        .percentChange(json.has("percentChange") ? json.getDouble("percentChange") : 0.0)
                         .inTheMoney(json.getBoolean("inTheMoney"))
                         .build();
 
@@ -279,7 +284,9 @@ public class OptionService implements OptionServiceInterface {
 
             JSONArray putsArray = options.getJSONArray("puts");
 
-            for (Object o : putsArray) {
+            for(int i=0;i<callsArray.length();i++) {
+
+                Object o = callsArray.get(i);
 
                 JSONObject json = (JSONObject) o;
 
@@ -304,7 +311,7 @@ public class OptionService implements OptionServiceInterface {
                         .bid(json.getDouble("bid"))
                         .ask(json.getDouble("ask"))
                         .changePrice(json.getDouble("change"))
-                        .percentChange(json.getDouble("percentChange"))
+                        .percentChange(json.has("percentChange") ? json.getDouble("percentChange") : 0.0)
                         .inTheMoney(json.getBoolean("inTheMoney"))
                         .build();
 
