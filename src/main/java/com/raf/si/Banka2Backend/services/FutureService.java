@@ -73,7 +73,9 @@ public class FutureService implements FutureServiceInterface {
                     //                    System.out.println("Limit " + limit + " vrednost " + amountDouble + "
                     // oduzimanje " + suma);
                     boolean limitTestBoolean = limit - amountDouble < 0 ? false : true;
-                    if (!limitTestBoolean) return ResponseEntity.status(500).body("Prekoracili ste dozvoljeni dnevni limit. Kontaktirajte administratora.");
+                    if (!limitTestBoolean)
+                        return ResponseEntity.status(500)
+                                .body("Prekoracili ste dozvoljeni dnevni limit. Kontaktirajte administratora.");
                     else {
                         optionalUser.get().setDailyLimit(limit - amountDouble);
                         userService.save(optionalUser.get());
@@ -94,7 +96,9 @@ public class FutureService implements FutureServiceInterface {
                 //                System.out.println("Limit " + limit + " vrednost " + amountDouble + " oduzimanje " +
                 // suma);
                 boolean limitTestBoolean = limit - amountDouble < 0 ? false : true;
-                if (!limitTestBoolean) return ResponseEntity.status(500).body("Prekoracili ste dozvoljeni dnevni limit. Kontaktirajte administratora.");
+                if (!limitTestBoolean)
+                    return ResponseEntity.status(500)
+                            .body("Prekoracili ste dozvoljeni dnevni limit. Kontaktirajte administratora.");
                 else {
                     optionalUser.get().setDailyLimit(limit - amountDouble);
                     userService.save(optionalUser.get());
@@ -107,7 +111,7 @@ public class FutureService implements FutureServiceInterface {
             return ResponseEntity.ok().body(findById(futureRequest.getId()));
         } else {
             futureBuyWorker.setFuturesRequestsMap(futureRequest.getId(), futureRequest);
-//            return ResponseEntity.ok().body("Future is set for custom sale and is waiting for trigger");
+            //            return ResponseEntity.ok().body("Future is set for custom sale and is waiting for trigger");
 
             Map<String, String> response = new HashMap<>();
             response.put("message", "Terminski ugovor je uspesno postavljen na prodaju sa limitom.");
@@ -141,7 +145,8 @@ public class FutureService implements FutureServiceInterface {
         if (future.isEmpty()) return ResponseEntity.status(500).body("Doslo je do neocekivane greske.");
 
         if (!future.get().isForSale()) {
-            return ResponseEntity.status(500).body("Ne mozete skinuti terminski ugovor sa prodaje, zato sto ugovor nije na prodaji.");
+            return ResponseEntity.status(500)
+                    .body("Ne mozete skinuti terminski ugovor sa prodaje, zato sto ugovor nije na prodaji.");
         }
 
         future.get().setForSale(false);
