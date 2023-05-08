@@ -110,7 +110,7 @@ if "%1" == "dev" (
     docker compose up -d mariadb
     docker compose up -d flyway
     docker compose up -d mongodb
-    docker run --rm -d --name backend --network bank2_net --entrypoint="" ^
+    docker run --rm -d --expose 8080 --name backend --network bank2_net --entrypoint="" ^
         backend /bin/bash ^
         -c "java -jar -Dspring.profiles.active=container,dev app.jar"
     goto end
@@ -130,7 +130,7 @@ if "%1" == "test" (
     rem TODO when adding new services, each service has to be started the
     rem "normal" way (but with test profile), and also have a test container
     rem started as well
-    docker run --rm --name backend --network bank2_net --entrypoint="" ^
+    docker run --rm --expose 8080 --name backend --network bank2_net --entrypoint="" ^
         backend /bin/bash ^
         -c "export MAVEN_OPTS=\"-Dspring.profiles.active=container,test\" && mvn clean compile test -DargLine=\"-Dspring.profiles.active=container,test\""
     goto end
@@ -150,23 +150,32 @@ if "%1" == "dist" (
     rem TODO when adding new services, each service has to be started the
     rem "normal" way (but with test profile), and also have a test container
     rem started as well
-    docker run --rm --name backend --network bank2_net --entrypoint="" ^
+    docker run --rm --expose 8080 --name backend --network bank2_net --entrypoint="" ^
         backend /bin/bash ^
         -c "export MAVEN_OPTS=\"-Dspring.profiles.active=container,test\" && mvn clean compile test -DargLine=\"-Dspring.profiles.active=container,test\"" ^
         && docker push harbor.k8s.elab.rs/banka-2/backend
     goto end
 )
 
-rem Starts the service on production.
+rem Starts frontend and backend on production.
 if "%1" == "prod" (
     :prod
+    docker tag backend harbor.k8s.elab.rs/banka-2/backend
+    docker tag frontend harbor.k8s.elab.rs/banka-2/frontend
 	docker compose down
     docker compose up -d mariadb
     docker compose up -d flyway
     docker compose up -d mongodb
-    docker run --rm -d --name backend --network bank2_net --entrypoint="" ^
-        backend /bin/bash ^
+    REM ne radi kako treba:
+    REM docker run --rm -d --expose 8080 --name backend --network bank2_net --entrypoint="" ^
+    REM     backend /bin/bash ^
+    REM     -c "java -jar -Dspring.profiles.active=container,prod app.jar"
+    REM docker run --rm -d --expose 80 --publish 80:80 --name frontend ^
+    REM     --network bank2_net frontend
+    docker run --rm -d --expose 8080 --publish 8080:8080 --name backend ^
+        --network bank2_net --entrypoint="" backend /bin/bash ^
         -c "java -jar -Dspring.profiles.active=container,prod app.jar"
+    docker run --rm -d --expose 80 --publish 80:80 --name frontend frontend
     goto end
 )
 

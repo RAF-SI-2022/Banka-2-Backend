@@ -100,7 +100,7 @@ dev:
 	docker compose up -d mariadb
 	docker compose up -d flyway
 	docker compose up -d mongodb
-	docker run --rm -d --name backend --network bank2_net --entrypoint="" backend /bin/bash -c "java -jar -Dspring.profiles.active=container,dev app.jar"
+	docker run --rm -d --expose 8080 --name backend --network bank2_net --entrypoint="" backend /bin/bash -c "java -jar -Dspring.profiles.active=container,dev app.jar"
 
 # Builds the test image and starts the required services.
 test:
@@ -115,7 +115,7 @@ test:
 	# TODO when adding new services, each service has to be started the
 	# "normal" way (but with test profile), and also have a test container
 	# started as well
-	docker run --rm --name backend --network bank2_net --entrypoint="" backend /bin/bash -c "export MAVEN_OPTS=\"-Dspring.profiles.active=container,test\" && mvn clean compile test -DargLine=\"-Dspring.profiles.active=container,test\""
+	docker run --rm --expose 8080 --name backend --network bank2_net --entrypoint="" backend /bin/bash -c "export MAVEN_OPTS=\"-Dspring.profiles.active=container,test\" && mvn clean compile test -DargLine=\"-Dspring.profiles.active=container,test\""
 
 # Builds and tests the production image, and pushes to harbor. NOTE: you
 # need to be logged in to harbor.k8s.elab.rs to execute this.
@@ -131,15 +131,24 @@ dist:
 	# TODO when adding new services, each service has to be started the
 	# "normal" way (but with test profile), and also have a test container
 	# started as well
-	docker run --rm --name backend --network bank2_net --entrypoint="" backend /bin/bash -c "export MAVEN_OPTS=\"-Dspring.profiles.active=container,test\" && mvn clean compile test -DargLine=\"-Dspring.profiles.active=container,test\"" && docker push harbor.k8s.elab.rs/banka-2/backend
+	docker run --rm --expose 8080 --name backend --network bank2_net --entrypoint="" backend /bin/bash -c "export MAVEN_OPTS=\"-Dspring.profiles.active=container,test\" && mvn clean compile test -DargLine=\"-Dspring.profiles.active=container,test\"" && docker push harbor.k8s.elab.rs/banka-2/backend
 
-# Starts the service on production.
+# Starts frontend and backend on production.
 prod:
+	docker tag backend harbor.k8s.elab.rs/banka-2/backend
+	docker tag frontend harbor.k8s.elab.rs/banka-2/frontend
 	docker compose down
 	docker compose up -d mariadb
 	docker compose up -d flyway
 	docker compose up -d mongodb
-	docker run --rm -d --name backend --network bank2_net --entrypoint="" backend /bin/bash -c "java -jar -Dspring.profiles.active=container,prod app.jar"
+	# ne radi kako treba:
+	# docker run --rm -d --expose 8080 --name backend --network bank2_net --entrypoint="" ^
+	#     backend /bin/bash ^
+	#     -c "java -jar -Dspring.profiles.active=container,prod app.jar"
+	# docker run --rm -d --expose 80 --publish 80:80 --name frontend ^
+	#     --network bank2_net frontend
+    docker run --rm -d --expose 8080 --publish 8080:8080 --name backend --network bank2_net --entrypoint="" backend /bin/bash -c "java -jar -Dspring.profiles.active=container,prod app.jar"
+    docker run --rm -d --expose 80 --publish 80:80 --name frontend frontend
 
 # Restarts all Docker helper services.
 services:
