@@ -411,16 +411,11 @@ public class StockService {
     public ResponseEntity<?> buyStock(StockRequest stockRequest, User user, StockOrder stockOrder) {
         Stock stock = getStockBySymbol(stockRequest.getStockSymbol());
         BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
-        Balance usersBalance =
-                balanceService.findBalanceByUserIdAndCurrency(user.getId(), stockRequest.getCurrencyCode());
+
 
         StockOrder order;
         if (user.getDailyLimit() == null || user.getDailyLimit() <= 0) {
             return ResponseEntity.internalServerError().body("Doslo je do neocekivane greske.");
-        }
-
-        if (usersBalance.getAmount() < price.doubleValue()) {
-            return ResponseEntity.status(400).body("Nemate dovoljno novca za ovu operaciju.");
         }
 
         if (price.doubleValue() > user.getDailyLimit()) {
@@ -438,12 +433,16 @@ public class StockService {
             user.setDailyLimit(user.getDailyLimit() - price.doubleValue());
             userService.save(user);
         }
-        this.balanceService.reserveAmount(price.floatValue(), user.getEmail(), stockRequest.getCurrencyCode());
-
+        this.balanceService.reserveAmount(price.floatValue(), user.getEmail(), order.getCurrencyCode());
         try {
             stockBuyRequestsQueue.put(order);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+        }
+        Balance usersBalance =
+                balanceService.findBalanceByUserIdAndCurrency(user.getId(), order.getCurrencyCode());
+        if (usersBalance.getAmount() < price.doubleValue()) {
+            return ResponseEntity.status(400).body("Nemate dovoljno novca za ovu operaciju.");
         }
 
         Map<String, String> response = new HashMap<>();
