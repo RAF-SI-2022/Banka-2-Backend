@@ -265,7 +265,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
     public void deleting_nonexistent_user_from_database() {
         try {
             Exception exception = assertThrows(Exception.class, () -> {
-                mockMvc.perform(delete("/api/users/" + -1L)
+                mockMvc.perform(delete("/api/users/-1")
                                 .contentType("application/json")
                                 .header("Content-Type", "application/json")
                                 .header("Access-Control-Allow-Origin", "*")
@@ -275,9 +275,9 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
             });
 
             String expectedMessage =
-                    "Request processing failed; nested exception is org.springframework.dao.EmptyResultDataAccessException: No class com.raf.si.Banka2Backend.models.users.User entity with id -1 exists!";
+                    "Request processing failed; nested exception is org.springframework.dao.EmptyResultDataAccessException: No class com.raf.si.Banka2Backend.models.mariadb.User entity with id -1 exists!";
             String actualMessage = exception.getMessage();
-            assertEquals(actualMessage, expectedMessage);
+            assertEquals(expectedMessage, actualMessage );
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -556,7 +556,6 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
     @Then("user doesnt get all users from database")
     public void user_doesnt_get_all_users_from_database() {
         try {
-            System.err.println(loggedInUser);
             mockMvc.perform(get("/api/users")
                             .contentType("application/json")
                             .header("Content-Type", "application/json")

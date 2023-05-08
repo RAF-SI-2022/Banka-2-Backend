@@ -1,9 +1,5 @@
 package com.raf.si.Banka2Backend.cucumber.integration.users;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.jayway.jsonpath.JsonPath;
 import com.raf.si.Banka2Backend.models.mariadb.Permission;
 import com.raf.si.Banka2Backend.models.mariadb.User;
@@ -11,12 +7,17 @@ import com.raf.si.Banka2Backend.services.UserService;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import java.io.UnsupportedEncodingException;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
 
@@ -176,6 +177,86 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
             fail(e.getMessage());
         }
     }
+
+    @Then("user gets his daily limit")
+    public void user_gets_his_daily_limit() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(get("/api/users/limit")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+            assertNotNull(mvcResult);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Then("admin resets his daily limit")
+    public void admin_resets_his_daily_limit() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(patch("/api/users/reset-limit/1")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+            assertNotNull(mvcResult);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+
+    @When("user to update exists in database")
+    public void user_to_update_exists_in_database() {
+        try {
+            assertNotNull(userService.findByEmail("testUser@gmail.com"));
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Then("admin updates user")
+    public void admin_updates_user() {
+        MvcResult mvcResult = null;
+        try {
+            testUser = userService.findByEmail("testUser@gmail.com");
+            if (userService.findByEmail("testUser@gmail.com").isPresent()) {
+
+                mvcResult = mockMvc.perform(put("/api/users/" + testUser.get().getId())
+                                .contentType("application/json")
+                                .content(
+                                        """
+                                        {
+                                          "email": "testUser@gmail.com",
+                                          "firstName": "TestUser",
+                                          "lastName": "TestUser",
+                                          "permissions": [
+                                            "ADMIN_USER"
+                                          ],
+                                          "jobPosition": "ADMINISTRATOR",
+                                          "active": true,
+                                          "dailyLimit": 5000,
+                                          "phone": "640601548865"
+                                        }
+                                        """)
+                                .header("Content-Type", "application/json")
+                                .header("Access-Control-Allow-Origin", "*")
+                                .header("Authorization", "Bearer " + token))
+                        .andExpect(status().isOk())
+                        .andReturn();
+                assertNotNull(mvcResult);
+            }
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+
+    }
+
 
     // Test get all users
     @When("database not empty")
