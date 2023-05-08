@@ -36,6 +36,7 @@
             **/responses/**,
             **/utils/**,
             **/ServletInitializer.java
+            **/**.xml
         </sonar.coverage.exclusions>
     </properties>
 
