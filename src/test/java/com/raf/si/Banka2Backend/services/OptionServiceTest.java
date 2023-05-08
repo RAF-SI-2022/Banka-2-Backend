@@ -10,7 +10,6 @@ import com.raf.si.Banka2Backend.models.mariadb.*;
 import com.raf.si.Banka2Backend.repositories.mariadb.*;
 import java.time.LocalDate;
 import java.util.*;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -326,10 +325,8 @@ class OptionServiceTest {
 
         // Verify the results
         assertEquals(Collections.emptyList(), result);
-        verify(mockOptionRepository)
-                .saveAll(Collections.emptyList());
+        verify(mockOptionRepository).saveAll(Collections.emptyList());
     }
-
 
     @Test
     void testFindByStockAndDate() {
@@ -392,8 +389,7 @@ class OptionServiceTest {
         // Verify the results
         assertEquals(Collections.emptyList(), result);
         verify(mockOptionRepository).deleteAll();
-        verify(mockOptionRepository)
-                .saveAll(Collections.emptyList());
+        verify(mockOptionRepository).saveAll(Collections.emptyList());
     }
 
     @Test
@@ -477,7 +473,7 @@ class OptionServiceTest {
     @Test
     void testBuyStockUsingOption_StockRepositoryReturnsAbsent() {
         // Setup
-//        final String expectedResult = "Stock with symbol <" + "stockSymbol" + "> not found.";
+        //        final String expectedResult = "Stock with symbol <" + "stockSymbol" + "> not found.";
 
         // Configure UserOptionRepository.findById(...).
         final Optional<UserOption> userOption = Optional.of(UserOption.builder()
@@ -508,59 +504,59 @@ class OptionServiceTest {
                 .build());
         when(mockUserOptionRepository.findById(0L)).thenReturn(userOption);
 
-        when(mockUserRepository.findById(0L)).thenReturn(Optional.of(User.builder().build()));
+        when(mockUserRepository.findById(0L))
+                .thenReturn(Optional.of(User.builder().build()));
         when(mockStockRepository.findStockBySymbol("stockSymbol")).thenReturn(Optional.empty());
-
 
         assertThrows(StockNotFoundException.class, () -> {
             optionServiceUnderTest.buyStockUsingOption(0L, 0L);
         });
     }
 
-//    @Test
-//    void testBuyStockUsingOption_StockRepositoryReturnsAbsent() {
-//        // Setup
-//        // Configure UserOptionRepository.findById(...).
-//        final Optional<UserOption> userOption = Optional.of(UserOption.builder()
-//                .user(User.builder().build())
-//                .option(Option.builder()
-//                        .stockSymbol("stockSymbol")
-//                        .contractSymbol("contractSymbol")
-//                        .optionType("optionType")
-//                        .strike(0.0)
-//                        .impliedVolatility(0.0)
-//                        .price(0.0)
-//                        .expirationDate(LocalDate.of(2020, 1, 1))
-//                        .openInterest(0)
-//                        .contractSize(0)
-//                        .maintenanceMargin(0.0)
-//                        .bid(0.0)
-//                        .ask(0.0)
-//                        .changePrice(0.0)
-//                        .percentChange(0.0)
-//                        .inTheMoney(false)
-//                        .build())
-//                .premium(0.0)
-//                .amount(0)
-//                .type("optionType")
-//                .expirationDate(LocalDate.of(2020, 1, 1))
-//                .strike(0.0)
-//                .stockSymbol("stockSymbol")
-//                .build());
-//        when(mockUserOptionRepository.findById(0L)).thenReturn(userOption);
-//
-//        when(mockUserRepository.findById(0L))
-//                .thenReturn(Optional.of(User.builder().build()));
-//        when(mockStockRepository.findStockBySymbol("stockSymbol")).thenReturn(Optional.empty());
-//
-//        // Run the test
-//        assertThrows(StockNotFoundException.class, () -> optionServiceUnderTest.buyStockUsingOption(0L, 0L));
-//    }
+    //    @Test
+    //    void testBuyStockUsingOption_StockRepositoryReturnsAbsent() {
+    //        // Setup
+    //        // Configure UserOptionRepository.findById(...).
+    //        final Optional<UserOption> userOption = Optional.of(UserOption.builder()
+    //                .user(User.builder().build())
+    //                .option(Option.builder()
+    //                        .stockSymbol("stockSymbol")
+    //                        .contractSymbol("contractSymbol")
+    //                        .optionType("optionType")
+    //                        .strike(0.0)
+    //                        .impliedVolatility(0.0)
+    //                        .price(0.0)
+    //                        .expirationDate(LocalDate.of(2020, 1, 1))
+    //                        .openInterest(0)
+    //                        .contractSize(0)
+    //                        .maintenanceMargin(0.0)
+    //                        .bid(0.0)
+    //                        .ask(0.0)
+    //                        .changePrice(0.0)
+    //                        .percentChange(0.0)
+    //                        .inTheMoney(false)
+    //                        .build())
+    //                .premium(0.0)
+    //                .amount(0)
+    //                .type("optionType")
+    //                .expirationDate(LocalDate.of(2020, 1, 1))
+    //                .strike(0.0)
+    //                .stockSymbol("stockSymbol")
+    //                .build());
+    //        when(mockUserOptionRepository.findById(0L)).thenReturn(userOption);
+    //
+    //        when(mockUserRepository.findById(0L))
+    //                .thenReturn(Optional.of(User.builder().build()));
+    //        when(mockStockRepository.findStockBySymbol("stockSymbol")).thenReturn(Optional.empty());
+    //
+    //        // Run the test
+    //        assertThrows(StockNotFoundException.class, () -> optionServiceUnderTest.buyStockUsingOption(0L, 0L));
+    //    }
 
-        @Test
+    @Test
     void testBuyStockUsingOption_userOptionExpirationDateIsBeforeCurrentTime() {
-//         Setup
-//         Configure UserOptionRepository.findById(...).
+        //         Setup
+        //         Configure UserOptionRepository.findById(...).
         final Optional<UserOption> userOption = Optional.of(UserOption.builder()
                 .user(User.builder().build())
                 .option(Option.builder()
@@ -598,8 +594,8 @@ class OptionServiceTest {
 
     @Test
     void testBuyStockUsingOption_userOptionNotInTheMoney() {
-//         Setup
-//         Configure UserOptionRepository.findById(...).
+        //         Setup
+        //         Configure UserOptionRepository.findById(...).
         final Optional<UserOption> userOption = Optional.of(UserOption.builder()
                 .user(User.builder().build())
                 .option(Option.builder()
@@ -849,6 +845,7 @@ class OptionServiceTest {
                         .inTheMoney(false)
                         .build());
     }
+
     @Test
     void testBuyOption_NotEnoughOptionsAvailable() {
         // Setup
@@ -871,9 +868,7 @@ class OptionServiceTest {
                 .build());
         when(mockOptionRepository.findById(0L)).thenReturn(option);
         assertThrows(NotEnoughOptionsAvailableException.class, () -> optionServiceUnderTest.buyOption(0L, 0L, 3, 0.0));
-
     }
-
 
     @Test
     void testBuyOption_OptionRepositoryFindByIdReturnsAbsent() {
@@ -1176,7 +1171,7 @@ class OptionServiceTest {
                 .build();
 
         final List<Option> result = optionServiceUnderTest.getFromExternalApi("AAPL", "1685664000");
-        for(int i = 0 ; i < 3 ; i++) result.get(i).setImpliedVolatility(0.0);
+        for (int i = 0; i < 3; i++) result.get(i).setImpliedVolatility(0.0);
 
         Option option2 = Option.builder()
                 .id(null)
@@ -1216,14 +1211,12 @@ class OptionServiceTest {
                 .inTheMoney(true)
                 .build();
 
-
         // Verify the results
-        assertEquals(option1.getContractSymbol(),result.get(0).getContractSymbol());
-        assertEquals(option1.getExpirationDate(),result.get(0).getExpirationDate());
-        assertEquals(option2.getContractSymbol(),result.get(1).getContractSymbol());
-        assertEquals(option2.getExpirationDate(),result.get(1).getExpirationDate());
-        assertEquals(option3.getContractSymbol(),result.get(2).getContractSymbol());
-        assertEquals(option3.getExpirationDate(),result.get(2).getExpirationDate());
-
+        assertEquals(option1.getContractSymbol(), result.get(0).getContractSymbol());
+        assertEquals(option1.getExpirationDate(), result.get(0).getExpirationDate());
+        assertEquals(option2.getContractSymbol(), result.get(1).getContractSymbol());
+        assertEquals(option2.getExpirationDate(), result.get(1).getExpirationDate());
+        assertEquals(option3.getContractSymbol(), result.get(2).getContractSymbol());
+        assertEquals(option3.getExpirationDate(), result.get(2).getExpirationDate());
     }
 }

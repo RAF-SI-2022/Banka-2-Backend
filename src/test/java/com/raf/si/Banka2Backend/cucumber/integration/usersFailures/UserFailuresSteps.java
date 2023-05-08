@@ -426,6 +426,36 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
         }
     }
 
+    @Then("user tries to change default limit")
+    public void user_tries_to_change_default_limit() {
+        try {
+            mockMvc.perform(patch("/api/users/change-limit/1/1000")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isUnauthorized())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Then("user tries to change nonexistent users default limit")
+    public void user_tries_to_change_nonexistent_users_default_limit() {
+        try {
+            mockMvc.perform(patch("/api/users/change-limit/-1/1000")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isUnauthorized())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
     // Test non privileged user reactivates user
     @Then("user doesnt reactivate user")
     public void user_doesnt_reactivate_user() {

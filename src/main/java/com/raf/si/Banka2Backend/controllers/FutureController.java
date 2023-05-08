@@ -158,4 +158,14 @@ public class FutureController {
 
         return ResponseEntity.status(500).body("Doslo je do neocekivane greske.");
     }
+
+    @GetMapping(value = "/user/{userId}")
+    public ResponseEntity<?> findByUserId(@PathVariable(name = "userId") Long id) {
+        String signedInUserEmail = getContext().getAuthentication().getName();
+        if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+            return ResponseEntity.status(401).body("Nemate dozvolu da pristupite terminskeim ugovorima.");
+        }
+
+        return ResponseEntity.ok().body(futureService.findFuturesByUserId(id));
+    }
 }

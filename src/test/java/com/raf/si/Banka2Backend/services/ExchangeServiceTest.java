@@ -142,9 +142,8 @@ class ExchangeServiceTest {
         assertEquals(isExchangeActive, exchangeService.isExchangeActive("AAAA"));
     }
 
-
     @Test
-    void isExchangeActive_ExchangeNotFound(){
+    void isExchangeActive_ExchangeNotFound() {
 
         when(exchangeRepository.findExchangeByMicCode("AAAA")).thenReturn(Optional.empty());
         assertThrows(ExchangeNotFoundException.class, () -> exchangeService.isExchangeActive("AAAA"));

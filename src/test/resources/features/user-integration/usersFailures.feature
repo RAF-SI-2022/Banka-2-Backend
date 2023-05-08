@@ -55,6 +55,14 @@ Feature: User service
     When non privileged user logged in and user exists in database
     Then user doesnt deactivate user
 
+  Scenario: non privileged user tries to change users default daily limit
+    When non privileged user logged in and user exists in database
+    Then user tries to change default limit
+
+  Scenario: user tries to change nonexistent users default daily limit
+    When non privileged user logged in and user exists in database
+    Then user tries to change nonexistent users default limit
+
   Scenario: non privileged user reactivates user
     When non privileged user logged in and user exists in database
     Then user doesnt reactivate user
@@ -73,3 +81,4 @@ Feature: User service
 
   Scenario: wipe db from test user
     Given delete test user
+

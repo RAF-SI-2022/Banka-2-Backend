@@ -22,6 +22,8 @@ public interface FutureServiceInterface {
 
     List<Long> getWaitingFuturesForUser(Long userId, String type, String futureName);
 
+    Optional<List<Future>> findFuturesByUserId(Long id);
+
     @Deprecated
     Optional<Future> findByName(String contractName);
 

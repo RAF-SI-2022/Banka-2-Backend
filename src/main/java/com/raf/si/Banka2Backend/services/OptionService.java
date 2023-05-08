@@ -280,7 +280,7 @@ public class OptionService implements OptionServiceInterface {
             JSONObject optionChain = fullResponse.getJSONObject("optionChain");
             JSONArray result = optionChain.getJSONArray("result");
 
-            if(result.length() == 0 ){
+            if (result.length() == 0) {
                 return optionList;
             }
 
@@ -289,9 +289,10 @@ public class OptionService implements OptionServiceInterface {
             JSONArray optionsArray = object.getJSONArray("options");
             JSONObject options = optionsArray.getJSONObject(0);
 
-            JSONArray callsArray = options.getJSONArray("calls");;
+            JSONArray callsArray = options.getJSONArray("calls");
+            ;
 
-            for(int i=0;i<callsArray.length();i++) {
+            for (int i = 0; i < callsArray.length(); i++) {
 
                 Object o = callsArray.get(i);
 
@@ -330,7 +331,7 @@ public class OptionService implements OptionServiceInterface {
 
             JSONArray putsArray = options.getJSONArray("puts");
 
-            for(int i=0;i<callsArray.length();i++) {
+            for (int i = 0; i < callsArray.length(); i++) {
 
                 Object o = callsArray.get(i);
 

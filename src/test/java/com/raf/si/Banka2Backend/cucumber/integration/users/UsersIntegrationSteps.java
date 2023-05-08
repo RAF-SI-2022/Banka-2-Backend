@@ -308,6 +308,21 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
         }
     }
 
+    @Then("admin changes users default daily limit")
+    public void admin_changes_users_default_daily_limit() {
+        try {
+            mockMvc.perform(patch("/api/users/change-limit/" + testUser.get().getId() + "/1000")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
     // Test deactivate user
     @Then("deactivate user in database")
     public void deactivate_user_in_database() {

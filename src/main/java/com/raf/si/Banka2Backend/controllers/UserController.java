@@ -363,4 +363,28 @@ public class UserController {
             return ResponseEntity.status(400).body("Korisnik ne postoji");
         }
     }
+
+    @PatchMapping(value = "change-limit/{id}/{limit}")
+    public ResponseEntity<?> changeUserDefaultDailyLimit(
+            @PathVariable(name = "id") Long id, @PathVariable(name = "limit") Double limit) {
+        String signedInUserEmail = getContext().getAuthentication().getName();
+        if (!authorisationService.isAuthorised(PermissionName.UPDATE_USERS, signedInUserEmail)) {
+            return ResponseEntity.status(401).body("Nemate dozvolu da resetujete limit korisnika.");
+        }
+
+        Optional<User> userOptional = userService.findById(id);
+        if (userOptional.isPresent()) {
+            userOptional.get().setDefaultDailyLimit(limit);
+            userOptional
+                    .get()
+                    .setDailyLimit(
+                            userOptional.get().getDailyLimit()
+                                            > userOptional.get().getDefaultDailyLimit()
+                                    ? userOptional.get().getDefaultDailyLimit()
+                                    : userOptional.get().getDailyLimit());
+            return ResponseEntity.ok().body(userService.save(userOptional.get()));
+        } else {
+            return ResponseEntity.status(400).body("Korisnik ne postoji");
+        }
+    }
 }
