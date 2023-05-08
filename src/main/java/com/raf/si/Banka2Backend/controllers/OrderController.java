@@ -33,8 +33,9 @@ public class OrderController {
     @PatchMapping("approve/{id}")
     public ResponseEntity<?> approveOrder(@PathVariable Long id) {
         Optional<Order> order = this.orderService.findById(id);
-        if (!order.isPresent()) return ResponseEntity.badRequest().body("Order not found");
-        if(order.get().getStatus() != OrderStatus.WAITING) return ResponseEntity.badRequest().body("Order has to be in waiting status");
+        if (!order.isPresent()) return ResponseEntity.badRequest().body("Porudzbina nije pronadjena");
+        if (order.get().getStatus() != OrderStatus.WAITING)
+            return ResponseEntity.badRequest().body("Porudzbina nije u odgovarajucem stanju.");
         return this.orderService.startOrder(id);
     }
 
@@ -42,7 +43,7 @@ public class OrderController {
     public ResponseEntity<?> denyOrder(@PathVariable Long id) {
         Optional<Order> order = this.orderService.findById(id);
         if (!order.isPresent()) return ResponseEntity.badRequest().body("Order not found");
-        if(order.get().getStatus() != OrderStatus.WAITING) return ResponseEntity.badRequest().body("Order has to be in waiting status");
+        if(order.get().getStatus() != OrderStatus.WAITING) return ResponseEntity.badRequest().body("Porudzbina nije u odgovarajucem stanju.");
         return ResponseEntity.ok().body(this.orderService.updateOrderStatus(id, OrderStatus.DENIED));
     }
 }

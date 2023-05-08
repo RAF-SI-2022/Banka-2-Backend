@@ -182,15 +182,7 @@ public class OptionService implements OptionServiceInterface {
                 throw new NotEnoughOptionsAvailableException(optionFromDB.getOpenInterest(), amount);
 
             Optional<User> userOptional = userService.findById(userId);
-//            Long id,
-//            @NotNull OrderType orderType,
-//            @NotNull OrderTradeType tradeType,
-//            @NotNull OrderStatus status,
-//            @NotNull String symbol,
-//            @NotNull int amount,
-//            @NotNull double price,
-//            @NotNull String lastModified,
-//            @NotNull User user
+
             if (userOptional.isPresent()) {
                 User userFromDB = userOptional.get();
 
@@ -234,8 +226,6 @@ public class OptionService implements OptionServiceInterface {
                 optionRepository.save(optionFromDB);
 
                 // TODO Smanjiti user balance
-                // ORDER -> transakcokcija, Balance reservise amount i decrese/increse
-                // skida se premium
                 this.orderService.updateOrderStatus(optionOrder.getId(), OrderStatus.COMPLETE);
                 Transaction transaction = this.transactionService.createTransaction(optionOrder, balance, (float) premium);
                 this.transactionService.save(transaction);
@@ -290,14 +280,20 @@ public class OptionService implements OptionServiceInterface {
             JSONObject optionChain = fullResponse.getJSONObject("optionChain");
             JSONArray result = optionChain.getJSONArray("result");
 
+            if(result.length() == 0 ){
+                return optionList;
+            }
+
             JSONObject object = result.getJSONObject(0);
 
             JSONArray optionsArray = object.getJSONArray("options");
             JSONObject options = optionsArray.getJSONObject(0);
 
-            JSONArray callsArray = options.getJSONArray("calls");
+            JSONArray callsArray = options.getJSONArray("calls");;
 
-            for (Object o : callsArray) {
+            for(int i=0;i<callsArray.length();i++) {
+
+                Object o = callsArray.get(i);
 
                 JSONObject json = (JSONObject) o;
                 System.out.println(json);
@@ -334,7 +330,9 @@ public class OptionService implements OptionServiceInterface {
 
             JSONArray putsArray = options.getJSONArray("puts");
 
-            for (Object o : putsArray) {
+            for(int i=0;i<callsArray.length();i++) {
+
+                Object o = callsArray.get(i);
 
                 JSONObject json = (JSONObject) o;
 

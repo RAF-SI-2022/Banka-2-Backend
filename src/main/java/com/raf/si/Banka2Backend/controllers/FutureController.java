@@ -42,7 +42,7 @@ public class FutureController {
     public ResponseEntity<?> findAll() {
         String signedInUserEmail = getContext().getAuthentication().getName(); // todo dodaj nove perms
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to read users.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da pristupite terminskeim ugovorima.");
         }
         return ResponseEntity.ok().body(futureService.findAll());
     }
@@ -51,7 +51,7 @@ public class FutureController {
     public ResponseEntity<?> findById(@PathVariable(name = "futureId") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to read.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da pristupite terminskeim ugovorima.");
         }
 
         return ResponseEntity.ok().body(futureService.findById(id));
@@ -61,7 +61,7 @@ public class FutureController {
     public ResponseEntity<?> findFuturesByName(@PathVariable(name = "name") String futureName) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to read.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da pristupite terminskeim ugovorima.");
         }
         return ResponseEntity.ok().body(futureService.findFuturesByFutureName(futureName));
     }
@@ -70,29 +70,37 @@ public class FutureController {
     public ResponseEntity<?> buyFuture(@RequestBody FutureRequestBuySell futureRequest) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to buy/sell.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da kupujete terminske ugovore.");
         }
         Optional<User> user = userService.findByEmail(signedInUserEmail);
-
-        // todo kasnije promeni (ako treba) umesto USD u nesto custom sa fronta
+        if (futureRequest.getCurrencyCode() == null
+                || futureRequest.getCurrencyCode().equals("")) {
+            futureRequest.setCurrencyCode(
+                    "USD"); // TODO: this is only for testing because front doesn't send currencyCode yet - remove this
+            // if later.
+        }
         Balance usersBalance =
-                balanceService.findBalanceByUserIdAndCurrency(user.get().getId(), "USD");
-
+                balanceService.findBalanceByUserIdAndCurrency(user.get().getId(), futureRequest.getCurrencyCode());
+        if (usersBalance == null) {
+            return ResponseEntity.badRequest()
+                    .body("Balance for user with id <" + user.get().getId() + "> and currency code "
+                            + futureRequest.getCurrencyCode() + " has not been found.");
+        }
         futureRequest.setUserId(user.get().getId());
-        return futureService.buyFuture(futureRequest, signedInUserEmail, usersBalance.getAmount());
+        return futureService.buyFuture(futureRequest, signedInUserEmail, usersBalance.getFree());
     }
 
     @PostMapping(value = "/sell")
     public ResponseEntity<?> sellFuture(@RequestBody FutureRequestBuySell futureRequest) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to buy/sell.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da pristupite terminskeim ugovorima.");
         }
 
         Optional<User> user = userService.findByEmail(signedInUserEmail);
         Optional<Future> future = futureService.findById(futureRequest.getId());
         if (future.get().getUser().getId() != user.get().getId()) {
-            return ResponseEntity.status(401).body("You don't have permission to modify this future contract.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da modifikujete terminskim ugovorom.");
         }
 
         futureRequest.setUserId(user.get().getId());
@@ -103,13 +111,13 @@ public class FutureController {
     public ResponseEntity<?> removeFromMarket(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to buy/sell.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da skinete terminski ugovor sa marketa.");
         }
 
         Optional<User> user = userService.findByEmail(signedInUserEmail);
         Optional<Future> future = futureService.findById(id);
         if (future.get().getUser().getId() != user.get().getId()) {
-            return ResponseEntity.status(401).body("You don't have permission to modify this future contract.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da skinete terminski ugovor sa marketa.");
         }
 
         return futureService.removeFromMarket(id);
@@ -120,7 +128,7 @@ public class FutureController {
         String signedInUserEmail = getContext().getAuthentication().getName();
 
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to read users.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da pristupite terminskim ugovorima");
         }
         return futureService.removeWaitingSellFuture(id);
     }
@@ -130,7 +138,7 @@ public class FutureController {
         String signedInUserEmail = getContext().getAuthentication().getName();
 
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to read users.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da pristupite terminskim ugovorima");
         }
         return futureService.removeWaitingBuyFuture(id);
     }
@@ -140,7 +148,7 @@ public class FutureController {
             @PathVariable(name = "type") String type, @PathVariable(name = "futureName") String futureName) {
         String signedInUserEmail = getContext().getAuthentication().getName(); // todo dodaj nove perms
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("You don't have permission to read users.");
+            return ResponseEntity.status(401).body("Nemate dozvolu da pristupite terminskeim ugovorima.");
         }
         Optional<User> user = userService.findByEmail(signedInUserEmail);
         if (user.isPresent()) {
@@ -148,6 +156,6 @@ public class FutureController {
                     .body(futureService.getWaitingFuturesForUser(user.get().getId(), type, futureName));
         }
 
-        return ResponseEntity.status(500).body("Internal error");
+        return ResponseEntity.status(500).body("Doslo je do neocekivane greske.");
     }
 }

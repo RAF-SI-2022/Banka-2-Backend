@@ -65,15 +65,15 @@ public class ForexFailureIntegrationSteps extends ForexFailureIntegrationTestCon
                             .content(
                                     """
 
-                                                            {
+                    {
 
-                                                              "email": "%s",
+                      "email": "%s",
 
-                                                              "password": "%s"
+                      "password": "%s"
 
-                                                            }
+                    }
 
-                                                            """
+                    """
                                             .formatted(email, password)))
                     .andExpect(status().isOk())
                     .andReturn();
@@ -120,7 +120,7 @@ public class ForexFailureIntegrationSteps extends ForexFailureIntegrationTestCon
         BuySellForexDto dto = new BuySellForexDto();
         dto.setFromCurrencyCode("SEK");
         dto.setToCurrencyCode("JPY");
-        //        dto.setAmountOfMoney(500);
+        dto.setAmount(10000000);
         MvcResult mvcResult = null;
         String body = new ObjectMapper().writeValueAsString(dto);
         try {
@@ -135,7 +135,7 @@ public class ForexFailureIntegrationSteps extends ForexFailureIntegrationTestCon
             fail(e.getMessage());
         }
         String errorMsg = mvcResult.getResponse().getContentAsString();
-        assertEquals("User with email " + email + ", doesn't have balance in currency Swedish Krona", errorMsg);
+        assertEquals("Korisnik sa email-om " + email + ", nema dovoljno balansa u valuti Swedish Krona", errorMsg);
     }
 
     @Then("user doesn't have enough balance in currency he requested to convert from")
@@ -144,7 +144,7 @@ public class ForexFailureIntegrationSteps extends ForexFailureIntegrationTestCon
         BuySellForexDto dto = new BuySellForexDto();
         dto.setFromCurrencyCode("RSD");
         dto.setToCurrencyCode("USD");
-        //        dto.setAmountOfMoney(10000000);
+        dto.setAmount(10000000);
         MvcResult mvcResult = null;
         String body = new ObjectMapper().writeValueAsString(dto);
         try {
@@ -161,9 +161,8 @@ public class ForexFailureIntegrationSteps extends ForexFailureIntegrationTestCon
         String errorMsg = mvcResult.getResponse().getContentAsString();
         System.out.println(errorMsg);
         assertEquals(
-                "User with email "
-                        + email
-                        + ", doesn't have enough money in currency Serbian Dinar for buying 10000000 USD(United States Dollar)",
+                "Korisnik sa email-om " + email
+                        + ", nema dovoljno novca u valuti Serbian Dinar za kupovinu 10000000 USD(United States Dollar)",
                 errorMsg);
     }
 }

@@ -225,9 +225,9 @@ public class BalanceService implements BalanceServiceInterface {
     }
 
     @Override
-    public void exchangeMoney(String userFromEmail, String userToEmail, Float amount, String currencyCode) {
-        decreaseBalance(userFromEmail, currencyCode, amount);
-        increaseBalance(userToEmail, currencyCode, amount);
+    public void exchangeMoney(String userSellerEmail, String userBuyerEmail, Float amount, String currencyCode) {
+        decreaseBalance(userBuyerEmail, currencyCode, amount);
+        increaseBalance(userSellerEmail, currencyCode, amount);
     }
 
     private String getTimestamp() {

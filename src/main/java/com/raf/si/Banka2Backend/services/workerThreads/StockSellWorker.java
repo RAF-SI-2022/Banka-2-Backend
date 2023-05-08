@@ -82,7 +82,8 @@ public class StockSellWorker extends Thread {
                         this.transactionService.saveAll(transactionList);
                     }
                     userStockService.save(usersStockToChange.get());
-                    this.balanceService.updateBalance(stockOrder, stockOrder.getUser().getEmail(), stockOrder.getCurrencyCode());
+                    this.balanceService.updateBalance(
+                            stockOrder, stockOrder.getUser().getEmail(), stockOrder.getCurrencyCode());
                     this.updateOrderStatus(stockOrder.getId(), OrderStatus.COMPLETE);
                 } else {
                     System.out.println("limit stop sell");
@@ -95,17 +96,13 @@ public class StockSellWorker extends Thread {
     }
 
     private void updateOrderStatus(Long id, OrderStatus orderStatus) {
-        System.out.println("usli smo");
         Optional<Order> order = this.orderRepository.findById(id);
         if (order.isPresent()) {
             System.out.println(order.get().getId());
             order.get().setStatus(orderStatus);
             this.orderRepository.save(order.get());
-        }
-        else {
-            System.out.println("KURACCCC");
+        } else {
             throw new OrderNotFoundException(id);
-
         }
     }
 }

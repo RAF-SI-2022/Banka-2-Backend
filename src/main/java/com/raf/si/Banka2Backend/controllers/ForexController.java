@@ -41,9 +41,9 @@ public class ForexController {
     @PostMapping("/buy-sell")
     public ResponseEntity<?> buyOrSell(@RequestBody @Valid BuySellForexDto dto) {
         Forex forex = forexService.getForexForCurrencies(dto.getFromCurrencyCode(), dto.getToCurrencyCode());
-        if (forex == null) {
-            return ResponseEntity.notFound().build();
-        }
+        //        if (forex == null) {
+        //            return ResponseEntity.notFound().build();
+        //        }
         String signedInUserEmail = getContext().getAuthentication().getName();
         try {
             boolean success = this.balanceService.buyOrSellCurrency(
@@ -55,11 +55,11 @@ public class ForexController {
                     null);
             if (!success)
                 return ResponseEntity.badRequest()
-                        .body("User with email "
+                        .body("Korisnik sa email-om "
                                 + signedInUserEmail
-                                + ", doesn't have enough money in currency "
+                                + ", nema dovoljno novca u valuti "
                                 + forex.getFromCurrencyName()
-                                + " for buying "
+                                + " za kupovinu "
                                 + dto.getAmount()
                                 + " "
                                 + dto.getToCurrencyCode()
@@ -69,13 +69,13 @@ public class ForexController {
             return ResponseEntity.ok(forex);
         } catch (BalanceNotFoundException e1) {
             return ResponseEntity.badRequest()
-                    .body("User with email "
+                    .body("Korisnik sa email-om "
                             + signedInUserEmail
-                            + ", doesn't have balance in currency "
+                            + ", nema dovoljno balansa u valuti "
                             + forex.getFromCurrencyName());
         } catch (Exception e3) {
             e3.printStackTrace();
-            return ResponseEntity.internalServerError().body("An unexpected error occurred.");
+            return ResponseEntity.internalServerError().body("Doslo je do neocekivane greske.");
         }
     }
 }
