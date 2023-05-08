@@ -113,12 +113,7 @@ public class OrderService implements OrderServiceInterface {
         return stockRequest;
     }
 
-    //    String stockSymbol;
-    //    Integer amount;
-    //    Integer limit;
-    //    Integer stop;
-    //    boolean allOrNone;
-    //    boolean margin;
-    //    Long userId; //null sa fronta, stavi se u servisima
-    //    String currencyCode;
+    public void removeOrder(Order o) {
+        this.orderRepository.delete(o);
+    }
 }

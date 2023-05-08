@@ -2,6 +2,10 @@ package com.raf.si.Banka2Backend.services;
 
 import com.raf.si.Banka2Backend.exceptions.*;
 import com.raf.si.Banka2Backend.models.mariadb.*;
+import com.raf.si.Banka2Backend.models.mariadb.orders.OptionOrder;
+import com.raf.si.Banka2Backend.models.mariadb.orders.OrderStatus;
+import com.raf.si.Banka2Backend.models.mariadb.orders.OrderTradeType;
+import com.raf.si.Banka2Backend.models.mariadb.orders.OrderType;
 import com.raf.si.Banka2Backend.repositories.mariadb.*;
 import com.raf.si.Banka2Backend.services.interfaces.OptionServiceInterface;
 import java.io.IOException;
@@ -23,6 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.NotNull;
+
 @Service
 public class OptionService implements OptionServiceInterface {
 
@@ -33,6 +39,9 @@ public class OptionService implements OptionServiceInterface {
     private final UserRepository userRepository;
     private final StockRepository stockRepository;
     private final UserStocksRepository userStocksRepository;
+    private final OrderService orderService;
+    private final TransactionService transactionService;
+    private final BalanceService balanceService;
 
     @Autowired
     public OptionService(
@@ -42,7 +51,12 @@ public class OptionService implements OptionServiceInterface {
             UserOptionRepository userOptionRepository,
             UserRepository userRepository,
             StockRepository stockRepository,
-            UserStocksRepository userStocksRepository) {
+            UserStocksRepository userStocksRepository,
+            OrderService orderService,
+            TransactionService transactionService,
+            BalanceService balanceService
+
+    ) {
         this.optionRepository = optionRepository;
         this.userService = userService;
         this.stockService = stockService;
@@ -50,6 +64,9 @@ public class OptionService implements OptionServiceInterface {
         this.userRepository = userRepository;
         this.stockRepository = stockRepository;
         this.userStocksRepository = userStocksRepository;
+        this.orderService = orderService;
+        this.transactionService = transactionService;
+        this.balanceService = balanceService;
     }
 
     @Override
@@ -165,10 +182,42 @@ public class OptionService implements OptionServiceInterface {
                 throw new NotEnoughOptionsAvailableException(optionFromDB.getOpenInterest(), amount);
 
             Optional<User> userOptional = userService.findById(userId);
-
+//            Long id,
+//            @NotNull OrderType orderType,
+//            @NotNull OrderTradeType tradeType,
+//            @NotNull OrderStatus status,
+//            @NotNull String symbol,
+//            @NotNull int amount,
+//            @NotNull double price,
+//            @NotNull String lastModified,
+//            @NotNull User user
             if (userOptional.isPresent()) {
-
                 User userFromDB = userOptional.get();
+
+                OptionOrder optionOrder = new OptionOrder(
+                        0L,
+                        OrderType.OPTION,
+                        OrderTradeType.BUY,
+                        OrderStatus.IN_PROGRESS,
+                        optionFromDB.getStockSymbol(),
+                        amount,
+                        premium,
+                        this.getTimestamp(),
+                        userFromDB
+                    );
+                optionOrder = (OptionOrder) this.orderService.save(optionOrder);
+                if(userFromDB.getDailyLimit() == null || userFromDB.getDailyLimit() <= 0) throw new NotEnoughMoneyException();
+                if(userFromDB.getDailyLimit() < premium) {
+                    this.orderService.updateOrderStatus(optionOrder.getId(), OrderStatus.WAITING);
+                    throw new NotEnoughMoneyException();
+                }
+                Balance balance;
+                try {
+                    balance = balanceService.findBalanceByUserEmailAndCurrencyCode(userFromDB.getEmail(), "USD");
+                } catch (BalanceNotFoundException e) {
+                    throw e;
+                }
+                balanceService.reserveAmount((float) premium, userFromDB.getEmail(), "USD");
 
                 UserOption userOption = UserOption.builder()
                         .user(userFromDB)
@@ -185,6 +234,12 @@ public class OptionService implements OptionServiceInterface {
                 optionRepository.save(optionFromDB);
 
                 // TODO Smanjiti user balance
+                // ORDER -> transakcokcija, Balance reservise amount i decrese/increse
+                // skida se premium
+                this.orderService.updateOrderStatus(optionOrder.getId(), OrderStatus.COMPLETE);
+                Transaction transaction = this.transactionService.createTransaction(optionOrder, balance, (float) premium);
+                this.transactionService.save(transaction);
+                this.balanceService.updateBalance(optionOrder, userFromDB.getEmail(), "USD");
                 return userOptionRepository.save(userOption);
 
             } else {
@@ -270,7 +325,7 @@ public class OptionService implements OptionServiceInterface {
                         .bid(json.getDouble("bid"))
                         .ask(json.getDouble("ask"))
                         .changePrice(json.getDouble("change"))
-                        .percentChange(json.getDouble("percentChange"))
+                        .percentChange(json.has("percentChange") ? json.getDouble("percentChange") : 0.0)
                         .inTheMoney(json.getBoolean("inTheMoney"))
                         .build();
 
@@ -304,7 +359,7 @@ public class OptionService implements OptionServiceInterface {
                         .bid(json.getDouble("bid"))
                         .ask(json.getDouble("ask"))
                         .changePrice(json.getDouble("change"))
-                        .percentChange(json.getDouble("percentChange"))
+                        .percentChange(json.has("percentChange") ? json.getDouble("percentChange") : 0.0)
                         .inTheMoney(json.getBoolean("inTheMoney"))
                         .build();
 
@@ -320,5 +375,11 @@ public class OptionService implements OptionServiceInterface {
         System.err.println(optionList.size());
 
         return optionList;
+    }
+
+    private String getTimestamp() {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return currentDateTime.format(formatter);
     }
 }

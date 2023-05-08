@@ -423,7 +423,7 @@ public class StockService {
             user.setDailyLimit(user.getDailyLimit() - price.doubleValue());
             userService.save(user);
         }
-        this.balanceService.reserveAmount(price.floatValue(), user.getEmail(), stockRequest.getCurrencyCode());
+        this.balanceService.reserveAmount(price.floatValue(), user.getEmail(), order.getCurrencyCode());
         try {
             stockBuyRequestsQueue.put(order);
         } catch (InterruptedException e) {

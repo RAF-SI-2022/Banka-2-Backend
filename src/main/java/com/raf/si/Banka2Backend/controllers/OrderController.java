@@ -34,13 +34,15 @@ public class OrderController {
     public ResponseEntity<?> approveOrder(@PathVariable Long id) {
         Optional<Order> order = this.orderService.findById(id);
         if (!order.isPresent()) return ResponseEntity.badRequest().body("Order not found");
-        if (order.get().getStatus() == OrderStatus.DENIED)
-            return ResponseEntity.badRequest().body("Order is denied ");
+        if(order.get().getStatus() != OrderStatus.WAITING) return ResponseEntity.badRequest().body("Order has to be in waiting status");
         return this.orderService.startOrder(id);
     }
 
     @PatchMapping("deny/{id}")
     public ResponseEntity<?> denyOrder(@PathVariable Long id) {
+        Optional<Order> order = this.orderService.findById(id);
+        if (!order.isPresent()) return ResponseEntity.badRequest().body("Order not found");
+        if(order.get().getStatus() != OrderStatus.WAITING) return ResponseEntity.badRequest().body("Order has to be in waiting status");
         return ResponseEntity.ok().body(this.orderService.updateOrderStatus(id, OrderStatus.DENIED));
     }
 }
