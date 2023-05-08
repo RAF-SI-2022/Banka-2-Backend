@@ -56,8 +56,8 @@ public class FutureService implements FutureServiceInterface {
     public Optional<List<Future>> findFuturesByFutureName(String futureName) {
         return futureRepository.findFuturesByFutureName(futureName);
     }
-    public void saveFuture(Future future) {
-        futureRepository.save(future);
+    public Future saveFuture(Future future) {
+        return futureRepository.save(future);
     }
 
     @Override
