@@ -41,6 +41,13 @@ class OptionServiceTest {
     @Mock
     private UserStocksRepository mockUserStocksRepository;
 
+    @Mock
+    private OrderService mockOrderService;
+    @Mock
+    private TransactionService mockTransactionService;
+    @Mock
+    private BalanceService mockBalanceService;
+
     private OptionService optionServiceUnderTest;
 
     @BeforeEach
@@ -52,7 +59,11 @@ class OptionServiceTest {
                 mockUserOptionRepository,
                 mockUserRepository,
                 mockStockRepository,
-                mockUserStocksRepository);
+                mockUserStocksRepository,
+                mockOrderService,
+                mockTransactionService,
+                mockBalanceService
+        );
     }
 
     @Test
