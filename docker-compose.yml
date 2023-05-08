@@ -1,5 +1,7 @@
 version: "3.4"
 
+name: bank-2
+
 services:
 
   mariadb:
@@ -25,7 +27,7 @@ services:
       - ./docker/provision/mariadb/mariadb-init.sql:/docker-entrypoint-initdb.d/mariadb-init.sql:ro
       - mariadb:/var/lib/mysql
     networks:
-      - net_all
+      - bank2_net
 
   mongodb:
     image: mongodb/mongodb-community-server:6.0-ubi8
@@ -49,7 +51,7 @@ services:
       - ./docker/provision/mongodb/mongodb-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
       - mongodb:/var/lib/mongodb
     networks:
-      - net_all
+      - bank2_net
 
   flyway:
     image: flyway/flyway:9
@@ -65,11 +67,11 @@ services:
       mariadb:
         condition: service_healthy
     networks:
-      - net_all
+      - bank2_net
 
-  banka2backend-dev:
-    container_name: banka2backend-dev
-    image: banka2backend-dev
+  backend:
+    container_name: backend
+    image: harbor.k8s.elab.rs/banka-2/backend
     expose:
       - "8080"
     ports:
@@ -82,24 +84,7 @@ services:
       flyway:
         condition: service_completed_successfully
     networks:
-      - net_all
-
-  banka2backend-prod:
-    container_name: banka2backend-prod
-    image: banka2backend-prod
-    expose:
-      - "8080"
-    ports:
-      - "8080:8080"
-    depends_on:
-      mariadb:
-        condition: service_healthy
-      mongodb:
-        condition: service_healthy
-      flyway:
-        condition: service_completed_successfully
-    networks:
-      - net_all
+      - bank2_net
 
   phpmyadmin:
     image: phpmyadmin
@@ -118,7 +103,7 @@ services:
       mariadb:
         condition: service_healthy
     networks:
-      - net_all
+      - bank2_net
 
 
 volumes:
@@ -126,5 +111,5 @@ volumes:
   mongodb:
 
 networks:
-  net_all:
-    driver: bridge
+  bank2_net:
+    external: true

@@ -1,1 +1,3 @@
+*.jar text=auto
+*.cmd text=crlf
 * text eol=lf

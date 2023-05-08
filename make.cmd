@@ -73,14 +73,6 @@ if "%1" == "init" (
     goto end
 )
 
-rem Builds the production image.
-if "%1" == "build" (
-    :build
-    mvnw spotless:apply
-	docker build -t banka2backend-prod -f ./docker/prod.Dockerfile .
-    goto end
-)
-
 rem Builds the app locally and starts the required services
 rem in a docker container (the app is run locally.)
 if "%1" == "local-dev" (
@@ -89,8 +81,7 @@ if "%1" == "local-dev" (
 	docker compose up -d flyway
 	docker compose up -d mongodb
 	set JAVA_HOME=%projectHome%\lib\%jdk%
-	%JAVA_HOME%/bin/javac.exe lib/FixLineEndings.java
-	%JAVA_HOME%/bin/java.exe -cp lib FixLineEndings
+	set MAVEN_OPTS=-Dspring.profiles.active=local,dev
 	mvnw spotless:apply clean compile exec:java
 	goto end
 )
@@ -103,9 +94,8 @@ if "%1" == "local-test" (
 	docker compose up -d flyway
 	docker compose up -d mongodb
 	set JAVA_HOME=%projectHome%\lib\%jdk%
-	%JAVA_HOME%/bin/javac.exe lib/FixLineEndings.java
-	%JAVA_HOME%/bin/java.exe -cp lib FixLineEndings
-	mvnw spotless:apply clean compile test
+	set MAVEN_OPTS=-Dspring.profiles.active=local,test
+	mvnw spotless:apply clean compile test -DargLine="-Dspring.profiles.active=local,test"
 	goto end
 )
 
@@ -113,13 +103,16 @@ rem Builds the dev image and starts the required services.
 if "%1" == "dev" (
     :dev
     mvnw spotless:apply
-    docker build -t banka2backend-dev -f ./docker/dev.Dockerfile .
-    docker compose rm -s -f banka2backend-test
-    docker compose rm -s -f banka2backend-prod
+    docker compose stop backend
+    docker network create --driver bridge bank2_net
+    docker build -t backend -f ./docker/backend.Dockerfile .
+    docker tag backend harbor.k8s.elab.rs/banka-2/backend
     docker compose up -d mariadb
     docker compose up -d flyway
     docker compose up -d mongodb
-    docker compose up -d banka2backend-dev
+    docker run --rm -d --expose 8080 --name backend --network bank2_net --entrypoint="" ^
+        backend /bin/bash ^
+        -c "java -jar -Dspring.profiles.active=container,dev app.jar"
     goto end
 )
 
@@ -127,27 +120,62 @@ rem Builds the test image and starts the required services.
 if "%1" == "test" (
     :test
     mvnw spotless:apply
-    docker build -t banka2backend-test -f ./docker/test.Dockerfile .
-    docker compose rm -s -f banka2backend-dev
-    docker compose rm -s -f banka2backend-prod
+    docker compose stop backend
+    docker network create --driver bridge bank2_net
+    docker build -t backend -f ./docker/backend.Dockerfile .
+    docker tag backend harbor.k8s.elab.rs/banka-2/backend
     docker compose up -d mariadb
     docker compose up -d flyway
     docker compose up -d mongodb
-    docker run --rm --network container:mariadb banka2backend-test
-    docker compose rm -s -f banka2backend-test
+    rem TODO when adding new services, each service has to be started the
+    rem "normal" way (but with test profile), and also have a test container
+    rem started as well
+    docker run --rm --expose 8080 --name backend --network bank2_net --entrypoint="" ^
+        backend /bin/bash ^
+        -c "export MAVEN_OPTS=\"-Dspring.profiles.active=container,test\" && mvn clean compile test -DargLine=\"-Dspring.profiles.active=container,test\""
     goto end
 )
 
-rem Builds the prod image and starts the required services.
+rem Builds and tests the production image, and pushes to harbor. NOTE: you
+rem need to be logged in to harbor.k8s.elab.rs to execute this.
+if "%1" == "dist" (
+    :test
+    docker compose stop backend
+    docker network create --driver bridge bank2_net
+    docker tag backend harbor.k8s.elab.rs/banka-2/backend
+    docker build -t backend -f ./docker/backend.Dockerfile .
+    docker compose up -d mariadb
+    docker compose up -d flyway
+    docker compose up -d mongodb
+    rem TODO when adding new services, each service has to be started the
+    rem "normal" way (but with test profile), and also have a test container
+    rem started as well
+    docker run --rm --expose 8080 --name backend --network bank2_net --entrypoint="" ^
+        backend /bin/bash ^
+        -c "export MAVEN_OPTS=\"-Dspring.profiles.active=container,test\" && mvn clean compile test -DargLine=\"-Dspring.profiles.active=container,test\"" ^
+        && docker push harbor.k8s.elab.rs/banka-2/backend
+    goto end
+)
+
+rem Starts frontend and backend on production.
 if "%1" == "prod" (
     :prod
-    mvnw spotless:apply
-	docker build -t banka2backend-prod -f ./docker/prod.Dockerfile .
+    docker tag backend harbor.k8s.elab.rs/banka-2/backend
+    docker tag frontend harbor.k8s.elab.rs/banka-2/frontend
 	docker compose down
     docker compose up -d mariadb
     docker compose up -d flyway
     docker compose up -d mongodb
-    docker compose up -d banka2backend-prod
+    REM ne radi kako treba:
+    REM docker run --rm -d --expose 8080 --name backend --network bank2_net --entrypoint="" ^
+    REM     backend /bin/bash ^
+    REM     -c "java -jar -Dspring.profiles.active=container,prod app.jar"
+    REM docker run --rm -d --expose 80 --publish 80:80 --name frontend ^
+    REM     --network bank2_net frontend
+    docker run --rm -d --expose 8080 --publish 8080:8080 --name backend ^
+        --network bank2_net --entrypoint="" backend /bin/bash ^
+        -c "java -jar -Dspring.profiles.active=container,prod app.jar"
+    docker run --rm -d --expose 80 --publish 80:80 --name frontend frontend
     goto end
 )
 
@@ -168,6 +196,14 @@ if "%1" == "reset" (
     docker compose up -d mariadb
     docker compose up -d flyway
     docker compose up -d mongodb
+    goto end
+)
+
+rem Stops all services.
+if "%1" == "stop" (
+    :stop
+	docker compose down
+	docker stop backend
     goto end
 )
 
