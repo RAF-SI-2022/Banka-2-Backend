@@ -1,16 +1,10 @@
 package com.raf.si.Banka2Backend.controllers;
 
-import com.raf.si.Banka2Backend.dto.InflationDto;
 import com.raf.si.Banka2Backend.exceptions.CurrencyNotFoundException;
-import com.raf.si.Banka2Backend.models.mariadb.Currency;
-import com.raf.si.Banka2Backend.models.mariadb.Inflation;
 import com.raf.si.Banka2Backend.services.CurrencyService;
 import com.raf.si.Banka2Backend.services.InflationService;
-import java.util.Optional;
-import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -60,25 +54,27 @@ public class CurrencyController {
         return ResponseEntity.ok(this.inflationService.findByYear(id, year));
     }
 
-    @PostMapping(value = "/inflation/add")
-    public ResponseEntity<?> addInflation(@RequestBody @Valid InflationDto inflationDto, BindingResult result) {
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest()
-                    .body("Nepravilno uneti podaci. Potrebni su inflationRate, godina, currencyId");
-        }
-        Optional<Currency> currency;
-        try {
-            currency = this.currencyService.findById(inflationDto.getCurrencyId());
-        } catch (CurrencyNotFoundException e) {
-            return ResponseEntity.badRequest()
-                    .body("Valuta sa id-em: " + inflationDto.getCurrencyId() + " nije pronadjena");
-        }
-        Inflation inflation = Inflation.builder()
-                .inflationRate(inflationDto.getInflationRate())
-                .year(inflationDto.getYear())
-                .currency(currency.get())
-                .build();
-        this.inflationService.save(inflation);
-        return ResponseEntity.ok(inflation);
-    }
+    // todo addInflation odkomentarisati ako bude zatrebalo :)
+    //    @PostMapping(value = "/inflation/add")
+    //    public ResponseEntity<?> addInflation(@RequestBody @Valid InflationDto inflationDto, BindingResult result) {
+    //        if (result.hasErrors()) {
+    //            return ResponseEntity.badRequest()
+    //                    .body("Nepravilno uneti podaci. Potrebni su inflationRate, godina, currencyId");
+    //        }
+    //        Optional<Currency> currency;
+    //        try {
+    //            currency = this.currencyService.findById(inflationDto.getCurrencyId());
+    //        } catch (CurrencyNotFoundException e) {
+    //            return ResponseEntity.badRequest()
+    //                    .body("Valuta sa id-em: " + inflationDto.getCurrencyId() + " nije pronadjena");
+    //        }
+    //        Inflation inflation = Inflation.builder()
+    //                .inflationRate(inflationDto.getInflationRate())
+    //                .year(inflationDto.getYear())
+    //                .currency(currency.get())
+    //                .build();
+    //        this.inflationService.save(inflation);
+    //        return ResponseEntity.ok(inflation);
+    //    }
+
 }
