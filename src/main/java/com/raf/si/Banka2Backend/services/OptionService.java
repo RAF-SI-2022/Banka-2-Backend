@@ -235,15 +235,16 @@ public class OptionService implements OptionServiceInterface {
             JSONObject optionChain = fullResponse.getJSONObject("optionChain");
             JSONArray result = optionChain.getJSONArray("result");
 
+            if(result.length() == 0 ){
+                return optionList;
+            }
+
             JSONObject object = result.getJSONObject(0);
 
             JSONArray optionsArray = object.getJSONArray("options");
             JSONObject options = optionsArray.getJSONObject(0);
 
-            JSONArray callsArray = options.getJSONArray("calls");
-
-            System.out.println("TU SAM");
-            System.out.println(callsArray);
+            JSONArray callsArray = options.getJSONArray("calls");;
 
             for(int i=0;i<callsArray.length();i++) {
 

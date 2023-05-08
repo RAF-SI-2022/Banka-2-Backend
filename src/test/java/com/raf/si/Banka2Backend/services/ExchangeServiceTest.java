@@ -117,11 +117,8 @@ class ExchangeServiceTest {
         LocalTime startTime = LocalTime.of(8, 0);
         LocalTime endTime = LocalTime.of(16, 0);
 
-        if (now.isAfter(startTime) && now.isBefore(endTime)) {
-            assertTrue(exchangeService.isExchangeActive("MIC"));
-        } else {
-            assertFalse(exchangeService.isExchangeActive("MIC"));
-        }
+        boolean isExchangeActive = now.isAfter(startTime) && now.isBefore(endTime);
+        assertEquals(isExchangeActive, exchangeService.isExchangeActive("MIC"));
     }
 
     @Test
@@ -136,16 +133,20 @@ class ExchangeServiceTest {
 
         when(exchangeRepository.findExchangeByMicCode("AAAA")).thenReturn(Optional.of(exchange));
 
-        // ima mnogo boljih nacina ali me mrzi da refaktorisem ceo kod
         LocalTime now = LocalTime.now(ZoneId.of("America/New_York"));
 
         LocalTime startTime = LocalTime.of(8, 0);
         LocalTime endTime = LocalTime.of(16, 0);
 
-        if (now.isAfter(startTime) && now.isBefore(endTime)) {
-            assertTrue(exchangeService.isExchangeActive("AAAA"));
-        } else {
-            assertFalse(exchangeService.isExchangeActive("AAAA"));
-        }
+        boolean isExchangeActive = now.isAfter(startTime) && now.isBefore(endTime);
+        assertEquals(isExchangeActive, exchangeService.isExchangeActive("AAAA"));
+    }
+
+
+    @Test
+    void isExchangeActive_ExchangeNotFound(){
+
+        when(exchangeRepository.findExchangeByMicCode("AAAA")).thenReturn(Optional.empty());
+        assertThrows(ExchangeNotFoundException.class, () -> exchangeService.isExchangeActive("AAAA"));
     }
 }

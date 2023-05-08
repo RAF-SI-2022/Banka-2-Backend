@@ -61,7 +61,6 @@ public class ForexService implements ForexServiceInterface {
                     }
                 } else return forex.get(); // Less than 30 minutes have passed since last modified date
             } catch (ParseException e) {
-                e.printStackTrace();
                 return forex.get(); // sigurnosti get - ako puknte try catch (ako pukne api) (ima ga u bazi satri)
             }
         }

@@ -7,7 +7,11 @@ import static org.mockito.Mockito.when;
 import com.raf.si.Banka2Backend.models.mariadb.Forex;
 import com.raf.si.Banka2Backend.repositories.mariadb.ForexRepository;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -116,5 +120,62 @@ class ForexServiceTest {
         String toCurrency = "XYZ";
         Forex forex = forexService.getForexForCurrencies(fromCurrency, toCurrency);
         assertNull(forex);
+    }
+
+    @Test
+    public void forexFromApi_NotNull(){
+
+        String fromCurrency = "USD";
+        String toCurrency = "EUR";
+        LocalDateTime lastRefreshedBad = LocalDateTime.now().minus(Duration.ofMinutes(45));
+        Date date = Date.from(lastRefreshedBad.atZone(ZoneId.systemDefault()).toInstant());
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String systemTimeWithDecrement = dateFormat.format(date);
+
+        Forex forex = Forex.builder()
+                .fromCurrencyCode(fromCurrency)
+                .toCurrencyCode(toCurrency)
+                .fromCurrencyName("United States Dollar")
+                .toCurrencyName("Euro")
+                .askPrice("0.845")
+                .bidPrice("0.855")
+                .exchangeRate("0.85")
+                .lastRefreshed(systemTimeWithDecrement)
+                .timeZone("UTC")
+                .build();
+
+        when(forexRepository.findForexByFromCurrencyCodeAndToCurrencyCode(fromCurrency, toCurrency))
+                .thenReturn(Optional.of(forex));
+
+        Forex returnedForex = forexService.getForexForCurrencies(fromCurrency, toCurrency);
+
+        assertEquals(forex.getFromCurrencyCode(), returnedForex.getFromCurrencyCode());
+        assertEquals(forex.getToCurrencyCode(), returnedForex.getToCurrencyCode());
+        // posto testiram api ovde testiram za vrednosti za koje znam da su fiksirane(ne menjaju se u zavisnosti od vremena pozivanja)
+    }
+
+    @Test
+    public void forexFromApi_BadDateParse(){
+
+        String fromCurrency = "USD";
+        String toCurrency = "EUR";
+
+        Forex forex = Forex.builder()
+                .fromCurrencyCode(fromCurrency)
+                .toCurrencyCode(toCurrency)
+                .fromCurrencyName("United States Dollar")
+                .toCurrencyName("Euro")
+                .askPrice("0.845")
+                .bidPrice("0.855")
+                .exchangeRate("0.85")
+                .lastRefreshed("01-111-4234")
+                .timeZone("UTC")
+                .build();
+
+        when(forexRepository.findForexByFromCurrencyCodeAndToCurrencyCode(fromCurrency, toCurrency))
+                .thenReturn(Optional.of(forex));
+
+        Forex result = forexService.getForexForCurrencies(fromCurrency, toCurrency);
+        assertEquals(forex, result);
     }
 }
