@@ -277,7 +277,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
             String expectedMessage =
                     "Request processing failed; nested exception is org.springframework.dao.EmptyResultDataAccessException: No class com.raf.si.Banka2Backend.models.mariadb.User entity with id -1 exists!";
             String actualMessage = exception.getMessage();
-            assertEquals(expectedMessage, actualMessage );
+            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }

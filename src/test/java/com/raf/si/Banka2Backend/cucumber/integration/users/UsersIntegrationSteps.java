@@ -1,5 +1,9 @@
 package com.raf.si.Banka2Backend.cucumber.integration.users;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.jayway.jsonpath.JsonPath;
 import com.raf.si.Banka2Backend.models.mariadb.Permission;
 import com.raf.si.Banka2Backend.models.mariadb.User;
@@ -7,17 +11,12 @@ import com.raf.si.Banka2Backend.services.UserService;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
 
@@ -210,7 +209,6 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
         }
     }
 
-
     @When("user to update exists in database")
     public void user_to_update_exists_in_database() {
         try {
@@ -254,9 +252,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
         } catch (Exception e) {
             fail(e.getMessage());
         }
-
     }
-
 
     // Test get all users
     @When("database not empty")

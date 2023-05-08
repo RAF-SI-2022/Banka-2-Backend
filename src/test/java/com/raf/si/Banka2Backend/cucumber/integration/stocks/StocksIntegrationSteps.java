@@ -12,7 +12,6 @@ import com.raf.si.Banka2Backend.models.mariadb.UserStock;
 import com.raf.si.Banka2Backend.services.StockService;
 import com.raf.si.Banka2Backend.services.UserStockService;
 import io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper;
-import io.cucumber.java.bs.A;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -22,7 +21,6 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -221,8 +219,8 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
     @Then("user sells stock")
     public void user_sells_stock() {
         try {
-            Optional<UserStock> userStockTest = userStockService.findUserStockByUserIdAndStockSymbol(1,"AAPL");
-            if (userStockTest.get().getAmount() < 10){
+            Optional<UserStock> userStockTest = userStockService.findUserStockByUserIdAndStockSymbol(1, "AAPL");
+            if (userStockTest.get().getAmount() < 10) {
                 userStockTest.get().setAmount(100);
                 userStockService.save(userStockTest.get());
                 System.out.println("Dodato extra");
