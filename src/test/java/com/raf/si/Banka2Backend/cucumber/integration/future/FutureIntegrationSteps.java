@@ -6,40 +6,42 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
-import com.raf.si.Banka2Backend.dto.BuySellForexDto;
 import com.raf.si.Banka2Backend.models.mariadb.*;
 import com.raf.si.Banka2Backend.repositories.mariadb.CurrencyRepository;
 import com.raf.si.Banka2Backend.repositories.mariadb.PermissionRepository;
 import com.raf.si.Banka2Backend.requests.FutureRequestBuySell;
 import com.raf.si.Banka2Backend.services.BalanceService;
 import com.raf.si.Banka2Backend.services.FutureService;
-import com.raf.si.Banka2Backend.services.PermissionService;
 import com.raf.si.Banka2Backend.services.UserService;
 import io.cucumber.core.internal.com.fasterxml.jackson.core.JsonProcessingException;
 import io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
 
     @Autowired
     private FutureService futureService;
+
     @Autowired
     private UserService userService;
+
     @Autowired
     private BalanceService balanceService;
+
     @Autowired
     CurrencyRepository currencyRepository;
+
     @Autowired
     private PermissionRepository permissionRepository;
+
     @Autowired
     protected MockMvc mockMvc;
 
@@ -50,12 +52,18 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
     @Given("user logs in")
     public void user_logs_in() {
         try {
-            MvcResult mvcResult = mockMvc.perform(post("/auth/login").contentType("application/json").content("""
+            MvcResult mvcResult = mockMvc.perform(
+                            post("/auth/login")
+                                    .contentType("application/json")
+                                    .content(
+                                            """
                     {
                       "email": "anesic3119rn+banka2backend+admin@raf.rs",
                       "password": "admin"
                     }
-                    """)).andExpect(status().isOk()).andReturn();
+                    """))
+                    .andExpect(status().isOk())
+                    .andReturn();
             token = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.token");
         } catch (Exception e) {
             fail("User failed to login");
@@ -75,7 +83,13 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
     @Then("user gets all futures from database")
     public void user_gets_futures() {
         try {
-            mockMvc.perform(get("/api/futures").contentType("application/json").header("Content-Type", "application/json").header("Access-Control-Allow-Origin", "*").header("Authorization", "Bearer " + token)).andExpect(status().isOk()).andReturn();
+            mockMvc.perform(get("/api/futures")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -85,7 +99,13 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
     @Then("user gets future by id from database")
     public void user_gets_future_by_id() {
         try {
-            mockMvc.perform(get("/api/futures/" + testFuture.getId()).contentType("application/json").header("Content-Type", "application/json").header("Access-Control-Allow-Origin", "*").header("Authorization", "Bearer " + token)).andExpect(status().isOk()).andReturn();
+            mockMvc.perform(get("/api/futures/" + testFuture.getId())
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
 
         } catch (Exception e) {
             fail(e.getMessage());
@@ -95,7 +115,13 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
     @Then("user gets future by name from database")
     public void user_gets_future_by_name() {
         try {
-            mockMvc.perform(get("/api/futures/name/" + testFuture.getFutureName()).contentType("application/json").header("Content-Type", "application/json").header("Access-Control-Allow-Origin", "*").header("Authorization", "Bearer " + token)).andExpect(status().isOk()).andReturn();
+            mockMvc.perform(get("/api/futures/name/" + testFuture.getFutureName())
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
 
         } catch (Exception e) {
             fail(e.getMessage());
@@ -112,6 +138,7 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
     public void futureIsOwnedByAnotherUser() {
         testUser = this.createTestUserWithBalance();
     }
+
     @Given("future is owned by this user")
     public void futureIsOwnedByThisUser() {
         Optional<User> user = this.userService.findByEmail("anesic3119rn+banka2backend+admin@raf.rs");
@@ -124,10 +151,19 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
     public void userBuysFutureFromCompany() throws JsonProcessingException {
 
         Optional<User> user = userService.findByEmail("anesic3119rn+banka2backend+admin@raf.rs");
-        Balance balance = this.balanceService.findBalanceByUserEmailAndCurrencyCode("anesic3119rn+banka2backend+admin@raf.rs", "USD");
+        Balance balance = this.balanceService.findBalanceByUserEmailAndCurrencyCode(
+                "anesic3119rn+banka2backend+admin@raf.rs", "USD");
         Float oldFree = balance.getFree();
 
-        FutureRequestBuySell request = this.createFutureRequest(testFuture.getId(), user.get().getId(), testFuture.getFutureName(), "BUY", testFuture.getMaintenanceMargin(), "USD", 0, 0);
+        FutureRequestBuySell request = this.createFutureRequest(
+                testFuture.getId(),
+                user.get().getId(),
+                testFuture.getFutureName(),
+                "BUY",
+                testFuture.getMaintenanceMargin(),
+                "USD",
+                0,
+                0);
         String body = new ObjectMapper().writeValueAsString(request);
         try {
             mockMvc.perform(post("/api/futures/buy")
@@ -140,16 +176,25 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
         } catch (Exception e) {
             fail(e.getMessage());
         }
-        balance = this.balanceService.findBalanceByUserEmailAndCurrencyCode("anesic3119rn+banka2backend+admin@raf.rs", "USD");
-        assertEquals(Math.round(oldFree - testFuture.getMaintenanceMargin().floatValue()), Math.round(balance.getFree()));
+        balance = this.balanceService.findBalanceByUserEmailAndCurrencyCode(
+                "anesic3119rn+banka2backend+admin@raf.rs", "USD");
+        assertEquals(
+                Math.round(oldFree - testFuture.getMaintenanceMargin().floatValue()), Math.round(balance.getFree()));
     }
-
 
     @Then("user buys future from company with limit or stop")
     public void userBuysFutureFromCompanyWithLimitOrStop() throws JsonProcessingException {
         Optional<User> user = userService.findByEmail("anesic3119rn+banka2backend+admin@raf.rs");
 
-        FutureRequestBuySell request = this.createFutureRequest(testFuture.getId(), user.get().getId(), testFuture.getFutureName(), "BUY", testFuture.getMaintenanceMargin(), "USD", 1900, 2500);
+        FutureRequestBuySell request = this.createFutureRequest(
+                testFuture.getId(),
+                user.get().getId(),
+                testFuture.getFutureName(),
+                "BUY",
+                testFuture.getMaintenanceMargin(),
+                "USD",
+                1900,
+                2500);
         String body = new ObjectMapper().writeValueAsString(request);
         try {
             mockMvc.perform(post("/api/futures/buy")
@@ -167,7 +212,8 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
     @Then("user buys future from another user")
     public void userBuysFutureFromAnotherUser() throws JsonProcessingException {
         Optional<User> buyer = userService.findByEmail("anesic3119rn+banka2backend+admin@raf.rs");
-        Balance buyerBalance = this.balanceService.findBalanceByUserEmailAndCurrencyCode("anesic3119rn+banka2backend+admin@raf.rs", "USD");
+        Balance buyerBalance = this.balanceService.findBalanceByUserEmailAndCurrencyCode(
+                "anesic3119rn+banka2backend+admin@raf.rs", "USD");
         Float buyerOldFree = buyerBalance.getFree();
 
         User seller = this.createTestUserWithBalance();
@@ -177,7 +223,15 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
         testFuture.setUser(seller);
         testFuture = this.futureService.saveFuture(testFuture);
 
-        FutureRequestBuySell request = this.createFutureRequest(testFuture.getId(), buyer.get().getId(), testFuture.getFutureName(), "BUY", testFuture.getMaintenanceMargin(), "USD", 0, 0);
+        FutureRequestBuySell request = this.createFutureRequest(
+                testFuture.getId(),
+                buyer.get().getId(),
+                testFuture.getFutureName(),
+                "BUY",
+                testFuture.getMaintenanceMargin(),
+                "USD",
+                0,
+                0);
         String body = new ObjectMapper().writeValueAsString(request);
         try {
             mockMvc.perform(post("/api/futures/buy")
@@ -190,11 +244,15 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
         } catch (Exception e) {
             fail(e.getMessage());
         }
-        buyerBalance = this.balanceService.findBalanceByUserEmailAndCurrencyCode(buyer.get().getEmail(), "USD");
+        buyerBalance = this.balanceService.findBalanceByUserEmailAndCurrencyCode(
+                buyer.get().getEmail(), "USD");
         sellerBalance = this.balanceService.findBalanceByUserEmailAndCurrencyCode(seller.getEmail(), "USD");
-        assertEquals(Math.round(buyerOldFree - testFuture.getMaintenanceMargin().floatValue()), Math.round(buyerBalance.getFree()));
-        assertEquals(Math.round(sellerOldFree + testFuture.getMaintenanceMargin().floatValue()), Math.round(sellerBalance.getFree()));
-
+        assertEquals(
+                Math.round(buyerOldFree - testFuture.getMaintenanceMargin().floatValue()),
+                Math.round(buyerBalance.getFree()));
+        assertEquals(
+                Math.round(sellerOldFree + testFuture.getMaintenanceMargin().floatValue()),
+                Math.round(sellerBalance.getFree()));
     }
 
     @Then("user buys future from another user with limit or stop")
@@ -204,7 +262,15 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
         testFuture.setUser(seller);
         testFuture = this.futureService.saveFuture(testFuture);
 
-        FutureRequestBuySell request = this.createFutureRequest(testFuture.getId(), buyer.get().getId(), testFuture.getFutureName(), "BUY", testFuture.getMaintenanceMargin(), "USD", 1900, 2500);
+        FutureRequestBuySell request = this.createFutureRequest(
+                testFuture.getId(),
+                buyer.get().getId(),
+                testFuture.getFutureName(),
+                "BUY",
+                testFuture.getMaintenanceMargin(),
+                "USD",
+                1900,
+                2500);
         String body = new ObjectMapper().writeValueAsString(request);
         try {
             mockMvc.perform(post("/api/futures/buy")
@@ -221,7 +287,15 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
 
     @Then("user sells future")
     public void userSellsFuture() throws JsonProcessingException {
-        FutureRequestBuySell request = this.createFutureRequest(testFuture.getId(), null, testFuture.getFutureName(), "BUY", testFuture.getMaintenanceMargin(), "USD", 0, 0);
+        FutureRequestBuySell request = this.createFutureRequest(
+                testFuture.getId(),
+                null,
+                testFuture.getFutureName(),
+                "BUY",
+                testFuture.getMaintenanceMargin(),
+                "USD",
+                0,
+                0);
         String body = new ObjectMapper().writeValueAsString(request);
         try {
             mockMvc.perform(post("/api/futures/sell")
@@ -240,7 +314,15 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
 
     @Then("user sells future with limit or stop")
     public void userSellsFutureWithLimitOrStop() throws JsonProcessingException {
-        FutureRequestBuySell request = this.createFutureRequest(testFuture.getId(), null, testFuture.getFutureName(), "BUY", testFuture.getMaintenanceMargin(), "USD", 2500, 1900);
+        FutureRequestBuySell request = this.createFutureRequest(
+                testFuture.getId(),
+                null,
+                testFuture.getFutureName(),
+                "BUY",
+                testFuture.getMaintenanceMargin(),
+                "USD",
+                2500,
+                1900);
         String body = new ObjectMapper().writeValueAsString(request);
         try {
             mockMvc.perform(post("/api/futures/sell")
@@ -255,8 +337,15 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
         }
     }
 
-    private FutureRequestBuySell createFutureRequest(Long id, Long userId, String futureName, String action, Integer price,
-                                                     String currencyCode, Integer limit, Integer stop) { //help method;
+    private FutureRequestBuySell createFutureRequest(
+            Long id,
+            Long userId,
+            String futureName,
+            String action,
+            Integer price,
+            String currencyCode,
+            Integer limit,
+            Integer stop) { // help method;
         FutureRequestBuySell request = new FutureRequestBuySell();
         request.setId(id);
         request.setUserId(userId);
@@ -268,9 +357,10 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
         request.setStop(stop);
         return request;
     }
+
     private User createTestUserWithBalance() {
         Optional<User> optionalUser = this.userService.findByEmail("futuretestuser11@gmail.com");
-        if(optionalUser.isPresent()){
+        if (optionalUser.isPresent()) {
             return optionalUser.get();
         }
         List<Permission> permissions = new ArrayList<>();

@@ -14,4 +14,6 @@ public interface FutureRepository extends JpaRepository<Future, Long> {
     Optional<List<Future>> findFuturesByFutureName(String futureName);
 
     Optional<Future> findFutureById(Long Id);
+
+    Optional<List<Future>> findFuturesByUserId(Long id);
 }

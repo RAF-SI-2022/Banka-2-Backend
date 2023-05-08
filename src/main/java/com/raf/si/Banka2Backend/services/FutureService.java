@@ -59,6 +59,7 @@ public class FutureService implements FutureServiceInterface {
     public Optional<List<Future>> findFuturesByFutureName(String futureName) {
         return futureRepository.findFuturesByFutureName(futureName);
     }
+
     public Future saveFuture(Future future) {
         return futureRepository.save(future);
     }
@@ -166,6 +167,11 @@ public class FutureService implements FutureServiceInterface {
         }
 
         return futureIdsToReturn;
+    }
+
+    @Override
+    public Optional<List<Future>> findFuturesByUserId(Long id) {
+        return futureRepository.findFuturesByUserId(id);
     }
 
     @Deprecated

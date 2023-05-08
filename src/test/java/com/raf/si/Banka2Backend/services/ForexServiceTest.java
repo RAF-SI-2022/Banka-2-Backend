@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 import com.raf.si.Banka2Backend.models.mariadb.Forex;
 import com.raf.si.Banka2Backend.repositories.mariadb.ForexRepository;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -123,7 +122,7 @@ class ForexServiceTest {
     }
 
     @Test
-    public void forexFromApi_NotNull(){
+    public void forexFromApi_NotNull() {
 
         String fromCurrency = "USD";
         String toCurrency = "EUR";
@@ -151,11 +150,12 @@ class ForexServiceTest {
 
         assertEquals(forex.getFromCurrencyCode(), returnedForex.getFromCurrencyCode());
         assertEquals(forex.getToCurrencyCode(), returnedForex.getToCurrencyCode());
-        // posto testiram api ovde testiram za vrednosti za koje znam da su fiksirane(ne menjaju se u zavisnosti od vremena pozivanja)
+        // posto testiram api ovde testiram za vrednosti za koje znam da su fiksirane(ne menjaju se u zavisnosti od
+        // vremena pozivanja)
     }
 
     @Test
-    public void forexFromApi_BadDateParse(){
+    public void forexFromApi_BadDateParse() {
 
         String fromCurrency = "USD";
         String toCurrency = "EUR";

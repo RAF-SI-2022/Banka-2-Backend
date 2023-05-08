@@ -36,6 +36,9 @@ Feature: User service
     When user exists in database
     Then get user by his id
 
+  Scenario: admin changes users default daily limit
+    Then admin changes users default daily limit
+
   Scenario: deactivate user
     When user exists in database
     Then deactivate user in database

@@ -1,5 +1,9 @@
 package com.raf.si.Banka2Backend.cucumber.integration.futureFailure;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.jayway.jsonpath.JsonPath;
 import com.raf.si.Banka2Backend.models.mariadb.*;
 import com.raf.si.Banka2Backend.repositories.mariadb.CurrencyRepository;
@@ -13,29 +17,29 @@ import io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestConfig{
+public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestConfig {
     @Autowired
     private FutureService futureService;
+
     @Autowired
     private UserService userService;
+
     @Autowired
     private BalanceService balanceService;
+
     @Autowired
     CurrencyRepository currencyRepository;
+
     @Autowired
     private PermissionRepository permissionRepository;
+
     @Autowired
     protected MockMvc mockMvc;
 
@@ -46,12 +50,18 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
     @Given("user logs in")
     public void user_logs_in() {
         try {
-            MvcResult mvcResult = mockMvc.perform(post("/auth/login").contentType("application/json").content("""
+            MvcResult mvcResult = mockMvc.perform(
+                            post("/auth/login")
+                                    .contentType("application/json")
+                                    .content(
+                                            """
                     {
                       "email": "anesic3119rn+banka2backend+admin@raf.rs",
                       "password": "admin"
                     }
-                    """)).andExpect(status().isOk()).andReturn();
+                    """))
+                    .andExpect(status().isOk())
+                    .andReturn();
             token = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.token");
         } catch (Exception e) {
             fail("User failed to login");
@@ -67,27 +77,32 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
             fail("User token null or empty - not logged in properly");
         }
     }
+
     @Given("future is not for sale")
     public void futureIsNotForSale() {
         testFuture.setForSale(false);
         testFuture = this.futureService.saveFuture(testFuture);
     }
+
     @Given("daily limit exceeded")
     public void dailyLimitExceeded() {
         Optional<User> user = userService.findByEmail("anesic3119rn+banka2backend+admin@raf.rs");
         user.get().setDailyLimit(1d); // setting daily limit to minimum
         this.userService.save(user.get());
     }
+
     @Given("user is not owner of the future")
     public void userIsNotOwnerOfTheFuture() {
         User user = this.createTestUserWithBalance();
-        testFuture.setUser(user); //setting another user to be owner of this future
+        testFuture.setUser(user); // setting another user to be owner of this future
         testFuture = this.futureService.saveFuture(testFuture);
     }
+
     @Given("user free money is zero")
     public void userFreeMoneyIsZero() {
         Optional<User> user = userService.findByEmail("anesic3119rn+banka2backend+admin@raf.rs");
-        Balance balance = balanceService.findBalanceByUserEmailAndCurrencyCode(user.get().getEmail(), "USD");
+        Balance balance =
+                balanceService.findBalanceByUserEmailAndCurrencyCode(user.get().getEmail(), "USD");
         balance.setFree(0f);
         balance.setAmount(0f);
         balance.setReserved(0f);
@@ -100,7 +115,15 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
     @Then("user can't buy future because it is not for sale")
     public void userCanTBuyFutureBecauseItIsNotForSale() throws JsonProcessingException {
         Optional<User> user = userService.findByEmail("anesic3119rn+banka2backend+admin@raf.rs");
-        FutureRequestBuySell request = this.createFutureRequest(testFuture.getId(), user.get().getId(), testFuture.getFutureName(), "BUY", testFuture.getMaintenanceMargin(), "USD", 0, 0);
+        FutureRequestBuySell request = this.createFutureRequest(
+                testFuture.getId(),
+                user.get().getId(),
+                testFuture.getFutureName(),
+                "BUY",
+                testFuture.getMaintenanceMargin(),
+                "USD",
+                0,
+                0);
         String body = new ObjectMapper().writeValueAsString(request);
         MvcResult result = null;
         try {
@@ -116,10 +139,19 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
             fail(e.getMessage());
         }
     }
+
     @Then("user can't buy future because his daily limit has exceeded")
     public void userCanTBuyFutureBecauseHisDailyLimitHasExceeded() throws JsonProcessingException {
         Optional<User> user = userService.findByEmail("anesic3119rn+banka2backend+admin@raf.rs");
-        FutureRequestBuySell request = this.createFutureRequest(testFuture.getId(), user.get().getId(), testFuture.getFutureName(), "BUY", testFuture.getMaintenanceMargin(), "USD", 0, 0);
+        FutureRequestBuySell request = this.createFutureRequest(
+                testFuture.getId(),
+                user.get().getId(),
+                testFuture.getFutureName(),
+                "BUY",
+                testFuture.getMaintenanceMargin(),
+                "USD",
+                0,
+                0);
         String body = new ObjectMapper().writeValueAsString(request);
         MvcResult result = null;
         try {
@@ -138,7 +170,15 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
     @Then("user cant buy future because he doesnt have enough money")
     public void userCantBuyFutureBecauseHeDoesntHaveEnoughMoney() throws JsonProcessingException {
         Optional<User> user = userService.findByEmail("anesic3119rn+banka2backend+admin@raf.rs");
-        FutureRequestBuySell request = this.createFutureRequest(testFuture.getId(), user.get().getId(), testFuture.getFutureName(), "BUY", testFuture.getMaintenanceMargin(), "USD", 0, 0);
+        FutureRequestBuySell request = this.createFutureRequest(
+                testFuture.getId(),
+                user.get().getId(),
+                testFuture.getFutureName(),
+                "BUY",
+                testFuture.getMaintenanceMargin(),
+                "USD",
+                0,
+                0);
         String body = new ObjectMapper().writeValueAsString(request);
         MvcResult result = null;
         try {
@@ -153,10 +193,19 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
             fail(e.getMessage());
         }
     }
+
     @Then("user can't sell future because he is not owner")
     public void userCanTSellFutureBecauseHeIsNotOwner() throws JsonProcessingException {
         Optional<User> user = userService.findByEmail("anesic3119rn+banka2backend+admin@raf.rs");
-        FutureRequestBuySell request = this.createFutureRequest(testFuture.getId(), user.get().getId(), testFuture.getFutureName(), "SELL", testFuture.getMaintenanceMargin(), "USD", 0, 0);
+        FutureRequestBuySell request = this.createFutureRequest(
+                testFuture.getId(),
+                user.get().getId(),
+                testFuture.getFutureName(),
+                "SELL",
+                testFuture.getMaintenanceMargin(),
+                "USD",
+                0,
+                0);
         String body = new ObjectMapper().writeValueAsString(request);
         MvcResult result = null;
         try {
@@ -170,9 +219,10 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
         } catch (Exception e) {
             fail(e.getMessage());
         }
-        //reset admins info after last test:
+        // reset admins info after last test:
         this.resetAdminInfo(user.get());
     }
+
     private void resetAdminInfo(User user) {
         user.setDailyLimit(1000000d);
         Balance balance = this.balanceService.findBalanceByUserEmailAndCurrencyCode(user.getEmail(), "USD");
@@ -186,8 +236,15 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
         this.userService.save(user);
     }
 
-    private FutureRequestBuySell createFutureRequest(Long id, Long userId, String futureName, String action, Integer price,
-                                                     String currencyCode, Integer limit, Integer stop) { //help method;
+    private FutureRequestBuySell createFutureRequest(
+            Long id,
+            Long userId,
+            String futureName,
+            String action,
+            Integer price,
+            String currencyCode,
+            Integer limit,
+            Integer stop) { // help method;
         FutureRequestBuySell request = new FutureRequestBuySell();
         request.setId(id);
         request.setUserId(userId);
@@ -199,9 +256,10 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
         request.setStop(stop);
         return request;
     }
+
     private User createTestUserWithBalance() {
         Optional<User> optionalUser = this.userService.findByEmail("futuretestuser11@gmail.com");
-        if(optionalUser.isPresent()){
+        if (optionalUser.isPresent()) {
             return optionalUser.get();
         }
         List<Permission> permissions = new ArrayList<>();
