@@ -16,75 +16,114 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 public class FutureServiceTest {
 
-  @Mock private FutureRepository futureRepository;
-  @Mock private UserService userService;
+    @Mock
+    private FutureRepository futureRepository;
 
-  @InjectMocks private FutureService futureService;
+    @Mock
+    private UserService userService;
 
-  @Test
-  void testFindAll() {
-    List<Future> futureList = new ArrayList<>();
-    Future future1 = new Future();
-    future1.setId(1L);
-    future1.setFutureName("CLJ22");
-    futureList.add(future1);
+    @InjectMocks
+    private FutureService futureService;
 
-    Future future2 = new Future();
-    future2.setId(2L);
-    future2.setFutureName("CLJ23");
-    futureList.add(future2);
+    @Test
+    void testFindAll() {
+        List<Future> futureList = new ArrayList<>();
+        Future future1 = new Future();
+        future1.setId(1L);
+        future1.setFutureName("CLJ22");
+        futureList.add(future1);
 
-    when(futureRepository.findAll()).thenReturn(futureList);
+        Future future2 = new Future();
+        future2.setId(2L);
+        future2.setFutureName("CLJ23");
+        futureList.add(future2);
 
-    List<Future> result = futureService.findAll();
+        when(futureRepository.findAll()).thenReturn(futureList);
 
-    assertEquals(2, result.size());
-    assertEquals(future1, result.get(0));
-    assertEquals(future2, result.get(1));
-  }
+        List<Future> result = futureService.findAll();
 
-  @Test
-  void testFindById() {
-    Future future = new Future();
-    future.setId(1L);
-    future.setFutureName("CLJ22");
+        assertEquals(2, result.size());
+        assertEquals(future1, result.get(0));
+        assertEquals(future2, result.get(1));
+    }
 
-    when(futureRepository.findFutureById(1L)).thenReturn(Optional.of(future));
+    @Test
+    void testFindById() {
+        Future future = new Future();
+        future.setId(1L);
+        future.setFutureName("CLJ22");
 
-    Optional<Future> result = futureService.findById(1L);
+        when(futureRepository.findFutureById(1L)).thenReturn(Optional.of(future));
 
-    assertTrue(result.isPresent());
-    assertEquals(future, result.get());
-  }
+        Optional<Future> result = futureService.findById(1L);
 
-  @Test
-  void testFindByName() {
-    Future future = new Future();
-    future.setId(1L);
-    future.setFutureName("CLJ22");
+        assertTrue(result.isPresent());
+        assertEquals(future, result.get());
+    }
 
-    when(futureRepository.findFutureByFutureName("CLJ22")).thenReturn(Optional.of(future));
+    @Test
+    void testFindByName() {
+        Future future = new Future();
+        future.setId(1L);
+        future.setFutureName("CLJ22");
 
-    Optional<Future> result = futureService.findByName("CLJ22");
+        when(futureRepository.findFutureByFutureName("CLJ22")).thenReturn(Optional.of(future));
 
-    assertEquals(future, result.get());
-  }
+        Optional<Future> result = futureService.findByName("CLJ22");
 
-  @Test
-  void testFindByNameWrongName() {
-    Future future = new Future();
-    future.setId(2L);
-    future.setFutureName("CLJ22");
+        assertEquals(future, result.get());
+    }
 
-    Future future2 = new Future();
-    future2.setId(1L);
-    future2.setFutureName("CLJ21");
+    @Test
+    void testFindByNameWrongName() {
+        Future future = new Future();
+        future.setId(2L);
+        future.setFutureName("CLJ22");
 
-    when(futureRepository.findFutureByFutureName("CLJ22")).thenReturn(Optional.of(future2));
-    when(futureRepository.findFutureByFutureName("CLJ21")).thenReturn(Optional.of(future));
+        Future future2 = new Future();
+        future2.setId(1L);
+        future2.setFutureName("CLJ21");
 
-    Optional<Future> result = futureService.findByName("CLJ21");
+        when(futureRepository.findFutureByFutureName("CLJ22")).thenReturn(Optional.of(future2));
+        when(futureRepository.findFutureByFutureName("CLJ21")).thenReturn(Optional.of(future));
 
-    assertNotEquals(future2, result.get());
-  }
+        Optional<Future> result = futureService.findByName("CLJ21");
+
+        assertNotEquals(future2, result.get());
+    }
+
+    @Test
+    void testBuyFuture() {}
+
+    @Test
+    void testSellFuture() {}
+
+    @Test
+    void testRemoveFromMarket() {}
+
+    @Test
+    void testRemoveWaitingSellFuture() {}
+
+    @Test // ovo vrv ne
+    void testWaitingFuturesForUser() {}
+
+    @Test
+    void testRegularSell() {}
+
+    @Test
+    void testRegularBuy() {}
+
+    @Test
+    void testCreateFutureOrder() {}
+
+    @Test
+    void testGetTimeStamp() {
+        //        LocalDateTime currentDateTime = LocalDateTime.now();
+        //        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        //
+        //        when(futureService)
+    }
+
+    @Test
+    void testProcessFutureBuyRequest() {}
 }

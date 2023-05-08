@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @EnableMongoRepositories("com.raf.si.Banka2Backend.repositories.mongodb")
 public class Banka2BackendApplication {
 
-  public static void main(String[] args) {
-    SpringApplication.run(Banka2BackendApplication.class, args);
-  }
+    public static void main(String[] args) {
+        SpringApplication.run(Banka2BackendApplication.class, args);
+    }
 }

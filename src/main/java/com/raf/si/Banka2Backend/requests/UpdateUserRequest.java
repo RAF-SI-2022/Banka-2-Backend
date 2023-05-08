@@ -7,12 +7,12 @@ import lombok.Data;
 @Data
 public class UpdateUserRequest {
 
-  private String email;
-  private String firstName;
-  private String lastName;
-  private List<PermissionName> permissions;
-  private String jobPosition;
-  private boolean active;
-  private Double dailyLimit;
-  private String phone;
+    private String email;
+    private String firstName;
+    private String lastName;
+    private List<PermissionName> permissions;
+    private String jobPosition;
+    private boolean active;
+    private Double dailyLimit;
+    private String phone;
 }

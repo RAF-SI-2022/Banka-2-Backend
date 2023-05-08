@@ -6,9 +6,9 @@ import java.util.Optional;
 
 public interface InflationServiceInterface {
 
-  Optional<List<Inflation>> findAllByCurrencyId(Long currencyId);
+    Optional<List<Inflation>> findAllByCurrencyId(Long currencyId);
 
-  Optional<List<Inflation>> findByYear(Long currencyId, Integer year);
+    Optional<List<Inflation>> findByYear(Long currencyId, Integer year);
 
-  Inflation save(Inflation inflation);
+    Inflation save(Inflation inflation);
 }

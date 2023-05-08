@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserStocksRepository extends JpaRepository<UserStock, Long> {
 
-  Optional<UserStock> findUserStockByUserIdAndStockSymbol(long userId, String stockSymbol);
+    Optional<UserStock> findUserStockByUserIdAndStockSymbol(long userId, String stockSymbol);
 
-  List<UserStock> findUserStocksByUserId(long userId);
+    List<UserStock> findUserStocksByUserId(long userId);
 }

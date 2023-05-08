@@ -18,68 +18,69 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class CurrencyServiceTest {
-  @Mock CurrencyRepository currencyRepository;
-  @InjectMocks CurrencyService currencyService;
+    @Mock
+    CurrencyRepository currencyRepository;
 
-  @Test
-  public void findAll_success() {
+    @InjectMocks
+    CurrencyService currencyService;
 
-    long id = 1L;
+    @Test
+    public void findAll_success() {
 
-    List<Currency> currencyList =
-        Arrays.asList(
-            Currency.builder()
+        long id = 1L;
+
+        List<Currency> currencyList = Arrays.asList(
+                Currency.builder()
+                        .id(id++)
+                        .currencyName("Euro")
+                        .currencyCode("EUR")
+                        .currencySymbol("€")
+                        .polity("European Union")
+                        .inflations(null)
+                        .build(),
+                Currency.builder()
+                        .id(id++)
+                        .currencyName("Serbian Dinar")
+                        .currencyCode("RSD")
+                        .currencySymbol("RSD")
+                        .polity("Serbia")
+                        .inflations(null)
+                        .build());
+
+        when(currencyRepository.findAll()).thenReturn(currencyList);
+
+        List<Currency> result = currencyService.findAll();
+        assertEquals(currencyList, result);
+    }
+
+    @Test
+    public void findById_success() {
+
+        long id = 1L;
+
+        Currency currency = Currency.builder()
                 .id(id++)
                 .currencyName("Euro")
                 .currencyCode("EUR")
                 .currencySymbol("€")
                 .polity("European Union")
                 .inflations(null)
-                .build(),
-            Currency.builder()
-                .id(id++)
-                .currencyName("Serbian Dinar")
-                .currencyCode("RSD")
-                .currencySymbol("RSD")
-                .polity("Serbia")
-                .inflations(null)
-                .build());
+                .build();
 
-    when(currencyRepository.findAll()).thenReturn(currencyList);
+        when(currencyRepository.findById(id)).thenReturn(Optional.of(currency));
 
-    List<Currency> result = currencyService.findAll();
-    assertEquals(currencyList, result);
-  }
+        Optional<Currency> result = currencyService.findById(id);
 
-  @Test
-  public void findById_success() {
+        assertEquals(currency, result.get());
+    }
 
-    long id = 1L;
+    @Test
+    public void findById_throwsCurrencyNotFoundException() {
 
-    Currency currency =
-        Currency.builder()
-            .id(id++)
-            .currencyName("Euro")
-            .currencyCode("EUR")
-            .currencySymbol("€")
-            .polity("European Union")
-            .inflations(null)
-            .build();
+        long currencyId = 1l;
 
-    when(currencyRepository.findById(id)).thenReturn(Optional.of(currency));
+        when(currencyRepository.findById(currencyId)).thenReturn(Optional.empty());
 
-    Optional<Currency> result = currencyService.findById(id);
-
-    assertEquals(currency, result.get());
-  }
-
-  @Test
-  public void findById_throwsCurrencyNotFoundException() {
-
-    long currencyId = 1l;
-
-    when(currencyRepository.findById(currencyId)).thenReturn(Optional.empty());
-
-    assertThrows(CurrencyNotFoundException.class, () -> currencyService.findById(currencyId));
-  }
+        assertThrows(CurrencyNotFoundException.class, () -> currencyService.findById(currencyId));
+    }
 }

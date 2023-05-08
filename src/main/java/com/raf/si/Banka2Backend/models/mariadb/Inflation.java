@@ -13,18 +13,18 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Entity
 @Table(
-    name = "inflations",
-    uniqueConstraints = {@UniqueConstraint(columnNames = {"id"})}) // dodaj posle i currency?
+        name = "inflations",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"id"})}) // dodaj posle i currency?
 public class Inflation {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  private Integer year;
-  private Float inflationRate;
+    private Integer year;
+    private Float inflationRate;
 
-  @JsonIgnore
-  @ManyToOne
-  @JoinColumn(name = "currency_id")
-  private Currency currency;
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "currency_id")
+    private Currency currency;
 }

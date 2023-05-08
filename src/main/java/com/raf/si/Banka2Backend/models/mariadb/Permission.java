@@ -16,34 +16,35 @@ import org.hibernate.Hibernate;
 @RequiredArgsConstructor
 @Entity
 @Table(
-    name = "permissions",
-    uniqueConstraints = {@UniqueConstraint(columnNames = "permissionName")})
+        name = "permissions",
+        uniqueConstraints = {@UniqueConstraint(columnNames = "permissionName")})
 public class Permission {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @NotNull private PermissionName permissionName;
+    @NotNull
+    private PermissionName permissionName;
 
-  @ManyToMany(mappedBy = "permissions")
-  @JsonIgnore
-  @ToString.Exclude
-  private Collection<User> users;
+    @ManyToMany(mappedBy = "permissions")
+    @JsonIgnore
+    @ToString.Exclude
+    private Collection<User> users;
 
-  public Permission(PermissionName permissionName) {
-    this.permissionName = permissionName;
-  }
+    public Permission(PermissionName permissionName) {
+        this.permissionName = permissionName;
+    }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    Permission that = (Permission) o;
-    return id != null && Objects.equals(id, that.id);
-  }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Permission that = (Permission) o;
+        return id != null && Objects.equals(id, that.id);
+    }
 
-  @Override
-  public int hashCode() {
-    return getClass().hashCode();
-  }
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

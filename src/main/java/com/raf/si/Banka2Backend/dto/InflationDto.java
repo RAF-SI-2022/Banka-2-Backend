@@ -5,7 +5,12 @@ import lombok.Data;
 
 @Data
 public class InflationDto {
-  @NotNull private Integer year;
-  @NotNull private Float inflationRate;
-  @NotNull private Long currencyId;
+    @NotNull
+    private Integer year;
+
+    @NotNull
+    private Float inflationRate;
+
+    @NotNull
+    private Long currencyId;
 }

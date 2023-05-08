@@ -6,13 +6,13 @@ import java.util.Optional;
 
 public interface ExchangeServiceInterface {
 
-  List<Exchange> findAll();
+    List<Exchange> findAll();
 
-  Optional<Exchange> findById(Long id);
+    Optional<Exchange> findById(Long id);
 
-  Optional<Exchange> findByMicCode(String micCode);
+    Optional<Exchange> findByMicCode(String micCode);
 
-  Optional<Exchange> findByAcronym(String acronym);
+    Optional<Exchange> findByAcronym(String acronym);
 
-  boolean isExchangeActive(String micCode);
+    boolean isExchangeActive(String micCode);
 }

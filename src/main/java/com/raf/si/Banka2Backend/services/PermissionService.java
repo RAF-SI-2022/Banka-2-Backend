@@ -10,20 +10,20 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PermissionService implements PermissionServiceInterface {
-  private final PermissionRepository permissionRepository;
+    private final PermissionRepository permissionRepository;
 
-  @Autowired
-  public PermissionService(PermissionRepository permissionRepository) {
-    this.permissionRepository = permissionRepository;
-  }
+    @Autowired
+    public PermissionService(PermissionRepository permissionRepository) {
+        this.permissionRepository = permissionRepository;
+    }
 
-  @Override
-  public List<Permission> findAll() {
-    return this.permissionRepository.findAll();
-  }
+    @Override
+    public List<Permission> findAll() {
+        return this.permissionRepository.findAll();
+    }
 
-  @Override
-  public List<Permission> findByPermissionNames(List<PermissionName> permissionNames) {
-    return this.permissionRepository.findByPermissionNames(permissionNames);
-  }
+    @Override
+    public List<Permission> findByPermissionNames(List<PermissionName> permissionNames) {
+        return this.permissionRepository.findByPermissionNames(permissionNames);
+    }
 }

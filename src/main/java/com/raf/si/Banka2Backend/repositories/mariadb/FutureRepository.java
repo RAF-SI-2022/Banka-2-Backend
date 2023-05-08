@@ -9,9 +9,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FutureRepository extends JpaRepository<Future, Long> {
 
-  Optional<Future> findFutureByFutureName(String futureName);
+    Optional<Future> findFutureByFutureName(String futureName);
 
-  Optional<List<Future>> findFuturesByFutureName(String futureName);
+    Optional<List<Future>> findFuturesByFutureName(String futureName);
 
-  Optional<Future> findFutureById(Long Id);
+    Optional<Future> findFutureById(Long Id);
+
+    Optional<List<Future>> findFuturesByUserId(Long id);
 }

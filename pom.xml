@@ -18,7 +18,27 @@
         <java.version>17</java.version>
         <!-- TODO update groupId to correct -->
         <exec.mainClass>com.raf.si.Banka2Backend.Banka2BackendApplication</exec.mainClass>
+        <version.spotless>2.35.0</version.spotless>
+        <!-- JaCoCo Properties -->
+        <jacoco.version>0.8.8</jacoco.version>
+        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+        <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+        <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/../target/jacoco.exec</sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.language>java</sonar.language>
+        <sonar.coverage.exclusions>
+            **/bootstrap/**,
+            **/dto/**,
+            **/exceptions/**,
+            **/models/**,
+            **/repositories/**,
+            **/requests/**,
+            **/responses/**,
+            **/utils/**,
+            **/ServletInitializer.java
+            **/**.xml
+        </sonar.coverage.exclusions>
     </properties>
+
     <dependencies>
         <!-- Core server dependencies -->
         <dependency>
@@ -35,13 +55,13 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
+            <groupId>org.sonarsource.scanner.maven</groupId>
+            <artifactId>sonar-maven-plugin</artifactId>
+            <version>3.9.1.2184</version>
         </dependency>
         <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20230227</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <!-- Security -->
         <dependency>
@@ -52,6 +72,12 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
             <version>0.9.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.8.8</version>
         </dependency>
 
         <!-- Mail service -->
@@ -182,6 +208,13 @@
             <artifactId>json</artifactId>
             <version>20230227</version>
         </dependency>
+
+        <!-- Jsoup za scrape-ovanje datuma opcija -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.15.4</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -199,28 +232,75 @@
                     <target>16</target>
                 </configuration>
             </plugin>
-
-            <!-- Formatting -->
             <plugin>
-                <groupId>com.diffplug.spotless</groupId>
-                <artifactId>spotless-maven-plugin</artifactId>
-                <version>2.27.2</version>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
                 <executions>
                     <execution>
-                        <id>spotless</id>
-                        <phase>validate</phase>
+                        <id>jacoco-initialize</id>
                         <goals>
-                            <goal>check</goal>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-site</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>report</goal>
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>${version.spotless}</version>
+                <executions>
+
+                    <!-- Never execute automatically -->
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <phase>none</phase>
+                    </execution>
+
+                </executions>
                 <configuration>
+
+                    <!-- Java format -->
+                    <formats>
+                        <format>
+                            <includes>*.java</includes>
+                            <trimTrailingWhitespace/>
+                            <endWithNewline/>
+                        </format>
+                    </formats>
+
+                    <!-- Avoid if indexed files not changed -->
+                    <upToDateChecking>
+                        <enabled>true</enabled>
+                    </upToDateChecking>
+
+                    <!-- Java config -->
                     <java>
-                        <googleJavaFormat>
-                            <version>1.15.0</version>
-                            <style>GOOGLE</style>
-                        </googleJavaFormat>
+
+                        <!-- Only include Java files -->
+                        <includes>
+                            <include>src/main/java/**/*.java</include>
+                            <include>src/test/java/**/*.java</include>
+                        </includes>
+
+                        <!-- Enforce standard import order -->
+                        <importOrder />
+
+                        <!-- Better than Google formatter -->
+                        <palantirJavaFormat>
+                            <version>2.10.0</version>
+                        </palantirJavaFormat>
                     </java>
+
                 </configuration>
             </plugin>
         </plugins>

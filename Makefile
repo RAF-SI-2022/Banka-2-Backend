@@ -76,9 +76,8 @@ local-dev:
 	docker compose up -d mariadb
 	docker compose up -d flyway
 	docker compose up -d mongodb
-	cd lib/${targetJdk} && export JAVA_HOME=$(pwd)#TODO test this!
-	./lib/${targetJdk}/bin/javac.exe ./lib/FixLineEndings.java
-	./lib/${targetJdk}/bin/java.exe -cp lib FixLineEndings
+	cd ${jdk} && export JAVA_HOME=$(pwd)#TODO test this!
+	export MAVEN_OPTS=-Dspring.profiles.active=local,dev
 	./mvnw spotless:apply clean compile exec:java
 
 # Builds the app locally and starts the required services
@@ -87,39 +86,69 @@ local-test:
 	docker compose up -d mariadb
 	docker compose up -d flyway
 	docker compose up -d mongodb
-	cd lib/${targetJdk} && export JAVA_HOME=$(pwd)#TODO test this!
-	./lib/${targetJdk}/bin/javac.exe ./lib/FixLineEndings.java
-	./lib/${targetJdk}/bin/java.exe -cp lib FixLineEndings
-	./mvnw spotless:apply clean compile test
+	cd ${jdk} && export JAVA_HOME=$(pwd)#TODO test this!
+	export MAVEN_OPTS=-Dspring.profiles.active=local,test
+	./mvnw spotless:apply clean compile test -DargLine="-Dspring.profiles.active=local,test"
 
 # Builds the dev image and starts the required services.
 dev:
 	./mvnw spotless:apply
-	docker build -t banka2backend-dev -f ./docker/dev.Dockerfile .
+	docker compose stop backend
+	docker network create --driver bridge bank2_net
+	docker build -t backend -f ./docker/backend.Dockerfile .
+	docker tag backend harbor.k8s.elab.rs/banka-2/backend
 	docker compose up -d mariadb
 	docker compose up -d flyway
 	docker compose up -d mongodb
-	docker compose up -d banka2backend-dev
+	docker run --rm -d --expose 8080 --name backend --network bank2_net --entrypoint="" backend /bin/bash -c "java -jar -Dspring.profiles.active=container,dev app.jar"
 
 # Builds the test image and starts the required services.
 test:
 	./mvnw spotless:apply
-	docker build -t banka2backend-test -f ./docker/test.Dockerfile .
+	docker compose stop backend
+	docker network create --driver bridge bank2_net
+	docker build -t backend -f ./docker/backend.Dockerfile .
+	docker tag backend harbor.k8s.elab.rs/banka-2/backend
 	docker compose up -d mariadb
 	docker compose up -d flyway
 	docker compose up -d mongodb
-	docker run --rm --network container:mariadb banka2backend-test
-	-docker compose rm -s -f banka2backend-test
+	# TODO when adding new services, each service has to be started the
+	# "normal" way (but with test profile), and also have a test container
+	# started as well
+	docker run --rm --expose 8080 --name backend --network bank2_net --entrypoint="" backend /bin/bash -c "export MAVEN_OPTS=\"-Dspring.profiles.active=container,test\" && mvn clean compile test -DargLine=\"-Dspring.profiles.active=container,test\""
 
-# Builds the prod image and starts the required services.
-prod:
+# Builds and tests the production image, and pushes to harbor. NOTE: you
+# need to be logged in to harbor.k8s.elab.rs to execute this.
+dist:
 	./mvnw spotless:apply
-	docker build -t banka2backend-prod -f ./docker/prod.Dockerfile .
+	docker compose stop backend
+	docker network create --driver bridge bank2_net
+	docker build -t backend -f ./docker/backend.Dockerfile .
+	docker tag backend harbor.k8s.elab.rs/banka-2/backend
+	docker compose up -d mariadb
+	docker compose up -d flyway
+	docker compose up -d mongodb
+	# TODO when adding new services, each service has to be started the
+	# "normal" way (but with test profile), and also have a test container
+	# started as well
+	docker run --rm --expose 8080 --name backend --network bank2_net --entrypoint="" backend /bin/bash -c "export MAVEN_OPTS=\"-Dspring.profiles.active=container,test\" && mvn clean compile test -DargLine=\"-Dspring.profiles.active=container,test\"" && docker push harbor.k8s.elab.rs/banka-2/backend
+
+# Starts frontend and backend on production.
+prod:
+	docker tag backend harbor.k8s.elab.rs/banka-2/backend
+	docker tag frontend harbor.k8s.elab.rs/banka-2/frontend
 	docker compose down
 	docker compose up -d mariadb
 	docker compose up -d flyway
 	docker compose up -d mongodb
-	docker compose up -d banka2backend-prod
+	# ne radi kako treba:
+	# docker run --rm -d --expose 8080 --name backend --network bank2_net --entrypoint="" ^
+	#     backend /bin/bash ^
+	#     -c "java -jar -Dspring.profiles.active=container,prod app.jar"
+	# docker run --rm -d --expose 80 --publish 80:80 --name frontend ^
+	#     --network bank2_net frontend
+    docker run --rm -d --expose 8080 --publish 8080:8080 --name backend --network bank2_net --entrypoint="" backend /bin/bash -c "java -jar -Dspring.profiles.active=container,prod app.jar"
+    docker run --rm -d --expose 80 --publish 80:80 --name frontend frontend
 
 # Restarts all Docker helper services.
 services:
@@ -134,6 +163,11 @@ reset:
 	docker compose up -d mariadb
 	docker compose up -d flyway
 	docker compose up -d mongodb
+
+# Stops all services.
+stop:
+	docker compose down
+	docker stop backend
 
 # DANGER!!! For testing the development environment.
 # Executes Docker containers in privileged mode. Do NOT use

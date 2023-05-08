@@ -6,13 +6,13 @@ import java.util.Optional;
 
 public interface UserStockServiceInterface {
 
-  Optional<UserStock> findUserStockByUserIdAndStockSymbol(long userId, String stockSymbol);
+    Optional<UserStock> findUserStockByUserIdAndStockSymbol(long userId, String stockSymbol);
 
-  UserStock save(UserStock userStock);
+    UserStock save(UserStock userStock);
 
-  List<UserStock> findAll();
+    List<UserStock> findAll();
 
-  List<UserStock> findAllForUser(long userId);
+    List<UserStock> findAllForUser(long userId);
 
-  UserStock removeFromMarket(long userId, String stockSymbol);
+    UserStock removeFromMarket(long userId, String stockSymbol);
 }

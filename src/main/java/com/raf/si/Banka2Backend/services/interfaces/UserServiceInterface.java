@@ -7,25 +7,25 @@ import java.util.Optional;
 
 public interface UserServiceInterface {
 
-  List<User> findAll();
+    List<User> findAll();
 
-  User save(User user);
+    User save(User user);
 
-  Optional<User> findById(Long id);
+    Optional<User> findById(Long id);
 
-  Optional<User> findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
-  List<Permission> getUserPermissions(String email);
+    List<Permission> getUserPermissions(String email);
 
-  //    User updateUser(User user);
+    //    User updateUser(User user);
 
-  void deleteById(Long id);
+    void deleteById(Long id);
 
-  Optional<User> getUserByPasswordResetToken(String token);
+    Optional<User> getUserByPasswordResetToken(String token);
 
-  void changePassword(User user, String newPassword, String token);
+    void changePassword(User user, String newPassword, String token);
 
-  User changeUsersDailyLimit(String userEmail, Double limitChange);
+    User changeUsersDailyLimit(String userEmail, Double limitChange);
 
-  Double getUsersDailyLimit(String userEmail);
+    Double getUsersDailyLimit(String userEmail);
 }

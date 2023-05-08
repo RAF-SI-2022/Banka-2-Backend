@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface InflationRepository extends JpaRepository<Inflation, Long> {
-  List<Inflation> findAllByCurrencyId(Long currencyId);
+    List<Inflation> findAllByCurrencyId(Long currencyId);
 
-  List<Inflation> findAllByCurrencyIdAndYear(Long currencyId, int year);
+    List<Inflation> findAllByCurrencyIdAndYear(Long currencyId, int year);
 }

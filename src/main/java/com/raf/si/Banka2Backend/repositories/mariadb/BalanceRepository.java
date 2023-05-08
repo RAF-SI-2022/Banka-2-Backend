@@ -8,10 +8,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BalanceRepository extends JpaRepository<Balance, Long> {
-  Optional<Balance> findBalanceByUser_EmailAndCurrency_CurrencyCode(
-      String userEmail, String currencyCode);
+    Optional<Balance> findBalanceByUser_EmailAndCurrency_CurrencyCode(String userEmail, String currencyCode);
 
-  List<Balance> findAllByUser_Id(Long userId);
+    List<Balance> findAllByUser_Id(Long userId);
 
-  Optional<Balance> findBalanceByUserIdAndCurrencyId(Long userId, Long currencyId);
+    Optional<Balance> findBalanceByUserIdAndCurrencyId(Long userId, Long currencyId);
 }

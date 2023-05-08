@@ -8,6 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ForexRepository extends JpaRepository<Forex, Long> {
 
-  Optional<Forex> findForexByFromCurrencyCodeAndToCurrencyCode(
-      String fromCurrencyCode, String toCurrencyCode);
+    Optional<Forex> findForexByFromCurrencyCodeAndToCurrencyCode(String fromCurrencyCode, String toCurrencyCode);
 }

@@ -10,8 +10,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PermissionRepository extends JpaRepository<Permission, Long> {
-  Optional<Permission> findByPermissionName(PermissionName permissionName);
+    Optional<Permission> findByPermissionName(PermissionName permissionName);
 
-  @Query("SELECT p FROM Permission p WHERE p.permissionName IN :permissionNames")
-  List<Permission> findByPermissionNames(List<PermissionName> permissionNames);
+    @Query("SELECT p FROM Permission p WHERE p.permissionName IN :permissionNames")
+    List<Permission> findByPermissionNames(List<PermissionName> permissionNames);
 }

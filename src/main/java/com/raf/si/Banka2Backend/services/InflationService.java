@@ -10,26 +10,25 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class InflationService implements InflationServiceInterface {
-  private final InflationRepository inflationRepository;
+    private final InflationRepository inflationRepository;
 
-  @Autowired
-  public InflationService(InflationRepository inflationRepository) {
-    this.inflationRepository = inflationRepository;
-  }
+    @Autowired
+    public InflationService(InflationRepository inflationRepository) {
+        this.inflationRepository = inflationRepository;
+    }
 
-  @Override
-  public Optional<List<Inflation>> findAllByCurrencyId(Long currencyId) {
-    return Optional.ofNullable(this.inflationRepository.findAllByCurrencyId(currencyId));
-  }
+    @Override
+    public Optional<List<Inflation>> findAllByCurrencyId(Long currencyId) {
+        return Optional.ofNullable(this.inflationRepository.findAllByCurrencyId(currencyId));
+    }
 
-  @Override
-  public Optional<List<Inflation>> findByYear(Long currencyId, Integer year) {
-    return Optional.ofNullable(
-        this.inflationRepository.findAllByCurrencyIdAndYear(currencyId, year));
-  }
+    @Override
+    public Optional<List<Inflation>> findByYear(Long currencyId, Integer year) {
+        return Optional.ofNullable(this.inflationRepository.findAllByCurrencyIdAndYear(currencyId, year));
+    }
 
-  @Override
-  public Inflation save(Inflation inflation) {
-    return this.inflationRepository.save(inflation);
-  }
+    @Override
+    public Inflation save(Inflation inflation) {
+        return this.inflationRepository.save(inflation);
+    }
 }

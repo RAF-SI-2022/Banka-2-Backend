@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface ForexServiceInterface {
 
-  List<Forex> findAll();
+    List<Forex> findAll();
 
-  Forex getForexForCurrencies(String fromCurrency, String toCurrency);
+    Forex getForexForCurrencies(String fromCurrency, String toCurrency);
 }

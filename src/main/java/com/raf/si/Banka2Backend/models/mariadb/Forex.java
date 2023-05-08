@@ -15,25 +15,34 @@ import lombok.RequiredArgsConstructor;
 @Table(name = "forex")
 public class Forex {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @NotNull private String fromCurrencyCode;
+    @NotNull
+    private String fromCurrencyCode;
 
-  @NotNull private String fromCurrencyName;
+    @NotNull
+    private String fromCurrencyName;
 
-  @NotNull private String toCurrencyCode;
+    @NotNull
+    private String toCurrencyCode;
 
-  @NotNull private String toCurrencyName;
+    @NotNull
+    private String toCurrencyName;
 
-  @NotNull private String exchangeRate;
+    @NotNull
+    private String exchangeRate;
 
-  @NotNull private String lastRefreshed;
+    @NotNull
+    private String lastRefreshed;
 
-  @NotNull private String timeZone;
+    @NotNull
+    private String timeZone;
 
-  @NotNull private String bidPrice;
+    @NotNull
+    private String bidPrice;
 
-  @NotNull private String askPrice;
+    @NotNull
+    private String askPrice;
 }

@@ -6,11 +6,11 @@ import lombok.Data;
 
 @Data
 public class LoginResponse {
-  private String token;
-  private List<Permission> permissions;
+    private String token;
+    private List<Permission> permissions;
 
-  public LoginResponse(String token, List<Permission> permissions) {
-    this.token = token;
-    this.permissions = permissions;
-  }
+    public LoginResponse(String token, List<Permission> permissions) {
+        this.token = token;
+        this.permissions = permissions;
+    }
 }

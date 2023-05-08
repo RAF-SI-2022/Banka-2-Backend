@@ -18,82 +18,104 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class InflationServiceTest {
-  @Mock InflationRepository inflationRepository;
-  @InjectMocks InflationService inflationService;
+    @Mock
+    InflationRepository inflationRepository;
 
-  @Test
-  public void findAllByCurrencyId_success() {
-    long id = 1L;
-    long currencyId = id;
-    Currency c =
-        Currency.builder()
-            .id(currencyId)
-            .currencyName("Euro")
-            .currencyCode("EUR")
-            .currencySymbol("€")
-            .polity("European Union")
-            .inflations(null)
-            .build();
+    @InjectMocks
+    InflationService inflationService;
 
-    List<Inflation> inflationList =
-        Arrays.asList(
-            Inflation.builder().id(id++).year(1970).inflationRate(3.45f).currency(c).build(),
-            Inflation.builder().id(id++).year(1971).inflationRate(5.24f).currency(c).build());
+    @Test
+    public void findAllByCurrencyId_success() {
+        long id = 1L;
+        long currencyId = id;
+        Currency c = Currency.builder()
+                .id(currencyId)
+                .currencyName("Euro")
+                .currencyCode("EUR")
+                .currencySymbol("€")
+                .polity("European Union")
+                .inflations(null)
+                .build();
 
-    when(inflationRepository.findAllByCurrencyId(c.getId())).thenReturn(inflationList);
+        List<Inflation> inflationList = Arrays.asList(
+                Inflation.builder()
+                        .id(id++)
+                        .year(1970)
+                        .inflationRate(3.45f)
+                        .currency(c)
+                        .build(),
+                Inflation.builder()
+                        .id(id++)
+                        .year(1971)
+                        .inflationRate(5.24f)
+                        .currency(c)
+                        .build());
 
-    Optional<List<Inflation>> result = inflationService.findAllByCurrencyId(c.getId());
-    assertEquals(inflationList, result.get());
-  }
+        when(inflationRepository.findAllByCurrencyId(c.getId())).thenReturn(inflationList);
 
-  @Test
-  public void findAllByCurrencyIdAndYear_success() {
-    long id = 1L;
-    long currencyId = id;
-    int year = 1970;
-    Currency c =
-        Currency.builder()
-            .id(currencyId)
-            .currencyName("Euro")
-            .currencyCode("EUR")
-            .currencySymbol("€")
-            .polity("European Union")
-            .inflations(null)
-            .build();
+        Optional<List<Inflation>> result = inflationService.findAllByCurrencyId(c.getId());
+        assertEquals(inflationList, result.get());
+    }
 
-    List<Inflation> inflationList =
-        Arrays.asList(
-            Inflation.builder().id(id++).year(year).inflationRate(3.45f).currency(c).build(),
-            Inflation.builder().id(id++).year(year).inflationRate(5.24f).currency(c).build());
+    @Test
+    public void findAllByCurrencyIdAndYear_success() {
+        long id = 1L;
+        long currencyId = id;
+        int year = 1970;
+        Currency c = Currency.builder()
+                .id(currencyId)
+                .currencyName("Euro")
+                .currencyCode("EUR")
+                .currencySymbol("€")
+                .polity("European Union")
+                .inflations(null)
+                .build();
 
-    when(inflationRepository.findAllByCurrencyIdAndYear(c.getId(), year)).thenReturn(inflationList);
+        List<Inflation> inflationList = Arrays.asList(
+                Inflation.builder()
+                        .id(id++)
+                        .year(year)
+                        .inflationRate(3.45f)
+                        .currency(c)
+                        .build(),
+                Inflation.builder()
+                        .id(id++)
+                        .year(year)
+                        .inflationRate(5.24f)
+                        .currency(c)
+                        .build());
 
-    Optional<List<Inflation>> result = inflationService.findByYear(c.getId(), year);
-    assertEquals(inflationList, result.get());
-  }
+        when(inflationRepository.findAllByCurrencyIdAndYear(c.getId(), year)).thenReturn(inflationList);
 
-  @Test
-  public void save_success() {
+        Optional<List<Inflation>> result = inflationService.findByYear(c.getId(), year);
+        assertEquals(inflationList, result.get());
+    }
 
-    long id = 1L;
+    @Test
+    public void save_success() {
 
-    Currency c =
-        Currency.builder()
-            .id(id)
-            .currencyName("Euro")
-            .currencyCode("EUR")
-            .currencySymbol("€")
-            .polity("European Union")
-            .inflations(null)
-            .build();
+        long id = 1L;
 
-    Inflation newInflation =
-        Inflation.builder().id(id).year(1970).inflationRate(3.45f).currency(c).build();
+        Currency c = Currency.builder()
+                .id(id)
+                .currencyName("Euro")
+                .currencyCode("EUR")
+                .currencySymbol("€")
+                .polity("European Union")
+                .inflations(null)
+                .build();
 
-    when(inflationRepository.save(newInflation)).thenReturn(newInflation);
+        Inflation newInflation = Inflation.builder()
+                .id(id)
+                .year(1970)
+                .inflationRate(3.45f)
+                .currency(c)
+                .build();
 
-    inflationService.save(newInflation);
+        when(inflationRepository.save(newInflation)).thenReturn(newInflation);
 
-    verify(inflationRepository).save(newInflation);
-  }
+        inflationService.save(newInflation);
+
+        verify(inflationRepository).save(newInflation);
+    }
 }

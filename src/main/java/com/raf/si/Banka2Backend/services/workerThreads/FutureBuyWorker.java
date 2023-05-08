@@ -1,91 +1,125 @@
 package com.raf.si.Banka2Backend.services.workerThreads;
 
+import com.raf.si.Banka2Backend.exceptions.BalanceNotFoundException;
+import com.raf.si.Banka2Backend.models.mariadb.Balance;
 import com.raf.si.Banka2Backend.models.mariadb.Future;
+import com.raf.si.Banka2Backend.models.mariadb.User;
+import com.raf.si.Banka2Backend.repositories.mariadb.OrderRepository;
 import com.raf.si.Banka2Backend.requests.FutureRequestBuySell;
+import com.raf.si.Banka2Backend.services.BalanceService;
 import com.raf.si.Banka2Backend.services.FutureService;
 import com.raf.si.Banka2Backend.services.UserService;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import lombok.SneakyThrows;
 
 public class FutureBuyWorker extends Thread {
 
-  private Map<Long, FutureRequestBuySell> futuresRequestsMap = new ConcurrentHashMap<>();
-  private List<FutureRequestBuySell> requestsToRemove;
-  private List<Future> futuresByName;
-  private FutureService futureService;
-  private UserService userService;
-  private boolean next = false;
+    private final Map<Long, FutureRequestBuySell> futuresRequestsMap;
+    private final List<Long> keysToRemove;
+    private List<Future> futuresByName;
+    private final FutureService futureService;
+    private final UserService userService;
+    private final OrderRepository orderRepository;
+    private final BalanceService balanceService;
+    private boolean next = false;
 
-  public FutureBuyWorker(FutureService futureService, UserService userService) {
-    requestsToRemove = new CopyOnWriteArrayList<>();
-    futuresByName = new CopyOnWriteArrayList<>();
-    this.futureService = futureService;
-    this.userService = userService;
-  }
+    public FutureBuyWorker(
+            FutureService futureService,
+            UserService userService,
+            OrderRepository orderRepository,
+            BalanceService balanceService) {
+        this.futuresRequestsMap = new ConcurrentHashMap<>();
+        this.futuresByName = new CopyOnWriteArrayList<>();
+        this.keysToRemove = new CopyOnWriteArrayList<>();
+        this.futureService = futureService;
+        this.userService = userService;
+        this.orderRepository = orderRepository;
+        this.balanceService = balanceService;
+    }
 
-  @SneakyThrows
-  @Override
-  public void run() {
-    while (true) {
-      //      System.out.println("start while - " + futuresRequestsMap.size());
+    @SneakyThrows
+    @Override
+    public void run() {
+        while (true) {
+            for (Map.Entry<Long, FutureRequestBuySell> requestEntry : futuresRequestsMap.entrySet()) {
+                this.futuresByName = futureService
+                        .findFuturesByFutureName(requestEntry.getValue().getFutureName())
+                        .get();
 
-      //      System.out.println("prvi "  + futuresRequestsMap);
+                for (Future futureFromTable : futuresByName) {
+                    if (next) continue;
 
-      for (Map.Entry<Long, FutureRequestBuySell> request : futuresRequestsMap.entrySet()) {
-        futuresByName =
-            futureService.findFuturesByFutureName(request.getValue().getFutureName()).get();
-
-        for (Future futureFromTable : futuresByName) {
-          if (next) continue;
-
-          if (request.getValue().getLimit() != 0) { // ako je postalvjen limit
-            if (futureFromTable.isForSale()
-                && futureFromTable.getMaintenanceMargin() < request.getValue().getLimit()) {
-              //              System.out.println("kupljen za limit");
-              futureFromTable.setUser(userService.findById(request.getValue().getUserId()).get());
-              futureFromTable.setForSale(false);
-              futureService.updateFuture(futureFromTable);
-              futuresRequestsMap.remove(request.getKey());
-              next = true;
+                    Optional<User> optionalUserBuyer =
+                            userService.findById(requestEntry.getValue().getUserId());
+                    Double price = (double) futureFromTable.getMaintenanceMargin();
+                    Double dailyLimit = optionalUserBuyer.get().getDailyLimit();
+                    if (optionalUserBuyer.isPresent() && optionalUserBuyer.get().getDailyLimit() != null) {
+                        if (price > dailyLimit) {
+                            continue;
+                        }
+                    } else {
+                        keysToRemove.add(requestEntry.getKey());
+                    }
+                    if (requestEntry.getValue().getLimit() != 0
+                            || requestEntry.getValue().getStop() != 0) { // ako je postavljen limit ili stop
+                        if (futureFromTable.isForSale()
+                                && (price < requestEntry.getValue().getLimit()
+                                        || price > requestEntry.getValue().getStop())) {
+                            if (optionalUserBuyer.isPresent()
+                                    && optionalUserBuyer.get().getDailyLimit() != null) {
+                                Balance balance;
+                                try {
+                                    balance = this.balanceService.findBalanceByUserEmailAndCurrencyCode(
+                                            optionalUserBuyer.get().getEmail(),
+                                            requestEntry.getValue().getCurrencyCode());
+                                } catch (BalanceNotFoundException e) {
+                                    e.printStackTrace();
+                                    continue;
+                                }
+                                this.futureService.processFutureBuyRequest(
+                                        requestEntry.getValue(),
+                                        price,
+                                        optionalUserBuyer.get(),
+                                        dailyLimit,
+                                        futureFromTable,
+                                        balance);
+                                futuresRequestsMap.remove(requestEntry.getKey());
+                                next = true;
+                            } else {
+                                keysToRemove.add(requestEntry.getKey());
+                            }
+                        }
+                    }
+                }
+                next = false;
             }
-          }
-
-          if (request.getValue().getStop() != 0) { // ako je postalvjen stop
-            if (futureFromTable.isForSale()
-                && futureFromTable.getMaintenanceMargin() > request.getValue().getStop()) {
-              //              System.out.println("kupljen za stop");
-              futureFromTable.setUser(userService.findById(request.getValue().getUserId()).get());
-              futureFromTable.setForSale(false);
-              futureService.updateFuture(futureFromTable);
-              futuresRequestsMap.remove(request.getKey());
-              next = true;
+            // u slucaju da se user izbrisao dodajemo kljuceve tih requestova i brisemo ih
+            for (Long key : this.keysToRemove) {
+                futuresRequestsMap.remove(key);
             }
-          }
+            this.keysToRemove.clear();
+            Thread.sleep(10000);
         }
-        next = false;
-      }
-      Thread.sleep(10000); // todo promeni ako treba duzinu sleep-a
     }
-  }
 
-  public Map<Long, FutureRequestBuySell> getFuturesRequestsMap() {
-    //    System.out.println(futuresRequestsMap);
-    return futuresRequestsMap;
-  }
-
-  public void setFuturesRequestsMap(Long id, FutureRequestBuySell futureRequest) {
-    this.futuresRequestsMap.put(id, futureRequest);
-  }
-
-  public boolean removeFuture(Long id) {
-
-    if (this.futuresRequestsMap.containsKey(id)) {
-      this.futuresRequestsMap.remove(id);
-      return false;
+    public Map<Long, FutureRequestBuySell> getFuturesRequestsMap() {
+        return futuresRequestsMap;
     }
-    return true;
-  }
+
+    public void putInFuturesRequestsMap(Long id, FutureRequestBuySell futureRequest) {
+        this.futuresRequestsMap.put(id, futureRequest);
+    }
+
+    public boolean removeFuture(Long id) {
+
+        if (this.futuresRequestsMap.containsKey(id)) {
+            this.futuresRequestsMap.remove(id);
+            return false;
+        }
+        return true;
+    }
 }

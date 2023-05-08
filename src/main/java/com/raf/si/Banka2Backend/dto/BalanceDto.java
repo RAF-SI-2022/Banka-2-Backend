@@ -5,7 +5,12 @@ import lombok.Data;
 
 @Data
 public class BalanceDto {
-  @NotNull private String userEmail;
-  @NotNull private String currencyCode;
-  @NotNull private Float amount;
+    @NotNull
+    private String userEmail;
+
+    @NotNull
+    private String currencyCode;
+
+    @NotNull
+    private Float amount;
 }

@@ -19,118 +19,117 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserService implements UserDetailsService, UserServiceInterface {
-  private final UserRepository userRepository;
-  private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final UserRepository userRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
-  @Autowired
-  public UserService(
-      UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository) {
-    this.userRepository = userRepository;
-    this.passwordResetTokenRepository = passwordResetTokenRepository;
-  }
-
-  @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    Optional<User> myUser = this.findByEmail(username);
-    if (myUser.isEmpty()) {
-      throw new UsernameNotFoundException("User with email: " + username + " not found");
+    @Autowired
+    public UserService(UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository) {
+        this.userRepository = userRepository;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
-    return new org.springframework.security.core.userdetails.User(
-        myUser.get().getEmail(), myUser.get().getPassword(), new ArrayList<>());
-  }
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> myUser = this.findByEmail(username);
+        if (myUser.isEmpty()) {
+            throw new UsernameNotFoundException("Korisnik sa email-om: " + username + " nije pronadjen.");
+        }
 
-  @Override
-  public Optional<User> findByEmail(String email) {
-    return userRepository.findUserByEmail(email);
-  }
-
-  @Override
-  public List<User> findAll() {
-    return userRepository.findAll();
-  }
-
-  @Override
-  public User save(User user) {
-    return userRepository.save(user);
-  }
-
-  @Override
-  public List<Permission> getUserPermissions(String email) {
-    List<Permission> permissions =
-        new ArrayList<>(userRepository.findUserByEmail(email).get().getPermissions());
-    return permissions;
-  }
-
-  @Override
-  public Optional<User> findById(Long id) throws UserNotFoundException {
-
-    Optional<User> user = userRepository.findById(id);
-
-    if (user.isPresent()) {
-      return user;
-    } else {
-      throw new UserNotFoundException(id);
+        return new org.springframework.security.core.userdetails.User(
+                myUser.get().getEmail(), myUser.get().getPassword(), new ArrayList<>());
     }
-  }
 
-  @Override
-  public void deleteById(Long id) throws UserNotFoundException {
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findUserByEmail(email);
+    }
 
-    //    try {
+    @Override
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
 
-    userRepository.deleteById(id);
-    //    }
-    //    catch (NoSuchElementException e) {
-    //      throw new UserNotFoundException(id);
-    //    }
-  }
+    @Override
+    public User save(User user) {
+        return userRepository.save(user);
+    }
 
-  @Override
-  public Optional<User> getUserByPasswordResetToken(String token) {
-    Optional<PasswordResetToken> passwordResetToken =
-        passwordResetTokenRepository.findPasswordResetTokenByToken(token);
+    @Override
+    public List<Permission> getUserPermissions(String email) {
+        List<Permission> permissions =
+                new ArrayList<>(userRepository.findUserByEmail(email).get().getPermissions());
+        return permissions;
+    }
 
-    if (passwordResetToken.isPresent())
-      return userRepository.findById(passwordResetToken.get().getUser().getId());
-    else throw new PasswordResetTokenNotFoundException(token);
-  }
+    @Override
+    public Optional<User> findById(Long id) throws UserNotFoundException {
 
-  @Override
-  public void changePassword(User user, String newPassword, String passwordResetToken) {
-    user.setPassword(newPassword);
+        Optional<User> user = userRepository.findById(id);
 
-    Optional<PasswordResetToken> passwordResetTokenFromDB =
-        passwordResetTokenRepository.findPasswordResetTokenByToken(passwordResetToken);
+        if (user.isPresent()) {
+            return user;
+        } else {
+            throw new UserNotFoundException(id);
+        }
+    }
 
-    if (passwordResetTokenFromDB.isPresent()) {
-      Optional<User> userFromDB = userRepository.findById(user.getId());
+    @Override
+    public void deleteById(Long id) throws UserNotFoundException {
 
-      if (userFromDB.isPresent()) {
-        User userToChangePasswordTo = userFromDB.get();
-        userToChangePasswordTo.setPassword(newPassword);
+        //    try {
 
+        userRepository.deleteById(id);
+        //    }
+        //    catch (NoSuchElementException e) {
+        //      throw new UserNotFoundException(id);
+        //    }
+    }
+
+    @Override
+    public Optional<User> getUserByPasswordResetToken(String token) {
+        Optional<PasswordResetToken> passwordResetToken =
+                passwordResetTokenRepository.findPasswordResetTokenByToken(token);
+
+        if (passwordResetToken.isPresent())
+            return userRepository.findById(passwordResetToken.get().getUser().getId());
+        else throw new PasswordResetTokenNotFoundException(token);
+    }
+
+    @Override
+    public void changePassword(User user, String newPassword, String passwordResetToken) {
+        user.setPassword(newPassword);
+
+        Optional<PasswordResetToken> passwordResetTokenFromDB =
+                passwordResetTokenRepository.findPasswordResetTokenByToken(passwordResetToken);
+
+        if (passwordResetTokenFromDB.isPresent()) {
+            Optional<User> userFromDB = userRepository.findById(user.getId());
+
+            if (userFromDB.isPresent()) {
+                User userToChangePasswordTo = userFromDB.get();
+                userToChangePasswordTo.setPassword(newPassword);
+
+                userRepository.save(user);
+            } else {
+                throw new UserNotFoundException(user.getId());
+            }
+
+            passwordResetTokenRepository.deleteByToken(passwordResetToken);
+        } else {
+            throw new PasswordResetTokenNotFoundException(passwordResetToken);
+        }
+    }
+
+    @Override
+    public User changeUsersDailyLimit(String userEmail, Double limitChange) {
+        User user = findByEmail(userEmail).get();
+        user.setDailyLimit(user.getDailyLimit() + limitChange);
         userRepository.save(user);
-      } else {
-        throw new UserNotFoundException(user.getId());
-      }
-
-      passwordResetTokenRepository.deleteByToken(passwordResetToken);
-    } else {
-      throw new PasswordResetTokenNotFoundException(passwordResetToken);
+        return user;
     }
-  }
 
-  @Override
-  public User changeUsersDailyLimit(String userEmail, Double limitChange) {
-    User user = findByEmail(userEmail).get();
-    user.setDailyLimit(user.getDailyLimit() + limitChange);
-    userRepository.save(user);
-    return user;
-  }
-
-  @Override
-  public Double getUsersDailyLimit(String userEmail) {
-    return findByEmail(userEmail).get().getDailyLimit();
-  }
+    @Override
+    public Double getUsersDailyLimit(String userEmail) {
+        return findByEmail(userEmail).get().getDailyLimit();
+    }
 }

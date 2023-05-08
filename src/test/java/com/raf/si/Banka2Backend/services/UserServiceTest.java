@@ -21,39 +21,64 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
-  @Mock UserRepository userRepository;
-  @Mock PasswordResetTokenRepository passwordResetTokenRepository;
+    @Mock
+    UserRepository userRepository;
 
-  @InjectMocks UserService userService;
+    @Mock
+    PasswordResetTokenRepository passwordResetTokenRepository;
 
-  @Test
-  public void findAll_success() {
+    @InjectMocks
+    UserService userService;
 
-    long id = 1L;
+    @Test
+    public void findAll_success() {
 
-    List<User> userList =
-        Arrays.asList(
-            User.builder()
-                .id(id++)
-                .firstName("Petar")
-                .lastName("Petrovic")
-                .phone("000000000")
-                .jmbg("000000000")
-                .password("12345")
-                .email("petar@gmail.com")
-                .jobPosition("/")
-                .build(),
-            User.builder()
-                .id(id++)
-                .firstName("Marko")
-                .lastName("Markovic")
-                .phone("000000000")
-                .jmbg("000000000")
-                .password("12345")
-                .email("marko@gmail.com")
-                .jobPosition("/")
-                .build(),
-            User.builder()
+        long id = 1L;
+
+        List<User> userList = Arrays.asList(
+                User.builder()
+                        .id(id++)
+                        .firstName("Petar")
+                        .lastName("Petrovic")
+                        .phone("000000000")
+                        .jmbg("000000000")
+                        .password("12345")
+                        .email("petar@gmail.com")
+                        .jobPosition("/")
+                        .build(),
+                User.builder()
+                        .id(id++)
+                        .firstName("Marko")
+                        .lastName("Markovic")
+                        .phone("000000000")
+                        .jmbg("000000000")
+                        .password("12345")
+                        .email("marko@gmail.com")
+                        .jobPosition("/")
+                        .build(),
+                User.builder()
+                        .id(id)
+                        .firstName("Darko")
+                        .lastName("Darkovic")
+                        .phone("000000000")
+                        .jmbg("000000000")
+                        .password("12345")
+                        .email("darko@gmail.com")
+                        .jobPosition("/")
+                        .build());
+
+        when(userRepository.findAll()).thenReturn(userList);
+
+        List<User> result = userService.findAll();
+        assertEquals(userList, result);
+    }
+
+    @Test
+    public void findById_success() {
+
+        long id = 1L;
+
+        User user = User.builder()
                 .id(id)
                 .firstName("Darko")
                 .lastName("Darkovic")
@@ -62,300 +87,259 @@ public class UserServiceTest {
                 .password("12345")
                 .email("darko@gmail.com")
                 .jobPosition("/")
-                .build());
+                .build();
 
-    when(userRepository.findAll()).thenReturn(userList);
+        when(userRepository.findById(id)).thenReturn(Optional.of(user));
 
-    List<User> result = userService.findAll();
-    assertEquals(userList, result);
-  }
+        Optional<User> result = userService.findById(id);
 
-  @Test
-  public void findById_success() {
+        assertEquals(user, result.get());
+    }
 
-    long id = 1L;
+    @Test
+    public void findById_throwsUserNotFoundException() {
 
-    User user =
-        User.builder()
-            .id(id)
-            .firstName("Darko")
-            .lastName("Darkovic")
-            .phone("000000000")
-            .jmbg("000000000")
-            .password("12345")
-            .email("darko@gmail.com")
-            .jobPosition("/")
-            .build();
+        long id = 1L;
 
-    when(userRepository.findById(id)).thenReturn(Optional.of(user));
+        when(userRepository.findById(id)).thenReturn(Optional.empty());
 
-    Optional<User> result = userService.findById(id);
-
-    assertEquals(user, result.get());
-  }
-
-  @Test
-  public void findById_throwsUserNotFoundException() {
-
-    long id = 1L;
-
-    when(userRepository.findById(id)).thenReturn(Optional.empty());
-
-    assertThrows(
-        UserNotFoundException.class,
-        () -> {
-          userService.findById(id);
+        assertThrows(UserNotFoundException.class, () -> {
+            userService.findById(id);
         });
-  }
+    }
 
-  @Test
-  public void findByEmail_success() {
+    @Test
+    public void findByEmail_success() {
 
-    long id = 1L;
+        long id = 1L;
 
-    String emailSearch = "darko@gmail.com";
+        String emailSearch = "darko@gmail.com";
 
-    User user =
-        User.builder()
-            .id(id)
-            .firstName("Darko")
-            .lastName("Darkovic")
-            .phone("000000000")
-            .jmbg("000000000")
-            .password("12345")
-            .email("darko@gmail.com")
-            .jobPosition("/")
-            .build();
+        User user = User.builder()
+                .id(id)
+                .firstName("Darko")
+                .lastName("Darkovic")
+                .phone("000000000")
+                .jmbg("000000000")
+                .password("12345")
+                .email("darko@gmail.com")
+                .jobPosition("/")
+                .build();
 
-    when(userRepository.findUserByEmail(emailSearch)).thenReturn(Optional.of(user));
+        when(userRepository.findUserByEmail(emailSearch)).thenReturn(Optional.of(user));
 
-    Optional<User> result = userService.findByEmail(emailSearch);
+        Optional<User> result = userService.findByEmail(emailSearch);
 
-    assertEquals(user, result.get());
-  }
+        assertEquals(user, result.get());
+    }
 
-  @Test
-  public void loadUserByUsername_success() {
+    @Test
+    public void loadUserByUsername_success() {
 
-    long id = 1L;
-    String email = "darko@gmail.com";
+        long id = 1L;
+        String email = "darko@gmail.com";
 
-    User userFromDB =
-        User.builder()
-            .id(id)
-            .firstName("Darko")
-            .lastName("Darkovic")
-            .phone("000000000")
-            .jmbg("000000000")
-            .password("12345")
-            .email("darko@gmail.com")
-            .jobPosition("/")
-            .build();
+        User userFromDB = User.builder()
+                .id(id)
+                .firstName("Darko")
+                .lastName("Darkovic")
+                .phone("000000000")
+                .jmbg("000000000")
+                .password("12345")
+                .email("darko@gmail.com")
+                .jobPosition("/")
+                .build();
 
-    when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(userFromDB));
+        when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(userFromDB));
 
-    UserDetails result = userService.loadUserByUsername(email);
+        UserDetails result = userService.loadUserByUsername(email);
 
-    assertEquals(userFromDB.getEmail(), result.getUsername());
-    assertEquals(userFromDB.getPassword(), result.getPassword());
-  }
+        assertEquals(userFromDB.getEmail(), result.getUsername());
+        assertEquals(userFromDB.getPassword(), result.getPassword());
+    }
 
-  @Test
-  public void loadUserByUsername_throwsUsernameNotFoundException() {
+    @Test
+    public void loadUserByUsername_throwsUsernameNotFoundException() {
 
-    String email = "darko@gmail.com";
+        String email = "darko@gmail.com";
 
-    when(userRepository.findUserByEmail(email)).thenReturn(Optional.empty());
+        when(userRepository.findUserByEmail(email)).thenReturn(Optional.empty());
 
-    assertThrows(UsernameNotFoundException.class, () -> userService.loadUserByUsername(email));
-  }
+        assertThrows(UsernameNotFoundException.class, () -> userService.loadUserByUsername(email));
+    }
 
-  @Test
-  public void save_success() {
+    @Test
+    public void save_success() {
 
-    long id = 1L;
+        long id = 1L;
 
-    User newUser =
-        User.builder()
-            .id(id)
-            .firstName("Darko")
-            .lastName("Darkovic")
-            .phone("000000000")
-            .jmbg("000000000")
-            .password("12345")
-            .email("darko@gmail.com")
-            .jobPosition("/")
-            .build();
+        User newUser = User.builder()
+                .id(id)
+                .firstName("Darko")
+                .lastName("Darkovic")
+                .phone("000000000")
+                .jmbg("000000000")
+                .password("12345")
+                .email("darko@gmail.com")
+                .jobPosition("/")
+                .build();
 
-    when(userRepository.save(newUser)).thenReturn(newUser);
+        when(userRepository.save(newUser)).thenReturn(newUser);
 
-    userService.save(newUser);
+        userService.save(newUser);
 
-    verify(userRepository).save(newUser);
-  }
+        verify(userRepository).save(newUser);
+    }
 
-  @Test
-  public void deleteById_success() {
+    @Test
+    public void deleteById_success() {
 
-    long id = 1L;
+        long id = 1L;
 
-    doNothing().when(userRepository).deleteById(id);
+        doNothing().when(userRepository).deleteById(id);
 
-    userService.deleteById(id);
+        userService.deleteById(id);
 
-    verify(userRepository).deleteById(id);
-  }
+        verify(userRepository).deleteById(id);
+    }
 
-  @Test
-  public void deleteById_throwsUserNotFoundException() {
+    @Test
+    public void deleteById_throwsUserNotFoundException() {
 
-    long id = 1L;
+        long id = 1L;
 
-    when(userRepository.findById(id)).thenThrow(UserNotFoundException.class);
+        when(userRepository.findById(id)).thenThrow(UserNotFoundException.class);
 
-    assertThrows(UserNotFoundException.class, () -> userService.findById(id));
-  }
+        assertThrows(UserNotFoundException.class, () -> userService.findById(id));
+    }
 
-  @Test
-  public void getUserByPasswordResetToken_success() {
+    @Test
+    public void getUserByPasswordResetToken_success() {
 
-    User user =
-        User.builder()
-            .id(1L)
-            .firstName("Darko")
-            .lastName("Darkovic")
-            .phone("000000000")
-            .jmbg("000000000")
-            .password("12345")
-            .email("darko@gmail.com")
-            .jobPosition("/")
-            .build();
-    String token = UUID.randomUUID().toString();
-    PasswordResetToken passwordResetToken = new PasswordResetToken(user, token);
+        User user = User.builder()
+                .id(1L)
+                .firstName("Darko")
+                .lastName("Darkovic")
+                .phone("000000000")
+                .jmbg("000000000")
+                .password("12345")
+                .email("darko@gmail.com")
+                .jobPosition("/")
+                .build();
+        String token = UUID.randomUUID().toString();
+        PasswordResetToken passwordResetToken = new PasswordResetToken(user, token);
 
-    when(passwordResetTokenRepository.findPasswordResetTokenByToken(token))
-        .thenReturn(Optional.of(passwordResetToken));
-    when(userRepository.findById(passwordResetToken.getUser().getId()))
-        .thenReturn(Optional.of(user));
+        when(passwordResetTokenRepository.findPasswordResetTokenByToken(token))
+                .thenReturn(Optional.of(passwordResetToken));
+        when(userRepository.findById(passwordResetToken.getUser().getId())).thenReturn(Optional.of(user));
 
-    Optional<User> userWithToken = userService.getUserByPasswordResetToken(token);
+        Optional<User> userWithToken = userService.getUserByPasswordResetToken(token);
 
-    assertEquals(user.getEmail(), userWithToken.get().getEmail());
-  }
+        assertEquals(user.getEmail(), userWithToken.get().getEmail());
+    }
 
-  @Test
-  public void getUserByPasswordResetToken_throwsPasswordResetTokenNotFoundException() {
+    @Test
+    public void getUserByPasswordResetToken_throwsPasswordResetTokenNotFoundException() {
 
-    String token = UUID.randomUUID().toString();
+        String token = UUID.randomUUID().toString();
 
-    when(passwordResetTokenRepository.findPasswordResetTokenByToken(token))
-        .thenReturn(Optional.empty());
+        when(passwordResetTokenRepository.findPasswordResetTokenByToken(token)).thenReturn(Optional.empty());
 
-    assertThrows(
-        PasswordResetTokenNotFoundException.class,
-        () -> {
-          userService.getUserByPasswordResetToken(token);
+        assertThrows(PasswordResetTokenNotFoundException.class, () -> {
+            userService.getUserByPasswordResetToken(token);
         });
-  }
+    }
 
-  @Test
-  public void changePassword_success() {
+    @Test
+    public void changePassword_success() {
 
-    long id = 1L;
+        long id = 1L;
 
-    User user =
-        User.builder()
-            .id(id)
-            .firstName("Darko")
-            .lastName("Darkovic")
-            .phone("000000000")
-            .jmbg("000000000")
-            .password("12345")
-            .email("darko@gmail.com")
-            .jobPosition("/")
-            .build();
+        User user = User.builder()
+                .id(id)
+                .firstName("Darko")
+                .lastName("Darkovic")
+                .phone("000000000")
+                .jmbg("000000000")
+                .password("12345")
+                .email("darko@gmail.com")
+                .jobPosition("/")
+                .build();
 
-    String newPassword = "54321";
+        String newPassword = "54321";
 
-    String token = UUID.randomUUID().toString();
-    PasswordResetToken passwordResetToken = new PasswordResetToken(user, token);
+        String token = UUID.randomUUID().toString();
+        PasswordResetToken passwordResetToken = new PasswordResetToken(user, token);
 
-    when(passwordResetTokenRepository.findPasswordResetTokenByToken(token))
-        .thenReturn(Optional.of(passwordResetToken));
-    when(userRepository.findById(id)).thenReturn(Optional.of(user));
+        when(passwordResetTokenRepository.findPasswordResetTokenByToken(token))
+                .thenReturn(Optional.of(passwordResetToken));
+        when(userRepository.findById(id)).thenReturn(Optional.of(user));
 
-    when(userRepository.save(user)).thenReturn(user);
+        when(userRepository.save(user)).thenReturn(user);
 
-    userService.changePassword(user, newPassword, token);
+        userService.changePassword(user, newPassword, token);
 
-    assertEquals(newPassword, user.getPassword());
+        assertEquals(newPassword, user.getPassword());
 
-    verify(userRepository).save(user);
-    verify(passwordResetTokenRepository).deleteByToken(token);
-  }
+        verify(userRepository).save(user);
+        verify(passwordResetTokenRepository).deleteByToken(token);
+    }
 
-  @Test
-  public void changePassword_throwsPasswordResetTokenNotFoundException() {
+    @Test
+    public void changePassword_throwsPasswordResetTokenNotFoundException() {
 
-    long id = 1L;
+        long id = 1L;
 
-    User user =
-        User.builder()
-            .id(id)
-            .firstName("Darko")
-            .lastName("Darkovic")
-            .phone("000000000")
-            .jmbg("000000000")
-            .password("12345")
-            .email("darko@gmail.com")
-            .jobPosition("/")
-            .build();
+        User user = User.builder()
+                .id(id)
+                .firstName("Darko")
+                .lastName("Darkovic")
+                .phone("000000000")
+                .jmbg("000000000")
+                .password("12345")
+                .email("darko@gmail.com")
+                .jobPosition("/")
+                .build();
 
-    String newPassword = "54321";
+        String newPassword = "54321";
 
-    String token = UUID.randomUUID().toString();
+        String token = UUID.randomUUID().toString();
 
-    when(passwordResetTokenRepository.findPasswordResetTokenByToken(token))
-        .thenReturn(Optional.empty());
+        when(passwordResetTokenRepository.findPasswordResetTokenByToken(token)).thenReturn(Optional.empty());
 
-    assertThrows(
-        PasswordResetTokenNotFoundException.class,
-        () -> {
-          userService.changePassword(user, newPassword, token);
+        assertThrows(PasswordResetTokenNotFoundException.class, () -> {
+            userService.changePassword(user, newPassword, token);
         });
-  }
+    }
 
-  @Test
-  public void changePassword_throwsUserNotFoundException() {
+    @Test
+    public void changePassword_throwsUserNotFoundException() {
 
-    long id = 1L;
+        long id = 1L;
 
-    User user =
-        User.builder()
-            .id(id)
-            .firstName("Darko")
-            .lastName("Darkovic")
-            .phone("000000000")
-            .jmbg("000000000")
-            .password("12345")
-            .email("darko@gmail.com")
-            .jobPosition("/")
-            .build();
+        User user = User.builder()
+                .id(id)
+                .firstName("Darko")
+                .lastName("Darkovic")
+                .phone("000000000")
+                .jmbg("000000000")
+                .password("12345")
+                .email("darko@gmail.com")
+                .jobPosition("/")
+                .build();
 
-    String newPassword = "54321";
+        String newPassword = "54321";
 
-    String token = UUID.randomUUID().toString();
+        String token = UUID.randomUUID().toString();
 
-    PasswordResetToken passwordResetToken = new PasswordResetToken(user, token);
+        PasswordResetToken passwordResetToken = new PasswordResetToken(user, token);
 
-    when(passwordResetTokenRepository.findPasswordResetTokenByToken(token))
-        .thenReturn(Optional.of(passwordResetToken));
-    when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
+        when(passwordResetTokenRepository.findPasswordResetTokenByToken(token))
+                .thenReturn(Optional.of(passwordResetToken));
+        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
 
-    assertThrows(
-        UserNotFoundException.class,
-        () -> {
-          userService.changePassword(user, newPassword, token);
+        assertThrows(UserNotFoundException.class, () -> {
+            userService.changePassword(user, newPassword, token);
         });
-  }
+    }
 }

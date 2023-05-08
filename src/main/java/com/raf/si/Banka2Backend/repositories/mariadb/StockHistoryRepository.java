@@ -11,24 +11,23 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public interface StockHistoryRepository extends JpaRepository<StockHistory, Long> {
 
-  @Query(
-      value =
-          "SELECT * FROM (SELECT * FROM stock_history s WHERE s.stock_id = :id AND s.type = 'DAILY' ORDER BY s.on_date DESC LIMIT :period) sh ORDER BY sh.on_date ASC",
-      nativeQuery = true)
-  List<StockHistory> getStockHistoryByStockIdAndHistoryType(Long id, Integer period);
+    @Query(
+            value =
+                    "SELECT * FROM (SELECT * FROM stock_history s WHERE s.stock_id = :id AND s.type = 'DAILY' ORDER BY s.on_date DESC LIMIT :period) sh ORDER BY sh.on_date ASC",
+            nativeQuery = true)
+    List<StockHistory> getStockHistoryByStockIdAndHistoryType(Long id, Integer period);
 
-  @Query(
-      value =
-          "SELECT * FROM (SELECT * FROM stock_history s WHERE s.stock_id = :id AND s.type = 'DAILY' AND year(on_date) = year(CURDATE()) ORDER BY s.on_date DESC) sh ORDER BY sh.on_date ASC",
-      nativeQuery = true)
-  List<StockHistory> getStockHistoryByStockIdForYTD(Long id);
+    @Query(
+            value =
+                    "SELECT * FROM (SELECT * FROM stock_history s WHERE s.stock_id = :id AND s.type = 'DAILY' AND year(on_date) = year(CURDATE()) ORDER BY s.on_date DESC) sh ORDER BY sh.on_date ASC",
+            nativeQuery = true)
+    List<StockHistory> getStockHistoryByStockIdForYTD(Long id);
 
-  @Query(
-      value =
-          "SELECT * FROM stock_history WHERE stock_id = :id AND type = :type ORDER BY on_date ASC",
-      nativeQuery = true)
-  List<StockHistory> getStockHistoryByStockIdAndHistoryType(Long id, String type);
+    @Query(
+            value = "SELECT * FROM stock_history WHERE stock_id = :id AND type = :type ORDER BY on_date ASC",
+            nativeQuery = true)
+    List<StockHistory> getStockHistoryByStockIdAndHistoryType(Long id, String type);
 
-  @Transactional
-  void deleteByStockIdAndType(Long stockId, StockHistoryType type);
+    @Transactional
+    void deleteByStockIdAndType(Long stockId, StockHistoryType type);
 }
