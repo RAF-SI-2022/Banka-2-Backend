@@ -34,7 +34,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class StockService {
 
-    private static final String KEY = "J3WDDK9HZ1G71YIP";
+    private static final String KEY = "RMNF9UJRB9BPVBKK";
+    private static final String ONE_DAY = "ONE_DAY";
+    private static final String FIVE_DAYS = "FIVE_DAYS";
+    private static final String ONE_MONTH = "ONE_MONTH";
+    private static final String SIX_MONTHS = "SIX_MONTHS";
+    private static final String ONE_YEAR = "ONE_YEAR";
+    private static final String YTD = "YTD";
+    private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    private static final String OPEN = "1. open";
+    private static final String HIGH = "2. high";
+    private static final String LOW = "3. low";
+    private static final String CLOSE = "4. close";
     private final StockRepository stockRepository;
     private final StockHistoryRepository stockHistoryRepository;
     private final ExchangeRepository exchangeRepository;
@@ -143,20 +154,19 @@ public class StockService {
                         exchangeRepository.findExchangeByAcronym(companyOverview.getString("Exchange"));
 
                 if (exchange.isPresent()) {
-                    stock = Stock.builder()
-                            .exchange(exchange.get())
+                    stock = Stock.builder().exchange(exchange.get())
                             .symbol(symbol)
                             .companyName(companyOverview.getString("Name"))
-                            .dividendYield(companyOverview.getBigDecimal("DividendYield"))
+                            .dividendYield(new BigDecimal(companyOverview.getString("DividendYield")))
                             .outstandingShares(companyOverview.getLong("SharesOutstanding"))
-                            .openValue(globalQuote.getBigDecimal("02. open"))
-                            .highValue(globalQuote.getBigDecimal("03. high"))
-                            .lowValue(globalQuote.getBigDecimal("04. low"))
-                            .priceValue(globalQuote.getBigDecimal("05. price"))
+                            .openValue(new BigDecimal(globalQuote.getString("02. open")))
+                            .highValue(new BigDecimal(globalQuote.getString("03. high")))
+                            .lowValue(new BigDecimal(globalQuote.getString("04. low")))
+                            .priceValue(new BigDecimal(globalQuote.getString("05. price")))
                             .volumeValue(globalQuote.getLong("06. volume"))
                             .lastUpdated(LocalDate.parse(globalQuote.getString("07. latest trading day")))
-                            .previousClose(globalQuote.getBigDecimal("08. previous close"))
-                            .changeValue(globalQuote.getBigDecimal("09. change"))
+                            .previousClose(new BigDecimal(globalQuote.getString("08. previous close")))
+                            .changeValue(new BigDecimal(globalQuote.getString("09. change")))
                             .changePercent(globalQuote.getString("10. change percent"))
                             .websiteUrl(website)
                             .build();
@@ -167,9 +177,9 @@ public class StockService {
                 }
 
             } catch (IOException | JSONException e) {
-                throw new StockNotFoundException(symbol);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                throw new ExternalAPILimitReachedException();
+            } catch (InterruptedException e){
+                Thread.currentThread().interrupt();
             }
 
             Optional<Stock> savedStock = stockRepository.findStockBySymbol(symbol);
@@ -186,14 +196,14 @@ public class StockService {
 
         if (stockFromDB.isEmpty()) throw new StockNotFoundException(id);
 
-        if (type.equals("YTD")) return stockHistoryRepository.getStockHistoryByStockIdForYTD(id);
+        if (type.equals(YTD)) return stockHistoryRepository.getStockHistoryByStockIdForYTD(id);
 
         Integer period = null;
 
         switch (type) {
-            case "ONE_YEAR" -> period = 365;
-            case "SIX_MONTHS" -> period = 180;
-            case "ONE_MONTH" -> period = 30;
+            case ONE_YEAR -> period = 365;
+            case SIX_MONTHS -> period = 180;
+            case ONE_MONTH -> period = 30;
         }
 
         if (period != null) return stockHistoryRepository.getStockHistoryByStockIdAndHistoryType(id, period);
@@ -209,21 +219,21 @@ public class StockService {
 
         String url =
                 switch (type) {
-                    case "ONE_DAY" -> "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol="
+                    case ONE_DAY -> "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol="
                             + stock.getSymbol()
                             + "&interval=5min&outputsize=full&apikey="
-                            + KEY;
-                    case "FIVE_DAYS" -> "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol="
+                            + "61U8HHCNVMVINYLI";
+                    case FIVE_DAYS -> "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol="
                             + stock.getSymbol()
                             + "&interval=60min&outputsize=full&apikey="
-                            + KEY;
-                    case "ONE_MONTH",
-                            "SIX_MONTHS",
-                            "ONE_YEAR",
-                            "YTD" -> "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol="
+                            + "J3WDDK9HZ1G71YIP";
+                    case ONE_MONTH,
+                            SIX_MONTHS,
+                            ONE_YEAR,
+                            YTD -> "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol="
                             + stock.getSymbol()
                             + "&outputsize=full&apikey="
-                            + KEY;
+                            + "61U8HHCNVMVINYLI";
                     default -> null;
                 };
 
@@ -235,10 +245,10 @@ public class StockService {
 
             return parseResponse(response, stock, type);
         } catch (IOException e) {
-
             return getStockHistoryByStockIdAndTimePeriod(stockId, type);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            Thread.currentThread().interrupt();
+            return null;
         }
     }
 
@@ -252,44 +262,51 @@ public class StockService {
         int limit = 365;
 
         switch (type) {
-            case "ONE_DAY" -> key = "Time Series (5min)";
-            case "FIVE_DAYS" -> key = "Time Series (60min)";
-            case "ONE_MONTH", "SIX_MONTHS", "ONE_YEAR", "YTD" -> key = "Time Series (Daily)";
+            case ONE_DAY -> key = "Time Series (5min)";
+            case FIVE_DAYS -> key = "Time Series (60min)";
+            case ONE_MONTH, SIX_MONTHS, ONE_YEAR, YTD -> key = "Time Series (Daily)";
         }
 
         JSONObject timeSeries;
 
         try {
             timeSeries = fullResponse.getJSONObject(key);
+            System.out.println(timeSeries);
         } catch (JSONException e) {
             throw new ExternalAPILimitReachedException();
         }
 
-        Set<String> timestamps = timeSeries.keySet();
+        Iterator<String> iterator = timeSeries.keys();
+
+        Set<String> timestamps = new HashSet<>();
+        while(iterator.hasNext()){
+            timestamps.add(iterator.next());
+        }
+
         List<String> listTimestamps = new ArrayList<>(timestamps);
 
         Collections.sort(listTimestamps);
         Collections.reverse(listTimestamps);
 
         switch (type) {
-            case "ONE_DAY" -> {
+            case ONE_DAY -> {
                 LocalDateTime latestTimestamp =
-                        LocalDateTime.parse(listTimestamps.get(0), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                        LocalDateTime.parse(listTimestamps.get(0), DateTimeFormatter.ofPattern(DATE_PATTERN));
 
                 for (int i = 1; i < listTimestamps.size() - 1; i++) {
 
                     LocalDateTime localDateTime = LocalDateTime.parse(
-                            listTimestamps.get(i), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                            listTimestamps.get(i), DateTimeFormatter.ofPattern(DATE_PATTERN));
 
                     JSONObject data = timeSeries.getJSONObject(listTimestamps.get(i));
 
                     if (latestTimestamp.toLocalDate().equals(localDateTime.toLocalDate())) {
 
                         StockHistory stockHistory = StockHistory.builder()
-                                .openValue(data.getBigDecimal("1. open"))
-                                .highValue(data.getBigDecimal("2. high"))
-                                .lowValue(data.getBigDecimal("3. low"))
-                                .closeValue(data.getBigDecimal("4. close"))
+                                .openValue(new BigDecimal(data.getString(OPEN)))
+                                .highValue(new BigDecimal(data.getString(HIGH)))
+                                .lowValue(new BigDecimal(data.getString(LOW)))
+                                .closeValue(new BigDecimal(data.getString(CLOSE)))
                                 .volumeValue(data.getLong("5. volume"))
                                 .stock(stock)
                                 .onDate(localDateTime)
@@ -305,9 +322,9 @@ public class StockService {
                 stockHistoryRepository.deleteByStockIdAndType(stock.getId(), StockHistoryType.ONE_DAY);
                 stockHistoryRepository.saveAll(stockHistoryList);
             }
-            case "FIVE_DAYS" -> {
+            case FIVE_DAYS -> {
                 LocalDateTime initiallocalDateTime =
-                        LocalDateTime.parse(listTimestamps.get(0), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                        LocalDateTime.parse(listTimestamps.get(0), DateTimeFormatter.ofPattern(DATE_PATTERN));
 
                 int dayCounter = 0;
 
@@ -316,17 +333,17 @@ public class StockService {
                     if (dayCounter == 5 * 16) break;
 
                     LocalDateTime localDateTime = LocalDateTime.parse(
-                            listTimestamps.get(i), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                            listTimestamps.get(i), DateTimeFormatter.ofPattern(DATE_PATTERN));
 
                     if (!initiallocalDateTime.toLocalDate().equals(localDateTime.toLocalDate())) dayCounter++;
 
                     JSONObject data = timeSeries.getJSONObject(listTimestamps.get(i));
 
                     StockHistory stockHistory = StockHistory.builder()
-                            .openValue(data.getBigDecimal("1. open"))
-                            .highValue(data.getBigDecimal("2. high"))
-                            .lowValue(data.getBigDecimal("3. low"))
-                            .closeValue(data.getBigDecimal("4. close"))
+                            .openValue(new BigDecimal(data.getString(OPEN)))
+                            .highValue(new BigDecimal(data.getString(HIGH)))
+                            .lowValue(new BigDecimal(data.getString(LOW)))
+                            .closeValue(new BigDecimal(data.getString(CLOSE)))
                             .volumeValue(data.getLong("5. volume"))
                             .stock(stock)
                             .onDate(localDateTime)
@@ -339,19 +356,19 @@ public class StockService {
                 stockHistoryRepository.deleteByStockIdAndType(stock.getId(), StockHistoryType.FIVE_DAYS);
                 stockHistoryRepository.saveAll(stockHistoryList);
             }
-            case "ONE_MONTH", "SIX_MONTHS", "ONE_YEAR", "YTD" -> {
+            case ONE_MONTH, SIX_MONTHS, ONE_YEAR, YTD -> {
                 for (int i = 0; i < limit; i++) {
 
                     LocalDateTime localDateTime = LocalDateTime.parse(
-                            listTimestamps.get(i) + " 00:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                            listTimestamps.get(i) + " 00:00:00", DateTimeFormatter.ofPattern(DATE_PATTERN));
 
                     JSONObject data = timeSeries.getJSONObject(listTimestamps.get(i));
 
                     StockHistory stockHistory = StockHistory.builder()
-                            .openValue(data.getBigDecimal("1. open"))
-                            .highValue(data.getBigDecimal("2. high"))
-                            .lowValue(data.getBigDecimal("3. low"))
-                            .closeValue(data.getBigDecimal("4. close"))
+                            .openValue(new BigDecimal(data.getString(OPEN)))
+                            .highValue(new BigDecimal(data.getString(HIGH)))
+                            .lowValue(new BigDecimal(data.getString(LOW)))
+                            .closeValue(new BigDecimal(data.getString(CLOSE)))
                             .volumeValue(data.getLong("6. volume"))
                             .stock(stock)
                             .onDate(localDateTime)
@@ -369,9 +386,9 @@ public class StockService {
         Collections.reverse(stockHistoryList);
 
         return switch (type) {
-            case "ONE_MONTH" -> stockHistoryList.subList(0, 30);
-            case "SIX_MONTHS" -> stockHistoryList.subList(0, 180);
-            case "YTD" -> {
+            case ONE_MONTH -> stockHistoryList.subList(0, 30);
+            case SIX_MONTHS -> stockHistoryList.subList(0, 180);
+            case YTD -> {
                 List<StockHistory> stockHistoryListYTD = new ArrayList<>();
 
                 int yearToLookUp = stockHistoryList
@@ -396,13 +413,10 @@ public class StockService {
         BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
 
 
-        StockOrder order = null;
+        StockOrder order;
         if (user.getDailyLimit() == null || user.getDailyLimit() <= 0) {
             return ResponseEntity.internalServerError().body("Doslo je do neocekivane greske.");
         }
-        //        System.out.println("check");
-        //        System.out.println(price.doubleValue());
-        //        System.out.println(user.getDailyLimit());
 
         if (price.doubleValue() > user.getDailyLimit()) {
             order = stockOrder == null
@@ -415,7 +429,7 @@ public class StockService {
                     ? this.createOrder(
                             stockRequest, price.doubleValue(), user, OrderStatus.IN_PROGRESS, OrderTradeType.BUY)
                     : stockOrder;
-            order = (StockOrder) this.orderRepository.save(order);
+            order = this.orderRepository.save(order);
             user.setDailyLimit(user.getDailyLimit() - price.doubleValue());
             userService.save(user);
         }
@@ -423,7 +437,7 @@ public class StockService {
         try {
             stockBuyRequestsQueue.put(order);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
         Balance usersBalance =
                 balanceService.findBalanceByUserIdAndCurrency(user.getId(), order.getCurrencyCode());
@@ -438,7 +452,7 @@ public class StockService {
 
     private StockOrder createOrder(
             StockRequest request, Double price, User user, OrderStatus status, OrderTradeType orderTradeType) {
-        StockOrder order = new StockOrder(
+        return new StockOrder(
                 0L,
                 OrderType.STOCK,
                 orderTradeType,
@@ -453,12 +467,11 @@ public class StockService {
                 request.isAllOrNone(),
                 request.isMargin(),
                 request.getCurrencyCode());
-        return order;
     }
 
     private String getTimestamp() {
         LocalDateTime currentDateTime = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_PATTERN);
         return currentDateTime.format(formatter);
     }
 
@@ -482,10 +495,10 @@ public class StockService {
                             OrderStatus.WAITING,
                             OrderTradeType.SELL)
                     : stockOrder;
-            order = (StockOrder) this.orderRepository.save(order);
+            order = this.orderRepository.save(order);
             stockSellRequestsQueue.put(order);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
 
         Map<String, String> response = new HashMap<>();
