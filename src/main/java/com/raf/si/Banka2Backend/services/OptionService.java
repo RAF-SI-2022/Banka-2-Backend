@@ -100,14 +100,13 @@ public class OptionService implements OptionServiceInterface {
         LocalDate date = LocalDate.parse(regularDate, formatter);
         formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
         LocalDateTime dateTime = LocalDateTime.parse(regularDate + " 02:00:00", formatter);
-        long milliseconds =
-                dateTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
+        long milliseconds = dateTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
 
         List<Option> requestedOptions =
                 optionRepository.findAllByStockSymbolAndExpirationDate(stockSymbol.toUpperCase(), date);
         if (requestedOptions.isEmpty()) {
             String parsedDate = "" + milliseconds / 1000;
-            optionRepository.deleteAll();
+//todo            optionRepository.deleteAll();  skloneno da ne bi pravilo bugove (vrati ako bude pravilo probleme kasnije)
             optionRepository.saveAll(getFromExternalApi(stockSymbol, parsedDate));
         }
         return optionRepository.findAllByStockSymbolAndExpirationDate(stockSymbol.toUpperCase(), date);
@@ -290,7 +289,7 @@ public class OptionService implements OptionServiceInterface {
             JSONObject options = optionsArray.getJSONObject(0);
 
             JSONArray callsArray = options.getJSONArray("calls");
-            ;
+
 
             for (int i = 0; i < callsArray.length(); i++) {
 
