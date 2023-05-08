@@ -77,10 +77,10 @@ public class StockBuyWorker extends Thread {
                 //
                 //                }
 
-                this.balanceService.reserveAmount(
-                        (float) (stockOrder.getAmount() * stockOrder.getPrice()),
-                        stockOrder.getUser().getEmail(),
-                        stockOrder.getCurrencyCode());
+//                this.balanceService.reserveAmount( // duplikat - pare se rezervisu pre nego sto se order doda queue; ovo je zakomentarisano(a ne skroz izbrisano) za svaki slucaj ako se pokaze da je ipak potrebno u nekim slucajevima
+//                        (float) (stockOrder.getAmount() * stockOrder.getPrice()),
+//                        stockOrder.getUser().getEmail(),
+//                        stockOrder.getCurrencyCode());
 
                 if (stockOrder.isAllOrNone()) {
                     usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + stockOrder.getAmount());
