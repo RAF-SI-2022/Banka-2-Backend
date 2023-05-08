@@ -3,7 +3,6 @@ package com.raf.si.Banka2Backend.models.mariadb;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-
 import lombok.*;
 
 @Data

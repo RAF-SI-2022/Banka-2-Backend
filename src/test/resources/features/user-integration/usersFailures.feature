@@ -27,9 +27,9 @@ Feature: User service
     When user doesnt exist in database
     Then reactivate nonexistent user
 
-#  Scenario: deleting nonexistent user #test je brljao zbog promenjenog importa (hoce -models.users.User umesto -models.mariaDb.User, i buni se)
-#    When user doesnt exist in database
-#    Then deleting nonexistent user from database
+  Scenario: deleting nonexistent user #test je brljao zbog promenjenog importa (hoce -models.users.User umesto -models.mariaDb.User, i buni se)
+    When user doesnt exist in database
+    Then deleting nonexistent user from database
 
   Scenario: non admin user gets all permission names
     Given non privileged user logs in
@@ -42,10 +42,10 @@ Feature: User service
 
   Scenario: non privileged user creates new user
     Then user not created
-#
-#  Scenario: non privileged user get all users
-#    When non privileged user logged in and database not empty
-#    Then user doesnt get all users from database
+
+  Scenario: non privileged user get all users
+    When non privileged user logged in and database not empty
+    Then user doesnt get all users from database
 
   Scenario: non privileged user gets user by his id
     When non privileged user logged in and user exists in database

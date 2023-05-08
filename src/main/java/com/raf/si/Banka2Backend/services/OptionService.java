@@ -235,14 +235,20 @@ public class OptionService implements OptionServiceInterface {
             JSONObject optionChain = fullResponse.getJSONObject("optionChain");
             JSONArray result = optionChain.getJSONArray("result");
 
+            if(result.length() == 0 ){
+                return optionList;
+            }
+
             JSONObject object = result.getJSONObject(0);
 
             JSONArray optionsArray = object.getJSONArray("options");
             JSONObject options = optionsArray.getJSONObject(0);
 
-            JSONArray callsArray = options.getJSONArray("calls");
+            JSONArray callsArray = options.getJSONArray("calls");;
 
-            for (Object o : callsArray) {
+            for(int i=0;i<callsArray.length();i++) {
+
+                Object o = callsArray.get(i);
 
                 JSONObject json = (JSONObject) o;
                 System.out.println(json);
@@ -270,7 +276,7 @@ public class OptionService implements OptionServiceInterface {
                         .bid(json.getDouble("bid"))
                         .ask(json.getDouble("ask"))
                         .changePrice(json.getDouble("change"))
-                        .percentChange(json.getDouble("percentChange"))
+                        .percentChange(json.has("percentChange") ? json.getDouble("percentChange") : 0.0)
                         .inTheMoney(json.getBoolean("inTheMoney"))
                         .build();
 
@@ -279,7 +285,9 @@ public class OptionService implements OptionServiceInterface {
 
             JSONArray putsArray = options.getJSONArray("puts");
 
-            for (Object o : putsArray) {
+            for(int i=0;i<callsArray.length();i++) {
+
+                Object o = callsArray.get(i);
 
                 JSONObject json = (JSONObject) o;
 
@@ -304,7 +312,7 @@ public class OptionService implements OptionServiceInterface {
                         .bid(json.getDouble("bid"))
                         .ask(json.getDouble("ask"))
                         .changePrice(json.getDouble("change"))
-                        .percentChange(json.getDouble("percentChange"))
+                        .percentChange(json.has("percentChange") ? json.getDouble("percentChange") : 0.0)
                         .inTheMoney(json.getBoolean("inTheMoney"))
                         .build();
 
