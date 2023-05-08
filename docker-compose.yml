@@ -1,5 +1,7 @@
 version: "3.4"
 
+name: bank-2
+
 services:
 
   mariadb:

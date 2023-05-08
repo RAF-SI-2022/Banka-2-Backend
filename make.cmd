@@ -110,7 +110,8 @@ if "%1" == "dev" (
     docker compose up -d mariadb
     docker compose up -d flyway
     docker compose up -d mongodb
-    docker run --rm -d --network bank2_net --entrypoint="" backend /bin/bash ^
+    docker run --rm -d --name backend --network bank2_net --entrypoint="" ^
+        backend /bin/bash ^
         -c "java -jar -Dspring.profiles.active=container,dev app.jar"
     goto end
 )
@@ -129,7 +130,8 @@ if "%1" == "test" (
     rem TODO when adding new services, each service has to be started the
     rem "normal" way (but with test profile), and also have a test container
     rem started as well
-    docker run --rm --network bank2_net --entrypoint="" backend /bin/bash ^
+    docker run --rm --name backend --network bank2_net --entrypoint="" ^
+        backend /bin/bash ^
         -c "export MAVEN_OPTS=\"-Dspring.profiles.active=container,test\" && mvn clean compile test -DargLine=\"-Dspring.profiles.active=container,test\""
     goto end
 )
@@ -148,7 +150,8 @@ if "%1" == "dist" (
     rem TODO when adding new services, each service has to be started the
     rem "normal" way (but with test profile), and also have a test container
     rem started as well
-    docker run --rm --network bank2_net --entrypoint="" backend /bin/bash ^
+    docker run --rm --name backend --network bank2_net --entrypoint="" ^
+        backend /bin/bash ^
         -c "export MAVEN_OPTS=\"-Dspring.profiles.active=container,test\" && mvn clean compile test -DargLine=\"-Dspring.profiles.active=container,test\"" ^
         && docker push harbor.k8s.elab.rs/banka-2/backend
     goto end
@@ -161,7 +164,8 @@ if "%1" == "prod" (
     docker compose up -d mariadb
     docker compose up -d flyway
     docker compose up -d mongodb
-    docker run --rm -d --network bank2_net --entrypoint="" backend /bin/bash ^
+    docker run --rm -d --name backend --network bank2_net --entrypoint="" ^
+        backend /bin/bash ^
         -c "java -jar -Dspring.profiles.active=container,prod app.jar"
     goto end
 )
@@ -183,6 +187,14 @@ if "%1" == "reset" (
     docker compose up -d mariadb
     docker compose up -d flyway
     docker compose up -d mongodb
+    goto end
+)
+
+rem Stops all services.
+if "%1" == "stop" (
+    :stop
+	docker compose down
+	docker stop backend
     goto end
 )
 

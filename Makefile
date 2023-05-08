@@ -100,7 +100,7 @@ dev:
 	docker compose up -d mariadb
 	docker compose up -d flyway
 	docker compose up -d mongodb
-	docker run --rm -d --network bank2_net --entrypoint="" backend /bin/bash -c "java -jar -Dspring.profiles.active=container,dev app.jar"
+	docker run --rm -d --name backend --network bank2_net --entrypoint="" backend /bin/bash -c "java -jar -Dspring.profiles.active=container,dev app.jar"
 
 # Builds the test image and starts the required services.
 test:
@@ -115,7 +115,7 @@ test:
 	# TODO when adding new services, each service has to be started the
 	# "normal" way (but with test profile), and also have a test container
 	# started as well
-	docker run --rm --network bank2_net --entrypoint="" backend /bin/bash -c "export MAVEN_OPTS=\"-Dspring.profiles.active=container,test\" && mvn clean compile test -DargLine=\"-Dspring.profiles.active=container,test\""
+	docker run --rm --name backend --network bank2_net --entrypoint="" backend /bin/bash -c "export MAVEN_OPTS=\"-Dspring.profiles.active=container,test\" && mvn clean compile test -DargLine=\"-Dspring.profiles.active=container,test\""
 
 # Builds and tests the production image, and pushes to harbor. NOTE: you
 # need to be logged in to harbor.k8s.elab.rs to execute this.
@@ -131,7 +131,7 @@ dist:
 	# TODO when adding new services, each service has to be started the
 	# "normal" way (but with test profile), and also have a test container
 	# started as well
-	docker run --rm --network bank2_net --entrypoint="" backend /bin/bash -c "export MAVEN_OPTS=\"-Dspring.profiles.active=container,test\" && mvn clean compile test -DargLine=\"-Dspring.profiles.active=container,test\"" && docker push harbor.k8s.elab.rs/banka-2/backend
+	docker run --rm --name backend --network bank2_net --entrypoint="" backend /bin/bash -c "export MAVEN_OPTS=\"-Dspring.profiles.active=container,test\" && mvn clean compile test -DargLine=\"-Dspring.profiles.active=container,test\"" && docker push harbor.k8s.elab.rs/banka-2/backend
 
 # Starts the service on production.
 prod:
@@ -139,7 +139,7 @@ prod:
 	docker compose up -d mariadb
 	docker compose up -d flyway
 	docker compose up -d mongodb
-	docker run --rm -d --network bank2_net --entrypoint="" backend /bin/bash -c "java -jar -Dspring.profiles.active=container,prod app.jar"
+	docker run --rm -d --name backend --network bank2_net --entrypoint="" backend /bin/bash -c "java -jar -Dspring.profiles.active=container,prod app.jar"
 
 # Restarts all Docker helper services.
 services:
@@ -154,6 +154,11 @@ reset:
 	docker compose up -d mariadb
 	docker compose up -d flyway
 	docker compose up -d mongodb
+
+# Stops all services.
+stop:
+	docker compose down
+	docker stop backend
 
 # DANGER!!! For testing the development environment.
 # Executes Docker containers in privileged mode. Do NOT use
