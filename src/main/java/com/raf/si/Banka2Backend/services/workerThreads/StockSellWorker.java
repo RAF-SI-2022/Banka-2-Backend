@@ -96,14 +96,12 @@ public class StockSellWorker extends Thread {
     }
 
     private void updateOrderStatus(Long id, OrderStatus orderStatus) {
-        System.out.println("usli smo");
         Optional<Order> order = this.orderRepository.findById(id);
         if (order.isPresent()) {
             System.out.println(order.get().getId());
             order.get().setStatus(orderStatus);
             this.orderRepository.save(order.get());
         } else {
-            System.out.println("KURACCCC");
             throw new OrderNotFoundException(id);
         }
     }

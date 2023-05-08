@@ -82,8 +82,6 @@ public class StockController {
         }
 
         Optional<User> user = userService.findByEmail(signedInUserEmail);
-        if (user.isEmpty()) return ResponseEntity.status(400).body("Korisnik ne postoji.");
-        stockRequest.setUserId(user.get().getId());
         return stockService.buyStock(stockRequest, user.get(), null);
     }
 
@@ -93,9 +91,6 @@ public class StockController {
         if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu da prodajete akcije.");
         }
-        Optional<User> user = userService.findByEmail(signedInUserEmail);
-        if (user.isEmpty()) return ResponseEntity.status(400).body("Korisnik ne postoji.");
-        stockRequest.setUserId(user.get().getId());
         return stockService.sellStock(stockRequest, null);
     }
 

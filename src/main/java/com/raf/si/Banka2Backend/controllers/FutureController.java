@@ -73,13 +73,21 @@ public class FutureController {
             return ResponseEntity.status(401).body("Nemate dozvolu da kupujete terminske ugovore.");
         }
         Optional<User> user = userService.findByEmail(signedInUserEmail);
-
-        // todo kasnije promeni (ako treba) umesto USD u nesto custom sa fronta
+        if (futureRequest.getCurrencyCode() == null
+                || futureRequest.getCurrencyCode().equals("")) {
+            futureRequest.setCurrencyCode(
+                    "USD"); // TODO: this is only for testing because front doesn't send currencyCode yet - remove this
+            // if later.
+        }
         Balance usersBalance =
-                balanceService.findBalanceByUserIdAndCurrency(user.get().getId(), "USD");
-
+                balanceService.findBalanceByUserIdAndCurrency(user.get().getId(), futureRequest.getCurrencyCode());
+        if (usersBalance == null) {
+            return ResponseEntity.badRequest()
+                    .body("Balance for user with id <" + user.get().getId() + "> and currency code "
+                            + futureRequest.getCurrencyCode() + " has not been found.");
+        }
         futureRequest.setUserId(user.get().getId());
-        return futureService.buyFuture(futureRequest, signedInUserEmail, usersBalance.getAmount());
+        return futureService.buyFuture(futureRequest, signedInUserEmail, usersBalance.getFree());
     }
 
     @PostMapping(value = "/sell")

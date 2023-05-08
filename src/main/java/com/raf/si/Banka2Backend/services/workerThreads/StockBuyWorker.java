@@ -1,7 +1,10 @@
 package com.raf.si.Banka2Backend.services.workerThreads;
 
 import com.raf.si.Banka2Backend.exceptions.OrderNotFoundException;
-import com.raf.si.Banka2Backend.models.mariadb.*;
+import com.raf.si.Banka2Backend.models.mariadb.Balance;
+import com.raf.si.Banka2Backend.models.mariadb.Stock;
+import com.raf.si.Banka2Backend.models.mariadb.Transaction;
+import com.raf.si.Banka2Backend.models.mariadb.UserStock;
 import com.raf.si.Banka2Backend.models.mariadb.orders.Order;
 import com.raf.si.Banka2Backend.models.mariadb.orders.OrderStatus;
 import com.raf.si.Banka2Backend.models.mariadb.orders.StockOrder;
@@ -57,14 +60,27 @@ public class StockBuyWorker extends Thread {
                 Optional<UserStock> usersStockToChange = userStockService.findUserStockByUserIdAndStockSymbol(
                         stockOrder.getUser().getId(), stockOrder.getSymbol());
 
+                // prvi put kupujemo stock
+                if (usersStockToChange.isEmpty() && !stockOrder.getSymbol().isBlank()) {
+                    Stock stock = stockService.getStockBySymbol(stockOrder.getSymbol());
+                    UserStock userStock = new UserStock(0L, stockOrder.getUser(), stock, 0, 0);
+                    userStockService.save(userStock);
+                    usersStockToChange = userStockService.findUserStockByUserIdAndStockSymbol(
+                            stockOrder.getUser().getId(), stockOrder.getSymbol());
+                }
+
                 // todo DODATI CHECKOVE ZA LIMIT I STOP
                 Balance balance = this.balanceService.findBalanceByUserIdAndCurrency(
                         stockOrder.getUser().getId(), stockOrder.getCurrencyCode());
+                //
+                //                if (balance.getAmount() < (stockOrder.getAmount() * stockOrder.getPrice()){
+                //
+                //                }
 
-                this.balanceService.reserveAmount(
-                        (float) (stockOrder.getAmount() * stockOrder.getPrice()),
-                        stockOrder.getUser().getEmail(),
-                        stockOrder.getCurrencyCode());
+//                this.balanceService.reserveAmount( // duplikat - pare se rezervisu pre nego sto se order doda queue; ovo je zakomentarisano(a ne skroz izbrisano) za svaki slucaj ako se pokaze da je ipak potrebno u nekim slucajevima
+//                        (float) (stockOrder.getAmount() * stockOrder.getPrice()),
+//                        stockOrder.getUser().getEmail(),
+//                        stockOrder.getCurrencyCode());
 
                 if (stockOrder.isAllOrNone()) {
                     usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + stockOrder.getAmount());

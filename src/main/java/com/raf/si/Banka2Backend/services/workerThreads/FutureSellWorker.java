@@ -40,7 +40,7 @@ public class FutureSellWorker extends Thread {
 
                     if (request.getValue().getLimit() != 0) { // ako je postalvjen limit
                         // ako se pojavio neki koji triggeruje limit
-                        if (futureFromTable.isForSale()
+                        if (!futureFromTable.isForSale()
                                 && futureFromTable.getMaintenanceMargin()
                                         > request.getValue().getLimit()
                                 && !futureFromTable
@@ -53,13 +53,13 @@ public class FutureSellWorker extends Thread {
                                     request.getValue().getPrice());
                             futureFromRequest.setForSale(true);
                             futuresRequestsMap.remove(request.getKey());
-                            futureService.updateFuture(futureFromRequest);
+                            futureService.saveFuture(futureFromRequest);
                             next = true;
                         }
                     }
                     if (request.getValue().getStop() != 0) { // ako je postalvjen stop
                         // ako se pojavio neki koji triggeruje stop
-                        if (futureFromTable.isForSale()
+                        if (!futureFromTable.isForSale()
                                 && futureFromTable.getMaintenanceMargin()
                                         < request.getValue().getStop()
                                 && !futureFromTable
@@ -72,7 +72,7 @@ public class FutureSellWorker extends Thread {
                                     request.getValue().getPrice());
                             futureFromRequest.setForSale(true);
                             futuresRequestsMap.remove(request.getKey());
-                            futureService.updateFuture(futureFromRequest);
+                            futureService.saveFuture(futureFromRequest);
                             next = true;
                         }
                     }
@@ -88,7 +88,7 @@ public class FutureSellWorker extends Thread {
         return futuresRequestsMap;
     }
 
-    public void setFuturesRequestsMap(Long singleId, FutureRequestBuySell future) {
+    public void putInFuturesRequestsMap(Long singleId, FutureRequestBuySell future) {
         this.futuresRequestsMap.put(singleId, future);
     }
 

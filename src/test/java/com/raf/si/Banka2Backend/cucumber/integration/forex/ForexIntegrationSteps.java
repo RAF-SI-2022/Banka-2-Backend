@@ -54,15 +54,15 @@ public class ForexIntegrationSteps extends ForexIntegrationTestConfig {
                             .content(
                                     """
 
-                                                            {
+                                            {
 
-                                                              "email": "%s",
+                                              "email": "%s",
 
-                                                              "password": "%s"
+                                              "password": "%s"
 
-                                                            }
+                                            }
 
-                                                            """
+                                            """
                                             .formatted(email, password)))
                     .andExpect(status().isOk())
                     .andReturn();
@@ -170,10 +170,10 @@ public class ForexIntegrationSteps extends ForexIntegrationTestConfig {
         String matrixTime = dateFormat.format(new Date(1999, 5, 31, 0, 0));
         testForex = Forex.builder()
                 .id(1L)
-                .fromCurrencyName("Serbian Dinar")
-                .toCurrencyName("British Pound Sterling")
-                .fromCurrencyCode("RSD")
-                .toCurrencyCode("GBP")
+                .fromCurrencyName("United States Dollar")
+                .toCurrencyName("Russian Ruble")
+                .fromCurrencyCode("USD")
+                .toCurrencyCode("RUB")
                 .bidPrice("1000")
                 .askPrice("500")
                 .exchangeRate("2")
@@ -214,8 +214,8 @@ public class ForexIntegrationSteps extends ForexIntegrationTestConfig {
     public void user_converts_from_one_currency_to_another_with_api()
             throws JsonProcessingException, UnsupportedEncodingException {
         BuySellForexDto dto = new BuySellForexDto();
-        dto.setFromCurrencyCode("RSD");
-        dto.setToCurrencyCode("GBP");
+        dto.setFromCurrencyCode("USD");
+        dto.setToCurrencyCode("RUB");
         dto.setAmount(112);
         MvcResult mvcResult = null;
         String body = new ObjectMapper().writeValueAsString(dto);
