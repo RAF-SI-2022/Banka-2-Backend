@@ -1,5 +1,9 @@
 package com.raf.si.Banka2Backend.cucumber.integration.orderFailures;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.jayway.jsonpath.JsonPath;
 import com.raf.si.Banka2Backend.models.mariadb.User;
 import com.raf.si.Banka2Backend.models.mariadb.orders.*;
@@ -8,16 +12,10 @@ import com.raf.si.Banka2Backend.services.UserService;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-
-import java.io.UnsupportedEncodingException;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class OrderFailuresIntegrationSteps extends OrderIntegrationFailuresTestConfig {
     @Autowired
@@ -33,7 +31,6 @@ public class OrderFailuresIntegrationSteps extends OrderIntegrationFailuresTestC
     protected static Optional<User> loggedInUser;
     protected static Optional<User> testUser;
     private static Order testOrder;
-
 
     @Given("user logs in")
     public void user_logs_in() {
@@ -56,13 +53,13 @@ public class OrderFailuresIntegrationSteps extends OrderIntegrationFailuresTestC
         } catch (Exception e) {
             fail("User failed to login");
         }
-
     }
 
     @When("user not logged in")
     public void user_not_logged_in() {
         token = "";
     }
+
     @Then("user accesses endpoint")
     public void user_accesses_endpoint() {
         try {
@@ -116,13 +113,14 @@ public class OrderFailuresIntegrationSteps extends OrderIntegrationFailuresTestC
                 2,
                 1,
                 "datum",
-                this.userService.findByEmail("anesic3119rn+banka2backend+admin@raf.rs").get(),
+                this.userService
+                        .findByEmail("anesic3119rn+banka2backend+admin@raf.rs")
+                        .get(),
                 0,
                 0,
                 false,
                 false,
-                "usd"
-        ));
+                "usd"));
     }
 
     @When("user logged in")
@@ -147,14 +145,16 @@ public class OrderFailuresIntegrationSteps extends OrderIntegrationFailuresTestC
             fail("User failed to login");
         }
     }
+
     @Then("order not approved")
     public void order_not_approved() {
         try {
-            MvcResult mvcResult = mockMvc.perform(patch("/api/orders/approve/" + (testOrder == null ? 0 : testOrder.getId()))
-                            .contentType("application/json")
-                            .header("Content-Type", "application/json")
-                            .header("Access-Control-Allow-Origin", "*")
-                            .header("Authorization", "Bearer " + token))
+            MvcResult mvcResult = mockMvc.perform(
+                            patch("/api/orders/approve/" + (testOrder == null ? 0 : testOrder.getId()))
+                                    .contentType("application/json")
+                                    .header("Content-Type", "application/json")
+                                    .header("Access-Control-Allow-Origin", "*")
+                                    .header("Authorization", "Bearer " + token))
                     .andExpect(status().isBadRequest())
                     .andReturn();
         } catch (Exception e) {
@@ -165,11 +165,12 @@ public class OrderFailuresIntegrationSteps extends OrderIntegrationFailuresTestC
     @Then("order not denied")
     public void order_not_denied() {
         try {
-            MvcResult mvcResult = mockMvc.perform(patch("/api/orders/deny/" + (testOrder == null ? 0 : testOrder.getId()))
-                            .contentType("application/json")
-                            .header("Content-Type", "application/json")
-                            .header("Access-Control-Allow-Origin", "*")
-                            .header("Authorization", "Bearer " + token))
+            MvcResult mvcResult = mockMvc.perform(
+                            patch("/api/orders/deny/" + (testOrder == null ? 0 : testOrder.getId()))
+                                    .contentType("application/json")
+                                    .header("Content-Type", "application/json")
+                                    .header("Access-Control-Allow-Origin", "*")
+                                    .header("Authorization", "Bearer " + token))
                     .andExpect(status().isBadRequest())
                     .andReturn();
         } catch (Exception e) {

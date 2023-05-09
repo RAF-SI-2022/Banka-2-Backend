@@ -154,7 +154,8 @@ public class StockService {
                         exchangeRepository.findExchangeByAcronym(companyOverview.getString("Exchange"));
 
                 if (exchange.isPresent()) {
-                    stock = Stock.builder().exchange(exchange.get())
+                    stock = Stock.builder()
+                            .exchange(exchange.get())
                             .symbol(symbol)
                             .companyName(companyOverview.getString("Name"))
                             .dividendYield(new BigDecimal(companyOverview.getString("DividendYield")))
@@ -178,7 +179,7 @@ public class StockService {
 
             } catch (IOException | JSONException e) {
                 throw new ExternalAPILimitReachedException();
-            } catch (InterruptedException e){
+            } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
 
@@ -279,7 +280,7 @@ public class StockService {
         Iterator<String> iterator = timeSeries.keys();
 
         Set<String> timestamps = new HashSet<>();
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             timestamps.add(iterator.next());
         }
 
@@ -295,8 +296,8 @@ public class StockService {
 
                 for (int i = 1; i < listTimestamps.size() - 1; i++) {
 
-                    LocalDateTime localDateTime = LocalDateTime.parse(
-                            listTimestamps.get(i), DateTimeFormatter.ofPattern(DATE_PATTERN));
+                    LocalDateTime localDateTime =
+                            LocalDateTime.parse(listTimestamps.get(i), DateTimeFormatter.ofPattern(DATE_PATTERN));
 
                     JSONObject data = timeSeries.getJSONObject(listTimestamps.get(i));
 
@@ -332,8 +333,8 @@ public class StockService {
 
                     if (dayCounter == 5 * 16) break;
 
-                    LocalDateTime localDateTime = LocalDateTime.parse(
-                            listTimestamps.get(i), DateTimeFormatter.ofPattern(DATE_PATTERN));
+                    LocalDateTime localDateTime =
+                            LocalDateTime.parse(listTimestamps.get(i), DateTimeFormatter.ofPattern(DATE_PATTERN));
 
                     if (!initiallocalDateTime.toLocalDate().equals(localDateTime.toLocalDate())) dayCounter++;
 
@@ -412,7 +413,6 @@ public class StockService {
         Stock stock = getStockBySymbol(stockRequest.getStockSymbol());
         BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
 
-
         StockOrder order;
         if (user.getDailyLimit() == null || user.getDailyLimit() <= 0) {
             return ResponseEntity.internalServerError().body("Doslo je do neocekivane greske.");
@@ -439,8 +439,7 @@ public class StockService {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        Balance usersBalance =
-                balanceService.findBalanceByUserIdAndCurrency(user.getId(), order.getCurrencyCode());
+        Balance usersBalance = balanceService.findBalanceByUserIdAndCurrency(user.getId(), order.getCurrencyCode());
         if (usersBalance.getAmount() < price.doubleValue()) {
             return ResponseEntity.status(400).body("Nemate dovoljno novca za ovu operaciju.");
         }

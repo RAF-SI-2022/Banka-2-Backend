@@ -27,8 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.constraints.NotNull;
-
 @Service
 public class OptionService implements OptionServiceInterface {
 
@@ -54,9 +52,8 @@ public class OptionService implements OptionServiceInterface {
             UserStocksRepository userStocksRepository,
             OrderService orderService,
             TransactionService transactionService,
-            BalanceService balanceService
+            BalanceService balanceService) {
 
-    ) {
         this.optionRepository = optionRepository;
         this.userService = userService;
         this.stockService = stockService;
@@ -100,13 +97,15 @@ public class OptionService implements OptionServiceInterface {
         LocalDate date = LocalDate.parse(regularDate, formatter);
         formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
         LocalDateTime dateTime = LocalDateTime.parse(regularDate + " 02:00:00", formatter);
-        long milliseconds = dateTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
+        long milliseconds =
+                dateTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
 
         List<Option> requestedOptions =
                 optionRepository.findAllByStockSymbolAndExpirationDate(stockSymbol.toUpperCase(), date);
         if (requestedOptions.isEmpty()) {
             String parsedDate = "" + milliseconds / 1000;
-//todo            optionRepository.deleteAll();  skloneno da ne bi pravilo bugove (vrati ako bude pravilo probleme kasnije)
+            // todo            optionRepository.deleteAll();  skloneno da ne bi pravilo bugove (vrati ako bude pravilo
+            // probleme kasnije)
             optionRepository.saveAll(getFromExternalApi(stockSymbol, parsedDate));
         }
         return optionRepository.findAllByStockSymbolAndExpirationDate(stockSymbol.toUpperCase(), date);
@@ -194,11 +193,11 @@ public class OptionService implements OptionServiceInterface {
                         amount,
                         premium,
                         this.getTimestamp(),
-                        userFromDB
-                    );
+                        userFromDB);
                 optionOrder = (OptionOrder) this.orderService.save(optionOrder);
-                if(userFromDB.getDailyLimit() == null || userFromDB.getDailyLimit() <= 0) throw new NotEnoughMoneyException();
-                if(userFromDB.getDailyLimit() < premium) {
+                if (userFromDB.getDailyLimit() == null || userFromDB.getDailyLimit() <= 0)
+                    throw new NotEnoughMoneyException();
+                if (userFromDB.getDailyLimit() < premium) {
                     this.orderService.updateOrderStatus(optionOrder.getId(), OrderStatus.WAITING);
                     throw new NotEnoughMoneyException();
                 }
@@ -226,7 +225,8 @@ public class OptionService implements OptionServiceInterface {
 
                 // TODO Smanjiti user balance
                 this.orderService.updateOrderStatus(optionOrder.getId(), OrderStatus.COMPLETE);
-                Transaction transaction = this.transactionService.createTransaction(optionOrder, balance, (float) premium);
+                Transaction transaction =
+                        this.transactionService.createTransaction(optionOrder, balance, (float) premium);
                 this.transactionService.save(transaction);
                 this.balanceService.updateBalance(optionOrder, userFromDB.getEmail(), "USD");
                 return userOptionRepository.save(userOption);
@@ -289,7 +289,6 @@ public class OptionService implements OptionServiceInterface {
             JSONObject options = optionsArray.getJSONObject(0);
 
             JSONArray callsArray = options.getJSONArray("calls");
-
 
             for (int i = 0; i < callsArray.length(); i++) {
 

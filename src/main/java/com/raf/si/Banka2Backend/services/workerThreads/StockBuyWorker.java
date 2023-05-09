@@ -50,6 +50,13 @@ public class StockBuyWorker extends Thread {
         processBuyRequests();
     }
 
+    // TODO ovo treba popraviti, baca null pointer exception i jos mnogo
+    //  drugih gresaka (foreign key, itd), testirati
+    // 2023-05-09 02:29:19.658 ERROR 18608 --- [       Thread-1] o.h.engine
+    // .jdbc.spi.SqlExceptionHelper   : (conn=323) Cannot add or update a
+    // child row: a foreign key constraint fails (`test`.`transactions`,
+    // CONSTRAINT `transactions_ibfk_2` FOREIGN KEY (`order_id`) REFERENCES
+    // `orders` (`id`))
     // todo dodaj limit i stop kada budemo na kubernetesu sa influxDb
     private void processBuyRequests() {
         while (true) {
