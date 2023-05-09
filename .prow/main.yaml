@@ -33,6 +33,7 @@ presubmits:
               git checkout $branch
 
               # Start all microservices
+              docker network create --driver bridge bank2_net || true
               docker compose up -d mariadb
               docker compose up -d flyway
               docker compose up -d mongodb
@@ -72,6 +73,7 @@ postsubmits:
               start-docker.sh
 
               # Start all microservices
+              docker network create --driver bridge bank2_net || true
               docker compose up -d mariadb
               docker compose up -d flyway
               docker compose up -d mongodb
