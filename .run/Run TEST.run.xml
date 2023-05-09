@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run TEST" type="ShConfigurationType">
-    <option name="SCRIPT_TEXT" value="./make local-test" />
+    <option name="SCRIPT_TEXT" value="./run test --local" />
     <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
     <option name="SCRIPT_PATH" value="" />
     <option name="SCRIPT_OPTIONS" value="" />
