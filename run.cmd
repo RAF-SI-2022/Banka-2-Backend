@@ -105,68 +105,71 @@ rem environemnt.
 :init
     setlocal
         rem Disable auto-modification of CR/LF endings
-        echo "Disabling git config core.autocrlf (this repo)..."
+        echo Disabling git config core.autocrlf (this repo)...
         call git config core.autocrlf false
-        echo "Done"
+        echo Done
 
         rem Copy git hooks
-        echo "Copying git hooks..."
-        xcopy "git\hooks" ".git\hooks" /E /C /H /R /K /Y
-        echo "Done"
+        echo Copying git hooks...
+        call xcopy "git\hooks" ".git\hooks" /E /C /H /R /K /Y
+        echo Done
+
+        echo Cleaning old !jdk! folder...
+        call rmdir %jdk% /s /q >NUL 2>&1
+        call del lib\sha_comp_0.txt >NUL 2>&1
+        call del lib\sha_comp_1.txt >NUL 2>&1
+        echo Done
 
         rem Download the package
-        echo "Downloading Amazon Corretto JDK..."
+        echo Downloading Amazon Corretto JDK and checksum...
         call curl -Lo ./lib/%targetJdk% %sourceJdk%
+
         rem Download the checksum
         call curl -Lo ./lib/%targetSha% %sourceSha%
-        echo "Done"
+        echo Done
 
         rem Check SHA256
         cd lib
-        echo "Verifying JDK checksum..."
-        del shacomputed0.txt
-        del shacomputed1.txt
-        set /p shadownload=<%targetSha%
-        >shacomputed0.txt (
+        echo Verifying JDK checksum...
+        set /p sha_dl=<%targetSha%
+
+        rem Calculate hashes
+        >sha_comp_0.txt (
             certutil -hashfile %targetJdk% SHA256
         )
-        >shacomputed1.txt (
-            findstr /r /c:"^[a-z0-9]*$" shacomputed0.txt
+        >sha_comp_1.txt (
+            findstr /r /c:"^[a-z0-9]*$" sha_comp_0.txt
         )
-        fsutil file seteof shacomputed1.txt 64 1> NUL
-        rem File may have multiple lines, but we're only interested
-        rem in the first line, so we'll keep the first var
-        SET count=1
-        FOR /F "tokens=* USEBACKQ" %%F IN (`type shacomputed1.txt`) DO (
-          SET shacomputed!count!=%%F
-          SET /a count=!count!+1
-        )
-        if "!shacomputed1!"=="" (
-            echo "Bad SHA, do ./run init again"
+
+        rem Set EOF after 64 chars and read into var
+        call fsutil file seteof sha_comp_1.txt 64 1> NUL
+        set /p sha_comp=<sha_comp_1.txt
+
+        rem Compare checksums
+        if "!sha_dl!" NEQ "!sha_comp!" (
+            echo Bad SHA, do ./run init again:
+            echo SHA downloaded: !sha_dl!
+            echo SHA computed:   !sha_comp!
             exit 1
         )
-        if not "!shadownload!"=="!shacomputed1!" (
-            echo "Bad SHA, do ./run init again"
-            exit 1
-        )
-        del shacomputed0.txt >NUL
-        del shacomputed1.txt >NUL
-        echo "Done"
+        echo Done
+
+        rem Delete checksum files
+        call del sha_comp_0.txt >NUL 2>&1
+        call del sha_comp_1.txt >NUL 2>&1
 
         rem Unpack
-        echo "Unpacking JDK..."
-        cd lib
-        rmdir %jdk% /s /q
-        tar -xf %targetJdk%
+        echo Unpacking JDK...
+        call tar -xf %targetJdk%
 
         rem Remove residue
         del %targetJdk%
         del %targetSha%
+        cd ..
 
-        rem Move files directly into current dir
-        move /y jdk* %jdk%
-        echo "Done"
-        echo "Init complete"
+        rem Move files directly into jdk dir
+        move /y lib\jdk* %jdk%
+        echo Init complete
     endlocal
 exit /B 0
 
@@ -523,7 +526,7 @@ rem Main script logic.
         set sourceJdk=https://corretto.aws/downloads/latest/%targetJdk%
         set targetSha=amazon-corretto-17-x64-windows-jdk.zip.checksum
         set sourceSha=https://corretto.aws/downloads/latest_sha256/%targetJdk%
-        set jdk=jdk-amazon-corretto-17-x64-windows
+        set jdk=lib\jdk
 
         if "%1" == "" call :dev
         if "%1" == "init" call :init

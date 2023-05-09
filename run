@@ -10,7 +10,7 @@
 init() {
 	# Disable auto-modification of CR/LF endings
 	echo "Disabling git config core.autocrlf (this repo)..."
-	-git config core.autocrlf false
+	git config core.autocrlf false
 	echo "Done"
 
 	# Copy git hooks
@@ -18,8 +18,14 @@ init() {
 	cp -a ./git/hooks/. ./.git/hooks
 	echo "Done"
 
+  echo "Cleaning old $jdk folder..."
+  rm -rf $jdk >/dev/null 2>&1
+  rm -f lib/sha_comp_0.txt >/dev/null 2>&1
+  rm -f lib/sha_comp_1.txt >/dev/null 2>&1
+  echo "Done"
+
 	# Download the package
-	echo "Downloading Amazon Corretto JDK..."
+	echo "Downloading Amazon Corretto JDK and checksum..."
 	curl -L -o ./lib/$targetJdk $sourceJdk
 
 	# Download the checksum
@@ -30,31 +36,35 @@ init() {
 	echo "Verifying JDK checksum..."
 	cd lib
 	echo "  $targetJdk" >> $targetSha
-  if [[ "$os" == "linux" ]]; then
-    sha256sum -c $targetSha
-  fi
   if [[ "$os" == "macos" ]]; then
-    shasum -a 256 -c $targetSha
+    # MacOS
+    shasum -a 256 -c $targetSha || {
+      echo "Bad SHA, do ./run init again"
+      exit 1
+    }
+  else
+    # Linux
+    sha256sum -c $targetSha || {
+      echo "Bad SHA, do ./run init again"
+      exit 1
+    }
   fi
   cd ..
 	echo "Done"
 
 	# Unpack
 	echo "Unpacking JDK..."
-	mkdir -p $jdk
-	tar -xf ./lib/amazon-corretto-$ver-$arch-$os-jdk.$ext -C $jdk
+	mkdir -p ./lib/tmp
+	tar -xf ./lib/$targetJdk -C ./lib/tmp
 
 	# Remove residue
 	rm -f ./lib/$targetJdk
 	rm -f ./lib/$targetSha
 
-	# Move files directly into current dir
-	mv $jdk/amazon-* ./lib/extracted
-	rm -rf $jdk
+	# Move files directly into current $jdk
 	mkdir -p $jdk
-	mv ./lib/extracted/* $jdk
-	rm -rf ./lib/extracted
-	echo "Done"
+	mv ./lib/tmp/amazon-*/* $jdk
+  rm -rf ./lib/tmp
 	echo "Init complete"
 }
 
@@ -167,7 +177,7 @@ devenv() {
 main() {
   ver=17
   os=$(uname)
-  ext=tar.gz
+  ext="tar.gz"
   # Get architecture; if egrep returns nothing, then it's arm64
   if [[ -z $(uname -m | egrep "^(arm.*)|(aarch.*)") ]]; then
     arch="x64"
@@ -177,9 +187,13 @@ main() {
   # Get os and sha commands for each os
   if [[ "$os" == "Linux" ]]; then
     os="linux"
-  fi
-  if [[ "$os" == "Darwin" ]]; then
+  elif [[ "$os" == "Darwin" ]]; then
     os="macos"
+  else
+    # Windows not supported. Use run.cmd instead.
+    # os="windows"
+    # ext="zip"
+    os="linux"
   fi
 
   # File/dir names
@@ -187,7 +201,7 @@ main() {
   sourceJdk=https://corretto.aws/downloads/latest/$targetJdk
   targetSha=amazon-corretto-$ver-$arch-$os-jdk.$ext.checksum
   sourceSha=https://corretto.aws/downloads/latest_sha256/$targetJdk
-  jdk=./lib/jdk-amazon-corretto-$ver-$arch-$os
+  jdk=./lib/jdk
 
   # Parameters
   local=FALSE
