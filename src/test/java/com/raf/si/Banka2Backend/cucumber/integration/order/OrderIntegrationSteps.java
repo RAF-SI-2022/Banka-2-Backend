@@ -1,8 +1,10 @@
 package com.raf.si.Banka2Backend.cucumber.integration.order;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.jayway.jsonpath.JsonPath;
-import com.raf.si.Banka2Backend.models.mariadb.Permission;
-import com.raf.si.Banka2Backend.models.mariadb.Stock;
 import com.raf.si.Banka2Backend.models.mariadb.User;
 import com.raf.si.Banka2Backend.models.mariadb.orders.*;
 import com.raf.si.Banka2Backend.services.OrderService;
@@ -10,18 +12,11 @@ import com.raf.si.Banka2Backend.services.UserService;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-
 import java.io.UnsupportedEncodingException;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 public class OrderIntegrationSteps extends OrderIntegrationTestConfig {
     @Autowired
@@ -59,7 +54,6 @@ public class OrderIntegrationSteps extends OrderIntegrationTestConfig {
         } catch (Exception e) {
             fail("User failed to login");
         }
-
     }
 
     @When("user logged in")
@@ -100,15 +94,20 @@ public class OrderIntegrationSteps extends OrderIntegrationTestConfig {
                 2,
                 1,
                 "datum",
-                this.userService.findByEmail("anesic3119rn+banka2backend+admin@raf.rs").get()
-        ));
+                this.userService
+                        .findByEmail("anesic3119rn+banka2backend+admin@raf.rs")
+                        .get()));
     }
 
     @Then("user gets orders by user id from database")
     public void user_gets_orders_by_user_id_from_database() throws UnsupportedEncodingException {
         MvcResult mvcResult = null;
         try {
-            mvcResult = mockMvc.perform(get("/api/orders/" + this.userService.findByEmail("anesic3119rn+banka2backend+admin@raf.rs").get().getId())
+            mvcResult = mockMvc.perform(get("/api/orders/"
+                                    + this.userService
+                                            .findByEmail("anesic3119rn+banka2backend+admin@raf.rs")
+                                            .get()
+                                            .getId())
                             .contentType("application/json")
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
@@ -135,14 +134,16 @@ public class OrderIntegrationSteps extends OrderIntegrationTestConfig {
                 2,
                 1,
                 "datum",
-                this.userService.findByEmail("anesic3119rn+banka2backend+admin@raf.rs").get(),
+                this.userService
+                        .findByEmail("anesic3119rn+banka2backend+admin@raf.rs")
+                        .get(),
                 0,
                 0,
                 false,
                 false,
-                "usd"
-        ));
+                "usd"));
     }
+
     @Then("user Approves order")
     public void user_approves_order() {
         MvcResult mvcResult = null;
@@ -177,6 +178,5 @@ public class OrderIntegrationSteps extends OrderIntegrationTestConfig {
             fail(e.getMessage());
         }
         this.orderService.removeOrder(testOrder);
-
     }
 }
