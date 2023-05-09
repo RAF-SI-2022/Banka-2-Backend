@@ -1,5 +1,11 @@
 package rs.edu.raf.si.bank2.main.services.workerThreads;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import lombok.SneakyThrows;
 import rs.edu.raf.si.bank2.main.exceptions.BalanceNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.Balance;
 import rs.edu.raf.si.bank2.main.models.mariadb.Future;
@@ -9,12 +15,6 @@ import rs.edu.raf.si.bank2.main.requests.FutureRequestBuySell;
 import rs.edu.raf.si.bank2.main.services.BalanceService;
 import rs.edu.raf.si.bank2.main.services.FutureService;
 import rs.edu.raf.si.bank2.main.services.UserService;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import lombok.SneakyThrows;
 
 public class FutureBuyWorker extends Thread {
 

@@ -6,14 +6,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
-import rs.edu.raf.si.bank2.main.models.mariadb.Currency;
-import rs.edu.raf.si.bank2.main.services.CurrencyService;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import rs.edu.raf.si.bank2.main.models.mariadb.Currency;
+import rs.edu.raf.si.bank2.main.services.CurrencyService;
 
 public class CurrenciesIntegrationSteps extends CurrenciesIntegrationTestConfig {
     @Autowired

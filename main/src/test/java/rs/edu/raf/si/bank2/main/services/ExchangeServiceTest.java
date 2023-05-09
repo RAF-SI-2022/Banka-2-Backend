@@ -3,9 +3,6 @@ package rs.edu.raf.si.bank2.main.services;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-import rs.edu.raf.si.bank2.main.exceptions.ExchangeNotFoundException;
-import rs.edu.raf.si.bank2.main.models.mariadb.Exchange;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.ExchangeRepository;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -15,8 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
-import rs.edu.raf.si.bank2.main.services.ExchangeService;
-import rs.edu.raf.si.bank2.main.services.UserService;
+import rs.edu.raf.si.bank2.main.exceptions.ExchangeNotFoundException;
+import rs.edu.raf.si.bank2.main.models.mariadb.Exchange;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.ExchangeRepository;
 
 @SpringBootTest
 class ExchangeServiceTest {

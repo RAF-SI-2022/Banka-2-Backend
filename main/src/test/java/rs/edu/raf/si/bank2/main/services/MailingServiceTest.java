@@ -4,16 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-import rs.edu.raf.si.bank2.main.models.mariadb.User;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.PasswordResetTokenRepository;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.UserRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import rs.edu.raf.si.bank2.main.services.MailingService;
+import rs.edu.raf.si.bank2.main.models.mariadb.User;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.PasswordResetTokenRepository;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 class MailingServiceTest {

@@ -1,8 +1,8 @@
 package rs.edu.raf.si.bank2.main.responses;
 
-import rs.edu.raf.si.bank2.main.models.mariadb.Permission;
 import java.util.List;
 import lombok.Data;
+import rs.edu.raf.si.bank2.main.models.mariadb.Permission;
 
 @Data
 public class LoginResponse {

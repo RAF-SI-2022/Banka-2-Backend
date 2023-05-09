@@ -1,5 +1,12 @@
 package rs.edu.raf.si.bank2.main.controllers;
 
+import java.util.HashMap;
+import java.util.Optional;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 import rs.edu.raf.si.bank2.main.dto.PasswordRecoveryDto;
 import rs.edu.raf.si.bank2.main.models.mariadb.User;
 import rs.edu.raf.si.bank2.main.requests.LoginRequest;
@@ -8,13 +15,6 @@ import rs.edu.raf.si.bank2.main.services.AuthorisationService;
 import rs.edu.raf.si.bank2.main.services.MailingService;
 import rs.edu.raf.si.bank2.main.services.UserService;
 import rs.edu.raf.si.bank2.main.utils.JwtUtil;
-import java.util.HashMap;
-import java.util.Optional;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin

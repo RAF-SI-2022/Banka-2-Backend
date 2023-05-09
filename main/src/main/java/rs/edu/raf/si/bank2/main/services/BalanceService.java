@@ -1,13 +1,5 @@
 package rs.edu.raf.si.bank2.main.services;
 
-import rs.edu.raf.si.bank2.main.exceptions.*;
-import rs.edu.raf.si.bank2.main.models.mariadb.*;
-import rs.edu.raf.si.bank2.main.models.mariadb.orders.*;
-import rs.edu.raf.si.bank2.main.exceptions.*;
-import rs.edu.raf.si.bank2.main.main.exceptions.*;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.BalanceRepository;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.OrderRepository;
-import rs.edu.raf.si.bank2.main.services.interfaces.BalanceServiceInterface;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -15,9 +7,12 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import rs.edu.raf.si.bank2.main.main.models.mariadb.orders.*;
+import rs.edu.raf.si.bank2.main.exceptions.*;
 import rs.edu.raf.si.bank2.main.models.mariadb.*;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.*;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.BalanceRepository;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.OrderRepository;
+import rs.edu.raf.si.bank2.main.services.interfaces.BalanceServiceInterface;
 
 @Service
 public class BalanceService implements BalanceServiceInterface {

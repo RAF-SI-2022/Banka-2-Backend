@@ -1,17 +1,5 @@
 package rs.edu.raf.si.bank2.main.services;
 
-import rs.edu.raf.si.bank2.main.exceptions.ExchangeNotFoundException;
-import rs.edu.raf.si.bank2.main.exceptions.ExternalAPILimitReachedException;
-import rs.edu.raf.si.bank2.main.exceptions.StockNotFoundException;
-import rs.edu.raf.si.bank2.main.models.mariadb.*;
-import rs.edu.raf.si.bank2.main.models.mariadb.orders.*;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.ExchangeRepository;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.OrderRepository;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.StockHistoryRepository;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.StockRepository;
-import rs.edu.raf.si.bank2.main.requests.StockRequest;
-import rs.edu.raf.si.bank2.main.services.workerThreads.StockBuyWorker;
-import rs.edu.raf.si.bank2.main.services.workerThreads.StockSellWorker;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
@@ -30,11 +18,22 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import rs.edu.raf.si.bank2.main.exceptions.ExchangeNotFoundException;
+import rs.edu.raf.si.bank2.main.exceptions.ExternalAPILimitReachedException;
+import rs.edu.raf.si.bank2.main.exceptions.StockNotFoundException;
+import rs.edu.raf.si.bank2.main.models.mariadb.*;
+import rs.edu.raf.si.bank2.main.models.mariadb.orders.*;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderStatus;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderTradeType;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderType;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.StockOrder;
-import rs.edu.raf.si.bank2.main.models.mariadb.*;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.ExchangeRepository;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.OrderRepository;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.StockHistoryRepository;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.StockRepository;
+import rs.edu.raf.si.bank2.main.requests.StockRequest;
+import rs.edu.raf.si.bank2.main.services.workerThreads.StockBuyWorker;
+import rs.edu.raf.si.bank2.main.services.workerThreads.StockSellWorker;
 
 @Service
 public class StockService {

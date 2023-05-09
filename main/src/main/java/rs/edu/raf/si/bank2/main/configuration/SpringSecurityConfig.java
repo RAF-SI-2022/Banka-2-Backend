@@ -1,7 +1,5 @@
 package rs.edu.raf.si.bank2.main.configuration;
 
-import rs.edu.raf.si.bank2.main.filters.JwtFilter;
-import rs.edu.raf.si.bank2.main.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +11,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import rs.edu.raf.si.bank2.main.filters.JwtFilter;
+import rs.edu.raf.si.bank2.main.services.UserService;
 
 @EnableWebSecurity
 @Configuration

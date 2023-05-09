@@ -1,5 +1,11 @@
 package rs.edu.raf.si.bank2.main.services.workerThreads;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.concurrent.BlockingQueue;
 import rs.edu.raf.si.bank2.main.exceptions.OrderNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.Balance;
 import rs.edu.raf.si.bank2.main.models.mariadb.Stock;
@@ -10,13 +16,6 @@ import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderStatus;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.StockOrder;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.OrderRepository;
 import rs.edu.raf.si.bank2.main.services.*;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.concurrent.BlockingQueue;
 
 public class StockBuyWorker extends Thread {
 

@@ -1,8 +1,7 @@
 package rs.edu.raf.si.bank2.main.services.interfaces;
 
-import rs.edu.raf.si.bank2.main.models.mariadb.Forex;
-
 import java.util.List;
+import rs.edu.raf.si.bank2.main.models.mariadb.Forex;
 
 public interface ForexServiceInterface {
 

@@ -2,6 +2,12 @@ package rs.edu.raf.si.bank2.main.controllers;
 
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import rs.edu.raf.si.bank2.main.exceptions.ExternalAPILimitReachedException;
 import rs.edu.raf.si.bank2.main.exceptions.StockNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
@@ -11,12 +17,6 @@ import rs.edu.raf.si.bank2.main.services.AuthorisationService;
 import rs.edu.raf.si.bank2.main.services.StockService;
 import rs.edu.raf.si.bank2.main.services.UserService;
 import rs.edu.raf.si.bank2.main.services.UserStockService;
-import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @CrossOrigin

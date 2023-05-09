@@ -1,12 +1,12 @@
 package rs.edu.raf.si.bank2.main.services;
 
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.main.models.mariadb.Permission;
 import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.PermissionRepository;
 import rs.edu.raf.si.bank2.main.services.interfaces.PermissionServiceInterface;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class PermissionService implements PermissionServiceInterface {

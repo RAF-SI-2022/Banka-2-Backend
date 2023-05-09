@@ -1,12 +1,12 @@
 package rs.edu.raf.si.bank2.main.services;
 
-import rs.edu.raf.si.bank2.main.models.mariadb.UserStock;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.UserStocksRepository;
-import rs.edu.raf.si.bank2.main.services.interfaces.UserStockServiceInterface;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import rs.edu.raf.si.bank2.main.models.mariadb.UserStock;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.UserStocksRepository;
+import rs.edu.raf.si.bank2.main.services.interfaces.UserStockServiceInterface;
 
 @Service
 public class UserStockService implements UserStockServiceInterface {

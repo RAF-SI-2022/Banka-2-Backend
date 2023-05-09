@@ -4,9 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import rs.edu.raf.si.bank2.main.models.mariadb.Currency;
-import rs.edu.raf.si.bank2.main.models.mariadb.Inflation;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.InflationRepository;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +12,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import rs.edu.raf.si.bank2.main.services.InflationService;
+import rs.edu.raf.si.bank2.main.models.mariadb.Currency;
+import rs.edu.raf.si.bank2.main.models.mariadb.Inflation;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.InflationRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class InflationServiceTest {

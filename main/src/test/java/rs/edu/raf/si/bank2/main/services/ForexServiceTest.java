@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import rs.edu.raf.si.bank2.main.models.mariadb.Forex;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.ForexRepository;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -20,8 +18,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import rs.edu.raf.si.bank2.main.services.ForexService;
-import rs.edu.raf.si.bank2.main.services.UserService;
+import rs.edu.raf.si.bank2.main.models.mariadb.Forex;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.ForexRepository;
 
 @ExtendWith(MockitoExtension.class)
 class ForexServiceTest {

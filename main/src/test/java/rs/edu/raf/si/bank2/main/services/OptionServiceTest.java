@@ -15,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import rs.edu.raf.si.bank2.main.exceptions.*;
 import rs.edu.raf.si.bank2.main.models.mariadb.*;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
-import rs.edu.raf.si.bank2.main.services.*;
 
 @ExtendWith(MockitoExtension.class)
 class OptionServiceTest {

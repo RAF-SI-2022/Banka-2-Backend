@@ -1,9 +1,8 @@
 package rs.edu.raf.si.bank2.main.services.interfaces;
 
-import rs.edu.raf.si.bank2.main.models.mariadb.Inflation;
-
 import java.util.List;
 import java.util.Optional;
+import rs.edu.raf.si.bank2.main.models.mariadb.Inflation;
 
 public interface InflationServiceInterface {
 

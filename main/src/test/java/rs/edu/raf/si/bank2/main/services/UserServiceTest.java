@@ -3,12 +3,6 @@ package rs.edu.raf.si.bank2.main.services;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import rs.edu.raf.si.bank2.main.exceptions.PasswordResetTokenNotFoundException;
-import rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException;
-import rs.edu.raf.si.bank2.main.models.mariadb.PasswordResetToken;
-import rs.edu.raf.si.bank2.main.models.mariadb.User;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.PasswordResetTokenRepository;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.UserRepository;
 import java.util.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +11,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import rs.edu.raf.si.bank2.main.services.UserService;
+import rs.edu.raf.si.bank2.main.exceptions.PasswordResetTokenNotFoundException;
+import rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException;
+import rs.edu.raf.si.bank2.main.models.mariadb.PasswordResetToken;
+import rs.edu.raf.si.bank2.main.models.mariadb.User;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.PasswordResetTokenRepository;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {

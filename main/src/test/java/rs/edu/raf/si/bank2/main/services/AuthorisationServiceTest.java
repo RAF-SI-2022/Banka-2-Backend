@@ -4,12 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import rs.edu.raf.si.bank2.main.models.mariadb.PasswordResetToken;
-import rs.edu.raf.si.bank2.main.models.mariadb.Permission;
-import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
-import rs.edu.raf.si.bank2.main.models.mariadb.User;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.PasswordResetTokenRepository;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.UserRepository;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -22,7 +16,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import rs.edu.raf.si.bank2.main.services.AuthorisationService;
+import rs.edu.raf.si.bank2.main.models.mariadb.PasswordResetToken;
+import rs.edu.raf.si.bank2.main.models.mariadb.Permission;
+import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
+import rs.edu.raf.si.bank2.main.models.mariadb.User;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.PasswordResetTokenRepository;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthorisationServiceTest {

@@ -2,15 +2,6 @@ package rs.edu.raf.si.bank2.main.controllers;
 
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
-import rs.edu.raf.si.bank2.main.exceptions.CurrencyNotFoundException;
-import rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException;
-import rs.edu.raf.si.bank2.main.models.mariadb.*;
-import rs.edu.raf.si.bank2.main.requests.ChangePasswordRequest;
-import rs.edu.raf.si.bank2.main.requests.RegisterRequest;
-import rs.edu.raf.si.bank2.main.requests.UpdateProfileRequest;
-import rs.edu.raf.si.bank2.main.requests.UpdateUserRequest;
-import rs.edu.raf.si.bank2.main.responses.RegisterResponse;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +12,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import rs.edu.raf.si.bank2.main.exceptions.CurrencyNotFoundException;
+import rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.*;
+import rs.edu.raf.si.bank2.main.requests.ChangePasswordRequest;
+import rs.edu.raf.si.bank2.main.requests.RegisterRequest;
+import rs.edu.raf.si.bank2.main.requests.UpdateProfileRequest;
+import rs.edu.raf.si.bank2.main.requests.UpdateUserRequest;
+import rs.edu.raf.si.bank2.main.responses.RegisterResponse;
 import rs.edu.raf.si.bank2.main.services.*;
 
 @RestController

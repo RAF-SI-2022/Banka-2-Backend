@@ -1,12 +1,12 @@
 package rs.edu.raf.si.bank2.main.models.mariadb.orders;
 
-import rs.edu.raf.si.bank2.main.models.mariadb.User;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import rs.edu.raf.si.bank2.main.models.mariadb.User;
 
 @Data
 @Builder

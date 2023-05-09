@@ -6,13 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
-import rs.edu.raf.si.bank2.main.models.mariadb.*;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.CurrencyRepository;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.PermissionRepository;
-import rs.edu.raf.si.bank2.main.requests.FutureRequestBuySell;
-import rs.edu.raf.si.bank2.main.services.BalanceService;
-import rs.edu.raf.si.bank2.main.services.FutureService;
-import rs.edu.raf.si.bank2.main.services.UserService;
 import io.cucumber.core.internal.com.fasterxml.jackson.core.JsonProcessingException;
 import io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.Given;
@@ -24,6 +17,13 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import rs.edu.raf.si.bank2.main.models.mariadb.*;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.CurrencyRepository;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.PermissionRepository;
+import rs.edu.raf.si.bank2.main.requests.FutureRequestBuySell;
+import rs.edu.raf.si.bank2.main.services.BalanceService;
+import rs.edu.raf.si.bank2.main.services.FutureService;
+import rs.edu.raf.si.bank2.main.services.UserService;
 
 public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
 

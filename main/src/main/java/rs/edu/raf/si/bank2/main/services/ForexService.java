@@ -1,9 +1,5 @@
 package rs.edu.raf.si.bank2.main.services;
 
-import rs.edu.raf.si.bank2.main.bootstrap.BootstrapData;
-import rs.edu.raf.si.bank2.main.models.mariadb.Forex;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.ForexRepository;
-import rs.edu.raf.si.bank2.main.services.interfaces.ForexServiceInterface;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -17,6 +13,10 @@ import java.util.Optional;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import rs.edu.raf.si.bank2.main.bootstrap.BootstrapData;
+import rs.edu.raf.si.bank2.main.models.mariadb.Forex;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.ForexRepository;
+import rs.edu.raf.si.bank2.main.services.interfaces.ForexServiceInterface;
 
 @Service
 public class ForexService implements ForexServiceInterface {

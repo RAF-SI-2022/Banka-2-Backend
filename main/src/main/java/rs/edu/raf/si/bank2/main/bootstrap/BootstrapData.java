@@ -1,16 +1,5 @@
 package rs.edu.raf.si.bank2.main.bootstrap;
 
-import rs.edu.raf.si.bank2.main.bootstrap.readers.CurrencyReader;
-import rs.edu.raf.si.bank2.main.exceptions.CurrencyNotFoundException;
-import rs.edu.raf.si.bank2.main.models.mariadb.*;
-import rs.edu.raf.si.bank2.main.models.mariadb.Currency;
-import rs.edu.raf.si.bank2.main.models.mariadb.Exchange;
-import rs.edu.raf.si.bank2.main.models.mariadb.Permission;
-import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
-import rs.edu.raf.si.bank2.main.services.ForexService;
-import rs.edu.raf.si.bank2.main.services.OptionService;
-import rs.edu.raf.si.bank2.main.services.StockService;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -30,9 +19,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import rs.edu.raf.si.bank2.main.main.repositories.mariadb.*;
+import rs.edu.raf.si.bank2.main.bootstrap.readers.CurrencyReader;
+import rs.edu.raf.si.bank2.main.exceptions.CurrencyNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.*;
+import rs.edu.raf.si.bank2.main.models.mariadb.Currency;
+import rs.edu.raf.si.bank2.main.models.mariadb.Exchange;
+import rs.edu.raf.si.bank2.main.models.mariadb.Permission;
+import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
+import rs.edu.raf.si.bank2.main.services.ForexService;
+import rs.edu.raf.si.bank2.main.services.OptionService;
+import rs.edu.raf.si.bank2.main.services.StockService;
 
 @Component
 public class BootstrapData implements CommandLineRunner {
@@ -215,7 +212,8 @@ public class BootstrapData implements CommandLineRunner {
     private Balance getInitialAdminBalance(User admin, String currency) {
         Balance balance = new Balance();
         balance.setUser(admin);
-        Optional<rs.edu.raf.si.bank2.main.models.mariadb.Currency> curr = this.currencyRepository.findCurrencyByCurrencyCode(currency);
+        Optional<rs.edu.raf.si.bank2.main.models.mariadb.Currency> curr =
+                this.currencyRepository.findCurrencyByCurrencyCode(currency);
         if (curr.isEmpty()) throw new CurrencyNotFoundException(currency);
         balance.setCurrency(curr.get());
         balance.setAmount(100000f);

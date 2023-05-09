@@ -1,10 +1,10 @@
 package rs.edu.raf.si.bank2.main.models.mariadb;
 
-import rs.edu.raf.si.bank2.main.models.mariadb.orders.Order;
 import java.sql.Timestamp;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import lombok.*;
+import rs.edu.raf.si.bank2.main.models.mariadb.orders.Order;
 
 @Data
 @ToString(exclude = {"currency", "user"})

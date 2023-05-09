@@ -4,13 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.mockito.Mockito.*;
 
-import rs.edu.raf.si.bank2.main.exceptions.StockNotFoundException;
-import rs.edu.raf.si.bank2.main.models.mariadb.Exchange;
-import rs.edu.raf.si.bank2.main.models.mariadb.Stock;
-import rs.edu.raf.si.bank2.main.models.mariadb.StockHistory;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.ExchangeRepository;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.StockHistoryRepository;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.StockRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -21,7 +14,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import rs.edu.raf.si.bank2.main.services.StockService;
+import rs.edu.raf.si.bank2.main.exceptions.StockNotFoundException;
+import rs.edu.raf.si.bank2.main.models.mariadb.Exchange;
+import rs.edu.raf.si.bank2.main.models.mariadb.Stock;
+import rs.edu.raf.si.bank2.main.models.mariadb.StockHistory;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.ExchangeRepository;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.StockHistoryRepository;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.StockRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class StockServiceTest {

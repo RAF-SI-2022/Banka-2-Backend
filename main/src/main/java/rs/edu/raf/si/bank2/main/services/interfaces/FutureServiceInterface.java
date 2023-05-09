@@ -1,10 +1,10 @@
 package rs.edu.raf.si.bank2.main.services.interfaces;
 
-import rs.edu.raf.si.bank2.main.models.mariadb.Future;
-import rs.edu.raf.si.bank2.main.requests.FutureRequestBuySell;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.http.ResponseEntity;
+import rs.edu.raf.si.bank2.main.models.mariadb.Future;
+import rs.edu.raf.si.bank2.main.requests.FutureRequestBuySell;
 
 public interface FutureServiceInterface {
 

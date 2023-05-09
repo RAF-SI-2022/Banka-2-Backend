@@ -3,13 +3,6 @@ package rs.edu.raf.si.bank2.main.services;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-import rs.edu.raf.si.bank2.main.exceptions.OrderNotFoundException;
-import rs.edu.raf.si.bank2.main.models.mariadb.User;
-import rs.edu.raf.si.bank2.main.models.mariadb.orders.Order;
-import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderStatus;
-import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderTradeType;
-import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderType;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.OrderRepository;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -20,9 +13,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import rs.edu.raf.si.bank2.main.services.BalanceService;
-import rs.edu.raf.si.bank2.main.services.OrderService;
-import rs.edu.raf.si.bank2.main.services.StockService;
+import rs.edu.raf.si.bank2.main.exceptions.OrderNotFoundException;
+import rs.edu.raf.si.bank2.main.models.mariadb.User;
+import rs.edu.raf.si.bank2.main.models.mariadb.orders.Order;
+import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderStatus;
+import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderTradeType;
+import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderType;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.OrderRepository;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {

@@ -1,12 +1,12 @@
 package rs.edu.raf.si.bank2.main.services;
 
-import rs.edu.raf.si.bank2.main.models.mariadb.Inflation;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.InflationRepository;
-import rs.edu.raf.si.bank2.main.services.interfaces.InflationServiceInterface;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import rs.edu.raf.si.bank2.main.models.mariadb.Inflation;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.InflationRepository;
+import rs.edu.raf.si.bank2.main.services.interfaces.InflationServiceInterface;
 
 @Service
 public class InflationService implements InflationServiceInterface {

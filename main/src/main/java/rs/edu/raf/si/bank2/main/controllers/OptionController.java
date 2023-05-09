@@ -2,6 +2,15 @@ package rs.edu.raf.si.bank2.main.controllers;
 
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import rs.edu.raf.si.bank2.main.dto.OptionBuyDto;
 import rs.edu.raf.si.bank2.main.dto.OptionSellDto;
 import rs.edu.raf.si.bank2.main.dto.SellStockUsingOptionDto;
@@ -13,15 +22,6 @@ import rs.edu.raf.si.bank2.main.models.mariadb.User;
 import rs.edu.raf.si.bank2.main.services.OptionService;
 import rs.edu.raf.si.bank2.main.services.UserService;
 import rs.edu.raf.si.bank2.main.utils.OptionDateScraper;
-import java.text.ParseException;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @CrossOrigin
@@ -108,9 +108,9 @@ public class OptionController {
                     .body(optionService.buyStockUsingOption(
                             userOptionId, userOptional.get().getId()));
         } catch (UserNotFoundException
-                 | OptionNotFoundException
-                 | StockNotFoundException
-                 | TooLateToBuyOptionException e) {
+                | OptionNotFoundException
+                | StockNotFoundException
+                | TooLateToBuyOptionException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }

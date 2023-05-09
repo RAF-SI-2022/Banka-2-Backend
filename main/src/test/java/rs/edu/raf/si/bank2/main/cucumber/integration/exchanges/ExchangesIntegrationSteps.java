@@ -8,9 +8,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
-import rs.edu.raf.si.bank2.main.models.mariadb.Exchange;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.ExchangeRepository;
-import rs.edu.raf.si.bank2.main.services.ExchangeService;
 import io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -20,6 +17,9 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import rs.edu.raf.si.bank2.main.models.mariadb.Exchange;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.ExchangeRepository;
+import rs.edu.raf.si.bank2.main.services.ExchangeService;
 
 public class ExchangesIntegrationSteps extends ExchangesIntegrationTestConfig {
     @Autowired

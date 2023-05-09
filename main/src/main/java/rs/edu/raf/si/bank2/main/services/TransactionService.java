@@ -1,5 +1,11 @@
 package rs.edu.raf.si.bank2.main.services;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.main.exceptions.TransactionNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.Balance;
 import rs.edu.raf.si.bank2.main.models.mariadb.Currency;
@@ -11,12 +17,6 @@ import rs.edu.raf.si.bank2.main.models.mariadb.orders.StockOrder;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.TransactionRepository;
 import rs.edu.raf.si.bank2.main.requests.FutureRequestBuySell;
 import rs.edu.raf.si.bank2.main.services.interfaces.TransactionServiceInterface;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class TransactionService implements TransactionServiceInterface {

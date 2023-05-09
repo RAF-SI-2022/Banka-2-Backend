@@ -1,8 +1,8 @@
 package rs.edu.raf.si.bank2.main.requests;
 
-import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
 import java.util.List;
 import lombok.Data;
+import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
 
 @Data
 public class RegisterRequest {

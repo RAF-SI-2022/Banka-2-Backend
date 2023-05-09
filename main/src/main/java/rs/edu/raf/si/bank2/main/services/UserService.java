@@ -1,13 +1,5 @@
 package rs.edu.raf.si.bank2.main.services;
 
-import rs.edu.raf.si.bank2.main.exceptions.PasswordResetTokenNotFoundException;
-import rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException;
-import rs.edu.raf.si.bank2.main.models.mariadb.PasswordResetToken;
-import rs.edu.raf.si.bank2.main.models.mariadb.Permission;
-import rs.edu.raf.si.bank2.main.models.mariadb.User;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.PasswordResetTokenRepository;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.UserRepository;
-import rs.edu.raf.si.bank2.main.services.interfaces.UserServiceInterface;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +8,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import rs.edu.raf.si.bank2.main.exceptions.PasswordResetTokenNotFoundException;
+import rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException;
+import rs.edu.raf.si.bank2.main.models.mariadb.PasswordResetToken;
+import rs.edu.raf.si.bank2.main.models.mariadb.Permission;
+import rs.edu.raf.si.bank2.main.models.mariadb.User;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.PasswordResetTokenRepository;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.UserRepository;
+import rs.edu.raf.si.bank2.main.services.interfaces.UserServiceInterface;
 
 @Service
 public class UserService implements UserDetailsService, UserServiceInterface {

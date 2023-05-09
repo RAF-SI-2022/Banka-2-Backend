@@ -2,15 +2,15 @@ package rs.edu.raf.si.bank2.main.controllers;
 
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
+import javax.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import rs.edu.raf.si.bank2.main.dto.BuySellForexDto;
 import rs.edu.raf.si.bank2.main.exceptions.BalanceNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.Forex;
 import rs.edu.raf.si.bank2.main.services.BalanceService;
 import rs.edu.raf.si.bank2.main.services.ForexService;
-import javax.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin

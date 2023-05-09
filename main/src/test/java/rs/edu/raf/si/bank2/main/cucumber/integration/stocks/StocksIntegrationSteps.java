@@ -6,11 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
-import rs.edu.raf.si.bank2.main.models.mariadb.Exchange;
-import rs.edu.raf.si.bank2.main.models.mariadb.Stock;
-import rs.edu.raf.si.bank2.main.models.mariadb.UserStock;
-import rs.edu.raf.si.bank2.main.services.StockService;
-import rs.edu.raf.si.bank2.main.services.UserStockService;
 import io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -26,6 +21,11 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import rs.edu.raf.si.bank2.main.models.mariadb.Exchange;
+import rs.edu.raf.si.bank2.main.models.mariadb.Stock;
+import rs.edu.raf.si.bank2.main.models.mariadb.UserStock;
+import rs.edu.raf.si.bank2.main.services.StockService;
+import rs.edu.raf.si.bank2.main.services.UserStockService;
 
 public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
 

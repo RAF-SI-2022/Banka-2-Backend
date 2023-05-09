@@ -1,10 +1,9 @@
 package rs.edu.raf.si.bank2.main.services.interfaces;
 
+import java.util.List;
 import rs.edu.raf.si.bank2.main.models.mariadb.Balance;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.ForexOrder;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.Order;
-
-import java.util.List;
 
 public interface BalanceServiceInterface {
     boolean buyOrSellCurrency(

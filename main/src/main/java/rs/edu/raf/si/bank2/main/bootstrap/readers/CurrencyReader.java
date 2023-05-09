@@ -2,10 +2,10 @@ package rs.edu.raf.si.bank2.main.bootstrap.readers;
 
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
-import rs.edu.raf.si.bank2.main.models.mariadb.Inflation;
 import java.io.*;
 import java.util.*;
 import org.springframework.util.ResourceUtils;
+import rs.edu.raf.si.bank2.main.models.mariadb.Inflation;
 
 public class CurrencyReader {
     private List<Inflation> inflations = new ArrayList<>();
@@ -49,7 +49,8 @@ public class CurrencyReader {
         return java.util.Currency.getInstance(currencyCode).getSymbol();
     }
 
-    private List<Inflation> getInflationList(rs.edu.raf.si.bank2.main.models.mariadb.Currency currency) throws IOException {
+    private List<Inflation> getInflationList(rs.edu.raf.si.bank2.main.models.mariadb.Currency currency)
+            throws IOException {
         List<Inflation> result = new ArrayList<>();
         String csvFilePath = "src/main/resources/currencies/inflations.csv";
         CSVReader csvReader = new CSVReader(new FileReader(csvFilePath));

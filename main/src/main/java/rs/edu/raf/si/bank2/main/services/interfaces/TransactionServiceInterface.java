@@ -1,13 +1,12 @@
 package rs.edu.raf.si.bank2.main.services.interfaces;
 
+import java.util.List;
 import rs.edu.raf.si.bank2.main.models.mariadb.Balance;
 import rs.edu.raf.si.bank2.main.models.mariadb.Transaction;
 import rs.edu.raf.si.bank2.main.models.mariadb.TransactionStatus;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.FutureOrder;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.Order;
 import rs.edu.raf.si.bank2.main.requests.FutureRequestBuySell;
-
-import java.util.List;
 
 public interface TransactionServiceInterface {
     Transaction save(Transaction transaction);

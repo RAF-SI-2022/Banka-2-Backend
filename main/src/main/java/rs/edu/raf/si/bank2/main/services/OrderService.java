@@ -1,18 +1,16 @@
 package rs.edu.raf.si.bank2.main.services;
 
-import rs.edu.raf.si.bank2.main.exceptions.OrderNotFoundException;
-import rs.edu.raf.si.bank2.main.models.mariadb.orders.*;
-import rs.edu.raf.si.bank2.main.requests.StockRequest;
-import rs.edu.raf.si.bank2.main.services.interfaces.OrderServiceInterface;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import rs.edu.raf.si.bank2.main.main.models.mariadb.orders.*;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.OrderRepository;
+import rs.edu.raf.si.bank2.main.exceptions.OrderNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.*;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.OrderRepository;
+import rs.edu.raf.si.bank2.main.requests.StockRequest;
+import rs.edu.raf.si.bank2.main.services.interfaces.OrderServiceInterface;
 
 @Service
 public class OrderService implements OrderServiceInterface {
@@ -21,10 +19,7 @@ public class OrderService implements OrderServiceInterface {
     private final BalanceService balanceService;
 
     @Autowired
-    public OrderService(
-            OrderRepository orderRepository,
-            StockService stockService,
-            BalanceService balanceService) {
+    public OrderService(OrderRepository orderRepository, StockService stockService, BalanceService balanceService) {
         this.orderRepository = orderRepository;
         this.stockService = stockService;
         this.balanceService = balanceService;

@@ -1,11 +1,11 @@
 package rs.edu.raf.si.bank2.main.controllers;
 
-import rs.edu.raf.si.bank2.main.exceptions.CurrencyNotFoundException;
-import rs.edu.raf.si.bank2.main.services.CurrencyService;
-import rs.edu.raf.si.bank2.main.services.InflationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import rs.edu.raf.si.bank2.main.exceptions.CurrencyNotFoundException;
+import rs.edu.raf.si.bank2.main.services.CurrencyService;
+import rs.edu.raf.si.bank2.main.services.InflationService;
 
 @RestController
 @CrossOrigin

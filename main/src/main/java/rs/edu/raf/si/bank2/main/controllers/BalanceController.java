@@ -1,14 +1,12 @@
 package rs.edu.raf.si.bank2.main.controllers;
 
-import rs.edu.raf.si.bank2.main.dto.BalanceDto;
-import rs.edu.raf.si.bank2.main.exceptions.*;
-import rs.edu.raf.si.bank2.main.exceptions.*;
-import rs.edu.raf.si.bank2.main.services.BalanceService;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import rs.edu.raf.si.bank2.main.main.exceptions.*;
+import rs.edu.raf.si.bank2.main.dto.BalanceDto;
+import rs.edu.raf.si.bank2.main.exceptions.*;
+import rs.edu.raf.si.bank2.main.services.BalanceService;
 
 @RestController
 @CrossOrigin

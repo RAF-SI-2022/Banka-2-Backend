@@ -4,9 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-import rs.edu.raf.si.bank2.main.exceptions.CurrencyNotFoundException;
-import rs.edu.raf.si.bank2.main.models.mariadb.Currency;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.CurrencyRepository;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +12,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import rs.edu.raf.si.bank2.main.services.CurrencyService;
+import rs.edu.raf.si.bank2.main.exceptions.CurrencyNotFoundException;
+import rs.edu.raf.si.bank2.main.models.mariadb.Currency;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.CurrencyRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class CurrencyServiceTest {

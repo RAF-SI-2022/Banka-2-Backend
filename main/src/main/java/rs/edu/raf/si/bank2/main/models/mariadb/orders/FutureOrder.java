@@ -1,10 +1,10 @@
 package rs.edu.raf.si.bank2.main.models.mariadb.orders;
 
-import rs.edu.raf.si.bank2.main.models.mariadb.User;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
+import rs.edu.raf.si.bank2.main.models.mariadb.User;
 
 @Data
 @Entity

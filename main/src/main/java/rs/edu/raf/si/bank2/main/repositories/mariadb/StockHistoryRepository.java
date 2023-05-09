@@ -1,12 +1,12 @@
 package rs.edu.raf.si.bank2.main.repositories.mariadb;
 
-import rs.edu.raf.si.bank2.main.models.mariadb.StockHistory;
-import rs.edu.raf.si.bank2.main.models.mariadb.StockHistoryType;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import rs.edu.raf.si.bank2.main.models.mariadb.StockHistory;
+import rs.edu.raf.si.bank2.main.models.mariadb.StockHistoryType;
 
 @Repository
 public interface StockHistoryRepository extends JpaRepository<StockHistory, Long> {

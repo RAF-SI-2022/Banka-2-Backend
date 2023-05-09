@@ -2,6 +2,10 @@ package rs.edu.raf.si.bank2.main.controllers;
 
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import rs.edu.raf.si.bank2.main.models.mariadb.Balance;
 import rs.edu.raf.si.bank2.main.models.mariadb.Future;
 import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
@@ -11,10 +15,6 @@ import rs.edu.raf.si.bank2.main.services.AuthorisationService;
 import rs.edu.raf.si.bank2.main.services.BalanceService;
 import rs.edu.raf.si.bank2.main.services.FutureService;
 import rs.edu.raf.si.bank2.main.services.UserService;
-import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin

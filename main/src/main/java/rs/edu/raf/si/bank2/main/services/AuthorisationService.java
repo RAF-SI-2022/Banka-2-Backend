@@ -1,5 +1,9 @@
 package rs.edu.raf.si.bank2.main.services;
 
+import java.util.Calendar;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.main.models.mariadb.PasswordResetToken;
 import rs.edu.raf.si.bank2.main.models.mariadb.Permission;
 import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
@@ -7,10 +11,6 @@ import rs.edu.raf.si.bank2.main.models.mariadb.User;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.PasswordResetTokenRepository;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.PermissionRepository;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.UserRepository;
-import java.util.Calendar;
-import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class AuthorisationService {

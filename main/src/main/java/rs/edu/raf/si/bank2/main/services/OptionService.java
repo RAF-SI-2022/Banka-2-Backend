@@ -1,15 +1,5 @@
 package rs.edu.raf.si.bank2.main.services;
 
-import rs.edu.raf.si.bank2.main.exceptions.*;
-import rs.edu.raf.si.bank2.main.models.mariadb.*;
-import rs.edu.raf.si.bank2.main.exceptions.*;
-import rs.edu.raf.si.bank2.main.main.exceptions.*;
-import rs.edu.raf.si.bank2.main.models.mariadb.orders.OptionOrder;
-import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderStatus;
-import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderTradeType;
-import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderType;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
-import rs.edu.raf.si.bank2.main.services.interfaces.OptionServiceInterface;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -28,9 +18,14 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import rs.edu.raf.si.bank2.main.main.repositories.mariadb.*;
+import rs.edu.raf.si.bank2.main.exceptions.*;
 import rs.edu.raf.si.bank2.main.models.mariadb.*;
+import rs.edu.raf.si.bank2.main.models.mariadb.orders.OptionOrder;
+import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderStatus;
+import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderTradeType;
+import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderType;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
+import rs.edu.raf.si.bank2.main.services.interfaces.OptionServiceInterface;
 
 @Service
 public class OptionService implements OptionServiceInterface {
@@ -118,7 +113,7 @@ public class OptionService implements OptionServiceInterface {
 
     public UserStock buyStockUsingOption(Long userOptionId, Long userId)
             throws TooLateToBuyOptionException, OptionNotInTheMoneyException, OptionNotFoundException,
-            StockNotFoundException {
+                    StockNotFoundException {
 
         Integer contractSize = 100;
         Optional<UserOption> userOptionFromDBOptional = userOptionRepository.findById(userOptionId);

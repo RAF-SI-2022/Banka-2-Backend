@@ -3,8 +3,6 @@ package rs.edu.raf.si.bank2.main.services;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-import rs.edu.raf.si.bank2.main.models.mariadb.Future;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.FutureRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -12,8 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
-import rs.edu.raf.si.bank2.main.services.FutureService;
-import rs.edu.raf.si.bank2.main.services.UserService;
+import rs.edu.raf.si.bank2.main.models.mariadb.Future;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.FutureRepository;
 
 @SpringBootTest
 public class FutureServiceTest {

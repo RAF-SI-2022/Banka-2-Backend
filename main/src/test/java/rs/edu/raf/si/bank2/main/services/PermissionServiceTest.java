@@ -3,9 +3,6 @@ package rs.edu.raf.si.bank2.main.services;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-import rs.edu.raf.si.bank2.main.models.mariadb.Permission;
-import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.PermissionRepository;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -13,7 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import rs.edu.raf.si.bank2.main.services.PermissionService;
+import rs.edu.raf.si.bank2.main.models.mariadb.Permission;
+import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.PermissionRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class PermissionServiceTest {
