@@ -105,7 +105,7 @@ if "%1" == "dev" (
     mvnw spotless:apply
     docker compose stop backend
     docker network create --driver bridge bank2_net
-    docker build -t backend -f ./docker/backend.Dockerfile .
+    docker build -t backend -f ./docker/main.Dockerfile .
     docker tag backend harbor.k8s.elab.rs/banka-2/backend
     docker compose up -d mariadb
     docker compose up -d flyway
@@ -122,7 +122,7 @@ if "%1" == "test" (
     mvnw spotless:apply
     docker compose stop backend
     docker network create --driver bridge bank2_net
-    docker build -t backend -f ./docker/backend.Dockerfile .
+    docker build -t backend -f ./docker/main.Dockerfile .
     docker tag backend harbor.k8s.elab.rs/banka-2/backend
     docker compose up -d mariadb
     docker compose up -d flyway
@@ -143,7 +143,7 @@ if "%1" == "dist" (
     docker compose stop backend
     docker network create --driver bridge bank2_net
     docker tag backend harbor.k8s.elab.rs/banka-2/backend
-    docker build -t backend -f ./docker/backend.Dockerfile .
+    docker build -t backend -f ./docker/main.Dockerfile .
     docker compose up -d mariadb
     docker compose up -d flyway
     docker compose up -d mongodb

@@ -8,16 +8,15 @@
         <version>2.6.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.raf.si</groupId>
+    <groupId>rs.edu.raf.si.bank2</groupId>
     <artifactId>Banka2Backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>Banka2Backend</name>
-    <description>Backend projekat za tim Banka2</description>
+    <name>main</name>
+    <description>Bank-2-Main microservice</description>
     <properties>
         <java.version>17</java.version>
-        <!-- TODO update groupId to correct -->
-        <exec.mainClass>com.raf.si.Banka2Backend.Banka2BackendApplication</exec.mainClass>
+        <exec.mainClass>rs.edu.raf.si.bank2.main.MainApplication</exec.mainClass>
         <version.spotless>2.35.0</version.spotless>
         <!-- JaCoCo Properties -->
         <jacoco.version>0.8.8</jacoco.version>

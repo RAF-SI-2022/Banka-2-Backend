@@ -95,7 +95,7 @@ dev:
 	./mvnw spotless:apply
 	docker compose stop backend
 	docker network create --driver bridge bank2_net
-	docker build -t backend -f ./docker/backend.Dockerfile .
+	docker build -t backend -f ./docker/main.Dockerfile .
 	docker tag backend harbor.k8s.elab.rs/banka-2/backend
 	docker compose up -d mariadb
 	docker compose up -d flyway
@@ -107,7 +107,7 @@ test:
 	./mvnw spotless:apply
 	docker compose stop backend
 	docker network create --driver bridge bank2_net
-	docker build -t backend -f ./docker/backend.Dockerfile .
+	docker build -t backend -f ./docker/main.Dockerfile .
 	docker tag backend harbor.k8s.elab.rs/banka-2/backend
 	docker compose up -d mariadb
 	docker compose up -d flyway
@@ -123,7 +123,7 @@ dist:
 	./mvnw spotless:apply
 	docker compose stop backend
 	docker network create --driver bridge bank2_net
-	docker build -t backend -f ./docker/backend.Dockerfile .
+	docker build -t backend -f ./docker/main.Dockerfile .
 	docker tag backend harbor.k8s.elab.rs/banka-2/backend
 	docker compose up -d mariadb
 	docker compose up -d flyway
