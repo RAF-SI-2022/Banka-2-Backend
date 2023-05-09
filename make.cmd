@@ -160,8 +160,8 @@ if "%1" == "dist" (
 rem Starts frontend and backend on production.
 if "%1" == "prod" (
     :prod
-    docker tag backend harbor.k8s.elab.rs/banka-2/backend
-    docker tag frontend harbor.k8s.elab.rs/banka-2/frontend
+    docker tag backend harbor.k8s.elab.rs/banka-2/backend || (docker image pull harbor.k8s.elab.rs/banka-2/backend && docker tag harbor.k8s.elab.rs/banka-2/backend backend)
+    docker tag frontend harbor.k8s.elab.rs/banka-2/frontend || (docker image pull harbor.k8s.elab.rs/banka-2/frontend && docker tag harbor.k8s.elab.rs/banka-2/frontend frontend)
 	docker compose down
     docker compose up -d mariadb
     docker compose up -d flyway
