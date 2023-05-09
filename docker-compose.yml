@@ -1,0 +1,115 @@
+version: "3.4"
+
+name: bank-2
+
+services:
+
+  mariadb:
+    image: mariadb:10.6
+    container_name: mariadb
+    restart: on-failure
+    expose:
+      - "3306"
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_ROOT_USER: root
+      MARIADB_ROOT_PASSWORD: root
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: [ "CMD", "bash", "/healthcheck.sh" ]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    volumes:
+      - ./docker/healthcheck/mariadb/healthcheck.sh:/healthcheck.sh:ro
+      - ./docker/provision/mariadb/mariadb-init.sql:/docker-entrypoint-initdb.d/mariadb-init.sql:ro
+      - mariadb:/var/lib/mysql
+    networks:
+      - bank2_net
+
+  mongodb:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    container_name: mongodb
+    restart: on-failure
+    expose:
+      - "27017"
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    healthcheck:
+      test: [ "CMD", "bash", "/healthcheck.sh" ]
+      interval: 2s
+      timeout: 10s
+      retries: 5
+      start_period: 25s
+    volumes:
+      - ./docker/healthcheck/mongodb/healthcheck.sh:/healthcheck.sh:ro
+      - ./docker/provision/mongodb/mongodb-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - mongodb:/var/lib/mongodb
+    networks:
+      - bank2_net
+
+  flyway:
+    image: flyway/flyway:9
+    container_name: flyway
+    restart: on-failure
+    command: "-url=jdbc:mariadb://mariadb:3306/dev -schemas=users -user=root -password=root -connectRetries=60 migrate &&
+              -url=jdbc:mariadb://mariadb:3306/test -schemas=users -user=root -password=root -connectRetries=60 migrate &&
+              -url=jdbc:mariadb://mariadb:3306/prod -schemas=users -user=root -password=root -connectRetries=60 migrate"
+    volumes:
+      - ./src/main/resources/db/migration:/flyway/sql
+      - ./flywayConfig:/flyway/conf
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      - bank2_net
+
+  backend:
+    container_name: backend
+    image: harbor.k8s.elab.rs/banka-2/backend
+    expose:
+      - "8080"
+    ports:
+      - "8080:8080"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
+    networks:
+      - bank2_net
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    expose:
+      - "8081"
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+      MYSQL_ROOT_USER: root
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      - bank2_net
+
+
+volumes:
+  mariadb:
+  mongodb:
+
+networks:
+  bank2_net:
+    external: true

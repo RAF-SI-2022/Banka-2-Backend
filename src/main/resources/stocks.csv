@@ -1,0 +1,6 @@
+companyName,outstandingShares,dividendYield,open,high,low,price,volume,lastUpdated,previousClose,change,changePercent,exchange,symbol,website
+Apple Inc,15821900000,0.0058,161.5300,162.4700,161.2700,162.3600,49443818,2023-03-30,160.7700,1.5900,0.9890%,NASDAQ,AAPL,https://www.apple.com
+Alphabet Inc Class A,5956000000,0,100.9100,101.1600,99.7800,100.8900,33050955,2023-03-30,101.3900,-0.5000,-0.4931%,NASDAQ,GOOGL,https://www.abc.xyz
+Amazon.com Inc,10247300000,0,101.5500,103.0400,101.0100,102.0000,53566617,2023-03-30,100.2500,1.7500,1.7456%,NASDAQ,AMZN,https://www.amazon.com
+Tesla Inc,3164100000,0,195.5800,197.3300,194.4200,195.2800,109950980,2023-03-30,193.8800,1.4000,0.7221%,NASDAQ,TSLA,https://www.tesla.com
+Netflix Inc,445347000,0,340.2700,343.2900,335.3000,338.4300,7125903,2023-03-30,332.0300,6.4000,1.9275%,NASDAQ,NFLX,https://www.netflix.com
