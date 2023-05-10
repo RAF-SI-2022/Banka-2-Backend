@@ -351,7 +351,7 @@ public class Main {
                     "--driver", "bridge",
                     NETWORK_NAME
             ).redirectOutput(ProcessBuilder.Redirect.DISCARD)
-                    .redirectError(ProcessBuilder.Redirect.INHERIT)
+                    .redirectError(ProcessBuilder.Redirect.DISCARD)
                     .start();
 
             // if bridge not available, try nat
@@ -361,7 +361,7 @@ public class Main {
                         "--driver", "nat",
                         NETWORK_NAME
                 ).redirectOutput(ProcessBuilder.Redirect.DISCARD)
-                        .redirectError(ProcessBuilder.Redirect.INHERIT)
+                        .redirectError(ProcessBuilder.Redirect.DISCARD)
                         .start();
             }
 
