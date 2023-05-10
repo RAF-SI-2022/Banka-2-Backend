@@ -81,11 +81,11 @@ exit /B 0
 rem Runs any commands other than init through the Java build script with JDK.
 :run
     setlocal
-        %bin%\javac -cp lib\build\src ^
-            -d lib\build\out ^
-            lib\build\src\rs\edu\raf\si\bank2\Main.java
-        cd lib\build\out
-        %bin%\java rs.edu.raf.si.bank2.Main %*
+        %bin%\javac -cp .build\src ^
+            -d .build\out ^
+            .build\src\rs\edu\raf\si\bank2\Main.java
+        set JAVA_HOME=%projectHome%\%jdk%
+        %bin%\java -cp .build\out rs.edu.raf.si.bank2.Main %*
     endlocal
 exit /B 0
 
@@ -105,10 +105,21 @@ rem Main script logic.
             call :init
         ) else (
             if exist %jdk%\bin  (
-                call :run %*
+                call :run "--shellCommand" "cmd" "--shellStartTokenCount" "1" ^
+                 "--shellStartTokens" "/c" %*
             ) else (
-                echo JDK not set up; run ./run init and then try again.
-                exit 1
+                (
+                    (
+                        call java --version >NUL
+                    ) && (
+                        call java -cp .build\out rs.edu.raf.si.bank2.Main ^
+                        "--shellCommand" "cmd" "--shellStartTokenCount" "1" ^
+                        "--shellStartTokens" "/c" %*
+                    )
+                ) ||  (
+                    echo Java not installed!
+                    exit 1
+                )
             )
         )
     endlocal

@@ -11,6 +11,11 @@ import java.util.function.Consumer;
  */
 public class StreamGobbler implements Runnable {
 
+    /**
+     * Consumer that discards any input.
+     */
+    public static final Consumer<String> NUL = (l) -> {
+    };
     private final InputStream inputStream;
     private final Consumer<String> consumer;
 
