@@ -7,13 +7,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static rs.edu.raf.si.bank2.StreamGobbler.NUL;
 
@@ -65,6 +63,14 @@ public class Main {
      */
     private final String startTimestamp;
     /**
+     * Wrapper for logging to CLI.
+     */
+    private final Logger logger;
+    /**
+     * List of all started processes that need to be cleaned up.
+     */
+    private final Set<Process> startedProcesses;
+    /**
      * The shell for this system. Passed by the run script.
      */
     private String shellCommand;
@@ -72,10 +78,6 @@ public class Main {
      * Shell start tokens.
      */
     private List<String> shellStartTokens;
-    /**
-     * Wrapper for logging to CLI.
-     */
-    private Logger logger;
 
     /**
      * Default constructor.
@@ -89,6 +91,7 @@ public class Main {
         argParser = new ArgParser(args);
         startTimestamp = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss")
                 .format(Calendar.getInstance().getTime());
+        startedProcesses = new HashSet<>();
 
         int shellStartTokenCount = 0;
         if (argParser.getArg(1, "--shellCommand").size() != 1) {
@@ -163,6 +166,50 @@ public class Main {
             }
             default -> {
                 logger.error("Undefined command: \"" + command + "\"");
+            }
+        }
+
+        boolean allStopped = true;
+        for (Process p : startedProcesses) {
+            if (p.isAlive()) {
+                allStopped = false;
+                break;
+            }
+        }
+        if (startedProcesses.isEmpty() || allStopped) {
+            logger.info("Done");
+            cleanup();
+            return;
+        }
+
+        logger.info("Done. Press ENTER to exit and kill processes");
+
+        AtomicBoolean kill = new AtomicBoolean(false);
+        executorService.submit(() -> {
+            Scanner sc = new Scanner(System.in);
+            sc.nextLine();
+            kill.set(true);
+        });
+
+        while (true) {
+            if (kill.get()) {
+                break;
+            }
+
+            try {
+                TimeUnit.MILLISECONDS.sleep(300);
+                allStopped = true;
+                for (Process p : startedProcesses) {
+                    if (p.isAlive()) {
+                        allStopped = false;
+                        break;
+                    }
+                }
+                if (allStopped) {
+                    break;
+                }
+            } catch (InterruptedException e) {
+                break;
             }
         }
 
@@ -389,7 +436,7 @@ public class Main {
         ));
 
         try {
-            return new ProcessBuilder(
+            Process p = new ProcessBuilder(
                     makeShellStartCommand(
                             "docker", "run",
                             "--rm",
@@ -403,6 +450,8 @@ public class Main {
                     .redirectOutput(new File(out.toFile().getAbsolutePath()))
                     .redirectError(new File(err.toFile().getAbsolutePath()))
                     .start();
+            startedProcesses.add(p);
+            return p;
         } catch (IOException e) {
             error(e);
             return null;
@@ -549,11 +598,11 @@ public class Main {
                                     )
                             ))
                             .directory(new File(
-                            System.getProperty("user.dir")
-                                    + "/" + m));
+                                    System.getProperty("user.dir")
+                                            + "/" + m));
                     pb.environment().put("MAVEN_OPTS", "-Dspring.profiles" +
                             ".active=local,dev");
-                    pb.start();
+                    startedProcesses.add(pb.start());
                 }
             } catch (IOException e) {
                 error(e);
@@ -638,15 +687,16 @@ public class Main {
     }
 
     /**
-     * Stops auxiliary services or microservices if "--microservices" passed.
+     * Stops auxiliary services or only microservices if "--microservices"
+     * passed.
      */
     public void stop() {
-        if (argParser.hasArg("--all")) {
+        if (!argParser.hasArg("--microservices")) {
             stop(true);
             stop(false);
             return;
         }
-        stop(argParser.hasArg("--microservices"));
+        stop(true);
     }
 
     /**
@@ -669,6 +719,9 @@ public class Main {
     public void cleanup() {
         if (!executorService.isShutdown()) {
             executorService.shutdown();
+        }
+        for (Process p : startedProcesses) {
+            p.destroy();
         }
     }
 

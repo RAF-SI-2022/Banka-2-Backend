@@ -105,16 +105,17 @@ rem Main script logic.
             call :init
         ) else (
             if exist %jdk%\bin  (
-                call :run "--shellCommand" "cmd" "--shellStartTokenCount" "1" ^
-                 "--shellStartTokens" "/c" %*
+                call :run %* ^
+                "--shellCommand" "cmd" "--shellStartTokenCount" "1" ^
+                 "--shellStartTokens" "/c"
             ) else (
                 (
                     (
                         call java --version >NUL
                     ) && (
-                        call java -cp .build\out rs.edu.raf.si.bank2.Main ^
+                        call java -cp .build\out rs.edu.raf.si.bank2.Main %* ^
                         "--shellCommand" "cmd" "--shellStartTokenCount" "1" ^
-                        "--shellStartTokens" "/c" %*
+                        "--shellStartTokens" "/c"
                     )
                 ) ||  (
                     echo Java not installed!
