@@ -4,19 +4,10 @@
 sudo dockerd &
 sudo docker run hello-world
 
-# Test make init
+# Test run init
 cd /home/project
-rm -rf lib/jdk-*
-make init
-
-# Fetch JDK dir
-wd=$(ls lib | egrep "jdk-.*")
-wd=$(pwd)/lib/$wd
-
-# Set JAVA_HOME
-JAVA_HOME=$wd
-export JAVA_HOME="$wd"
+run init
 
 # Test make test
 sudo service docker start
-make test
+run test

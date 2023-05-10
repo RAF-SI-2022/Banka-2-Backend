@@ -243,6 +243,24 @@ public class Main {
     }
 
     /**
+     * Creates a command that starts a new shell with this command in the
+     * specified directory. Use for ProcessBuilder.
+     *
+     * @param dir     where the command should be executed
+     * @param command command to run
+     * @return complete shell command
+     */
+    private List<String> makeShellStartCommand(File dir, String... command) {
+        List<String> res = new LinkedList<>();
+        res.add(shellCommand);
+        res.addAll(shellStartTokens);
+        res.add(String.format(
+                "\"cd %s && %s\"", dir.getAbsolutePath(),
+                String.join(" ", command)));
+        return res;
+    }
+
+    /**
      * Fetches the output directory path.
      *
      * @return output directory path
@@ -395,13 +413,14 @@ public class Main {
      */
     private void buildDockerImage(String microservice) {
         try {
+            File rundir = new File(System.getProperty("user.dir")
+                    + File.separator + microservice);
             if (new ProcessBuilder(
                     makeShellStartCommand(
+                            rundir,
                             "mvnw",
                             "spotless:apply")
-            ).directory(new File(
-                            System.getProperty("user.dir")
-                                    + "/" + microservice))
+            )
                     .redirectOutput(ProcessBuilder.Redirect.DISCARD)
                     .redirectError(ProcessBuilder.Redirect.INHERIT)
                     .start()
@@ -629,8 +648,12 @@ public class Main {
         } else {
             try {
                 for (String m : microservicesToRun) {
+                    File rundir = new File(
+                            System.getProperty("user.dir")
+                                    + File.separator + m);
                     ProcessBuilder pb = new ProcessBuilder(
                             makeShellStartCommand(
+                                    rundir,
                                     "mvnw",
                                     "spotless:apply",
                                     "clean",
@@ -653,9 +676,7 @@ public class Main {
                                             m
                                     ))
                             ))
-                            .directory(new File(
-                                    System.getProperty("user.dir")
-                                            + "/" + m));
+                            .directory(rundir);
                     pb.environment().put("MAVEN_OPTS", "-Dspring.profiles" +
                             ".active=local,dev");
                     startedProcesses.add(pb.start());
@@ -727,6 +748,10 @@ public class Main {
         try {
             // start all services for dependency reasons
             for (String m : MICROSERVICES) {
+                File rundir = new File(
+                        System.getProperty("user.dir")
+                                + File.separator + m);
+
                 if (!local) {
                     runDockerService(m,
                             "java -jar -Dspring.profiles.active=container," +
@@ -736,6 +761,7 @@ public class Main {
 
                     ProcessBuilder pb = new ProcessBuilder(
                             makeShellStartCommand(
+                                    rundir,
                                     "mvnw",
                                     "spotless:apply",
                                     "clean",
@@ -758,9 +784,7 @@ public class Main {
                                             m
                                     ))
                             ))
-                            .directory(new File(
-                                    System.getProperty("user.dir")
-                                            + "/" + m));
+                            .directory(rundir);
                     pb.environment().put("MAVEN_OPTS", "-Dspring.profiles" +
                             ".active=local,test");
                     Process p = pb.start();
@@ -849,9 +873,13 @@ public class Main {
                                 "more information", m));
 
                 // run test
+                File rundir = new File(
+                        System.getProperty("user.dir")
+                                + File.separator + m);
 
                 ProcessBuilder pb = new ProcessBuilder(
                         makeShellStartCommand(
+                                rundir,
                                 "mvnw",
                                 "spotless:apply",
                                 "clean",
@@ -876,9 +904,7 @@ public class Main {
                                         m
                                 ))
                         ))
-                        .directory(new File(
-                                System.getProperty("user.dir")
-                                        + "/" + m));
+                        .directory(rundir);
                 pb.environment().put("MAVEN_OPTS", "-Dspring.profiles" +
                         ".active=local,test");
                 Process p = pb.start();
@@ -906,6 +932,7 @@ public class Main {
 
                 pb = new ProcessBuilder(
                         makeShellStartCommand(
+                                rundir,
                                 "mvnw",
                                 "spotless:apply",
                                 "clean",
@@ -928,9 +955,7 @@ public class Main {
                                         m
                                 ))
                         ))
-                        .directory(new File(
-                                System.getProperty("user.dir")
-                                        + "/" + m));
+                        .directory(rundir);
                 pb.environment().put("MAVEN_OPTS", "-Dspring.profiles" +
                         ".active=local,test");
                 p = pb.start();
@@ -1171,10 +1196,50 @@ public class Main {
     }
 
     /**
-     * Devenv command
+     * DANGER!!! For testing the development environment. Executes Docker
+     * containers in privileged mode. Do NOT use for app development!
      */
     public void devenv() {
-        // TODO: implement
+        try {
+            for (String t : Arrays.asList(
+                    "ubuntu.x64",
+                    "ubuntu.aarch64"
+            )) {
+                String imgName = "test-devenv-" + t.replaceAll("\\.", "-");
+                String path = "./docker/test-devenv." + t + ".Dockerfile";
+                Process p = new ProcessBuilder(
+                        "docker", "build",
+                        "-t", imgName,
+                        "-f", path,
+                        "."
+                )
+                        .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+                        .redirectError(ProcessBuilder.Redirect.INHERIT)
+                        .start();
+                startedProcesses.add(p);
+                if (p.waitFor() != 0) {
+                    logger.error("Error building " + imgName);
+                    continue;
+                }
+
+                p = new ProcessBuilder(
+                        "docker", "run", "--rm", "-it",
+                        "--cap-add=NET_ADMIN", "--privileged",
+                        "--entrypoint", "/home/project/docker/test-devenv.sh",
+                        imgName
+                )
+                        .redirectError(ProcessBuilder.Redirect.INHERIT)
+                        .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+                        .start();
+                startedProcesses.add(p);
+                if (p.waitFor() != 0) {
+                    logger.error("Dev env testing failed on " + imgName);
+                    continue;
+                }
+            }
+        } catch (IOException | InterruptedException e) {
+            logger.error(e);
+        }
     }
 
     /**
