@@ -1,4 +1,4 @@
-
+# TODO update for microservices
 presubmits:
   - name: pull-banka-2-backend-main-sonarqube
     labels:
