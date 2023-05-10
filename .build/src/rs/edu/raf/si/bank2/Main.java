@@ -397,7 +397,7 @@ public class Main {
         try {
             if (new ProcessBuilder(
                     makeShellStartCommand(
-                            "./mvnw",
+                            "mvnw",
                             "spotless:apply")
             ).directory(new File(
                             System.getProperty("user.dir")
@@ -631,7 +631,7 @@ public class Main {
                 for (String m : microservicesToRun) {
                     ProcessBuilder pb = new ProcessBuilder(
                             makeShellStartCommand(
-                                    "./mvnw",
+                                    "mvnw",
                                     "spotless:apply",
                                     "clean",
                                     "compile",
@@ -736,7 +736,7 @@ public class Main {
 
                     ProcessBuilder pb = new ProcessBuilder(
                             makeShellStartCommand(
-                                    "./mvnw",
+                                    "mvnw",
                                     "spotless:apply",
                                     "clean",
                                     "compile",
@@ -852,7 +852,7 @@ public class Main {
 
                 ProcessBuilder pb = new ProcessBuilder(
                         makeShellStartCommand(
-                                "./mvnw",
+                                "mvnw",
                                 "spotless:apply",
                                 "clean",
                                 "compile",
@@ -906,7 +906,7 @@ public class Main {
 
                 pb = new ProcessBuilder(
                         makeShellStartCommand(
-                                "./mvnw",
+                                "mvnw",
                                 "spotless:apply",
                                 "clean",
                                 "compile",

@@ -102,7 +102,14 @@ main() {
   sourceSha=https://corretto.aws/downloads/latest_sha256/$targetJdk
   jdk=lib/jdk
   bin=$jdk/bin
-  terminal=$(which bash || which sh)
+  if which bash >/dev/null 2>&1; then
+    terminal="bash"
+  elif which sh >/dev/null 2>&1; then
+    terminal="sh"
+  else
+    echo "Unknown shell"
+    exit 1
+  fi
 
   if [[ "$1" == "init" ]]; then
     init
