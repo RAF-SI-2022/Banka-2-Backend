@@ -118,7 +118,7 @@ rem Main script logic.
                         "--shellStartTokens" "/c"
                     )
                 ) ||  (
-                    echo Java not installed!
+                    echo Java not installed! Run init or install Java first
                     exit 1
                 )
             )
