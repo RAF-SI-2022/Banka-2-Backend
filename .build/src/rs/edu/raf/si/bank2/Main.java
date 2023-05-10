@@ -681,6 +681,7 @@ public class Main {
      */
     public void test() {
         assertDockerDaemonRunning();
+        int exitCode = 0;
 
         stop(true);
         stop(false);
@@ -817,6 +818,7 @@ public class Main {
                                         m
                                 )
                         );
+                        exitCode = 1;
                     }
 
                     // restart service in normal mode
@@ -897,6 +899,7 @@ public class Main {
                                     m
                             )
                     );
+                    exitCode = 1;
                 }
 
                 // restart service
@@ -937,6 +940,11 @@ public class Main {
         } catch (Exception e) {
             error(e);
             return;
+        }
+
+        if (exitCode != 0) {
+            cleanup();
+            System.exit(1);
         }
     }
 
