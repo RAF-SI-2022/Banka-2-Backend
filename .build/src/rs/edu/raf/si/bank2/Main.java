@@ -443,7 +443,7 @@ public class Main {
             File rundir = new File(System.getProperty("user.dir")
                     + File.separator + microservice);
             if (new ProcessBuilder(
-                    runScriptShCmd(rundir.getAbsolutePath() + File.separator + "mvnw.cmd"),
+                    runScriptShCmd(rundir.getAbsolutePath() + File.separator + "mvnw"),
                     "spotless:apply"
             )
                     .directory(rundir)
@@ -678,7 +678,7 @@ public class Main {
                             System.getProperty("user.dir")
                                     + File.separator + m);
                     ProcessBuilder pb = new ProcessBuilder(
-                            runScriptShCmd(rundir.getAbsolutePath() + File.separator + "mvnw.cmd"),
+                            runScriptShCmd(rundir.getAbsolutePath() + File.separator + "mvnw"),
                             "spotless:apply",
                             "clean",
                             "compile",
@@ -784,7 +784,7 @@ public class Main {
                 } else {
 
                     ProcessBuilder pb = new ProcessBuilder(
-                            runScriptShCmd(rundir.getAbsolutePath() + File.separator + "mvnw.cmd"),
+                            runScriptShCmd(rundir.getAbsolutePath() + File.separator + "mvnw"),
                             "spotless:apply",
                             "clean",
                             "compile",
@@ -900,7 +900,7 @@ public class Main {
                                 + File.separator + m);
 
                 ProcessBuilder pb = new ProcessBuilder(
-                        runScriptShCmd(rundir.getAbsolutePath() + File.separator + "mvnw.cmd"),
+                        runScriptShCmd(rundir.getAbsolutePath() + File.separator + "mvnw"),
                         "spotless:apply",
                         "clean",
                         "compile",
@@ -951,7 +951,7 @@ public class Main {
                 // restart service
 
                 pb = new ProcessBuilder(
-                        runScriptShCmd(rundir.getAbsolutePath() + File.separator + "mvnw.cmd"),
+                        runScriptShCmd(rundir.getAbsolutePath() + File.separator + "mvnw"),
                         "spotless:apply",
                         "clean",
                         "compile",
