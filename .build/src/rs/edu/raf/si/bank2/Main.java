@@ -89,7 +89,7 @@ public class Main {
         executorService = Executors.newCachedThreadPool();
         processHelper = new ProcessHelper(executorService, logger);
         argParser = new ArgParser(args);
-        startTimestamp = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss")
+        startTimestamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
                 .format(Calendar.getInstance().getTime());
         startedProcesses = new HashSet<>();
 
@@ -128,6 +128,11 @@ public class Main {
                 "--shellStartTokens");
     }
 
+    /**
+     * Main
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         new Main(args).run();
     }
@@ -160,6 +165,10 @@ public class Main {
             }
             case "stop" -> {
                 stop();
+            }
+            case "help" -> {
+                help();
+                return;
             }
             case "devenv" -> {
                 devenv();
@@ -415,7 +424,8 @@ public class Main {
     }
 
     /**
-     * Runs a service on Docker with the given Spring profile.
+     * Runs a service on Docker with the given Spring profile. Each started
+     * process is added to {@link #startedProcesses}.
      *
      * @param microservice microservice name
      * @param entrypoint   command to be passed to bash when running
@@ -447,8 +457,8 @@ public class Main {
                             "/bin/bash", "-c",
                             "\"" + entrypoint + "\"")
             )
-                    .redirectOutput(new File(out.toFile().getAbsolutePath()))
-                    .redirectError(new File(err.toFile().getAbsolutePath()))
+                    .redirectOutput(ProcessBuilder.Redirect.appendTo(new File(out.toFile().getAbsolutePath())))
+                    .redirectError(ProcessBuilder.Redirect.appendTo(new File(err.toFile().getAbsolutePath())))
                     .start();
             startedProcesses.add(p);
             return p;
@@ -498,6 +508,28 @@ public class Main {
     }
 
     /**
+     * Checks that the Docker image for each passed microservice exists locally.
+     *
+     * @param microservice microservice name(s)
+     */
+    private void assertDockerImageBuilt(String... microservice) {
+        try {
+            for (String m : microservice) {
+                Process proc = processHelper.startProcessIgnoreOutput(
+                        "docker", "inspect", "--type=image", m
+                );
+                if (proc.waitFor() != 0) {
+                    error(String.format("Image for %s not found. Check that " +
+                            "you have built this image and try again.", m));
+                    return;
+                }
+            }
+        } catch (InterruptedException e) {
+            error(e);
+        }
+    }
+
+    /**
      * "Synchronizes" Docker images on the host/remote by checking whether
      * the image is present on host and tagging it with HARBOR_URL/imgName, or
      * pulling the image from HARBOR_URL/imgName and tagging it with imgName.
@@ -509,7 +541,7 @@ public class Main {
             String remoteName = HARBOR_URL + imgName;
             Process proc = processHelper.startProcessIgnoreOutput(
                     "docker", "inspect", "--type=image",
-                    remoteName, imgName
+                    imgName
             );
             if (proc.waitFor() == 0) {
                 logger.pass("Image " + imgName + " found locally");
@@ -555,24 +587,37 @@ public class Main {
 
         composeDockerHelperServices();
 
+        List<String> microservicesToRun = new LinkedList<>();
+        for (String t : argParser.args()) {
+            for (String m : MICROSERVICES) {
+                if (m.equals(t)) {
+                    microservicesToRun.add(m);
+                }
+            }
+        }
+
+        if (microservicesToRun.isEmpty()) {
+            microservicesToRun = List.of(MICROSERVICES);
+        }
+
         // containerized
         if (!local) {
 
-            for (String t : MICROSERVICES) {
+            for (String t : microservicesToRun) {
                 buildDockerImage(t);
             }
 
             String comm = "java -jar -Dspring.profiles.active=container,dev " +
                     "app.jar";
 
-            for (String m : MICROSERVICES) {
+            for (String m : microservicesToRun) {
                 runDockerService(m, comm);
             }
 
             logger.info("Started microservices");
         } else {
             try {
-                for (String m : MICROSERVICES) {
+                for (String m : microservicesToRun) {
                     ProcessBuilder pb = new ProcessBuilder(
                             makeShellStartCommand(
                                     "mvnw",
@@ -581,21 +626,21 @@ public class Main {
                                     "compile",
                                     "exec:java")
                     )
-                            .redirectOutput(new File(
+                            .redirectOutput(ProcessBuilder.Redirect.appendTo(new File(
                                     String.format(
                                             "%s%s%s.out.log",
                                             getOutDir(),
                                             File.separator,
                                             m
-                                    )
+                                    ))
                             ))
-                            .redirectError(new File(
+                            .redirectError(ProcessBuilder.Redirect.appendTo(new File(
                                     String.format(
                                             "%s%s%s.err.log",
                                             getErrDir(),
                                             File.separator,
                                             m
-                                    )
+                                    ))
                             ))
                             .directory(new File(
                                     System.getProperty("user.dir")
@@ -624,14 +669,334 @@ public class Main {
      * Test command
      */
     public void test() {
-        this.logger.info("Running test...");
+        assertDockerDaemonRunning();
+
+        stop(true);
+        stop(false);
+        createDockerNetwork();
+
+        boolean local = argParser.hasArg("-l", "--local");
+
+        List<String> microservicesToTest = new LinkedList<>();
+        for (String t : argParser.args()) {
+            for (String m : MICROSERVICES) {
+                if (m.equals(t)) {
+                    microservicesToTest.add(m);
+                }
+            }
+        }
+
+        if (microservicesToTest.isEmpty()) {
+            microservicesToTest = List.of(MICROSERVICES);
+        }
+
+        if (!local) {
+            try {
+                for (String m : MICROSERVICES) {
+                    new ProcessBuilder(
+                            "docker", "compose", "rm", "-s", "-f", m
+                    ).redirectError(ProcessBuilder.Redirect.DISCARD)
+                            .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+                            .start()
+                            .waitFor();
+
+                    buildDockerImage(m);
+                }
+            } catch (IOException | InterruptedException e) {
+                error(e);
+                return;
+            }
+        }
+
+        composeDockerHelperServices();
+
+        Map<String, Process> localMicroservices = new HashMap<>();
+
+        try {
+            // start all services for dependency reasons
+            for (String m : MICROSERVICES) {
+                if (!local) {
+                    runDockerService(m,
+                            "java -jar -Dspring.profiles.active=container," +
+                                    "test " +
+                                    "app.jar");
+                } else {
+
+                    ProcessBuilder pb = new ProcessBuilder(
+                            makeShellStartCommand(
+                                    "mvnw",
+                                    "spotless:apply",
+                                    "clean",
+                                    "compile",
+                                    "exec:java")
+                    )
+                            .redirectOutput(ProcessBuilder.Redirect.appendTo(new File(
+                                    String.format(
+                                            "%s%s%s.out.log",
+                                            getOutDir(),
+                                            File.separator,
+                                            m
+                                    ))
+                            ))
+                            .redirectError(ProcessBuilder.Redirect.appendTo(new File(
+                                    String.format(
+                                            "%s%s%s.err.log",
+                                            getErrDir(),
+                                            File.separator,
+                                            m
+                                    ))
+                            ))
+                            .directory(new File(
+                                    System.getProperty("user.dir")
+                                            + "/" + m));
+                    pb.environment().put("MAVEN_OPTS", "-Dspring.profiles" +
+                            ".active=local,test");
+                    Process p = pb.start();
+                    startedProcesses.add(p);
+                    localMicroservices.put(m, p);
+                }
+
+                try {
+                    TimeUnit.SECONDS.sleep(3);
+                } catch (Exception ignored) {
+                    ;
+                }
+            }
+
+            logger.info("Started all microservices");
+
+            // stop service, start tests, then restart service
+            for (String m : microservicesToTest) {
+                if (!local) {
+                    // stop service
+                    new ProcessBuilder(
+                            "docker", "stop", m
+                    ).redirectError(ProcessBuilder.Redirect.DISCARD)
+                            .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+                            .start()
+                            .waitFor();
+
+                    try {
+                        TimeUnit.SECONDS.sleep(3);
+                    } catch (Exception ignored) {
+                        ;
+                    }
+
+                    logger.info(String.format(
+                            "Running tests on %s. Check output and error for " +
+                                    "more information", m));
+
+                    // run test
+                    String entrypoint = "export MAVEN_OPTS=" +
+                            "\"-Dspring.profiles.active=container,test\" " +
+                            "&& mvn clean compile test -DargLine=" +
+                            "\"-Dspring.profiles.active=container,test\"";
+                    Process p = runDockerService(m, entrypoint);
+                    assert p != null;
+                    int c = p.waitFor();
+                    if (c == 0) {
+                        logger.info(
+                                String.format("All tests passed for %s", m));
+                    } else {
+                        logger.error(
+                                String.format(
+                                        "Tests failed for %s. Check output" +
+                                                " and error files for more " +
+                                                "information.",
+                                        m
+                                )
+                        );
+                    }
+
+                    // restart service in normal mode
+                    runDockerService(m,
+                            "java -jar -Dspring.profiles.active=container," +
+                                    "test " +
+                                    "app.jar");
+                    continue;
+                }
+
+                // stop service
+                if (localMicroservices.get(m) == null) {
+                    logger.warn("Could not detect process for microservice " + m);
+                    continue;
+                }
+
+                localMicroservices.get(m).destroy();
+                localMicroservices.get(m).waitFor();
+
+                try {
+                    TimeUnit.SECONDS.sleep(3);
+                } catch (Exception ignored) {
+                    ;
+                }
+
+                logger.info(String.format(
+                        "Running tests on %s. Check output and error for " +
+                                "more information", m));
+
+                // run test
+
+                ProcessBuilder pb = new ProcessBuilder(
+                        makeShellStartCommand(
+                                "mvnw",
+                                "spotless:apply",
+                                "clean",
+                                "compile",
+                                "test",
+                                "-DargLine=\"-Dspring.profiles.active=local," +
+                                        "test\"")
+                )
+                        .redirectOutput(ProcessBuilder.Redirect.appendTo(new File(
+                                String.format(
+                                        "%s%s%s.out.log",
+                                        getOutDir(),
+                                        File.separator,
+                                        m
+                                ))
+                        ))
+                        .redirectError(ProcessBuilder.Redirect.appendTo(new File(
+                                String.format(
+                                        "%s%s%s.err.log",
+                                        getErrDir(),
+                                        File.separator,
+                                        m
+                                ))
+                        ))
+                        .directory(new File(
+                                System.getProperty("user.dir")
+                                        + "/" + m));
+                pb.environment().put("MAVEN_OPTS", "-Dspring.profiles" +
+                        ".active=local,test");
+                Process p = pb.start();
+                startedProcesses.add(p);
+                localMicroservices.put(m, p);
+
+                // wait and restart in normal
+                int c = p.waitFor();
+                if (c == 0) {
+                    logger.info(
+                            String.format("All tests passed for %s", m));
+                } else {
+                    logger.error(
+                            String.format(
+                                    "Tests failed for %s. Check output" +
+                                            " and error files for more " +
+                                            "information.",
+                                    m
+                            )
+                    );
+                }
+
+                // restart service
+
+                pb = new ProcessBuilder(
+                        makeShellStartCommand(
+                                "mvnw",
+                                "spotless:apply",
+                                "clean",
+                                "compile",
+                                "exec:java")
+                )
+                        .redirectOutput(ProcessBuilder.Redirect.appendTo(new File(
+                                String.format(
+                                        "%s%s%s.out.log",
+                                        getOutDir(),
+                                        File.separator,
+                                        m
+                                ))
+                        ))
+                        .redirectError(ProcessBuilder.Redirect.appendTo(new File(
+                                String.format(
+                                        "%s%s%s.err.log",
+                                        getErrDir(),
+                                        File.separator,
+                                        m
+                                ))
+                        ))
+                        .directory(new File(
+                                System.getProperty("user.dir")
+                                        + "/" + m));
+                pb.environment().put("MAVEN_OPTS", "-Dspring.profiles" +
+                        ".active=local,test");
+                p = pb.start();
+                startedProcesses.add(p);
+                localMicroservices.put(m, p);
+            }
+        } catch (Exception e) {
+            error(e);
+            return;
+        }
     }
 
     /**
-     * Dist command
+     * Pushes the selected images to harbor, or all if --all passed.
      */
     public void dist() {
+        boolean all = false;
 
+        List<String> microservicesToRun = new LinkedList<>();
+        for (String t : argParser.args()) {
+            for (String m : MICROSERVICES) {
+                if (m.equals(t)) {
+                    microservicesToRun.add(m);
+                }
+            }
+        }
+
+        if (microservicesToRun.isEmpty()) {
+            microservicesToRun = List.of(MICROSERVICES);
+        }
+
+        if (microservicesToRun.containsAll(List.of(MICROSERVICES))) {
+            all = true;
+        }
+
+        if (all && !argParser.hasArg("-y")) {
+            Scanner scanner = new Scanner(System.in);
+            logger.warn("You're about to push all microservice images to " +
+                    "harbor. Continue? (y/N)");
+            String resp = scanner.nextLine();
+            if (!resp.trim().equalsIgnoreCase("y")) {
+                return;
+            }
+        }
+
+        assertLoggedInToDockerRegistry();
+
+        for (String m : microservicesToRun) {
+
+            assertDockerImageBuilt();
+
+            try {
+
+                String remoteName = HARBOR_URL + m;
+                if (processHelper.startProcessIgnoreOutput(
+                        "docker", "tag",
+                        m, remoteName
+                ).waitFor() != 0) {
+                    error("Failed to tag image " + m
+                            + " as " + remoteName);
+                    return;
+                }
+
+                Process p = new ProcessBuilder(
+                        "docker", "push", remoteName
+                ).redirectError(ProcessBuilder.Redirect.INHERIT)
+                        .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+                        .start();
+                if (p.waitFor() != 0) {
+                    logger.error(
+                            String.format(
+                                    "Failed to push image to harbor: %s",
+                                    m
+                            ));
+                }
+            } catch (IOException | InterruptedException e) {
+                error(e);
+                return;
+            }
+        }
     }
 
     /**
@@ -704,6 +1069,86 @@ public class Main {
      */
     public void clean() {
         // TODO: implement
+    }
+
+    /**
+     * Prints the help menu.
+     */
+    public void help() {
+        String banner = """
+                                
+                .______        ___      .__   __.  __  ___  ___      .______    __    __   __   __       _______ \s
+                |   _  \\      /   \\     |  \\ |  | |  |/  / |__ \\     |   _  \\  |  |  |  | |  | |  |     |       \\\s
+                |  |_)  |    /  ^  \\    |   \\|  | |  '  /     ) |    |  |_)  | |  |  |  | |  | |  |     |  .--.  |
+                |   _  <    /  /_\\  \\   |  . `  | |    <     / /     |   _  <  |  |  |  | |  | |  |     |  |  |  |
+                |  |_)  |  /  _____  \\  |  |\\   | |  .  \\   / /_     |  |_)  | |  `--'  | |  | |  `----.|  '--'  |
+                |______/  /__/     \\__\\ |__| \\__| |__|\\__\\ |____|    |______/   \\______/  |__| |_______||_______/\s\n""";
+        System.out.print(
+                Logger.ANSI_GREEN
+                        .concat(banner)
+                        .concat(Logger.ANSI_RESET)
+                        .concat("\n\nScript for developing and testing " +
+                                "Bank-2" +
+                                " application in local or containerized mode." +
+                                " See instructions for more details.\n\n")
+                        .concat(Logger.ANSI_CYAN)
+                        .concat("\nhelp ")
+                        .concat(Logger.ANSI_RESET + "\n")
+                        .concat("show this menu\n")
+                        .concat(Logger.ANSI_CYAN)
+                        .concat("\ndev [--local] [<microservice>*]")
+                        .concat(Logger.ANSI_RESET + "\n")
+                        .concat("starts the " +
+                                "development stack, which includes the " +
+                                "specified microservices plus frontend " +
+                                "(always). If no microservices specified, " +
+                                "runs all microservices." +
+                                " Microservices are started in Docker, unless" +
+                                " --local is passed.\n")
+                        .concat(Logger.ANSI_CYAN)
+                        .concat("\ntest [--local] [<microservice>*]")
+                        .concat(Logger.ANSI_RESET + "\n")
+                        .concat("runs tests" +
+                                " on all specified microservices. If no " +
+                                "microservices specified, runs tests on all " +
+                                "microservices. Microservices are started in " +
+                                "Docker, unless --local is passed.\n")
+                        .concat(Logger.ANSI_CYAN)
+                        .concat("\ndist [<microservice>*] [-y]")
+                        .concat(Logger.ANSI_RESET + "\n")
+                        .concat("pushes the images of" +
+                                " the specified microservices to harbor. If " +
+                                "no microservices specified, pushes the " +
+                                "images of all microservices. (This requires " +
+                                "confirmation; use -y to skip.)\n")
+                        .concat(Logger.ANSI_CYAN)
+                        .concat("\nstack")
+                        .concat(Logger.ANSI_RESET + "\n")
+                        .concat("restart helper services (MariaDB, " +
+                                "MongoDB, etc.)\n")
+                        .concat(Logger.ANSI_CYAN)
+                        .concat("\nreset")
+                        .concat(Logger.ANSI_RESET + "\n")
+                        .concat("reset helper services. Removes all " +
+                                "helper services and starts them again. Use " +
+                                "this if you're having trouble running the " +
+                                "app.\n")
+                        .concat(Logger.ANSI_CYAN)
+                        .concat("\nstop [--microservices]")
+                        .concat(Logger.ANSI_RESET + "\n")
+                        .concat("stops all running " +
+                                "containers, which includes both helper " +
+                                "services and microservices. If " +
+                                "--microservices specified, then only stops " +
+                                "microservices. *NOTE this does NOT stop " +
+                                "locally started microservices.\n")
+                        .concat(Logger.ANSI_CYAN)
+                        .concat("\nclean")
+                        .concat(Logger.ANSI_RESET + "\n")
+                        .concat("clean residue from running this script. " +
+                                "TODO implement\n")
+                        .concat("\n")
+        );
     }
 
     /**
