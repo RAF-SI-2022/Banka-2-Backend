@@ -17,6 +17,7 @@ presubmits:
 
               SONAR_PROJECT_KEY="Banka-2-Backend-Main"
               SONAR_PROJECT_NAME="Banka-2-Backend-Main"
+              MICROSERVICE="main"
 
               start-docker.sh
 
@@ -37,6 +38,8 @@ presubmits:
               docker compose up -d mariadb
               docker compose up -d flyway
               docker compose up -d mongodb
+              
+              cd $MICROSERVICE
 
               mvn clean verify sonar:sonar -Pcoverage \
                 -Dsonar.host.url=https://sonar.k8s.elab.rs \
@@ -69,6 +72,7 @@ postsubmits:
 
               SONAR_PROJECT_KEY="Banka-2-Backend-Main"
               SONAR_PROJECT_NAME="Banka-2-Backend-Main"
+              MICROSERVICE="main"
 
               start-docker.sh
 
@@ -79,6 +83,8 @@ postsubmits:
               docker compose up -d mongodb
               
               ref=$(git rev-parse --abbrev-ref HEAD)
+              
+              cd $MICROSERVICE
 
               mvn clean verify sonar:sonar -Pcoverage \
                 -Dsonar.host.url=https://sonar.k8s.elab.rs \
