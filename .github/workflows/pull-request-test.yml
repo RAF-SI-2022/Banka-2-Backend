@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         # TODO debug on [ubuntu-22.04, windows-2022, macos-12]
-        os: [ubuntu-22.04]
+        os: [ubuntu-22.04, windows-2022]
     runs-on: ${{ matrix.os }}
     continue-on-error: false
     steps:
@@ -23,8 +23,8 @@ jobs:
       # Take permission of all files
       - run: cd ${{ github.workspace }}
       - run: chmod 777 -R .
-      # Test the repository
-      - run: make test
+      # Test all microservices
+      - run: run test
       # Remove services
       - run: docker compose -v down
 #   report:
