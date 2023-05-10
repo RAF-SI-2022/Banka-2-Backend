@@ -23,7 +23,7 @@ rem environemnt.
         call rmdir %jdk% /s /q >NUL 2>&1
         call del lib\sha_comp_0.txt >NUL 2>&1
         call del lib\sha_comp_1.txt >NUL 2>&1
-        call mkdir -p lib
+        if not exist "lib" mkdir lib
         echo Done
 
         rem Download the package
@@ -79,12 +79,18 @@ rem environemnt.
     endlocal
 exit /B 0
 
-rem Runs any commands other than init through the Java build script with JDK.
-:run
+rem Compiles the .build project.
+:compileBuild
     setlocal
         %bin%\javac -cp .build\src ^
             -d .build\out ^
             .build\src\rs\edu\raf\si\bank2\Main.java
+    endlocal
+exit /B 0
+
+rem Runs any commands other than init through the Java build script with JDK.
+:run
+    setlocal
         set JAVA_HOME=%projectHome%\%jdk%
         %bin%\java -cp .build\out rs.edu.raf.si.bank2.Main %*
     endlocal
@@ -105,6 +111,11 @@ rem Main script logic.
         if "%~1" == "init" (
             call :init
         ) else (
+            if "%~1" == "compileBuild" (
+                call :compileBuild
+                exit 0
+            )
+
             if exist %jdk%\bin  (
                 call :run %* ^
                 "--shellCommand" "cmd" "--shellStartTokenCount" "1" ^

@@ -63,10 +63,14 @@ init() {
 	echo "Init complete"
 }
 
+# Compiles the .build project.
+compileBuild() {
+  $bin/javac -cp .build/src -d .build/out \
+    .build/src/rs/edu/raf/si/bank2/Main.java
+}
+
 # Runs any commands other than init through the Java build script with JDK.
 run() {
-  $bin/javac -cp .build/src -d .build/out \
-    build/src/rs/edu/raf/si/bank2/Main.java
   export JAVA_HOME=$projectHome/$jdk
   $bin/java -cp .build/out rs.edu.raf.si.bank2.Main "$@"
 }
@@ -113,6 +117,8 @@ main() {
 
   if [[ "$1" == "init" ]]; then
     init
+  elif [[ "$1" == "compileBuild" ]]; then
+    compileBuild
   else
     if [ -d "$bin" ]; then
       run "$@" --shellCommand $terminal \

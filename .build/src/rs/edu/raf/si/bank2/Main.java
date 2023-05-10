@@ -261,6 +261,33 @@ public class Main {
     }
 
     /**
+     * Returns the platform-dependent string for executing a local shell script.
+     *
+     * @param scriptFile path to the script
+     * @return command string
+     */
+    private String runScriptShCmd(String scriptFile) {
+        if (!argParser.hasArg("--platform")) {
+            error("Platform not specified, fix run shell script");
+            return null;
+        }
+
+        List<String> toks = argParser.getArg(1, "--platform");
+        if (toks.size() < 1) {
+            error("Platform not specified, fix run shell script");
+            return null;
+        }
+
+        String platform = toks.get(0);
+
+        if (platform.equalsIgnoreCase("windows")) {
+            return scriptFile + ".cmd";
+        }
+
+        return scriptFile;
+    }
+
+    /**
      * Fetches the output directory path.
      *
      * @return output directory path
@@ -416,7 +443,7 @@ public class Main {
             File rundir = new File(System.getProperty("user.dir")
                     + File.separator + microservice);
             if (new ProcessBuilder(
-                    "mvnw",
+                    runScriptShCmd(rundir.getAbsolutePath() + File.separator + "mvnw.cmd"),
                     "spotless:apply"
             )
                     .directory(rundir)
@@ -651,11 +678,11 @@ public class Main {
                             System.getProperty("user.dir")
                                     + File.separator + m);
                     ProcessBuilder pb = new ProcessBuilder(
-                                    "mvnw",
-                                    "spotless:apply",
-                                    "clean",
-                                    "compile",
-                                    "exec:java")
+                            runScriptShCmd(rundir.getAbsolutePath() + File.separator + "mvnw.cmd"),
+                            "spotless:apply",
+                            "clean",
+                            "compile",
+                            "exec:java")
                             .directory(rundir)
                             .redirectOutput(ProcessBuilder.Redirect.appendTo(new File(
                                     String.format(
@@ -757,11 +784,11 @@ public class Main {
                 } else {
 
                     ProcessBuilder pb = new ProcessBuilder(
-                                    "mvnw",
-                                    "spotless:apply",
-                                    "clean",
-                                    "compile",
-                                    "exec:java")
+                            runScriptShCmd(rundir.getAbsolutePath() + File.separator + "mvnw.cmd"),
+                            "spotless:apply",
+                            "clean",
+                            "compile",
+                            "exec:java")
                             .directory(rundir)
                             .redirectOutput(ProcessBuilder.Redirect.appendTo(new File(
                                     String.format(
@@ -873,13 +900,13 @@ public class Main {
                                 + File.separator + m);
 
                 ProcessBuilder pb = new ProcessBuilder(
-                                "mvnw",
-                                "spotless:apply",
-                                "clean",
-                                "compile",
-                                "test",
-                                "-DargLine=\"-Dspring.profiles.active=local," +
-                                        "test\"")
+                        runScriptShCmd(rundir.getAbsolutePath() + File.separator + "mvnw.cmd"),
+                        "spotless:apply",
+                        "clean",
+                        "compile",
+                        "test",
+                        "-DargLine=\"-Dspring.profiles.active=local," +
+                                "test\"")
                         .directory(rundir)
                         .redirectOutput(ProcessBuilder.Redirect.appendTo(new File(
                                 String.format(
@@ -924,11 +951,11 @@ public class Main {
                 // restart service
 
                 pb = new ProcessBuilder(
-                                "mvnw",
-                                "spotless:apply",
-                                "clean",
-                                "compile",
-                                "exec:java")
+                        runScriptShCmd(rundir.getAbsolutePath() + File.separator + "mvnw.cmd"),
+                        "spotless:apply",
+                        "clean",
+                        "compile",
+                        "exec:java")
                         .directory(rundir)
                         .redirectOutput(ProcessBuilder.Redirect.appendTo(new File(
                                 String.format(
@@ -1214,7 +1241,7 @@ public class Main {
                 }
 
                 p = new ProcessBuilder(
-                        "docker", "run", "--rm", "-it",
+                        "docker", "run", "--rm",
                         "--cap-add=NET_ADMIN", "--privileged",
                         "--entrypoint", "/home/project/docker/test-devenv.sh",
                         imgName

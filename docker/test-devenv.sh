@@ -6,8 +6,8 @@ sudo docker run hello-world
 
 # Test run init
 cd /home/project
-run init
+./run init
 
 # Test make test
 sudo service docker start
-run test
+./run test
