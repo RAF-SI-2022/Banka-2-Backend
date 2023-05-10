@@ -13,8 +13,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static rs.edu.raf.si.bank2.StreamGobbler.NUL;
-
 /**
  * The build script for this project.
  */
@@ -336,7 +334,8 @@ public class Main {
     }
 
     /**
-     * Creates/prepares the Docker network.
+     * Creates/prepares the Docker network. Platform-dependent: "bridge" may
+     * not be available on Windows. Try nat.
      */
     private void createDockerNetwork() {
         try {
@@ -347,24 +346,32 @@ public class Main {
                 logger.pass("Docker network " + NETWORK_NAME + " running");
                 return;
             }
-            StringBuilder err = new StringBuilder();
-            proc = processHelper.startProcessWithOutputError(
-                    new ProcessBuilder()
-                            .command(
-                                    "docker", "network", "create",
-                                    "--driver", "bridge",
-                                    NETWORK_NAME),
-                    NUL,
-                    (l) -> {
-                        err.append(l).append("\n");
-                    }
-            );
+            proc = new ProcessBuilder(
+                    "docker", "network", "create",
+                    "--driver", "bridge",
+                    NETWORK_NAME
+            ).redirectOutput(ProcessBuilder.Redirect.DISCARD)
+                    .redirectError(ProcessBuilder.Redirect.INHERIT)
+                    .start();
+
+            // if bridge not available, try nat
+            if (proc.waitFor() != 0) {
+                proc = new ProcessBuilder(
+                        "docker", "network", "create",
+                        "--driver", "nat",
+                        NETWORK_NAME
+                ).redirectOutput(ProcessBuilder.Redirect.DISCARD)
+                        .redirectError(ProcessBuilder.Redirect.INHERIT)
+                        .start();
+            }
+
             if (proc.waitFor() == 0) {
                 logger.pass("Docker network " + NETWORK_NAME + " created");
                 return;
             }
-            error("Failed to create Docker network:\n" + err);
-        } catch (InterruptedException e) {
+
+            error("Failed to create Docker network");
+        } catch (InterruptedException | IOException e) {
             error(e);
         }
     }

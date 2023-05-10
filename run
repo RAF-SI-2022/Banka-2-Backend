@@ -110,7 +110,8 @@ main() {
     if [ -d "$bin" ]; then
       run "$@" --shellCommand $terminal \
         --shellStartTokenCount 1 \
-        --shellStartTokens -c
+        --shellStartTokens -c \
+        --platform nix
     else
       if java --version >/dev/null; then
         echo "Java not installed! Run init or install Java first"
@@ -118,7 +119,8 @@ main() {
         java -cp .build/out rs.edu.raf.si.bank2.Main \
           "$@" --shellCommand $terminal \
           --shellStartTokenCount 1 \
-          --shellStartTokens -c
+          --shellStartTokens -c \
+          --platform nix
       fi
     fi
   fi
