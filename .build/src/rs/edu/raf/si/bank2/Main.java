@@ -416,11 +416,10 @@ public class Main {
             File rundir = new File(System.getProperty("user.dir")
                     + File.separator + microservice);
             if (new ProcessBuilder(
-                    makeShellStartCommand(
-                            rundir,
-                            "mvnw",
-                            "spotless:apply")
+                    "mvnw",
+                    "spotless:apply"
             )
+                    .directory(rundir)
                     .redirectOutput(ProcessBuilder.Redirect.DISCARD)
                     .redirectError(ProcessBuilder.Redirect.INHERIT)
                     .start()
@@ -652,14 +651,12 @@ public class Main {
                             System.getProperty("user.dir")
                                     + File.separator + m);
                     ProcessBuilder pb = new ProcessBuilder(
-                            makeShellStartCommand(
-                                    rundir,
                                     "mvnw",
                                     "spotless:apply",
                                     "clean",
                                     "compile",
                                     "exec:java")
-                    )
+                            .directory(rundir)
                             .redirectOutput(ProcessBuilder.Redirect.appendTo(new File(
                                     String.format(
                                             "%s%s%s.out.log",
@@ -760,14 +757,12 @@ public class Main {
                 } else {
 
                     ProcessBuilder pb = new ProcessBuilder(
-                            makeShellStartCommand(
-                                    rundir,
                                     "mvnw",
                                     "spotless:apply",
                                     "clean",
                                     "compile",
                                     "exec:java")
-                    )
+                            .directory(rundir)
                             .redirectOutput(ProcessBuilder.Redirect.appendTo(new File(
                                     String.format(
                                             "%s%s%s.out.log",
@@ -878,8 +873,6 @@ public class Main {
                                 + File.separator + m);
 
                 ProcessBuilder pb = new ProcessBuilder(
-                        makeShellStartCommand(
-                                rundir,
                                 "mvnw",
                                 "spotless:apply",
                                 "clean",
@@ -887,7 +880,7 @@ public class Main {
                                 "test",
                                 "-DargLine=\"-Dspring.profiles.active=local," +
                                         "test\"")
-                )
+                        .directory(rundir)
                         .redirectOutput(ProcessBuilder.Redirect.appendTo(new File(
                                 String.format(
                                         "%s%s%s.out.log",
@@ -931,14 +924,12 @@ public class Main {
                 // restart service
 
                 pb = new ProcessBuilder(
-                        makeShellStartCommand(
-                                rundir,
                                 "mvnw",
                                 "spotless:apply",
                                 "clean",
                                 "compile",
                                 "exec:java")
-                )
+                        .directory(rundir)
                         .redirectOutput(ProcessBuilder.Redirect.appendTo(new File(
                                 String.format(
                                         "%s%s%s.out.log",
