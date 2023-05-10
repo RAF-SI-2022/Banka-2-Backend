@@ -53,6 +53,7 @@ public class ArgParser {
             case "reset":
             case "stop":
             case "help":
+            case "clean":
             case "devenv":
                 return c;
             default:

@@ -166,6 +166,10 @@ public class Main {
             case "stop" -> {
                 stop();
             }
+            case "clean" -> {
+                clean();
+                return;
+            }
             case "help" -> {
                 help();
                 return;
@@ -1155,7 +1159,7 @@ public class Main {
      * Devenv command
      */
     public void devenv() {
-
+        // TODO: implement
     }
 
     /**
