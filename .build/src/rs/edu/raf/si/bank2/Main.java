@@ -890,10 +890,10 @@ public class Main {
                     // run test
 
                     // will be wrapped in double quotes by ProcBuilder
-                    String entrypoint = "export MAVEN_OPTS=" +
-                            "-Dspring.profiles.active=container,test && " +
+                    String entrypoint = "/bin/bash -c 'export MAVEN_OPTS=" +
+                            "-Dspring.profiles.active=container,test; " +
                             "mvn clean compile test -DargLine=" +
-                            "-Dspring.profiles.active=container,test";
+                            "-Dspring.profiles.active=container,test'";
                     Process p = runDockerService(m, entrypoint, failstop);
                     assert p != null;
                     int c = p.waitFor();
