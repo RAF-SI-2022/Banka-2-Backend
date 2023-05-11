@@ -966,8 +966,8 @@ public class Main {
                                 "test\"")
                         .directory(rundir);
                 if (failstop) {
-                    pb.redirectError(ProcessBuilder.Redirect.DISCARD)
-                            .redirectOutput(ProcessBuilder.Redirect.DISCARD);
+                    pb.redirectError(ProcessBuilder.Redirect.INHERIT)
+                            .redirectOutput(ProcessBuilder.Redirect.INHERIT);
                 } else {
                     pb.redirectOutput(ProcessBuilder.Redirect.appendTo(new File(
                                     String.format(
