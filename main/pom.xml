@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>rs.edu.raf.si.bank2</groupId>
-    <artifactId>Banka2Backend</artifactId>
+    <artifactId>main</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>main</name>
+    <name>Bank-2-Main</name>
     <description>Bank-2-Main microservice</description>
     <properties>
         <java.version>17</java.version>
