@@ -488,7 +488,7 @@ public class Main {
      * @return started process
      */
     private Process runDockerService(String microservice, String entrypoint) {
-        return runDockerService(microservice, entrypoint, false);
+        return runDockerService(microservice, entrypoint, null, false);
     }
 
     /**
@@ -497,12 +497,15 @@ public class Main {
      *
      * @param microservice microservice name
      * @param entrypoint   command to be passed to bash when running
+     * @param environment  map of environment variables to be passed to the
+     *                     service
      * @param inheritIO    whether to redirect IO to inherit or to use log files
      * @return started process
      */
     private Process runDockerService(
             String microservice,
             String entrypoint,
+            Map<String, String> environment,
             boolean inheritIO
     ) {
         Path out = null, err = null;
@@ -528,6 +531,12 @@ public class Main {
             command.add("--entrypoint");
             command.add("/bin/bash");
             command.add("--rm");
+            if (environment != null) {
+                for (Map.Entry<String, String> entry : environment.entrySet()) {
+                    command.add("-e");
+                    command.add(entry.getKey() + "='" + entry.getValue() + "'");
+                }
+            }
             command.add("--name");
             command.add(microservice);
             command.add("--network");
@@ -889,12 +898,11 @@ public class Main {
 
                     // run test
 
-                    // will be wrapped in double quotes by ProcBuilder
-                    String entrypoint = "/bin/bash -c 'export MAVEN_OPTS=" +
-                            "-Dspring.profiles.active=container,test; " +
-                            "mvn clean compile test -DargLine=" +
-                            "-Dspring.profiles.active=container,test'";
-                    Process p = runDockerService(m, entrypoint, failstop);
+                    String entrypoint = "mvn clean compile test " +
+                            "-Dspring.profiles.active=container,test " +
+                            "-DargLine=-Dspring.profiles.active=container,test";
+                    Process p = runDockerService(m, entrypoint, new HashMap<>(),
+                            failstop);
                     assert p != null;
                     int c = p.waitFor();
                     if (c == 0) {
