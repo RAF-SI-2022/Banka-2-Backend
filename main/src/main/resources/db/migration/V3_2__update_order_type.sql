@@ -1,0 +1,3 @@
+ALTER TABLE `orders`
+    MODIFY COLUMN `order_type`    ENUM('STOCK', 'FUTURE', 'FOREX', 'OPTION') NOT NULL;
+
