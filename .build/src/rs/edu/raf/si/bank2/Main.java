@@ -522,19 +522,22 @@ public class Main {
         }
 
         try {
-            ProcessBuilder pb = new ProcessBuilder(
-                    "docker", "run",
-                    "--rm",
-                    "--name", microservice,
-                    "--network", NETWORK_NAME,
-                    "--entrypoint=\"\"",
-                    microservice,
-                    "/bin/bash", "-c",
-                    // wrap in quotes only if no space; otherwise,
-                    // processbuilder will wrap it
-                    entrypoint.matches("[^\\s]*\\s[^\\s]*") ?
-                            entrypoint : "\"" + entrypoint + "\""
-            );
+            List<String> command = new LinkedList<>();
+            command.add("docker");
+            command.add("run");
+            command.add("--entrypoint");
+            command.add("/bin/bash");
+            command.add("--rm");
+            command.add("--name");
+            command.add(microservice);
+            command.add("--network");
+            command.add(NETWORK_NAME);
+            command.add(microservice);
+            command.add("-c");
+            entrypoint = (entrypoint.startsWith("\"") ? "" : "\"") + entrypoint;
+            entrypoint = entrypoint + (entrypoint.endsWith("\"") ? "" : "\"");
+            command.add(entrypoint);
+            ProcessBuilder pb = new ProcessBuilder(command);
 
             if (inheritIO) {
                 pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
