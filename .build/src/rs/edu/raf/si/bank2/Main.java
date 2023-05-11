@@ -530,7 +530,7 @@ public class Main {
                     "--entrypoint=\"\"",
                     microservice,
                     "/bin/bash", "-c",
-                    "\"" + entrypoint + "\""
+                    "'" + entrypoint + "'"
             );
 
             if (inheritIO) {
@@ -884,9 +884,9 @@ public class Main {
                     // run test
 
                     String entrypoint = "export MAVEN_OPTS=" +
-                            "\"-Dspring.profiles.active=container,test\" " +
-                            "&& mvn clean compile test -DargLine=" +
-                            "\"-Dspring.profiles.active=container,test\"";
+                            "-Dspring.profiles.active=container,test; " +
+                            "mvn clean compile test -DargLine=" +
+                            "-Dspring.profiles.active=container,test:";
                     Process p = runDockerService(m, entrypoint, failstop);
                     assert p != null;
                     int c = p.waitFor();
