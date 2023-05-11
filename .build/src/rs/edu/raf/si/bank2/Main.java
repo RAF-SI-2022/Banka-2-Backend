@@ -488,21 +488,41 @@ public class Main {
      * @return started process
      */
     private Process runDockerService(String microservice, String entrypoint) {
-        Path out = Paths.get(String.format(
-                "%s%s%s.out.log",
-                getOutDir(),
-                File.separator,
-                microservice
-        ));
-        Path err = Paths.get(String.format(
-                "%s%s%s.err.log",
-                getErrDir(),
-                File.separator,
-                microservice
-        ));
+        return runDockerService(microservice, entrypoint, false);
+    }
+
+    /**
+     * Runs a service on Docker with the given Spring profile. Each started
+     * process is added to {@link #startedProcesses}.
+     *
+     * @param microservice microservice name
+     * @param entrypoint   command to be passed to bash when running
+     * @param inheritIO    whether to redirect IO to inherit or to use log files
+     * @return started process
+     */
+    private Process runDockerService(
+            String microservice,
+            String entrypoint,
+            boolean inheritIO
+    ) {
+        Path out = null, err = null;
+        if (!inheritIO) {
+            out = Paths.get(String.format(
+                    "%s%s%s.out.log",
+                    getOutDir(),
+                    File.separator,
+                    microservice
+            ));
+            err = Paths.get(String.format(
+                    "%s%s%s.err.log",
+                    getErrDir(),
+                    File.separator,
+                    microservice
+            ));
+        }
 
         try {
-            Process p = new ProcessBuilder(
+            ProcessBuilder pb = new ProcessBuilder(
                     makeShellStartCommand(
                             "docker", "run",
                             "--rm",
@@ -512,10 +532,18 @@ public class Main {
                             microservice,
                             "/bin/bash", "-c",
                             "\"" + entrypoint + "\"")
-            )
-                    .redirectOutput(ProcessBuilder.Redirect.appendTo(new File(out.toFile().getAbsolutePath())))
-                    .redirectError(ProcessBuilder.Redirect.appendTo(new File(err.toFile().getAbsolutePath())))
-                    .start();
+            );
+
+            if (inheritIO) {
+                pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+                pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+            } else {
+                pb.redirectOutput(ProcessBuilder.Redirect.appendTo(
+                        new File(out.toFile().getAbsolutePath())));
+                pb.redirectError(ProcessBuilder.Redirect.appendTo(
+                        new File(err.toFile().getAbsolutePath())));
+            }
+            Process p = pb.start();
             startedProcesses.add(p);
             return p;
         } catch (IOException e) {
@@ -733,6 +761,9 @@ public class Main {
         createDockerNetwork();
 
         boolean local = argParser.hasArg("-l", "--local");
+        boolean failstop = argParser.hasArg("--failstop");
+
+        // fetch microservices to test
 
         List<String> microservicesToTest = new LinkedList<>();
         for (String t : argParser.args()) {
@@ -746,6 +777,8 @@ public class Main {
         if (microservicesToTest.isEmpty()) {
             microservicesToTest = List.of(MICROSERVICES);
         }
+
+        // build microservices if not local
 
         if (!local) {
             try {
@@ -824,9 +857,12 @@ public class Main {
             logger.info("Started all microservices");
 
             // stop service, start tests, then restart service
+
             for (String m : microservicesToTest) {
                 if (!local) {
+
                     // stop service
+
                     new ProcessBuilder(
                             "docker", "stop", m
                     ).redirectError(ProcessBuilder.Redirect.DISCARD)
@@ -840,16 +876,21 @@ public class Main {
                         ;
                     }
 
+
+
                     logger.info(String.format(
                             "Running tests on %s. Check output and error for " +
                                     "more information", m));
 
+
+
                     // run test
+
                     String entrypoint = "export MAVEN_OPTS=" +
                             "\"-Dspring.profiles.active=container,test\" " +
                             "&& mvn clean compile test -DargLine=" +
                             "\"-Dspring.profiles.active=container,test\"";
-                    Process p = runDockerService(m, entrypoint);
+                    Process p = runDockerService(m, entrypoint, failstop);
                     assert p != null;
                     int c = p.waitFor();
                     if (c == 0) {
@@ -865,7 +906,12 @@ public class Main {
                                 )
                         );
                         exitCode = 1;
+                        if (failstop) {
+                            break;
+                        }
                     }
+
+
 
                     // restart service in normal mode
                     runDockerService(m,
@@ -1168,13 +1214,18 @@ public class Main {
                                 " Microservices are started in Docker, unless" +
                                 " --local is passed.\n")
                         .concat(Logger.ANSI_CYAN)
-                        .concat("\ntest [--local] [<microservice>*]")
+                        .concat("\ntest [--local] [<microservice>*] " +
+                                "[--failstop]")
                         .concat(Logger.ANSI_RESET + "\n")
                         .concat("runs tests" +
                                 " on all specified microservices. If no " +
                                 "microservices specified, runs tests on all " +
                                 "microservices. Microservices are started in " +
-                                "Docker, unless --local is passed.\n")
+                                "Docker, unless --local is passed. If " +
+                                "--failstop passed, logging is done to " +
+                                "console instead in the logs folder, and the " +
+                                "process fails on first test failure (no more" +
+                                " tests executed after first failure)\n")
                         .concat(Logger.ANSI_CYAN)
                         .concat("\ndist [<microservice>*] [-y]")
                         .concat(Logger.ANSI_RESET + "\n")
