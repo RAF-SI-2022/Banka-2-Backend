@@ -530,7 +530,10 @@ public class Main {
                     "--entrypoint=\"\"",
                     microservice,
                     "/bin/bash", "-c",
-                    "'" + entrypoint + "'"
+                    // wrap in quotes only if no space; otherwise,
+                    // processbuilder will wrap it
+                    entrypoint.matches("[^\\s]*\\s[^\\s]*") ?
+                            entrypoint : "\"" + entrypoint + "\""
             );
 
             if (inheritIO) {
@@ -883,10 +886,11 @@ public class Main {
 
                     // run test
 
+                    // will be wrapped in double quotes by ProcBuilder
                     String entrypoint = "export MAVEN_OPTS=" +
-                            "-Dspring.profiles.active=container,test; " +
+                            "-Dspring.profiles.active=container,test && " +
                             "mvn clean compile test -DargLine=" +
-                            "-Dspring.profiles.active=container,test:";
+                            "-Dspring.profiles.active=container,test";
                     Process p = runDockerService(m, entrypoint, failstop);
                     assert p != null;
                     int c = p.waitFor();
