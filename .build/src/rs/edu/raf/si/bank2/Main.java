@@ -523,15 +523,14 @@ public class Main {
 
         try {
             ProcessBuilder pb = new ProcessBuilder(
-                    makeShellStartCommand(
-                            "docker", "run",
-                            "--rm",
-                            "--name", microservice,
-                            "--network", NETWORK_NAME,
-                            "--entrypoint=\"\"",
-                            microservice,
-                            "/bin/bash", "-c",
-                            "\"" + entrypoint + "\"")
+                    "docker", "run",
+                    "--rm",
+                    "--name", microservice,
+                    "--network", NETWORK_NAME,
+                    "--entrypoint=\"\"",
+                    microservice,
+                    "/bin/bash", "-c",
+                    "\"" + entrypoint + "\""
             );
 
             if (inheritIO) {
@@ -877,11 +876,9 @@ public class Main {
                     }
 
 
-
                     logger.info(String.format(
                             "Running tests on %s. Check output and error for " +
                                     "more information", m));
-
 
 
                     // run test
@@ -910,7 +907,6 @@ public class Main {
                             break;
                         }
                     }
-
 
 
                     // restart service in normal mode
