@@ -964,24 +964,28 @@ public class Main {
                         "test",
                         "-DargLine=\"-Dspring.profiles.active=local," +
                                 "test\"")
-                        .directory(rundir)
-                        .redirectOutput(ProcessBuilder.Redirect.appendTo(new File(
-                                String.format(
-                                        "%s%s%s.out.log",
-                                        getOutDir(),
-                                        File.separator,
-                                        m
-                                ))
-                        ))
-                        .redirectError(ProcessBuilder.Redirect.appendTo(new File(
-                                String.format(
-                                        "%s%s%s.err.log",
-                                        getErrDir(),
-                                        File.separator,
-                                        m
-                                ))
-                        ))
                         .directory(rundir);
+                if (failstop) {
+                    pb.redirectError(ProcessBuilder.Redirect.DISCARD)
+                            .redirectOutput(ProcessBuilder.Redirect.DISCARD);
+                } else {
+                    pb.redirectOutput(ProcessBuilder.Redirect.appendTo(new File(
+                                    String.format(
+                                            "%s%s%s.out.log",
+                                            getOutDir(),
+                                            File.separator,
+                                            m
+                                    ))
+                            ))
+                            .redirectError(ProcessBuilder.Redirect.appendTo(new File(
+                                    String.format(
+                                            "%s%s%s.err.log",
+                                            getErrDir(),
+                                            File.separator,
+                                            m
+                                    ))
+                            ));
+                }
                 pb.environment().put("MAVEN_OPTS", "-Dspring.profiles" +
                         ".active=local,test");
                 Process p = pb.start();
