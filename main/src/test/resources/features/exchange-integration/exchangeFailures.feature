@@ -11,7 +11,6 @@ Feature: Exchange Failure service
     When user is logged in
     Then get nonexistent exchange by id
 
-
   Scenario: user gets exchange by nonexistent acronym from database
     Given user logs in
     When user is logged in
