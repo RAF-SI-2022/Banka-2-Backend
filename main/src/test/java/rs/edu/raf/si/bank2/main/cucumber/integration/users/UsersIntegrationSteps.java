@@ -159,7 +159,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                         .andExpect(status().isOk())
                         .andReturn();
 
-                        System.out.println(mvcResult.getResponse().getContentAsString());
+                System.out.println(mvcResult.getResponse().getContentAsString());
             }
         } catch (Exception e) {
             fail(e.getMessage());
@@ -584,8 +584,8 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                     .andReturn();
         });
 
-        String expectedMessage = "Request processing failed; nested exception is" +
-                " rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException: User with id <"
+        String expectedMessage = "Request processing failed; nested exception is"
+                + " rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException: User with id <"
                 + testUser.get().getId()
                 + "> not found.";
         String actualMessage = exception.getMessage();
