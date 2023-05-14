@@ -96,7 +96,7 @@ public class StockFailureIntegrationSteps extends StockFailureIntegrationTestCon
 
             String expectedMessage = "Status expected:<200> but was:<404>";
             String actualMessage = exception.getMessage();
-            assertEquals(actualMessage, expectedMessage);
+            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -133,7 +133,7 @@ public class StockFailureIntegrationSteps extends StockFailureIntegrationTestCon
 
             String expectedMessage = "Status expected:<200> but was:<404>";
             String actualMessage = exception.getMessage();
-            assertEquals(actualMessage, expectedMessage);
+            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }

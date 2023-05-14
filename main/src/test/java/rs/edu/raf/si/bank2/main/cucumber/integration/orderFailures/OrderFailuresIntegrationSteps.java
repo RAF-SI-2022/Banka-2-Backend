@@ -75,7 +75,7 @@ public class OrderFailuresIntegrationSteps extends OrderIntegrationFailuresTestC
 
             String expectedMessage = "JWT String argument cannot be null or empty.";
             String actualMessage = exception.getMessage();
-            assertEquals(actualMessage, expectedMessage);
+            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -96,7 +96,7 @@ public class OrderFailuresIntegrationSteps extends OrderIntegrationFailuresTestC
 
             String expectedMessage = "JWT String argument cannot be null or empty.";
             String actualMessage = exception.getMessage();
-            assertEquals(actualMessage, expectedMessage);
+            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }

@@ -62,7 +62,7 @@ public class ExchangeFailuresIntegrationSteps extends ExchangeFailuresIntegratio
 
             String expectedMessage = "JWT String argument cannot be null or empty.";
             String actualMessage = exception.getMessage();
-            assertEquals(actualMessage, expectedMessage);
+            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -119,16 +119,16 @@ public class ExchangeFailuresIntegrationSteps extends ExchangeFailuresIntegratio
             });
 
             String expectedMessage =
-                    "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.main.ExchangeNotFoundException: Requested exchange not found in the database.";
+                    "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.ExchangeNotFoundException: Requested exchange not found in the database.";
             String actualMessage = exception.getMessage();
-            assertEquals(actualMessage, expectedMessage);
+            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }
     }
 
     @Then("user gets exchange by nonexistent acronym from database")
-    public void user_gets_exchange_by_nonexistent_acronym_from_database() {
+    public void user_gets_exchange_by_nonexistent_acronym_from_database() { // todo fix
         try {
             Exception exception = assertThrows(Exception.class, () -> {
                 mockMvc.perform(get("/api/exchange/acronym/" + testExchange.getAcronym())
@@ -141,15 +141,15 @@ public class ExchangeFailuresIntegrationSteps extends ExchangeFailuresIntegratio
             });
 
             String expectedMessage =
-                    "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.main.ExchangeNotFoundException: Requested exchange not found in the database.";
+                    "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.ExchangeNotFoundException: Requested exchange not found in the database.";
             String actualMessage = exception.getMessage();
-            assertEquals(actualMessage, expectedMessage);
+            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }
     }
 
-    @Then("user gets activity of nonexistent exchange by MIC Code from database")
+    @Then("user gets activity of nonexistent exchange by MIC Code from database") // todo fix
     public void user_gets_activity_of_nonexistent_exchange_by_mic_code_from_database() {
         try {
             Exception exception = assertThrows(Exception.class, () -> {
@@ -163,9 +163,9 @@ public class ExchangeFailuresIntegrationSteps extends ExchangeFailuresIntegratio
             });
 
             String expectedMessage =
-                    "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.main.ExchangeNotFoundException: Requested exchange not found in the database.";
+                    "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.ExchangeNotFoundException: Requested exchange not found in the database.";
             String actualMessage = exception.getMessage();
-            assertEquals(actualMessage, expectedMessage);
+            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }
