@@ -1,0 +1,22 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="MainApplication [DEV]" type="Application" factoryName="Application">
+    <option name="INCLUDE_PROVIDED_SCOPE" value="true" />
+    <option name="MAIN_CLASS_NAME" value="rs.edu.raf.si.bank2.main.MainApplication" />
+    <module name="Banka-2-Backend" />
+    <option name="PROGRAM_PARAMETERS" value="local,dev" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="rs.edu.raf.si.bank2.main.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
+      <option name="credential" />
+      <option name="region" />
+      <option name="useCurrentConnection" value="false" />
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
