@@ -12,6 +12,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The build script for this project.
@@ -144,6 +147,26 @@ public class Main {
         );
 
         String command = argParser.command();
+
+        if (command == null) {
+            if (argParser.args().size() > 0) {
+                logger.error(String.format(
+                        "Command %s not found. Do run help to see the help " +
+                                "menu",
+                        argParser.args().get(0).toLowerCase()
+                ));
+            } else {
+                logger.error(
+                        "No command specified, please do run help to all " +
+                                "available commands"
+                );
+            }
+
+            cleanup();
+            return;
+        }
+
+        assertNoWhitespaceInDir();
 
         switch (command.toLowerCase()) {
             case "dev" -> {
@@ -359,6 +382,31 @@ public class Main {
         }
 
         return d;
+    }
+
+    /**
+     * Prints a warning if there are whitespaces in the project path.
+     */
+    private void assertNoWhitespaceInDir() {
+        String currPath = System.getProperty("user.dir");
+        Pattern p = Pattern.compile("\\p{Zs}+");
+        if (!p.matcher(currPath).find()) return;
+        logger.warn("Warning: Whitespaces in project path detected:");
+        logger.warn(currPath);
+        StringBuilder whitespaceHighlighter = new StringBuilder();
+        for (int i = 0; i < currPath.length(); i++) {
+            if (Character.isWhitespace(currPath.charAt(i))) {
+                whitespaceHighlighter.append("^");
+            } else {
+                whitespaceHighlighter.append(" ");
+            }
+        }
+        logger.warn(whitespaceHighlighter.toString());
+        logger.warn("This could cause errors in the script or prevent it from" +
+                " working completely. In order to ensure no errors, please " +
+                "remove whitespaces from the project path. run dev --local " +
+                "and run test --local are known to produce errors when " +
+                "running on a path with whitespaces.");
     }
 
     /**
