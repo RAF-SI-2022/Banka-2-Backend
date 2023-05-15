@@ -30,7 +30,7 @@ jobs:
       #   each service
       - run: ./run stack
       - run: cd main
-      - run: bash -c "mvnw clean compile test -DargLine=spring.profiles.active=local,test"
+      - run: /home/runner/work/Banka-2-Backend/Banka-2-Backend/mvnw clean compile test -DargLine=spring.profiles.active=local,test"
       # Remove services
       - run: docker compose -v down
 #   report:
