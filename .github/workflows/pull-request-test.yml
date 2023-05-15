@@ -30,7 +30,7 @@ jobs:
       #   each service
       - run: ./run stack
       - run: cd main
-      - run: ./mvnw clean compile test -DargLine=spring.profiles.active=local,test
+      - run: bash -c "mvnw clean compile test -DargLine=spring.profiles.active=local,test"
       # Remove services
       - run: docker compose -v down
 #   report:
