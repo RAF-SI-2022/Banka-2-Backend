@@ -1001,6 +1001,15 @@ public class Main {
             processHelper.startProcessIgnoreOutput(
                     "docker", "compose", "down").waitFor();
             for (String name : HELPER_SERVICES) {
+                Process proc = processHelper.startProcessIgnoreOutput(
+                        "docker", "inspect", "--type=image", name
+                );
+                if (proc.waitFor() == 0) {
+                    logger.info("(Re)starting service " + name);
+                } else {
+                    logger.info("Pulling service image " + name);
+                }
+
                 processHelper.startProcessIgnoreOutput(
                         "docker", "compose", "up", "-d", name).waitFor();
             }
