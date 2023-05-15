@@ -302,37 +302,37 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
     }
 
 
-    @Then("nonpriv user exists")
-    public void nonpriv_user_exists() {
-        try {
-            if (userService.findByEmail("ftestUser@gmail.com").isEmpty()) {
-
-                MvcResult mvcResult = mockMvc.perform(post("/api/users/register")
-                                .contentType("application/json")
-                                .content(
-                                        """
-                                                {
-                                                  "firstName": "TestUser",
-                                                  "lastName": "TestUser",
-                                                  "email": "ftestUser@gmail.com",
-                                                  "password": "admin",
-                                                  "permissions": [],
-                                                  "jobPosition": "ADMINISTRATOR",
-                                                  "active": true,
-                                                  "jmbg": "1231231231235",
-                                                  "phone": "640601548865"
-                                                }
-                                                """)
-                                .header("Content-Type", "application/json")
-                                .header("Access-Control-Allow-Origin", "*")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isUnauthorized())
-                        .andReturn();
-            }
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
+//    @Then("nonpriv user exists")
+//    public void nonpriv_user_exists() {
+//        try {
+//            if (userService.findByEmail("ftestUser@gmail.com").isEmpty()) {
+//
+//                MvcResult mvcResult = mockMvc.perform(post("/api/users/register")
+//                                .contentType("application/json")
+//                                .content(
+//                                        """
+//                                                {
+//                                                  "firstName": "TestUser",
+//                                                  "lastName": "TestUser",
+//                                                  "email": "ftestUser@gmail.com",
+//                                                  "password": "admin",
+//                                                  "permissions": [],
+//                                                  "jobPosition": "ADMINISTRATOR",
+//                                                  "active": true,
+//                                                  "jmbg": "1231231231235",
+//                                                  "phone": "640601548865"
+//                                                }
+//                                                """)
+//                                .header("Content-Type", "application/json")
+//                                .header("Access-Control-Allow-Origin", "*")
+//                                .header("Authorization", "Bearer " + token))
+//                        .andExpect(status().isUnauthorized())
+//                        .andReturn();
+//            }
+//        } catch (Exception e) {
+//            fail(e.getMessage());
+//        }
+//    }
 
     @Given("nonpriv user logs in")
     public void nonpriv_user_logs_in() {

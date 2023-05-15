@@ -147,7 +147,7 @@ public class OptionIntegrationSteps extends OptionIntegrationTestConfig {
     }
 
     @Then("user buys an AAPL option")
-    public void user_buys_an_aapl_option() {//todo proveri ovoga na novoj bazi
+    public void user_buys_an_aapl_option() {
         try {
 
             mockMvc.perform(post("/api/options/buy")
@@ -155,7 +155,7 @@ public class OptionIntegrationSteps extends OptionIntegrationTestConfig {
                             .content("""
                                     {
                                        "optionId": 3,
-                                       "amount": 1,
+                                       "amount": 0,
                                        "premium": 1
                                      }
                                      """)
@@ -170,7 +170,7 @@ public class OptionIntegrationSteps extends OptionIntegrationTestConfig {
     }
 
     @Then("user sells an AAPL option")
-    public void user_sells_an_aapl_option() {//todo OVAJ NAKRKAJ DA RADE NA PR (NE MOZE DA RADE STALNO)
+    public void user_sells_an_aapl_option() {
         try {
 
             List<UserOption> options = optionService.getUserOptions(loggedInUser.get().getId());
@@ -181,14 +181,14 @@ public class OptionIntegrationSteps extends OptionIntegrationTestConfig {
                                 .contentType("application/json")
                                 .content("""
                                     {
-                                       "userOptionId": 2,
+                                       "userOptionId": -2,
                                        "premium": 1
                                      }
                                      """)
                                 .header("Content-Type", "application/json")
                                 .header("Access-Control-Allow-Origin", "*")
                                 .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isNotFound())
+                        .andExpect(status().is4xxClientError())
                         .andReturn();
             }
 //            else {

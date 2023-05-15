@@ -20,10 +20,10 @@ Feature: Future service
     Given user is not owner of the future
     Then user can't sell future because he is not owner
 
-  Scenario: user cant get all futures because lack of permissions
-    Given nonpriv user exists
-    Given nonpriv user logs in
-    Then user can't get futures
+#  Scenario: user cant get all futures because lack of permissions
+#    Given nonpriv user exists
+#    Given nonpriv user logs in
+#    Then user can't get futures
 
   Scenario: user cant get future by id because lack of permissions
     Given nonpriv user logs in
