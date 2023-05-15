@@ -1,22 +1,5 @@
 package rs.edu.raf.si.bank2.main.bootstrap;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
-import rs.edu.raf.si.bank2.main.bootstrap.readers.CurrencyReader;
-import rs.edu.raf.si.bank2.main.exceptions.CurrencyNotFoundException;
-import rs.edu.raf.si.bank2.main.models.mariadb.Currency;
-import rs.edu.raf.si.bank2.main.models.mariadb.*;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
-import rs.edu.raf.si.bank2.main.services.ForexService;
-import rs.edu.raf.si.bank2.main.services.OptionService;
-import rs.edu.raf.si.bank2.main.services.StockService;
-
-import javax.persistence.EntityManagerFactory;
-import javax.servlet.ServletContextListener;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -33,6 +16,22 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import javax.persistence.EntityManagerFactory;
+import javax.servlet.ServletContextListener;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+import rs.edu.raf.si.bank2.main.bootstrap.readers.CurrencyReader;
+import rs.edu.raf.si.bank2.main.exceptions.CurrencyNotFoundException;
+import rs.edu.raf.si.bank2.main.models.mariadb.*;
+import rs.edu.raf.si.bank2.main.models.mariadb.Currency;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
+import rs.edu.raf.si.bank2.main.services.ForexService;
+import rs.edu.raf.si.bank2.main.services.OptionService;
+import rs.edu.raf.si.bank2.main.services.StockService;
 
 @Component
 public class BootstrapData implements CommandLineRunner {
@@ -43,14 +42,14 @@ public class BootstrapData implements CommandLineRunner {
      * zapravo imali pristup. Mogu
      * da podesim forwardovanje ako je potrebno nekom drugom jos pristup.
      */
-    private static final String ADMIN_EMAIL = "anesic3119rn+banka2backend" +
-            "+admin@raf.rs";
+    private static final String ADMIN_EMAIL = "anesic3119rn+banka2backend" + "+admin@raf.rs";
     /**
      * TODO promeniti password ovde da bude jaci! Eventualno TODO napraviti
      * da se auto-generise novi
      * password pri TODO svakoj migraciji.
      */
     private static final String ADMIN_PASS = "admin";
+
     private static final String ADMIN_FNAME = "Admin";
     private static final String ADMIN_LNAME = "Adminic";
     private static final String ADMIN_JMBG = "2902968000000";
@@ -178,12 +177,9 @@ public class BootstrapData implements CommandLineRunner {
         List<Permission> permissions = new ArrayList<>();
         Permission adminPermission = new Permission(PermissionName.ADMIN_USER);
         Permission readPermission = new Permission(PermissionName.READ_USERS);
-        Permission createPermission =
-                new Permission(PermissionName.CREATE_USERS);
-        Permission updatePermission =
-                new Permission(PermissionName.UPDATE_USERS);
-        Permission deletePermission =
-                new Permission(PermissionName.DELETE_USERS);
+        Permission createPermission = new Permission(PermissionName.CREATE_USERS);
+        Permission updatePermission = new Permission(PermissionName.UPDATE_USERS);
+        Permission deletePermission = new Permission(PermissionName.DELETE_USERS);
         permissions.add(adminPermission);
         this.permissionRepository.save(adminPermission);
         this.permissionRepository.save(readPermission);
@@ -243,8 +239,7 @@ public class BootstrapData implements CommandLineRunner {
         // read from file
 
         String resPath = "csvs/exchange.csv";
-        URL url = ServletContextListener.class.getClassLoader()
-                .getResource(resPath);
+        URL url = ServletContextListener.class.getClassLoader().getResource(resPath);
         if (url == null) {
             System.err.println("Could not find resource: " + resPath);
             return;
@@ -258,8 +253,7 @@ public class BootstrapData implements CommandLineRunner {
             return;
         }
 
-        List<Exchange> exchanges = Files.lines(
-                        Paths.get(uri))
+        List<Exchange> exchanges = Files.lines(Paths.get(uri))
                 .parallel()
                 .skip(1)
                 .map(line -> line.split(","))
@@ -271,11 +265,11 @@ public class BootstrapData implements CommandLineRunner {
                         data[2],
                         data[3],
                         this.currencyRepository
-                                .findCurrencyByCurrencyCode(data[4])
-                                .isPresent()
+                                        .findCurrencyByCurrencyCode(data[4])
+                                        .isPresent()
                                 ? this.currencyRepository
-                                .findCurrencyByCurrencyCode(data[4])
-                                .get()
+                                        .findCurrencyByCurrencyCode(data[4])
+                                        .get()
                                 : null,
                         data[5],
                         data[6],
@@ -301,8 +295,7 @@ public class BootstrapData implements CommandLineRunner {
         String formattedDate = dateFormat.format(new Date());
 
         String resPath = "csvs/future_data.csv";
-        URL url = ServletContextListener.class.getClassLoader()
-                .getResource(resPath);
+        URL url = ServletContextListener.class.getClassLoader().getResource(resPath);
         if (url == null) {
             System.err.println("Could not find resource: " + resPath);
             return;
@@ -317,9 +310,7 @@ public class BootstrapData implements CommandLineRunner {
         }
 
         // TODO intellij kaze da treba dodati try-catch
-        List<Future> futures = Files.lines(
-                        Paths.get(uri)
-                )
+        List<Future> futures = Files.lines(Paths.get(uri))
                 .parallel()
                 .skip(1)
                 .map(line -> line.split(","))
@@ -372,13 +363,11 @@ public class BootstrapData implements CommandLineRunner {
 
     private void loadStocksTable() throws IOException {
 
-        SessionFactory sessionFactory =
-                entityManagerFactory.unwrap(SessionFactory.class);
+        SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
         Session session = sessionFactory.openSession();
 
         String resPath = "stocks.csv";
-        URL url = ServletContextListener.class.getClassLoader()
-                .getResource(resPath);
+        URL url = ServletContextListener.class.getClassLoader().getResource(resPath);
         if (url == null) {
             System.err.println("Could not find resource: " + resPath);
             return;
@@ -386,8 +375,7 @@ public class BootstrapData implements CommandLineRunner {
 
         BufferedReader br;
         try {
-            br = new BufferedReader(
-                    new FileReader(url.getPath()));
+            br = new BufferedReader(new FileReader(url.getPath()));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return;
@@ -400,8 +388,7 @@ public class BootstrapData implements CommandLineRunner {
 
             String[] data = line.split(",");
 
-            Optional<Exchange> exchange =
-                    exchangeRepository.findExchangeByAcronym(data[12]);
+            Optional<Exchange> exchange = exchangeRepository.findExchangeByAcronym(data[12]);
             Exchange mergedExchange = (Exchange) session.merge(exchange.get());
 
             Stock stock = Stock.builder()
@@ -434,8 +421,7 @@ public class BootstrapData implements CommandLineRunner {
         for (Stock s : stockRepository.findAll()) {
 
             resPath = "stock_history.csv";
-            url = ServletContextListener.class.getClassLoader()
-                    .getResource(resPath);
+            url = ServletContextListener.class.getClassLoader().getResource(resPath);
             if (url == null) {
                 System.err.println("Could not find resource: " + resPath);
                 return;
@@ -449,7 +435,6 @@ public class BootstrapData implements CommandLineRunner {
                 e.printStackTrace();
                 return;
             }
-
 
             String header1 = br1.readLine();
             String line1 = br1.readLine();
@@ -469,13 +454,10 @@ public class BootstrapData implements CommandLineRunner {
                             .onDate(
                                     data[5].contains(" ")
                                             ? LocalDateTime.parse(
-                                            data[5],
-                                            DateTimeFormatter.ofPattern("yyyy" +
-                                                    "-MM-dd HH:mm:ss"))
+                                                    data[5], DateTimeFormatter.ofPattern("yyyy" + "-MM-dd HH:mm:ss"))
                                             : LocalDateTime.parse(
-                                            data[5] + " 00:00:00",
-                                            DateTimeFormatter.ofPattern("yyyy" +
-                                                    "-MM-dd HH:mm:ss")))
+                                                    data[5] + " 00:00:00",
+                                                    DateTimeFormatter.ofPattern("yyyy" + "-MM-dd HH:mm:ss")))
                             .stock(mergedStock)
                             .type(StockHistoryType.valueOf(data[7]))
                             .build();

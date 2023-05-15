@@ -2,10 +2,6 @@ package rs.edu.raf.si.bank2.main.bootstrap.readers;
 
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
-import org.springframework.util.ResourceUtils;
-import rs.edu.raf.si.bank2.main.models.mariadb.Inflation;
-
-import javax.servlet.ServletContextListener;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -13,6 +9,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import javax.servlet.ServletContextListener;
+import org.springframework.util.ResourceUtils;
+import rs.edu.raf.si.bank2.main.models.mariadb.Inflation;
 
 public class CurrencyReader {
     private List<Inflation> inflations = new ArrayList<>();
@@ -21,15 +20,13 @@ public class CurrencyReader {
         // TODO da li ovo treba da vrati praznu listu ili null ako neuspesno?
 
         String resPath = "currencies/currencies.csv";
-        URL url = ServletContextListener.class.getClassLoader()
-                .getResource(resPath);
+        URL url = ServletContextListener.class.getClassLoader().getResource(resPath);
         if (url == null) {
             System.err.println("Could not find resource: " + resPath);
             return new ArrayList<>();
         }
 
-        return new CsvToBeanBuilder<CurrencyCSV>(
-                new FileReader(ResourceUtils.getFile(url.getPath())))
+        return new CsvToBeanBuilder<CurrencyCSV>(new FileReader(ResourceUtils.getFile(url.getPath())))
                 .withType(CurrencyCSV.class)
                 .withSkipLines(1)
                 .build()
@@ -37,12 +34,10 @@ public class CurrencyReader {
     }
 
     public List<rs.edu.raf.si.bank2.main.models.mariadb.Currency> getCurrencies() throws IOException {
-        List<rs.edu.raf.si.bank2.main.models.mariadb.Currency> result =
-                new ArrayList<>();
+        List<rs.edu.raf.si.bank2.main.models.mariadb.Currency> result = new ArrayList<>();
         List<CurrencyCSV> currenciesCsv = getCurrenciesFromCsv();
         for (CurrencyCSV currencyCsv : currenciesCsv) {
-            rs.edu.raf.si.bank2.main.models.mariadb.Currency c =
-                    new rs.edu.raf.si.bank2.main.models.mariadb.Currency();
+            rs.edu.raf.si.bank2.main.models.mariadb.Currency c = new rs.edu.raf.si.bank2.main.models.mariadb.Currency();
             c.setCurrencyName(currencyCsv.getCurrencyName());
             c.setCurrencyCode(currencyCsv.getCurrencyCode());
             c.setPolity(getCurrencyPolity(currencyCsv.getCurrencyCode()));
@@ -75,8 +70,7 @@ public class CurrencyReader {
         // TODO da li ovo treba da vrati praznu listu ili null ako neuspesno?
 
         String resPath = "currencies/inflations.csv";
-        URL url = ServletContextListener.class.getClassLoader()
-                .getResource(resPath);
+        URL url = ServletContextListener.class.getClassLoader().getResource(resPath);
         if (url == null) {
             System.err.println("Could not find resource: " + resPath);
             return result;
@@ -93,8 +87,7 @@ public class CurrencyReader {
         String[] headerRow = csvReader.readNext();
         String[] dataRow;
         int yearIndex = 2;
-        String currencyCountryCode =
-                CountryCodeMapper.getCountryCode(currency.getPolity());
+        String currencyCountryCode = CountryCodeMapper.getCountryCode(currency.getPolity());
         // Explanation for if: In data source inflation is tracked by
         // countries, not by currencies.
         // European Union is not a country,
