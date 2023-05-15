@@ -31,13 +31,13 @@ public class ExchangeController {
     }
 
     @GetMapping(value = "/id/{id}")
-    @Cacheable(value = "exchanges", key="#id")
+    @Cacheable(value = "exchanges", key = "#id")
     public ResponseEntity<?> findById(@PathVariable(name = "id") Long id) {
         return ResponseEntity.ok().body(exchangeService.findById(id));
     }
 
     @GetMapping(value = "/status/{micCode}")
-    @Cacheable(value = "exchanges", key="#micCode")
+    @Cacheable(value = "exchanges", key = "#micCode")
     public ResponseEntity<?> isExchangeActive(@PathVariable(name = "micCode") String micCode) {
         if (exchangeService.findByMicCode(micCode).isPresent()) {
             return ResponseEntity.ok().body(exchangeService.isExchangeActive(micCode));
@@ -47,7 +47,7 @@ public class ExchangeController {
     }
 
     @GetMapping(value = "/acronym/{acronym}")
-    @Cacheable(value = "exchanges", key="#acronym")
+    @Cacheable(value = "exchanges", key = "#acronym")
     public ResponseEntity<?> findByAcronym(@PathVariable(name = "acronym") String acronym) {
         return ResponseEntity.ok().body(exchangeService.findByAcronym(acronym));
     }
