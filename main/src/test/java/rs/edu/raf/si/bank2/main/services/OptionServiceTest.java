@@ -6,9 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -1183,76 +1181,76 @@ class OptionServiceTest {
         assertThrows(OptionNotFoundException.class, () -> optionServiceUnderTest.sellOption(0L, 0.0));
     }
 
-    //    @Test
-    //    void testGetFromExternalApi() {
-    //        // Setup
-    //        // https://query1.finance.yahoo.com/v7/finance/options/AAPL?date=1577836800
-    //        Option option1 = Option.builder()
-    //                .id(null)
-    //                .stockSymbol("AAPL")
-    //                .contractSymbol("AAPL230602C00085000")
-    //                .optionType("CALL")
-    //                .strike(85.0)
-    //                .impliedVolatility(0.0)
-    //                .price(80.17)
-    //                .expirationDate(LocalDate.parse("2023-06-02"))
-    //                .openInterest(2)
-    //                .contractSize(100)
-    //                .maintenanceMargin(4008.5)
-    //                .bid(87.7)
-    //                .ask(89.65)
-    //                .changePrice(0.0)
-    //                .percentChange(0.0)
-    //                .inTheMoney(true)
-    //                .build();
-    //
-    //        final List<Option> result = optionServiceUnderTest.getFromExternalApi("AAPL", "1685664000");
-    //        for (int i = 0; i < 3; i++) result.get(i).setImpliedVolatility(0.0);
-    //
-    //        Option option2 = Option.builder()
-    //                .id(null)
-    //                .stockSymbol("AAPL")
-    //                .contractSymbol("AAPL230602C00100000")
-    //                .optionType("CALL")
-    //                .strike(100.0)
-    //                .impliedVolatility(0.0)
-    //                .price(73.61)
-    //                .expirationDate(LocalDate.parse("2023-06-02"))
-    //                .openInterest(1)
-    //                .contractSize(100)
-    //                .maintenanceMargin(3680.5)
-    //                .bid(73.05)
-    //                .ask(74.5)
-    //                .changePrice(8.190002)
-    //                .percentChange(12.519111)
-    //                .inTheMoney(true)
-    //                .build();
-    //
-    //        Option option3 = Option.builder()
-    //                .id(null)
-    //                .stockSymbol("AAPL")
-    //                .contractSymbol("AAPL230602C00110000")
-    //                .optionType("CALL")
-    //                .strike(110.0)
-    //                .impliedVolatility(0.0)
-    //                .price(63.63)
-    //                .expirationDate(LocalDate.parse("2023-06-02"))
-    //                .openInterest(1)
-    //                .contractSize(100)
-    //                .maintenanceMargin(3181.5)
-    //                .bid(63.45)
-    //                .ask(64.1)
-    //                .changePrice(8.799999)
-    //                .percentChange(16.049606)
-    //                .inTheMoney(true)
-    //                .build();
-    //
-    //        // Verify the results
-    //        assertEquals(option1.getContractSymbol(), result.get(0).getContractSymbol());
-    //        assertEquals(option1.getExpirationDate(), result.get(0).getExpirationDate());
-    //        assertEquals(option2.getContractSymbol(), result.get(1).getContractSymbol());
-    //        assertEquals(option2.getExpirationDate(), result.get(1).getExpirationDate());
-    //        assertEquals(option3.getContractSymbol(), result.get(2).getContractSymbol());
-    //        assertEquals(option3.getExpirationDate(), result.get(2).getExpirationDate());
-    //    }
+    @Test
+    void testGetFromExternalApi() {
+        // Setup
+        // https://query1.finance.yahoo.com/v7/finance/options/AAPL?date=1577836800
+        Option option1 = Option.builder()
+                .id(null)
+                .stockSymbol("AAPL")
+                .contractSymbol("AAPL250620C00050000")
+                .optionType("CALL")
+                .strike(85.0)
+                .impliedVolatility(0.0)
+                .price(80.17)
+                .expirationDate(LocalDate.parse("2025-06-20"))
+                .openInterest(2)
+                .contractSize(100)
+                .maintenanceMargin(4008.5)
+                .bid(87.7)
+                .ask(89.65)
+                .changePrice(0.0)
+                .percentChange(0.0)
+                .inTheMoney(true)
+                .build();
+
+        final List<Option> result = optionServiceUnderTest.getFromExternalApi("AAPL", "1750377600");
+        for (int i = 0; i < 3; i++) result.get(i).setImpliedVolatility(0.0);
+
+        Option option2 = Option.builder()
+                .id(null)
+                .stockSymbol("AAPL")
+                .contractSymbol("AAPL250620C00055000")
+                .optionType("CALL")
+                .strike(100.0)
+                .impliedVolatility(0.0)
+                .price(73.61)
+                .expirationDate(LocalDate.parse("2025-06-20"))
+                .openInterest(1)
+                .contractSize(100)
+                .maintenanceMargin(3680.5)
+                .bid(73.05)
+                .ask(74.5)
+                .changePrice(8.190002)
+                .percentChange(12.519111)
+                .inTheMoney(true)
+                .build();
+
+        Option option3 = Option.builder()
+                .id(null)
+                .stockSymbol("AAPL")
+                .contractSymbol("AAPL250620C00060000")
+                .optionType("CALL")
+                .strike(110.0)
+                .impliedVolatility(0.0)
+                .price(63.63)
+                .expirationDate(LocalDate.parse("2025-06-20"))
+                .openInterest(1)
+                .contractSize(100)
+                .maintenanceMargin(3181.5)
+                .bid(63.45)
+                .ask(64.1)
+                .changePrice(8.799999)
+                .percentChange(16.049606)
+                .inTheMoney(true)
+                .build();
+
+        // Verify the results
+        assertEquals(option1.getContractSymbol(), result.get(0).getContractSymbol());
+        assertEquals(option1.getExpirationDate(), result.get(0).getExpirationDate());
+        assertEquals(option2.getContractSymbol(), result.get(1).getContractSymbol());
+        assertEquals(option2.getExpirationDate(), result.get(1).getExpirationDate());
+        assertEquals(option3.getContractSymbol(), result.get(2).getContractSymbol());
+        assertEquals(option3.getExpirationDate(), result.get(2).getExpirationDate());
+    }
 }

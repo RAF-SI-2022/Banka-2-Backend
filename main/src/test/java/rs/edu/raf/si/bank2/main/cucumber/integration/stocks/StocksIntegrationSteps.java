@@ -180,7 +180,7 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
                                     """
                                             {
                                             "stockSymbol": "AAPL",
-                                            "amount":"10",
+                                            "amount":"5",
                                             "limit":"0",
                                             "stop":"0",
                                             "allOrNone":false,
@@ -232,7 +232,7 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
                                     """
                                             {
                                             "stockSymbol": "AAPL",
-                                            "amount":"10",
+                                            "amount":"1",
                                             "limit":"0",
                                             "stop":"0",
                                             "allOrNone":false,

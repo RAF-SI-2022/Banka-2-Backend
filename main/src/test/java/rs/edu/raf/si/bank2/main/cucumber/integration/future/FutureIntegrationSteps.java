@@ -182,6 +182,41 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
                 Math.round(oldFree - testFuture.getMaintenanceMargin().floatValue()), Math.round(balance.getFree()));
     }
 
+    @Then("user buys future from company with null currency code")
+    public void userBuysFutureFromCompany_with_null_currency_code() throws JsonProcessingException {
+
+        Optional<User> user = userService.findByEmail("anesic3119rn+banka2backend+admin@raf.rs");
+        Balance balance = this.balanceService.findBalanceByUserEmailAndCurrencyCode(
+                "anesic3119rn+banka2backend+admin@raf.rs", "USD");
+        Float oldFree = balance.getFree();
+
+        FutureRequestBuySell request = this.createFutureRequest(
+                testFuture.getId(),
+                user.get().getId(),
+                testFuture.getFutureName(),
+                "BUY",
+                testFuture.getMaintenanceMargin(),
+                "",
+                0,
+                0);
+        String body = new ObjectMapper().writeValueAsString(request);
+        try {
+            mockMvc.perform(post("/api/futures/buy")
+                            .header("Authorization", "Bearer " + token)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .content(body))
+                    .andExpect(status().isOk())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+        balance = this.balanceService.findBalanceByUserEmailAndCurrencyCode(
+                "anesic3119rn+banka2backend+admin@raf.rs", "USD");
+        assertEquals(
+                Math.round(oldFree - testFuture.getMaintenanceMargin().floatValue()), Math.round(balance.getFree()));
+    }
+
     @Then("user buys future from company with limit or stop")
     public void userBuysFutureFromCompanyWithLimitOrStop() throws JsonProcessingException {
         Optional<User> user = userService.findByEmail("anesic3119rn+banka2backend+admin@raf.rs");
@@ -396,4 +431,83 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
         user.setBalances(balances);
         return this.userService.save(user);
     }
+
+    @Then("user gets waiting-futures")
+    public void user_gets_waiting_futures() {
+        try {
+            mockMvc.perform(get("/api/futures/CALL/A")
+                            .header("Authorization", "Bearer " + token)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                    )
+                    .andExpect(status().isNotFound())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Then("user gets his futures")
+    public void user_gets_his_futures() {
+        try {
+            mockMvc.perform(get("/api/futures/user/1")
+                            .header("Authorization", "Bearer " + token)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*"))
+                    .andExpect(status().isOk())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Then("user removes waiting future buy")
+    public void user_removes_waiting_future_buy() {
+        try {
+            mockMvc.perform(post("/api/futures/remove-waiting-buy/-1")
+                            .header("Authorization", "Bearer " + token)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*"))
+                    .andExpect(status().isInternalServerError())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+
+    @Then("user removes waiting future sell")
+    public void user_removes_waiting_future_sell() {
+        try {
+            mockMvc.perform(post("/api/futures/remove-waiting-sell/-1")
+                            .header("Authorization", "Bearer " + token)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*"))
+                    .andExpect(status().isInternalServerError())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Then("user removes from market")
+    public void user_removes_removes_from_market() {
+        try {
+            Exception exception = assertThrows(Exception.class, () -> {
+                mockMvc.perform(post("/api/futures/remove/0")
+                                .header("Authorization", "Bearer " + token)
+                                .header("Content-Type", "application/json")
+                                .header("Access-Control-Allow-Origin", "*"))
+                        .andExpect(status().isInternalServerError())
+                        .andReturn();
+            });
+            String expectedMessage = "Request processing failed; nested exception is java.util.NoSuchElementException: No value present";
+            String actualMessage = exception.getMessage();
+            assertEquals(expectedMessage, actualMessage);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+
 }
