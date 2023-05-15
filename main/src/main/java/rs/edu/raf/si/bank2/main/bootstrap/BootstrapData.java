@@ -1,18 +1,5 @@
 package rs.edu.raf.si.bank2.main.bootstrap;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import javax.persistence.EntityManagerFactory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,39 +8,55 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import rs.edu.raf.si.bank2.main.bootstrap.readers.CurrencyReader;
 import rs.edu.raf.si.bank2.main.exceptions.CurrencyNotFoundException;
-import rs.edu.raf.si.bank2.main.models.mariadb.*;
 import rs.edu.raf.si.bank2.main.models.mariadb.Currency;
-import rs.edu.raf.si.bank2.main.models.mariadb.Exchange;
-import rs.edu.raf.si.bank2.main.models.mariadb.Permission;
-import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
+import rs.edu.raf.si.bank2.main.models.mariadb.*;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
 import rs.edu.raf.si.bank2.main.services.ForexService;
 import rs.edu.raf.si.bank2.main.services.OptionService;
 import rs.edu.raf.si.bank2.main.services.StockService;
 
+import javax.persistence.EntityManagerFactory;
+import javax.servlet.ServletContextListener;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
 @Component
 public class BootstrapData implements CommandLineRunner {
 
+    public static final String forexApiKey = "6DL0Q8YP76H9K9T6";
     /**
-     * TODO promeniti ovo pre produkcije. Promenjen admin mejl da bismo mu zapravo imali pristup. Mogu
+     * TODO promeniti ovo pre produkcije. Promenjen admin mejl da bismo mu
+     * zapravo imali pristup. Mogu
      * da podesim forwardovanje ako je potrebno nekom drugom jos pristup.
      */
-    private static final String ADMIN_EMAIL = "anesic3119rn+banka2backend+admin@raf.rs";
+    private static final String ADMIN_EMAIL = "anesic3119rn+banka2backend" +
+            "+admin@raf.rs";
     /**
-     * TODO promeniti password ovde da bude jaci! Eventualno TODO napraviti da se auto-generise novi
+     * TODO promeniti password ovde da bude jaci! Eventualno TODO napraviti
+     * da se auto-generise novi
      * password pri TODO svakoj migraciji.
      */
     private static final String ADMIN_PASS = "admin";
-
     private static final String ADMIN_FNAME = "Admin";
     private static final String ADMIN_LNAME = "Adminic";
     private static final String ADMIN_JMBG = "2902968000000";
     private static final String ADMIN_PHONE = "0657817522";
     private static final String ADMIN_JOB = "ADMINISTRATOR";
     private static final boolean ADMIN_ACTIVE = true;
-
-    public static final String forexApiKey = "6DL0Q8YP76H9K9T6";
-
     private final UserRepository userRepository;
     private final PermissionRepository permissionRepository;
     private final CurrencyRepository currencyRepository;
@@ -139,7 +142,8 @@ public class BootstrapData implements CommandLineRunner {
             loadStocksTable();
         }
 
-        // New data introduced in V2_2, if we keep this code devs will not get proper exchanges in db
+        // New data introduced in V2_2, if we keep this code devs will not
+        // get proper exchanges in db
         //    long numberOfExchanges = this.exchangeRepository.count();
         //    if (numberOfExchanges == 0) {
         //      System.out.println("Added exchange markets");
@@ -174,9 +178,12 @@ public class BootstrapData implements CommandLineRunner {
         List<Permission> permissions = new ArrayList<>();
         Permission adminPermission = new Permission(PermissionName.ADMIN_USER);
         Permission readPermission = new Permission(PermissionName.READ_USERS);
-        Permission createPermission = new Permission(PermissionName.CREATE_USERS);
-        Permission updatePermission = new Permission(PermissionName.UPDATE_USERS);
-        Permission deletePermission = new Permission(PermissionName.DELETE_USERS);
+        Permission createPermission =
+                new Permission(PermissionName.CREATE_USERS);
+        Permission updatePermission =
+                new Permission(PermissionName.UPDATE_USERS);
+        Permission deletePermission =
+                new Permission(PermissionName.DELETE_USERS);
         permissions.add(adminPermission);
         this.permissionRepository.save(adminPermission);
         this.permissionRepository.save(readPermission);
@@ -234,7 +241,25 @@ public class BootstrapData implements CommandLineRunner {
     private void loadExchangeMarkets() throws IOException {
         // Do this only on the first ever run of the app.
         // read from file
-        List<Exchange> exchanges = Files.lines(Paths.get("src/main/resources/csvs/exchange.csv"))
+
+        String resPath = "csvs/exchange.csv";
+        URL url = ServletContextListener.class.getClassLoader()
+                .getResource(resPath);
+        if (url == null) {
+            System.err.println("Could not find resource: " + resPath);
+            return;
+        }
+
+        URI uri;
+        try {
+            uri = url.toURI();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        List<Exchange> exchanges = Files.lines(
+                        Paths.get(uri))
                 .parallel()
                 .skip(1)
                 .map(line -> line.split(","))
@@ -246,11 +271,11 @@ public class BootstrapData implements CommandLineRunner {
                         data[2],
                         data[3],
                         this.currencyRepository
-                                        .findCurrencyByCurrencyCode(data[4])
-                                        .isPresent()
+                                .findCurrencyByCurrencyCode(data[4])
+                                .isPresent()
                                 ? this.currencyRepository
-                                        .findCurrencyByCurrencyCode(data[4])
-                                        .get()
+                                .findCurrencyByCurrencyCode(data[4])
+                                .get()
                                 : null,
                         data[5],
                         data[6],
@@ -270,11 +295,31 @@ public class BootstrapData implements CommandLineRunner {
         exchangeRepository.saveAll(exchanges);
     }
 
-    private void loadFutureTable() throws IOException, ParseException { // todo promeni da ucitava sa id
+    private void loadFutureTable() throws IOException, ParseException { //
+        // todo promeni da ucitava sa id
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yyyy");
         String formattedDate = dateFormat.format(new Date());
 
-        List<Future> futures = Files.lines(Paths.get("src/main/resources/csvs/future_data.csv"))
+        String resPath = "csvs/future_data.csv";
+        URL url = ServletContextListener.class.getClassLoader()
+                .getResource(resPath);
+        if (url == null) {
+            System.err.println("Could not find resource: " + resPath);
+            return;
+        }
+
+        URI uri;
+        try {
+            uri = url.toURI();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // TODO intellij kaze da treba dodati try-catch
+        List<Future> futures = Files.lines(
+                        Paths.get(uri)
+                )
                 .parallel()
                 .skip(1)
                 .map(line -> line.split(","))
@@ -294,7 +339,8 @@ public class BootstrapData implements CommandLineRunner {
         randomiseFutureTableData();
     }
 
-    private void randomiseFutureTableData() throws ParseException { // calendar.add(Calendar.MONTH, 1);
+    private void randomiseFutureTableData() throws ParseException { //
+        // calendar.add(Calendar.MONTH, 1);
         List<Future> allFutures = futureRepository.findAll();
         List<Future> newRandomisedFutures = new ArrayList<>();
         Random randomGenerator = new Random();
@@ -326,10 +372,26 @@ public class BootstrapData implements CommandLineRunner {
 
     private void loadStocksTable() throws IOException {
 
-        SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
+        SessionFactory sessionFactory =
+                entityManagerFactory.unwrap(SessionFactory.class);
         Session session = sessionFactory.openSession();
 
-        BufferedReader br = new BufferedReader(new FileReader("src/main/resources/stocks.csv"));
+        String resPath = "stocks.csv";
+        URL url = ServletContextListener.class.getClassLoader()
+                .getResource(resPath);
+        if (url == null) {
+            System.err.println("Could not find resource: " + resPath);
+            return;
+        }
+
+        BufferedReader br;
+        try {
+            br = new BufferedReader(
+                    new FileReader(url.getPath()));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return;
+        }
 
         String header = br.readLine();
         String line = br.readLine();
@@ -338,7 +400,8 @@ public class BootstrapData implements CommandLineRunner {
 
             String[] data = line.split(",");
 
-            Optional<Exchange> exchange = exchangeRepository.findExchangeByAcronym(data[12]);
+            Optional<Exchange> exchange =
+                    exchangeRepository.findExchangeByAcronym(data[12]);
             Exchange mergedExchange = (Exchange) session.merge(exchange.get());
 
             Stock stock = Stock.builder()
@@ -370,8 +433,23 @@ public class BootstrapData implements CommandLineRunner {
 
         for (Stock s : stockRepository.findAll()) {
 
+            resPath = "stock_history.csv";
+            url = ServletContextListener.class.getClassLoader()
+                    .getResource(resPath);
+            if (url == null) {
+                System.err.println("Could not find resource: " + resPath);
+                return;
+            }
+
             Stock mergedStock = (Stock) session.merge(s);
-            BufferedReader br1 = new BufferedReader(new FileReader("src/main/resources/stock_history.csv"));
+            BufferedReader br1;
+            try {
+                br1 = new BufferedReader(new FileReader(url.getPath()));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return;
+            }
+
 
             String header1 = br1.readLine();
             String line1 = br1.readLine();
@@ -391,10 +469,13 @@ public class BootstrapData implements CommandLineRunner {
                             .onDate(
                                     data[5].contains(" ")
                                             ? LocalDateTime.parse(
-                                                    data[5], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                                            data[5],
+                                            DateTimeFormatter.ofPattern("yyyy" +
+                                                    "-MM-dd HH:mm:ss"))
                                             : LocalDateTime.parse(
-                                                    data[5] + " 00:00:00",
-                                                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                                            data[5] + " 00:00:00",
+                                            DateTimeFormatter.ofPattern("yyyy" +
+                                                    "-MM-dd HH:mm:ss")))
                             .stock(mergedStock)
                             .type(StockHistoryType.valueOf(data[7]))
                             .build();
