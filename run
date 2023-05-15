@@ -105,7 +105,7 @@ main() {
   targetSha=amazon-corretto-$ver-$arch-$os-jdk.$ext.checksum
   sourceSha=https://corretto.aws/downloads/latest_sha256/$targetJdk
   jdk=lib/jdk
-  bin=$jdk/bin
+  bin="$jdk/bin"
   if which bash >/dev/null 2>&1; then
     terminal="bash"
   elif which sh >/dev/null 2>&1; then

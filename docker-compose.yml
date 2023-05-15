@@ -69,6 +69,22 @@ services:
     networks:
       - bank2_net
 
+  redis:
+    image: redis:7.0.11-alpine
+    container_name: redis
+    expose:
+      - "6379"
+    ports:
+      - "6379:6379"
+    restart: on-failure
+    volumes:
+      - redis:/bitnami/redis/data
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    profiles: [ "all", "core" ]
+    networks:
+      - bank2_net
+
   backend:
     container_name: backend
     image: harbor.k8s.elab.rs/banka-2/backend
@@ -105,10 +121,10 @@ services:
     networks:
       - bank2_net
 
-
 volumes:
   mariadb:
   mongodb:
+  redis:
 
 networks:
   bank2_net:

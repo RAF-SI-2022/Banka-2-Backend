@@ -70,7 +70,6 @@ public class ExchangesIntegrationSteps extends ExchangesIntegrationTestConfig {
         }
     }
 
-
     @Then("user gets exchange by id from database")
     public void user_gets_exchange_by_id_from_database() {
         MvcResult mvcResult = null;
@@ -113,7 +112,6 @@ public class ExchangesIntegrationSteps extends ExchangesIntegrationTestConfig {
             fail(e.getMessage());
         }
     }
-
 
     @Then("user gets exchange by acronym from database")
     public void user_gets_exchange_by_acronym_from_database() {
