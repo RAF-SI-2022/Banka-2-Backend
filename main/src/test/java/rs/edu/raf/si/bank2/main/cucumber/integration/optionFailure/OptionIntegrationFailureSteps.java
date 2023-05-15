@@ -1,22 +1,21 @@
 package rs.edu.raf.si.bank2.main.cucumber.integration.optionFailure;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.jayway.jsonpath.JsonPath;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import rs.edu.raf.si.bank2.main.models.mariadb.User;
 import rs.edu.raf.si.bank2.main.services.OptionService;
 import rs.edu.raf.si.bank2.main.services.UserService;
-
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class OptionIntegrationFailureSteps extends OptionIntegrationTestFailureConfig {
 
@@ -32,7 +31,6 @@ public class OptionIntegrationFailureSteps extends OptionIntegrationTestFailureC
     protected static String token;
     protected static Optional<User> loggedInUser;
     protected static Optional<User> testUser;
-
 
     @Given("user logs in")
     public void user_logs_in() {
@@ -72,7 +70,8 @@ public class OptionIntegrationFailureSteps extends OptionIntegrationTestFailureC
 
             mockMvc.perform(post("/api/options/sell")
                             .contentType("application/json")
-                            .content("""
+                            .content(
+                                    """
                                     {
                                        "userOptionId": -1,
                                        "premium": 1
@@ -95,7 +94,8 @@ public class OptionIntegrationFailureSteps extends OptionIntegrationTestFailureC
 
             mockMvc.perform(post("/api/options/buy")
                             .contentType("application/json")
-                            .content("""
+                            .content(
+                                    """
                                     {
                                        "optionId": -1,
                                        "amount": 1,
@@ -111,6 +111,4 @@ public class OptionIntegrationFailureSteps extends OptionIntegrationTestFailureC
             fail(e.getMessage());
         }
     }
-
-
 }

@@ -301,7 +301,6 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
         return this.userService.save(user);
     }
 
-
     @Then("nonpriv user exists")
     public void nonpriv_user_exists() {
         try {
@@ -369,7 +368,6 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
             fail(e.getMessage());
         }
     }
-
 
     @Then("user cant get future by id")
     public void user_cant_get_future_by_id() {
@@ -517,18 +515,16 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
         }
     }
 
-
     @Given("user doesnt have a balance")
     public void user_doesnt_have_a_balance() {
 
         Optional<User> user = userService.findByEmail("futuretestuser11@gmail.com");
         List<Balance> userBalances = user.get().getBalances();
 
-
-//        Balance balance = this.balanceService.findBalanceByUserEmailAndCurrencyCode(
-//                "futuretestuser11@gmail.com", "USD");
-//        System.out.println(balance.getId());
-//        balanceRepository.deleteById(balance.getId());
+        //        Balance balance = this.balanceService.findBalanceByUserEmailAndCurrencyCode(
+        //                "futuretestuser11@gmail.com", "USD");
+        //        System.out.println(balance.getId());
+        //        balanceRepository.deleteById(balance.getId());
     }
 
     @Then("user tries to but future")
@@ -563,5 +559,4 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
             fail(e.getMessage());
         }
     }
-
 }

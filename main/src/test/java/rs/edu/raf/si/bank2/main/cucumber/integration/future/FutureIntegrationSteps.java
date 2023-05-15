@@ -438,8 +438,7 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
             mockMvc.perform(get("/api/futures/CALL/A")
                             .header("Authorization", "Bearer " + token)
                             .header("Content-Type", "application/json")
-                            .header("Access-Control-Allow-Origin", "*")
-                    )
+                            .header("Access-Control-Allow-Origin", "*"))
                     .andExpect(status().isNotFound())
                     .andReturn();
         } catch (Exception e) {
@@ -475,7 +474,6 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
         }
     }
 
-
     @Then("user removes waiting future sell")
     public void user_removes_waiting_future_sell() {
         try {
@@ -501,13 +499,12 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
                         .andExpect(status().isInternalServerError())
                         .andReturn();
             });
-            String expectedMessage = "Request processing failed; nested exception is java.util.NoSuchElementException: No value present";
+            String expectedMessage =
+                    "Request processing failed; nested exception is java.util.NoSuchElementException: No value present";
             String actualMessage = exception.getMessage();
             assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }
     }
-
-
 }

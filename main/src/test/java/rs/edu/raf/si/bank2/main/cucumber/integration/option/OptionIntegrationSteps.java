@@ -10,14 +10,11 @@ import com.jayway.jsonpath.JsonPath;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import rs.edu.raf.si.bank2.main.dto.OptionBuyDto;
-import rs.edu.raf.si.bank2.main.models.mariadb.Option;
 import rs.edu.raf.si.bank2.main.models.mariadb.User;
 import rs.edu.raf.si.bank2.main.models.mariadb.UserOption;
 import rs.edu.raf.si.bank2.main.services.OptionService;
@@ -100,7 +97,6 @@ public class OptionIntegrationSteps extends OptionIntegrationTestConfig {
         }
     }
 
-
     @Then("user gets dates")
     public void user_gets_dates() {
         try {
@@ -147,12 +143,13 @@ public class OptionIntegrationSteps extends OptionIntegrationTestConfig {
     }
 
     @Then("user buys an AAPL option")
-    public void user_buys_an_aapl_option() {//todo proveri ovoga na novoj bazi
+    public void user_buys_an_aapl_option() { // todo proveri ovoga na novoj bazi
         try {
 
             mockMvc.perform(post("/api/options/buy")
                             .contentType("application/json")
-                            .content("""
+                            .content(
+                                    """
                                     {
                                        "optionId": 3,
                                        "amount": 1,
@@ -170,16 +167,18 @@ public class OptionIntegrationSteps extends OptionIntegrationTestConfig {
     }
 
     @Then("user sells an AAPL option")
-    public void user_sells_an_aapl_option() {//todo OVAJ NAKRKAJ DA RADE NA PR (NE MOZE DA RADE STALNO)
+    public void user_sells_an_aapl_option() { // todo OVAJ NAKRKAJ DA RADE NA PR (NE MOZE DA RADE STALNO)
         try {
 
-            List<UserOption> options = optionService.getUserOptions(loggedInUser.get().getId());
+            List<UserOption> options =
+                    optionService.getUserOptions(loggedInUser.get().getId());
 
-            if (options.size() > 0){
+            if (options.size() > 0) {
 
                 mockMvc.perform(post("/api/options/sell")
                                 .contentType("application/json")
-                                .content("""
+                                .content(
+                                        """
                                     {
                                        "userOptionId": 2,
                                        "premium": 1
@@ -191,9 +190,9 @@ public class OptionIntegrationSteps extends OptionIntegrationTestConfig {
                         .andExpect(status().isNotFound())
                         .andReturn();
             }
-//            else {
-//                fail("User has no options to sell");
-//            }
+            //            else {
+            //                fail("User has no options to sell");
+            //            }
         } catch (Exception e) {
             //            fail(e.getMessage());
             System.out.println("user has no options to sell ");
@@ -201,16 +200,18 @@ public class OptionIntegrationSteps extends OptionIntegrationTestConfig {
     }
 
     @Then("user buys stock with option")
-    public void user_buys_stock_with_option() {//todo OVAJ NAKRKAJ DA RADE NA PR (NE MOZE DA RADE STALNO)
+    public void user_buys_stock_with_option() { // todo OVAJ NAKRKAJ DA RADE NA PR (NE MOZE DA RADE STALNO)
         try {
 
-            List<UserOption> options = optionService.getUserOptions(loggedInUser.get().getId());
+            List<UserOption> options =
+                    optionService.getUserOptions(loggedInUser.get().getId());
 
-            if (options.size() > 0){
+            if (options.size() > 0) {
 
                 mockMvc.perform(get("/api/options/buy-stocks/" + -1)
                                 .contentType("application/json")
-                                .content("""
+                                .content(
+                                        """
                                     {
                                        "userOptionId": 2,
                                        "premium": 1
@@ -222,15 +223,12 @@ public class OptionIntegrationSteps extends OptionIntegrationTestConfig {
                         .andExpect(status().isNotFound())
                         .andReturn();
             }
-//            else {
-//                fail("User has no options to sell");
-//            }
+            //            else {
+            //                fail("User has no options to sell");
+            //            }
         } catch (Exception e) {
-//            fail(e.getMessage());
+            //            fail(e.getMessage());
             System.out.println("user has no options to sell ");
-
         }
     }
-
-
 }
