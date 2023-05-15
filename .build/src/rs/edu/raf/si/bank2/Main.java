@@ -1001,8 +1001,13 @@ public class Main {
             processHelper.startProcessIgnoreOutput(
                     "docker", "compose", "restart", name);
         }
+
         processHelper.startProcessIgnoreOutput(
-                "docker", "compose", "restart", "frontend");
+                "docker", "stop", "frontend");
+        processHelper.startProcessIgnoreOutput(
+                "docker", "run", "--rm", "-d", "--expose", "80",
+                "--publish", "80:80", "--name", "frontend", "frontend"
+        );
 
         this.logger.info("Helper services restarted");
     }
