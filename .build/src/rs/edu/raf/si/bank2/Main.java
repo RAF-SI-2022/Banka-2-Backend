@@ -997,17 +997,23 @@ public class Main {
      * Restarts all auxiliary Docker services.
      */
     public void stack() {
-        for (String name : HELPER_SERVICES) {
+        try {
             processHelper.startProcessIgnoreOutput(
-                    "docker", "compose", "restart", name);
-        }
+                    "docker", "compose", "down").waitFor();
+            for (String name : HELPER_SERVICES) {
+                processHelper.startProcessIgnoreOutput(
+                        "docker", "compose", "up", "-d", name).waitFor();
+            }
 
-        processHelper.startProcessIgnoreOutput(
-                "docker", "stop", "frontend");
-        processHelper.startProcessIgnoreOutput(
-                "docker", "run", "--rm", "-d", "--expose", "80",
-                "--publish", "80:80", "--name", "frontend", "frontend"
-        );
+            processHelper.startProcessIgnoreOutput(
+                    "docker", "stop", "frontend").waitFor();
+            processHelper.startProcessIgnoreOutput(
+                    "docker", "run", "--rm", "-d", "--expose", "80",
+                    "--publish", "80:80", "--name", "frontend", "frontend"
+            );
+        } catch (InterruptedException e) {
+            logger.error(e);
+        }
 
         this.logger.info("Helper services restarted");
     }
