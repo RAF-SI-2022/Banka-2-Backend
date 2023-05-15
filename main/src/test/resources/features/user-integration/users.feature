@@ -25,6 +25,9 @@ Feature: User service
   Scenario: admin gets his daily limit
     Then user gets his daily limit
 
+  Scenario: user resets password
+    Then user resets password
+
   Scenario: user resets his daily limit
     Then admin resets his daily limit
 

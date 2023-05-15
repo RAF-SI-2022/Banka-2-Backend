@@ -11,6 +11,7 @@ import io.cucumber.java.en.When;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Optional;
+import javax.persistence.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -188,6 +189,28 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                     .andExpect(status().isOk())
                     .andReturn();
             assertNotNull(mvcResult);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Then("user resets password")
+    public void user_resets_password() {
+        try {
+            mockMvc.perform(post("/auth/reset-password")
+                            .contentType("application/json")
+                            .content(
+                                    """
+                                            {
+                                                  "email": "anesic3119rn+banka2backend+admin@raf.rs",
+                                                  "password": "admin"
+                                            }
+                                            """)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
         }
