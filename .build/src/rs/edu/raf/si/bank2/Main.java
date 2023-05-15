@@ -33,7 +33,8 @@ public class Main {
     private static final String[] HELPER_SERVICES = new String[]{
             "mariadb",
             "flyway",
-            "mongodb"
+            "mongodb",
+            "redis",
     };
     /**
      * Name of the Docker network.
