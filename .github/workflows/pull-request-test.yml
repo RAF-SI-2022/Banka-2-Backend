@@ -26,7 +26,11 @@ jobs:
       # TODO this should be run in container, not on local, fix:
       # https://github.com/andrejanesic/Banka-2-Backend/actions/runs/4947032630/jobs/8845872525#step:6:20745
       # Test all microservices
-      - run: ./run test --local --failstop
+      # TODO this should be done from the runner, programmatically for
+      #   each service
+      - run: ./run stack
+      - run: cd main
+      - run: ./mvnw clean compile test -DargLine=spring.profiles.active=local,test
       # Remove services
       - run: docker compose -v down
 #   report:
