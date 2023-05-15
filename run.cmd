@@ -91,7 +91,7 @@ exit /B 0
 rem Runs any commands other than init through the Java build script with JDK.
 :run
     setlocal
-        set JAVA_HOME=%projectHome%\%jdk%
+        set JAVA_HOME="%projectHome%\%jdk%"
         %bin%\java -cp .build\out rs.edu.raf.si.bank2.Main %*
     endlocal
 exit /B 0
@@ -106,7 +106,7 @@ rem Main script logic.
         set targetSha=amazon-corretto-17-x64-windows-jdk.zip.checksum
         set sourceSha=https://corretto.aws/downloads/latest_sha256/%targetJdk%
         set jdk=lib\jdk
-        set bin=%cd%\%jdk%\bin
+        set bin="%cd%\%jdk%\bin"
 
         if "%~1" == "init" (
             call :init
