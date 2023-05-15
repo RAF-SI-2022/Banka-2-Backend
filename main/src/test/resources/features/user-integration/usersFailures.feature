@@ -27,7 +27,7 @@ Feature: User service
     When user doesnt exist in database
     Then reactivate nonexistent user
 
-  Scenario: deleting nonexistent user #test je brljao zbog promenjenog importa (hoce -models.users.User umesto -models.mariaDb.User, i buni se)
+  Scenario: deleting nonexistent user
     When user doesnt exist in database
     Then deleting nonexistent user from database
 

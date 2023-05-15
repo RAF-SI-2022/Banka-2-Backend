@@ -1,8 +1,6 @@
 package rs.edu.raf.si.bank2.main.cucumber.integration.exchanges;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -72,20 +70,6 @@ public class ExchangesIntegrationSteps extends ExchangesIntegrationTestConfig {
         }
     }
 
-    @Then("user gets all exchanges from database")
-    public void user_gets_all_exchanges_from_database() {
-        try {
-            mockMvc.perform(get("/api/exchange")
-                            .contentType("application/json")
-                            .header("Content-Type", "application/json")
-                            .header("Access-Control-Allow-Origin", "*")
-                            .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isOk())
-                    .andReturn();
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
 
     @Then("user gets exchange by id from database")
     public void user_gets_exchange_by_id_from_database() {
@@ -112,6 +96,24 @@ public class ExchangesIntegrationSteps extends ExchangesIntegrationTestConfig {
         // Perform an assertion that verifies the actual result matches the expected result
         assertEquals(testExchange, actualExchange);
     }
+
+    @Then("user gets all exchanges from database")
+    public void user_gets_all_exchanges_from_database() {
+        MvcResult mvcResult;
+        try {
+            mvcResult = mockMvc.perform(get("/api/exchange")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+            assertNotNull(mvcResult);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
 
     @Then("user gets exchange by acronym from database")
     public void user_gets_exchange_by_acronym_from_database() {

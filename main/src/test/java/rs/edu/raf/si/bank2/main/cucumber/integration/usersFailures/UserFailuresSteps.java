@@ -48,7 +48,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
 
             String expectedMessage = "JWT String argument cannot be null or empty.";
             String actualMessage = exception.getMessage();
-            assertEquals(actualMessage, expectedMessage);
+            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -108,7 +108,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
         }
     }
 
-    // Test admin gets permissions from nonexistent user
+    // Test admin gets permissions from nonexistent user todo fix
     @When("user doesnt exist in database")
     public void user_doesnt_exist_in_database() {
         try {
@@ -123,9 +123,9 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
             });
 
             String expectedMessage =
-                    "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.main.UserNotFoundException: User with id <-1> not found.";
+                    "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException: User with id <-1> not found.";
             String actualMessage = exception.getMessage();
-            assertEquals(actualMessage, expectedMessage);
+            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -145,9 +145,9 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
             });
 
             String expectedMessage =
-                    "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.main.UserNotFoundException: User with id <-1> not found.";
+                    "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException: User with id <-1> not found.";
             String actualMessage = exception.getMessage();
-            assertEquals(actualMessage, expectedMessage);
+            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -168,9 +168,9 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
             });
 
             String expectedMessage =
-                    "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.main.UserNotFoundException: User with id <-1> not found.";
+                    "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException: User with id <-1> not found.";
             String actualMessage = exception.getMessage();
-            assertEquals(actualMessage, expectedMessage);
+            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -191,9 +191,9 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
             });
 
             String expectedMessage =
-                    "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.main.UserNotFoundException: User with id <-1> not found.";
+                    "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException: User with id <-1> not found.";
             String actualMessage = exception.getMessage();
-            assertEquals(actualMessage, expectedMessage);
+            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -214,9 +214,9 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
             });
 
             String expectedMessage =
-                    "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.main.UserNotFoundException: User with id <-1> not found.";
+                    "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException: User with id <-1> not found.";
             String actualMessage = exception.getMessage();
-            assertEquals(actualMessage, expectedMessage);
+            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -254,7 +254,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
             String expectedMessage =
                     "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.main.UserNotFoundException: User with id <-1> not found.";
             String actualMessage = exception.getMessage();
-            assertEquals(actualMessage, expectedMessage);
+            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -275,7 +275,8 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
             });
 
             String expectedMessage =
-                    "Request processing failed; nested exception is org.springframework.dao.EmptyResultDataAccessException: No class rs.edu.raf.si.bank2.main.mariadb.models.main.User entity with id -1 exists!";
+                    "Request processing failed; nested exception is org.springframework.dao.EmptyResultDataAccessException: "
+                            + "No class rs.edu.raf.si.bank2.main.models.mariadb.User entity with id -1 exists!";
             String actualMessage = exception.getMessage();
             assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {

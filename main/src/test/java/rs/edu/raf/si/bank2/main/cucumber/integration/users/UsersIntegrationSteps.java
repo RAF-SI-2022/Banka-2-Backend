@@ -158,12 +158,12 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                                 .header("Authorization", "Bearer " + token))
                         .andExpect(status().isOk())
                         .andReturn();
+
+                System.out.println(mvcResult.getResponse().getContentAsString());
             }
         } catch (Exception e) {
             fail(e.getMessage());
         }
-
-        System.out.println(mvcResult.getResponse().getContentAsString());
     }
 
     @Then("new user is saved in database")
@@ -573,7 +573,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
     }
 
     @Then("user no longer in database")
-    public void user_no_longer_in_database() {
+    public void user_no_longer_in_database() { // todo fix
         Exception exception = assertThrows(Exception.class, () -> {
             mockMvc.perform(get("/api/users/" + testUser.get().getId())
                             .contentType("application/json")
@@ -584,8 +584,8 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                     .andReturn();
         });
 
-        String expectedMessage = "Request processing failed; nested exception is "
-                + "rs.edu.raf.si.bank2.main.exceptions.main.UserNotFoundException: User with id <"
+        String expectedMessage = "Request processing failed; nested exception is"
+                + " rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException: User with id <"
                 + testUser.get().getId()
                 + "> not found.";
         String actualMessage = exception.getMessage();
