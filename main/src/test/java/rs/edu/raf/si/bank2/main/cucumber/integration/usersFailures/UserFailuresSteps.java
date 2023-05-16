@@ -108,6 +108,66 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
         }
     }
 
+    @Then("user types wrong credentials")
+    public void userTypesWrongCredentials() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(
+                            post("/auth/login")
+                                    .contentType("application/json")
+                                    .content(
+                                            """
+                                                    {
+                                                      "email": "error@gmail.com",
+                                                      "password": "error"
+                                                    }
+                                                    """))
+                    .andExpect(status().isUnauthorized())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Then("user tries to change password with wrong token")
+    public void user_tries_to_change_password_with_wrong_token() {
+        try {
+            mockMvc.perform(get("/auth/change-password/errorToken")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().is4xxClientError())
+                    .andReturn();
+
+        } catch (Exception e) {
+            fail("Internal server error");
+        }
+    }
+
+    @Then("user tries to change user password with wrong token")
+    public void user_tries_to_change_user_password_with_wrong_token() {
+        try {
+            mockMvc.perform(post("/auth/change-user-password")
+                            .contentType("application/json")
+                            .content(
+                                    """
+                                {
+                                    "token": "",
+                                    "newPassword": "newPassword"
+                                }
+                             """)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().is4xxClientError())
+                    .andReturn();
+
+        } catch (Exception e) {
+            fail("Internal server error");
+        }
+    }
+
+
     // Test admin gets permissions from nonexistent user todo fix
     @When("user doesnt exist in database")
     public void user_doesnt_exist_in_database() {

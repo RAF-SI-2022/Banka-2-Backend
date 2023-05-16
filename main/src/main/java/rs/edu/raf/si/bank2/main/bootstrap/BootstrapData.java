@@ -36,7 +36,7 @@ import rs.edu.raf.si.bank2.main.services.StockService;
 @Component
 public class BootstrapData implements CommandLineRunner {
 
-    public static final String forexApiKey = "6DL0Q8YP76H9K9T6";
+    public static final String forexApiKey = "OF6BVKZOCXWHD9NS";
     /**
      * TODO promeniti ovo pre produkcije. Promenjen admin mejl da bismo mu
      * zapravo imali pristup. Mogu

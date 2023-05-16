@@ -17,10 +17,14 @@ import org.hamcrest.Matcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import rs.edu.raf.si.bank2.main.models.mariadb.Option;
 import rs.edu.raf.si.bank2.main.models.mariadb.User;
 import rs.edu.raf.si.bank2.main.models.mariadb.UserOption;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.OptionRepository;
 import rs.edu.raf.si.bank2.main.services.OptionService;
 import rs.edu.raf.si.bank2.main.services.UserService;
+
+import javax.transaction.Transactional;
 
 public class OptionIntegrationSteps extends OptionIntegrationTestConfig {
 
@@ -29,6 +33,9 @@ public class OptionIntegrationSteps extends OptionIntegrationTestConfig {
 
     @Autowired
     private OptionService optionService;
+
+    @Autowired
+    OptionRepository optionRepository;
 
     @Autowired
     protected MockMvc mockMvc;
@@ -142,6 +149,14 @@ public class OptionIntegrationSteps extends OptionIntegrationTestConfig {
         } catch (Exception e) {
             fail(e.getMessage());
         }
+    }
+
+    @Transactional
+    @Given("there is an option to buy")
+    public void there_is_an_option_to_buy() {
+        Option toUpdate = optionRepository.getById(3L);
+        toUpdate.setOpenInterest(25);
+        optionRepository.save(toUpdate);
     }
 
     @Then("user buys an AAPL option")

@@ -53,7 +53,7 @@ public class ForexController {
                     Float.parseFloat(forex.getExchangeRate()),
                     dto.getAmount(),
                     null);
-            if (!success)
+            if (!success) {
                 return ResponseEntity.badRequest()
                         .body("Korisnik sa email-om "
                                 + signedInUserEmail
@@ -66,6 +66,7 @@ public class ForexController {
                                 + "("
                                 + forex.getToCurrencyName()
                                 + ")");
+            }
             return ResponseEntity.ok(forex);
         } catch (BalanceNotFoundException e1) {
             return ResponseEntity.badRequest()

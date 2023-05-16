@@ -27,6 +27,7 @@ Feature: Option service
 
   Scenario: user buys an AAPL option
     Given user logs in
+    And there is an option to buy
     When user is logged in
     Then user buys an AAPL option
 

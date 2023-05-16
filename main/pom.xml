@@ -36,7 +36,12 @@
             **/requests/**,
             **/responses/**,
             **/utils/**,
-            **/ServletInitializer.java
+            **/ServletInitializer.java,
+            **/FutureBuyWorker.java,
+            **/FutureSellWorker.java,
+            **/StockBuyWorker.java,
+            **/StockSellWorker.java,
+            **/MainApplication.java,
             **/**.xml
         </sonar.coverage.exclusions>
 
@@ -336,5 +341,35 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${jacoco.version}</version>
+                        <executions>
+                            <execution>
+                                <id>jacoco-initialize</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>jacoco-site</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

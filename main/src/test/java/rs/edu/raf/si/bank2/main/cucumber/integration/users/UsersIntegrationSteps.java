@@ -193,6 +193,29 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
         }
     }
 
+
+    @Then("user resets password")
+    public void user_resets_password() {
+        try {
+            mockMvc.perform(post("/auth/reset-password")
+                            .contentType("application/json")
+                            .content(
+                                    """
+                                            {
+                                                  "email": "anesic3119rn+banka2backend+admin@raf.rs",
+                                                  "password": "admin"
+                                            }
+                                            """)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
     @Then("admin resets his daily limit")
     public void admin_resets_his_daily_limit() {
         try {

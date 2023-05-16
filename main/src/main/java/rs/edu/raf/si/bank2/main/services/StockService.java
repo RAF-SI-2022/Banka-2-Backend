@@ -38,7 +38,7 @@ import rs.edu.raf.si.bank2.main.services.workerThreads.StockSellWorker;
 @Service
 public class StockService {
 
-    private static final String KEY = "RMNF9UJRB9BPVBKK";
+    private static final String KEY = "OF6BVKZOCXWHD9NS";
     private static final String ONE_DAY = "ONE_DAY";
     private static final String FIVE_DAYS = "FIVE_DAYS";
     private static final String ONE_MONTH = "ONE_MONTH";
@@ -85,16 +85,10 @@ public class StockService {
         this.userStockService = userStockService;
         this.balanceService = balanceService;
         this.orderRepository = orderRepository;
-        this.stockBuyWorker = new StockBuyWorker(
-                stockBuyRequestsQueue,
-                userStockService,
-                this,
-                balanceService,
-                currencyService,
-                transactionService,
-                orderRepository);
-        this.stockSellWorker = new StockSellWorker(
-                stockSellRequestsQueue, userStockService, this, transactionService, orderRepository, balanceService);
+        this.stockBuyWorker = new StockBuyWorker(stockBuyRequestsQueue,userStockService,this,
+                balanceService, currencyService, transactionService, orderRepository);
+        this.stockSellWorker = new StockSellWorker(stockSellRequestsQueue, userStockService, this,
+                transactionService, orderRepository, balanceService);
         stockBuyWorker.start();
         stockSellWorker.start();
     }
@@ -227,18 +221,18 @@ public class StockService {
                     case ONE_DAY -> "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol="
                             + stock.getSymbol()
                             + "&interval=5min&outputsize=full&apikey="
-                            + "61U8HHCNVMVINYLI";
+                            + KEY;
                     case FIVE_DAYS -> "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol="
                             + stock.getSymbol()
                             + "&interval=60min&outputsize=full&apikey="
-                            + "J3WDDK9HZ1G71YIP";
+                            + KEY;
                     case ONE_MONTH,
                             SIX_MONTHS,
                             ONE_YEAR,
                             YTD -> "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol="
                             + stock.getSymbol()
                             + "&outputsize=full&apikey="
-                            + "61U8HHCNVMVINYLI";
+                            + KEY;
                     default -> null;
                 };
 
