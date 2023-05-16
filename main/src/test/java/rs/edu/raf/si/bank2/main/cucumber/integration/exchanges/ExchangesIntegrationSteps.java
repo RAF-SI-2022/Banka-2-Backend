@@ -87,6 +87,7 @@ public class ExchangesIntegrationSteps extends ExchangesIntegrationTestConfig {
         Exchange actualExchange = null;
         try {
             actualExchange = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Exchange.class);
+//            actualExchange.setCurrency(null);
         } catch (IOException e) {
             fail(e.getMessage());
         }
@@ -130,6 +131,7 @@ public class ExchangesIntegrationSteps extends ExchangesIntegrationTestConfig {
         Exchange actualExchange = null;
         try {
             actualExchange = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Exchange.class);
+//            actualExchange.setCurrency(null);
         } catch (IOException e) {
             fail(e.getMessage());
         }

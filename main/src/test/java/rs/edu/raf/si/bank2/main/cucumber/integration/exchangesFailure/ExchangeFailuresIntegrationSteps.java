@@ -34,8 +34,7 @@ public class ExchangeFailuresIntegrationSteps extends ExchangeFailuresIntegratio
             "Germany",
             "Europe/Berlin",
             " 08:00",
-            " 20:00"
-    );
+            " 20:00");
     ;
 
     protected static String token;

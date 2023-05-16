@@ -270,7 +270,7 @@ public class StockService {
 
         try {
             timeSeries = fullResponse.getJSONObject(key);
-            System.out.println(timeSeries);
+//            System.out.println(timeSeries);
         } catch (JSONException e) {
             throw new ExternalAPILimitReachedException();
         }

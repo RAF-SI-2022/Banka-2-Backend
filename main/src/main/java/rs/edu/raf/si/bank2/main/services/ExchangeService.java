@@ -6,12 +6,15 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.main.exceptions.ExchangeNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.Exchange;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.ExchangeRepository;
 import rs.edu.raf.si.bank2.main.services.interfaces.ExchangeServiceInterface;
 
+@EnableCaching
 @Service
 public class ExchangeService implements ExchangeServiceInterface {
 
@@ -24,44 +27,65 @@ public class ExchangeService implements ExchangeServiceInterface {
         this.userService = userService;
     }
 
-    @Cacheable(value = "exchanges")
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+    @Cacheable(value = "exchangesALL")
     @Override
     public List<Exchange> findAll() {
+
+//        System.out.println(redisTemplate.keys("*"));
+//      za test ovo moze da se otkomentarise i tacno se vidi da kesira kljuceve redis :)
+        System.out.println("UZMI SVE ID-eve (redis resava to sledeci put matoreee)");
         return exchangeRepository.findAll();
     }
 
-    @Cacheable(value = "exchange", key = "#id")
+
     @Override
-    public Optional<Exchange> findById(Long id) {
+    @Cacheable(value = "exchangesID", key = "#id")
+    public Exchange findById(Long id) {
+//        System.out.println(redisTemplate.keys("*"));
+//      za test ovo moze da se otkomentarise i tacno se vidi da kesira kljuceve redis :)
+        System.out.println("POKUUUUUUUUUUSAJ ZA ID");
+
         Optional<Exchange> exchange = exchangeRepository.findById(id);
         if (exchange.isPresent()) {
-            return exchange;
+            System.out.println("OVDE SMO");
+            return exchange.get();
         } else {
             throw new ExchangeNotFoundException();
         }
     }
 
     @Override
-    public Optional<Exchange> findByMicCode(String micCode) {
+    @Cacheable(value = "exchangesMIC", key = "#micCode")
+    public Exchange findByMicCode(String micCode) {
+
+//        System.out.println(redisTemplate.keys("*"));
+//      za test ovo moze da se otkomentarise i tacno se vidi da kesira kljuceve redis :)
+        System.out.println("POKUUUUUUUUUUSAJ ZA MIC");
         Optional<Exchange> exchange = exchangeRepository.findExchangeByMicCode(micCode);
         if (exchange.isPresent()) {
-            return exchange;
+            return exchange.get();
         } else {
             throw new ExchangeNotFoundException();
         }
     }
 
     @Override
-    public Optional<Exchange> findByAcronym(String acronym) {
+    @Cacheable(value = "exchangesAcronym", key = "#acronym")
+    public Exchange findByAcronym(String acronym) {
+//        System.out.println(redisTemplate.keys("*"));
+//      za test ovo moze da se otkomentarise i tacno se vidi da kesira kljuceve redis :)
+        System.out.println("POKUUUUUUUUUUSAJ ZA ACRONYM");
         Optional<Exchange> exchange = exchangeRepository.findExchangeByAcronym(acronym);
         if (exchange.isPresent()) {
-            return exchange;
+            return exchange.get();
         } else {
             throw new ExchangeNotFoundException();
         }
     }
 
-    @Override
+
     public boolean isExchangeActive(String micCode) {
 
         Optional<Exchange> exchangeEntry = exchangeRepository.findExchangeByMicCode(micCode);
