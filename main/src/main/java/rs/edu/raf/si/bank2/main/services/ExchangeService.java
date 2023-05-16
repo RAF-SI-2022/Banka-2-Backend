@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.main.exceptions.ExchangeNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.Exchange;
@@ -23,14 +24,15 @@ public class ExchangeService implements ExchangeServiceInterface {
         this.userService = userService;
     }
 
+    @Cacheable(value = "exchanges")
     @Override
     public List<Exchange> findAll() {
         return exchangeRepository.findAll();
     }
 
+    @Cacheable(value = "exchange", key = "#id")
     @Override
     public Optional<Exchange> findById(Long id) {
-
         Optional<Exchange> exchange = exchangeRepository.findById(id);
         if (exchange.isPresent()) {
             return exchange;

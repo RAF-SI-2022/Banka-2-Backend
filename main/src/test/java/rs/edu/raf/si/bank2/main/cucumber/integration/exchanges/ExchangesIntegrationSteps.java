@@ -57,7 +57,7 @@ public class ExchangesIntegrationSteps extends ExchangesIntegrationTestConfig {
     @Given("there is an exchange record in database")
     public void there_is_an_exchange_record_in_database() {
         testExchange = new Exchange(
-                2L, "Nasdaq", "NASDAQ", "XNAS", "USA", null, "America/New_York", " 09:30", " 16:00", Arrays.asList());
+                2L, "Nasdaq", "NASDAQ", "XNAS", "USA", "America/New_York", " 09:30", " 16:00");
     }
 
     @When("user is logged in")
@@ -87,7 +87,6 @@ public class ExchangesIntegrationSteps extends ExchangesIntegrationTestConfig {
         Exchange actualExchange = null;
         try {
             actualExchange = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Exchange.class);
-            actualExchange.setCurrency(null);
         } catch (IOException e) {
             fail(e.getMessage());
         }
@@ -131,7 +130,6 @@ public class ExchangesIntegrationSteps extends ExchangesIntegrationTestConfig {
         Exchange actualExchange = null;
         try {
             actualExchange = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Exchange.class);
-            actualExchange.setCurrency(null);
         } catch (IOException e) {
             fail(e.getMessage());
         }

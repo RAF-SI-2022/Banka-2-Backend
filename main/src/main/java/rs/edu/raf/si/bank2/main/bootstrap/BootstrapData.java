@@ -22,6 +22,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import rs.edu.raf.si.bank2.main.bootstrap.readers.CurrencyReader;
@@ -75,6 +76,8 @@ public class BootstrapData implements CommandLineRunner {
 
     private final EntityManagerFactory entityManagerFactory;
 
+    private final RedisConnectionFactory redisConnectionFactory;
+
     @Autowired
     public BootstrapData(
             UserRepository userRepository,
@@ -92,7 +95,7 @@ public class BootstrapData implements CommandLineRunner {
             StockService stockService,
             OptionService optionService,
             OptionRepository optionRepository,
-            EntityManagerFactory entityManagerFactory) {
+            EntityManagerFactory entityManagerFactory, RedisConnectionFactory redisConnectionFactory) {
         this.userRepository = userRepository;
         this.permissionRepository = permissionRepository;
         this.currencyRepository = currencyRepository;
@@ -109,10 +112,14 @@ public class BootstrapData implements CommandLineRunner {
         this.optionService = optionService;
         this.optionRepository = optionRepository;
         this.entityManagerFactory = entityManagerFactory;
+        this.redisConnectionFactory = redisConnectionFactory;
     }
 
     @Override
     public void run(String... args) throws Exception {
+
+        System.out.println("We are pinging redis \n PING");
+        System.out.println(redisConnectionFactory.getConnection().ping());
 
         // If empty, add futures in db from csv
         long numberOfRowsFutures = this.futureRepository.count();

@@ -32,11 +32,10 @@ public class ExchangeFailuresIntegrationSteps extends ExchangeFailuresIntegratio
             "FAIL",
             "LLLL",
             "Germany",
-            null,
             "Europe/Berlin",
             " 08:00",
-            " 20:00",
-            Arrays.asList());
+            " 20:00"
+    );
     ;
 
     protected static String token;
