@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <output url="file://$MODULE_DIR$/../../.build/out" />
+    <output-test url="file://$MODULE_DIR$/../../.build/out" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../.build">
+      <sourceFolder url="file://$MODULE_DIR$/../../.build/src"
+        isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../.build/out" />
+    </content>
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

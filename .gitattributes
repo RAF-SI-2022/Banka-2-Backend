@@ -1,3 +1,4 @@
 * text eol=lf
 *.jar binary -text
+*.class -text
 *.cmd text=crlf
