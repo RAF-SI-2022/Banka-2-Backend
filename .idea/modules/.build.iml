@@ -5,10 +5,10 @@
     <output-test url="file://$MODULE_DIR$/../../.build/out" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../.build">
-      <sourceFolder url="file://$MODULE_DIR$/../../.build/src"
-        isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../.build/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/../../.build/out" />
     </content>
+    <orderEntry type="jdk" jdkName="17" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

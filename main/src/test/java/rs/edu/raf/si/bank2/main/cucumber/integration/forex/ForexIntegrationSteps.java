@@ -221,13 +221,13 @@ public class ForexIntegrationSteps extends ForexIntegrationTestConfig {
         String body = new ObjectMapper().writeValueAsString(dto);
         try {
             // TODO ovo nekad pada nekad ne, mora da se vidi u cemu je problem
-             mvcResult = mockMvc.perform(post("/api/forex/buy-sell")
-                             .header("Authorization", "Bearer " + token)
-                             .header("Content-Type", "application/json")
-                             .header("Access-Control-Allow-Origin", "*")
-                             .content(body))
-                     .andExpect(status().isOk())
-                     .andReturn();
+            mvcResult = mockMvc.perform(post("/api/forex/buy-sell")
+                            .header("Authorization", "Bearer " + token)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .content(body))
+                    .andExpect(status().isOk())
+                    .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
         }

@@ -27,3 +27,4 @@ Feature: Stock service
   Scenario: user without perms tries to remove stocks
     Then user tries to remove stock
 
+

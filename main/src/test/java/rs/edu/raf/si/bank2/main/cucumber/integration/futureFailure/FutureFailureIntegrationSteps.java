@@ -534,6 +534,38 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
         }
     }
 
+    /*
+    @Then("user gets waiting buy future but error occurs")
+    public void user_gets_waiting_buy_future_but_error_occurs() throws JsonProcessingException {
+
+
+        Optional<User> user = userService.findByEmail("anesic3119rn+banka2backend+admin@raf.rs");
+        FutureRequestBuySell request = this.createFutureRequest(
+                testFuture.getId(),
+                user.get().getId(),
+                testFuture.getFutureName(),
+                "SELL",
+                testFuture.getMaintenanceMargin(),
+                "USD",
+                0,
+                0);
+        String body = new ObjectMapper().writeValueAsString(request);
+        try {
+            mockMvc.perform(get("/api/futures/waiting-futures/type/name")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token)
+                            .content(body))
+                    .andExpect(status().isInternalServerError())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+        this.resetAdminInfo(user.get());
+    }
+     */
+
     @Then("user cant get future by user")
     public void user_cant_get_future_by_user() {
         try {
@@ -589,6 +621,20 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
             String expectedMessage = "JWT String argument cannot be null or empty.";
             String actualMessage = exception.getMessage();
             assertEquals(expectedMessage, actualMessage);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Then("user removes waiting future buy but isnt authorized")
+    public void user_removes_waiting_future_buy_but_isnt_authorized() {
+        try {
+            mockMvc.perform(post("/api/futures/remove-waiting-buy/1")
+                            .header("Authorization", "Bearer " + token)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*"))
+                    .andExpect(status().isUnauthorized())
+                    .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
         }

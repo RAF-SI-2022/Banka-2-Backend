@@ -123,6 +123,27 @@ public class OrderFailuresIntegrationSteps extends OrderIntegrationFailuresTestC
                 "usd"));
     }
 
+    @Given("there is order in waiting status in db")
+    public void there_is_order_in_waiting_status_in_db() {
+        testOrder = this.orderService.save(new StockOrder(
+                0L,
+                OrderType.STOCK,
+                OrderTradeType.BUY,
+                OrderStatus.WAITING,
+                "AAPL",
+                2,
+                1,
+                "datum",
+                this.userService
+                        .findByEmail("anesic3119rn+banka2backend+admin@raf.rs")
+                        .get(),
+                0,
+                0,
+                false,
+                false,
+                "usd"));
+    }
+
     @When("user logged in")
     public void user_logged_in() {
         token = null;
@@ -172,6 +193,22 @@ public class OrderFailuresIntegrationSteps extends OrderIntegrationFailuresTestC
                                     .header("Access-Control-Allow-Origin", "*")
                                     .header("Authorization", "Bearer " + token))
                     .andExpect(status().isBadRequest())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Then("order denied")
+    public void order_denied() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(
+                            patch("/api/orders/deny/" + (testOrder.getId()))
+                                    .contentType("application/json")
+                                    .header("Content-Type", "application/json")
+                                    .header("Access-Control-Allow-Origin", "*")
+                                    .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());

@@ -266,4 +266,34 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
         }
     }
 
+    @Then("user gets stock history by id and time")
+    public void user_gets_stock_history_by_id_and_time() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(get("/api/stock/1/history/ONE_DAY")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+            assertNotNull(mvcResult);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Then("authorised user removes stock")
+    public void authorised_user_removes_stock() {
+        try {
+            mockMvc.perform(post("/api/stock/remove/" + testStock.getSymbol())
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
 }

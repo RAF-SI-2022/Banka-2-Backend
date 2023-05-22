@@ -167,7 +167,6 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
         }
     }
 
-
     // Test admin gets permissions from nonexistent user todo fix
     @When("user doesnt exist in database")
     public void user_doesnt_exist_in_database() {
@@ -654,6 +653,22 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
                             .header("Authorization", "Bearer " + token))
                     .andExpect(status().isUnauthorized())
                     .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Then("unauthorised user resets his daily limit")
+    public void unauthorised_user_resets_his_daily_limit() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(patch("/api/users/reset-limit/1")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isUnauthorized())
+                    .andReturn();
+            assertNotNull(mvcResult);
         } catch (Exception e) {
             fail(e.getMessage());
         }
