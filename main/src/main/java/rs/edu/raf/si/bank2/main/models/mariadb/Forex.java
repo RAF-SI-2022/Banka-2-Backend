@@ -7,13 +7,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Entity
 @Table(name = "forex")
-public class Forex {
+public class Forex implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
