@@ -29,21 +29,21 @@ public class ExchangeService implements ExchangeServiceInterface {
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
+
     @Cacheable(value = "exchangesALL")
     @Override
     public List<Exchange> findAll() {
-//        System.out.println(redisTemplate.keys("*"));
-//      za test ovo moze da se otkomentarise i tacno se vidi da kesira kljuceve redis :)
+        //        System.out.println(redisTemplate.keys("*"));
+        //      za test ovo moze da se otkomentarise i tacno se vidi da kesira kljuceve redis :)
         System.out.println("Getting all exchanges first time (caching into redis)");
         return exchangeRepository.findAll();
     }
 
-
     @Override
     @Cacheable(value = "exchangesID", key = "#id")
     public Exchange findById(Long id) {
-//        System.out.println(redisTemplate.keys("*"));
-//      za test ovo moze da se otkomentarise i tacno se vidi da kesira kljuceve redis :)
+        //        System.out.println(redisTemplate.keys("*"));
+        //      za test ovo moze da se otkomentarise i tacno se vidi da kesira kljuceve redis :)
 
         System.out.println("Getting exchange by id first time (caching into redis)");
 
@@ -58,8 +58,8 @@ public class ExchangeService implements ExchangeServiceInterface {
     @Override
     @Cacheable(value = "exchangesMIC", key = "#micCode")
     public Exchange findByMicCode(String micCode) {
-//        System.out.println(redisTemplate.keys("*"));
-//      za test ovo moze da se otkomentarise i tacno se vidi da kesira kljuceve redis :)
+        //        System.out.println(redisTemplate.keys("*"));
+        //      za test ovo moze da se otkomentarise i tacno se vidi da kesira kljuceve redis :)
 
         System.out.println("Getting exchange for micCode first time (caching into redis)");
         Optional<Exchange> exchange = exchangeRepository.findExchangeByMicCode(micCode);
@@ -73,8 +73,8 @@ public class ExchangeService implements ExchangeServiceInterface {
     @Override
     @Cacheable(value = "exchangesAcronym", key = "#acronym")
     public Exchange findByAcronym(String acronym) {
-//        System.out.println(redisTemplate.keys("*"));
-//      za test ovo moze da se otkomentarise i tacno se vidi da kesira kljuceve redis :)
+        //        System.out.println(redisTemplate.keys("*"));
+        //      za test ovo moze da se otkomentarise i tacno se vidi da kesira kljuceve redis :)
 
         System.out.println("Getting exchange for acronym first time (caching into redis)");
         Optional<Exchange> exchange = exchangeRepository.findExchangeByAcronym(acronym);
@@ -84,7 +84,6 @@ public class ExchangeService implements ExchangeServiceInterface {
             throw new ExchangeNotFoundException();
         }
     }
-
 
     public boolean isExchangeActive(String micCode) {
 

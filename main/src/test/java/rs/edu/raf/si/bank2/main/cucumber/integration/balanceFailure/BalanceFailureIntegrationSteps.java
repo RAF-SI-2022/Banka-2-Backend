@@ -1,5 +1,9 @@
 package rs.edu.raf.si.bank2.main.cucumber.integration.balanceFailure;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.jayway.jsonpath.JsonPath;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -7,19 +11,9 @@ import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import rs.edu.raf.si.bank2.main.models.mariadb.Balance;
-import rs.edu.raf.si.bank2.main.models.mariadb.Currency;
-import rs.edu.raf.si.bank2.main.models.mariadb.User;
 import rs.edu.raf.si.bank2.main.services.BalanceService;
-import rs.edu.raf.si.bank2.main.services.CurrencyService;
 import rs.edu.raf.si.bank2.main.services.UserService;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 public class BalanceFailureIntegrationSteps extends BalanceFailureIntegrationTestConfig {
     @Autowired
     BalanceService balanceService;
@@ -31,8 +25,6 @@ public class BalanceFailureIntegrationSteps extends BalanceFailureIntegrationTes
     protected MockMvc mockMvc;
 
     protected static String token;
-
-
 
     @Given("user logs in")
     public void user_logs_in() {
@@ -71,7 +63,8 @@ public class BalanceFailureIntegrationSteps extends BalanceFailureIntegrationTes
         try {
             mockMvc.perform(post("/api/balances/increase")
                             .contentType("application/json")
-                            .content("""
+                            .content(
+                                    """
                                 {
                                     "userEmail": "anesic3119rn+banka2backend+admin@raf.rs",
                                     "currencyCode": "USDD",
@@ -87,12 +80,14 @@ public class BalanceFailureIntegrationSteps extends BalanceFailureIntegrationTes
             fail(e.getMessage());
         }
     }
+
     @Then("user tries to increase balance but user not found")
     public void userTriesToIncreaseBalanceButUserNotFound() {
         try {
             mockMvc.perform(post("/api/balances/increase")
                             .contentType("application/json")
-                            .content("""
+                            .content(
+                                    """
                                 {
                                     "userEmail": "aanesic3119rn+banka2backend+admin@raf.rs",
                                     "currencyCode": "USD",
@@ -114,7 +109,8 @@ public class BalanceFailureIntegrationSteps extends BalanceFailureIntegrationTes
         try {
             mockMvc.perform(post("/api/balances/decrease")
                             .contentType("application/json")
-                            .content("""
+                            .content(
+                                    """
                                 {
                                     "userEmail": "anesic3119rn+banka2backend+admin@raf.rs",
                                     "currencyCode": "USD",
@@ -136,7 +132,8 @@ public class BalanceFailureIntegrationSteps extends BalanceFailureIntegrationTes
         try {
             mockMvc.perform(post("/api/balances/decrease")
                             .contentType("application/json")
-                            .content("""
+                            .content(
+                                    """
                                 {
                                     "userEmail": "anesic3119rn+banka2backend+admin@raf.rs",
                                     "currencyCode": "USD",
@@ -158,7 +155,8 @@ public class BalanceFailureIntegrationSteps extends BalanceFailureIntegrationTes
         try {
             mockMvc.perform(post("/api/balances/decrease")
                             .contentType("application/json")
-                            .content("""
+                            .content(
+                                    """
                                 {
                                     "userEmail": "aaanesic3119rn+banka2backend+admin@raf.rs",
                                     "currencyCode": "UUSD",
@@ -174,5 +172,4 @@ public class BalanceFailureIntegrationSteps extends BalanceFailureIntegrationTes
             fail(e.getMessage());
         }
     }
-
 }

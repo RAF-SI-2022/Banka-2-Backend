@@ -3,10 +3,7 @@ package rs.edu.raf.si.bank2.main.services;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -55,14 +52,14 @@ public class FutureService implements FutureServiceInterface {
     }
 
     @Override
-//    @Cacheable(value = "futureALL")
+    //    @Cacheable(value = "futureALL")
     public List<Future> findAll() {
         System.out.println("Getting all futures first time (caching into redis)");
         return futureRepository.findAll();
     }
 
     @Override
-//    @Cacheable(value = "futureID", key = "#id")
+    //    @Cacheable(value = "futureID", key = "#id")
     public Optional<Future> findById(Long id) {
         System.out.println("Getting future by id first time (caching into redis)");
         return futureRepository.findFutureById(id);
@@ -75,16 +72,18 @@ public class FutureService implements FutureServiceInterface {
         return futureRepository.findFuturesByFutureName(futureName);
     }
 
-    //todo cache
+    // todo cache
     public Future saveFuture(Future future) {
         return futureRepository.save(future);
     }
 
     @Override
-//    @Caching(evict = {@CacheEvict("futureALL"), @CacheEvict(value="futureID", key="#futureRequest.id") })
-//    @CachePut(value = "futureID", key = "#futureRequest.id")
-    public ResponseEntity<?> buyFuture(FutureRequestBuySell futureRequest, String userBuyerEmail, Float usersMoneyInCurrency) {
-        if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) { // regular buy - kupuje se odmah, ne ceka se nista;
+    //    @Caching(evict = {@CacheEvict("futureALL"), @CacheEvict(value="futureID", key="#futureRequest.id") })
+    //    @CachePut(value = "futureID", key = "#futureRequest.id")
+    public ResponseEntity<?> buyFuture(
+            FutureRequestBuySell futureRequest, String userBuyerEmail, Float usersMoneyInCurrency) {
+        if (futureRequest.getLimit() == 0
+                && futureRequest.getStop() == 0) { // regular buy - kupuje se odmah, ne ceka se nista;
             System.err.println("KURACCCC");
             return this.regularBuy(futureRequest, userBuyerEmail, usersMoneyInCurrency);
         }
@@ -93,7 +92,7 @@ public class FutureService implements FutureServiceInterface {
     }
 
     @Override
-    @Caching(evict = {@CacheEvict("futureALL"), @CacheEvict(value="futureID", key="#futureRequest.id") })
+    @Caching(evict = {@CacheEvict("futureALL"), @CacheEvict(value = "futureID", key = "#futureRequest.id")})
     public ResponseEntity<?> sellFuture(FutureRequestBuySell futureRequest) {
         if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) {
             return this.regularSell(futureRequest);

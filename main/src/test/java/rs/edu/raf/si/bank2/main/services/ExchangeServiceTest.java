@@ -13,13 +13,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 import rs.edu.raf.si.bank2.main.configuration.RedisTestConfiguration;
 import rs.edu.raf.si.bank2.main.exceptions.ExchangeNotFoundException;
@@ -32,8 +28,8 @@ import rs.edu.raf.si.bank2.main.repositories.mariadb.ExchangeRepository;
 @Import(RedisTestConfiguration.class)
 class ExchangeServiceTest {
 
-//    @Autowired
-//    private RedisTemplate<String, Object> redisTemplate;
+    //    @Autowired
+    //    private RedisTemplate<String, Object> redisTemplate;
 
     @Mock
     private ExchangeRepository exchangeRepository;

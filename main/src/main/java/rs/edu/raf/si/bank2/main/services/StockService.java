@@ -86,10 +86,16 @@ public class StockService {
         this.userStockService = userStockService;
         this.balanceService = balanceService;
         this.orderRepository = orderRepository;
-        this.stockBuyWorker = new StockBuyWorker(stockBuyRequestsQueue,userStockService,this,
-                balanceService, currencyService, transactionService, orderRepository);
-        this.stockSellWorker = new StockSellWorker(stockSellRequestsQueue, userStockService, this,
-                transactionService, orderRepository, balanceService);
+        this.stockBuyWorker = new StockBuyWorker(
+                stockBuyRequestsQueue,
+                userStockService,
+                this,
+                balanceService,
+                currencyService,
+                transactionService,
+                orderRepository);
+        this.stockSellWorker = new StockSellWorker(
+                stockSellRequestsQueue, userStockService, this, transactionService, orderRepository, balanceService);
         stockBuyWorker.start();
         stockSellWorker.start();
     }
@@ -275,7 +281,7 @@ public class StockService {
 
         try {
             timeSeries = fullResponse.getJSONObject(key);
-//            System.out.println(timeSeries);
+            //            System.out.println(timeSeries);
         } catch (JSONException e) {
             throw new ExternalAPILimitReachedException();
         }

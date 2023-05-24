@@ -1,8 +1,7 @@
 package rs.edu.raf.si.bank2.main.requests;
 
-import lombok.Data;
-
 import java.io.Serializable;
+import lombok.Data;
 
 @Data
 public class FutureRequestBuySell implements Serializable {

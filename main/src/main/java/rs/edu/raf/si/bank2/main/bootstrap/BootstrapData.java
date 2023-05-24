@@ -95,7 +95,8 @@ public class BootstrapData implements CommandLineRunner {
             StockService stockService,
             OptionService optionService,
             OptionRepository optionRepository,
-            EntityManagerFactory entityManagerFactory, RedisConnectionFactory redisConnectionFactory) {
+            EntityManagerFactory entityManagerFactory,
+            RedisConnectionFactory redisConnectionFactory) {
         this.userRepository = userRepository;
         this.permissionRepository = permissionRepository;
         this.currencyRepository = currencyRepository;

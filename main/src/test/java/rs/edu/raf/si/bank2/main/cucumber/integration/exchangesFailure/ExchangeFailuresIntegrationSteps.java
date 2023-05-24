@@ -9,7 +9,6 @@ import com.jayway.jsonpath.JsonPath;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import java.util.Arrays;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,15 +25,8 @@ public class ExchangeFailuresIntegrationSteps extends ExchangeFailuresIntegratio
     @Autowired
     protected MockMvc mockMvc;
 
-    protected static Exchange testExchange = new Exchange(
-            -1L,
-            "Fail Stock Xchange",
-            "FAIL",
-            "LLLL",
-            "Germany",
-            "Europe/Berlin",
-            " 08:00",
-            " 20:00");
+    protected static Exchange testExchange =
+            new Exchange(-1L, "Fail Stock Xchange", "FAIL", "LLLL", "Germany", "Europe/Berlin", " 08:00", " 20:00");
     ;
 
     protected static String token;

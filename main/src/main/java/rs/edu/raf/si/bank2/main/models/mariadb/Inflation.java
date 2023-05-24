@@ -1,13 +1,12 @@
 package rs.edu.raf.si.bank2.main.models.mariadb;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serializable;
 import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-
-import java.io.Serializable;
 
 @Data
 @Builder

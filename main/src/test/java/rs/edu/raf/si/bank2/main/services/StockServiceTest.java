@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -515,9 +514,9 @@ public class StockServiceTest {
 
         assertNotNull(result);
 
-        //TODO Test je odradjen ali faila zbog free api key-a
+        // TODO Test je odradjen ali faila zbog free api key-a
         //        assertThrows(ExternalAPILimitReachedException.class, () ->
-//        stockService.getStockHistoryForStockByIdAndType(id, type));
+        //        stockService.getStockHistoryForStockByIdAndType(id, type));
     }
 
     static Stream<Arguments> getStockHistoryForStockByIdAndType_provider() {
@@ -527,8 +526,7 @@ public class StockServiceTest {
                 Arguments.of("ONE_MONTH"),
                 Arguments.of("SIX_MONTHS"),
                 Arguments.of("ONE_YEAR"),
-                Arguments.of("YTD")
-        );
+                Arguments.of("YTD"));
     }
 
     @Test
