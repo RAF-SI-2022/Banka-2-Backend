@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 
+import java.io.Serializable;
+
 @Data
 @ToString(exclude = "user")
 @Builder
@@ -14,7 +16,7 @@ import lombok.ToString;
 // @RequiredArgsConstructor
 @Entity
 @Table(name = "futureTable")
-public class Future {
+public class Future implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

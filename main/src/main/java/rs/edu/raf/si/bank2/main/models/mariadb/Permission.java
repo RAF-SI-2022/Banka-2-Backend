@@ -1,6 +1,8 @@
 package rs.edu.raf.si.bank2.main.models.mariadb;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Objects;
 import javax.persistence.*;
@@ -18,7 +20,7 @@ import org.hibernate.Hibernate;
 @Table(
         name = "permissions",
         uniqueConstraints = {@UniqueConstraint(columnNames = "permissionName")})
-public class Permission {
+public class Permission implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

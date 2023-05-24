@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -15,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @Table(
         name = "inflations",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"id"})}) // dodaj posle i currency?
-public class Inflation {
+public class Inflation implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

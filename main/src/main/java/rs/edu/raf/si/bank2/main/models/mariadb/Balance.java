@@ -5,6 +5,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Data
 @ToString(exclude = {"user", "currency"})
 @Builder
@@ -14,7 +16,7 @@ import lombok.*;
 @Table(
         name = "balances",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"id"})})
-public class Balance {
+public class Balance implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

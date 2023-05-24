@@ -2,8 +2,10 @@ package rs.edu.raf.si.bank2.main.requests;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class FutureRequestBuySell {
+public class FutureRequestBuySell implements Serializable {
     Long id;
     Long userId; // na frontu je null
     String futureName; // sluzi za pretragu
