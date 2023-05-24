@@ -1,5 +1,6 @@
 package rs.edu.raf.si.bank2.main.models.mariadb;
 
+import java.io.Serializable;
 import java.util.List;
 import javax.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @Table(
         name = "currencies",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"id"})}) // dodaj posle i ostale atribute
-public class Currency {
+public class Currency implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

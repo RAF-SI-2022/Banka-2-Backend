@@ -1,6 +1,7 @@
 package rs.edu.raf.si.bank2.main.models.mariadb;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serializable;
 import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @Table(
         name = "inflations",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"id"})}) // dodaj posle i currency?
-public class Inflation {
+public class Inflation implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

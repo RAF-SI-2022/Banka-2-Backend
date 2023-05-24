@@ -1,7 +1,6 @@
 package rs.edu.raf.si.bank2.main.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.edu.raf.si.bank2.main.services.AuthorisationService;

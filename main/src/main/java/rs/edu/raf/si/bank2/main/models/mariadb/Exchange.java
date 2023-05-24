@@ -1,7 +1,6 @@
 package rs.edu.raf.si.bank2.main.models.mariadb;
 
 import java.io.Serializable;
-import java.util.Collection;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -39,7 +38,7 @@ public class Exchange implements Serializable {
         this.acronym = acronym;
         this.micCode = micCode;
         this.polity = polity;
-//        this.currency = currency;
+        //        this.currency = currency;
         this.timeZone = timeZone;
         this.openTime = openTime;
         this.closeTime = closeTime;
@@ -55,9 +54,9 @@ public class Exchange implements Serializable {
 
     private String polity;
 
-//    @ManyToOne
-//    @JoinColumn(name = "currency_id")
-//    private Currency currency;
+    //    @ManyToOne
+    //    @JoinColumn(name = "currency_id")
+    //    private Currency currency;
 
     private String timeZone;
 
@@ -65,8 +64,8 @@ public class Exchange implements Serializable {
 
     private String closeTime;
 
-//    @ElementCollection
-//    @CollectionTable(name = "exchange_calendar", joinColumns = @JoinColumn(name = "exchange_id"))
-//    @Column(name = "calendar_value")
-//    private Collection<String> calendar;
+    //    @ElementCollection
+    //    @CollectionTable(name = "exchange_calendar", joinColumns = @JoinColumn(name = "exchange_id"))
+    //    @Column(name = "calendar_value")
+    //    private Collection<String> calendar;
 }

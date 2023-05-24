@@ -265,5 +265,4 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
             fail(e.getMessage());
         }
     }
-
 }

@@ -12,6 +12,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.util.List;
 import java.util.Optional;
+import javax.transaction.Transactional;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,6 @@ import rs.edu.raf.si.bank2.main.models.mariadb.UserOption;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.OptionRepository;
 import rs.edu.raf.si.bank2.main.services.OptionService;
 import rs.edu.raf.si.bank2.main.services.UserService;
-
-import javax.transaction.Transactional;
 
 public class OptionIntegrationSteps extends OptionIntegrationTestConfig {
 

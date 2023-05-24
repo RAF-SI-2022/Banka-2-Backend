@@ -95,7 +95,8 @@ public class BootstrapData implements CommandLineRunner {
             StockService stockService,
             OptionService optionService,
             OptionRepository optionRepository,
-            EntityManagerFactory entityManagerFactory, RedisConnectionFactory redisConnectionFactory) {
+            EntityManagerFactory entityManagerFactory,
+            RedisConnectionFactory redisConnectionFactory) {
         this.userRepository = userRepository;
         this.permissionRepository = permissionRepository;
         this.currencyRepository = currencyRepository;
@@ -118,7 +119,7 @@ public class BootstrapData implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        System.out.println("We are pinging redis \n PING");
+        System.out.println("We are pinging redis \nPING");
         System.out.println(redisConnectionFactory.getConnection().ping());
 
         // If empty, add futures in db from csv

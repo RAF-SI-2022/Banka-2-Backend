@@ -1,5 +1,6 @@
 package rs.edu.raf.si.bank2.main.models.mariadb;
 
+import java.io.Serializable;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -13,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Entity
 @Table(name = "forex")
-public class Forex {
+public class Forex implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
