@@ -6,6 +6,11 @@
       <sourceFolder url="file://$MODULE_DIR$/main/src/main/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/main/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/main/src/test/resources" type="java-test-resource" />
+
+        <sourceFolder url="file://$MODULE_DIR$/users/src/main/java" isTestSource="false" />
+        <sourceFolder url="file://$MODULE_DIR$/users/src/main/resources" type="java-resource" />
+        <sourceFolder url="file://$MODULE_DIR$/users/src/test/java" isTestSource="true" />
+        <sourceFolder url="file://$MODULE_DIR$/users/src/test/resources" type="java-test-resource" />
     </content>
   </component>
 </module>
