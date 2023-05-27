@@ -34,7 +34,6 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
     private final CurrencyService currencyService;
     private final BalanceService balanceService;
-
     private final CommunicationInterface communicationInterface;
 
     @Autowired
@@ -56,8 +55,12 @@ public class UserController {
 
 
     @GetMapping("/test")
-    public ResponseEntity<?> testMethod() throws IOException, InterruptedException {
-        return ResponseEntity.ok().body(communicationInterface.testComs());
+    public ResponseEntity<?> testMethod() throws IOException {
+        String signedInUserEmail = getContext().getAuthentication().getName();
+        String result = communicationInterface.isAuthorised(PermissionName.ADMIN_USER ,signedInUserEmail);
+
+        if (result.equals("All good")) return ResponseEntity.ok().body("good job");
+        else return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
     }
 
     @GetMapping(value = "/permissions")
@@ -283,8 +286,7 @@ public class UserController {
     }
 
     @PutMapping("/password/{id}")
-    public ResponseEntity<?> changePassword(
-            @PathVariable(name = "id") Long id, @RequestBody ChangePasswordRequest user) {
+    public ResponseEntity<?> changePassword(@PathVariable(name = "id") Long id, @RequestBody ChangePasswordRequest user) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         Optional<User> logovan = userService.findByEmail(signedInUserEmail);
 
