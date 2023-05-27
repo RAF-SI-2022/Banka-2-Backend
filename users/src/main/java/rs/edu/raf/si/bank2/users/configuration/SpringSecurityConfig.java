@@ -46,20 +46,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/auth/**")
-                .permitAll()
-                .antMatchers("/swagger-ui/**")
-                .permitAll()
-                .antMatchers("/swagger-ui.html")
-                .permitAll()
-                .antMatchers("/v3/api-docs/**")
-                .permitAll()
-                .antMatchers("/actuator/**")
-                .permitAll()
-                .anyRequest()
-                .authenticated()
-                .and()
-                .sessionManagement()
+                .antMatchers("/api/**").permitAll()
+                .anyRequest().authenticated()
+                .and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         httpSecurity.addFilterBefore(this.jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -70,4 +59,5 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManager();
     }
+
 }

@@ -11,10 +11,8 @@ import rs.edu.raf.si.bank2.main.models.mariadb.Future;
 import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
 import rs.edu.raf.si.bank2.main.models.mariadb.User;
 import rs.edu.raf.si.bank2.main.requests.FutureRequestBuySell;
-import rs.edu.raf.si.bank2.main.services.AuthorisationService;
-import rs.edu.raf.si.bank2.main.services.BalanceService;
-import rs.edu.raf.si.bank2.main.services.FutureService;
-import rs.edu.raf.si.bank2.main.services.UserService;
+import rs.edu.raf.si.bank2.main.services.*;
+import rs.edu.raf.si.bank2.main.services.interfaces.CommunicationInterface;
 
 @RestController
 @CrossOrigin
@@ -25,13 +23,16 @@ public class FutureController {
     private final FutureService futureService;
     private final BalanceService balanceService;
     private final UserService userService;
+    private final CommunicationInterface communicationInterface;
 
     @Autowired
     public FutureController(
             AuthorisationService authorisationService,
             FutureService futureService,
             BalanceService balanceService,
-            UserService userService) {
+            UserService userService,
+            CommunicationService communicationService) {
+        this.communicationInterface = communicationService;
         this.authorisationService = authorisationService;
         this.futureService = futureService;
         this.balanceService = balanceService;
@@ -41,7 +42,7 @@ public class FutureController {
     @GetMapping()
     public ResponseEntity<?> findAll() {
         String signedInUserEmail = getContext().getAuthentication().getName(); // todo dodaj nove perms
-        if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
             return ResponseEntity.status(401).body("Nemate dozvolu da pristupite terminskeim ugovorima.");
         }
         return ResponseEntity.ok().body(futureService.findAll());
@@ -50,7 +51,7 @@ public class FutureController {
     @GetMapping(value = "/{futureId}")
     public ResponseEntity<?> findById(@PathVariable(name = "futureId") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
             return ResponseEntity.status(401).body("Nemate dozvolu da pristupite terminskeim ugovorima.");
         }
 
@@ -60,7 +61,7 @@ public class FutureController {
     @GetMapping(value = "/name/{name}")
     public ResponseEntity<?> findFuturesByName(@PathVariable(name = "name") String futureName) {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
             return ResponseEntity.status(401).body("Nemate dozvolu da pristupite terminskeim ugovorima.");
         }
         return ResponseEntity.ok().body(futureService.findFuturesByFutureName(futureName));
@@ -69,7 +70,7 @@ public class FutureController {
     @PostMapping(value = "/buy")
     public ResponseEntity<?> buyFuture(@RequestBody FutureRequestBuySell futureRequest) {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
             return ResponseEntity.status(401).body("Nemate dozvolu da kupujete terminske ugovore.");
         }
         Optional<User> user = userService.findByEmail(signedInUserEmail);
@@ -93,7 +94,7 @@ public class FutureController {
     @PostMapping(value = "/sell")
     public ResponseEntity<?> sellFuture(@RequestBody FutureRequestBuySell futureRequest) {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
             return ResponseEntity.status(401).body("Nemate dozvolu da pristupite terminskeim ugovorima.");
         }
 
@@ -110,7 +111,7 @@ public class FutureController {
     @PostMapping(value = "/remove/{id}")
     public ResponseEntity<?> removeFromMarket(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
             return ResponseEntity.status(401).body("Nemate dozvolu da skinete terminski ugovor sa marketa.");
         }
 
@@ -127,7 +128,7 @@ public class FutureController {
     public ResponseEntity<?> removeWaitingSellFutures(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
 
-        if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
             return ResponseEntity.status(401).body("Nemate dozvolu da pristupite terminskim ugovorima");
         }
         return futureService.removeWaitingSellFuture(id);
@@ -137,7 +138,7 @@ public class FutureController {
     public ResponseEntity<?> removeWaitingBuyFutures(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
 
-        if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
             return ResponseEntity.status(401).body("Nemate dozvolu da pristupite terminskim ugovorima");
         }
         return futureService.removeWaitingBuyFuture(id);
@@ -147,7 +148,7 @@ public class FutureController {
     public ResponseEntity<?> getAllWaitingFuturesForUser(
             @PathVariable(name = "type") String type, @PathVariable(name = "futureName") String futureName) {
         String signedInUserEmail = getContext().getAuthentication().getName(); // todo dodaj nove perms
-        if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
             return ResponseEntity.status(401).body("Nemate dozvolu da pristupite terminskeim ugovorima.");
         }
         Optional<User> user = userService.findByEmail(signedInUserEmail);
@@ -162,7 +163,7 @@ public class FutureController {
     @GetMapping(value = "/user/{userId}")
     public ResponseEntity<?> findByUserId(@PathVariable(name = "userId") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
             return ResponseEntity.status(401).body("Nemate dozvolu da pristupite terminskeim ugovorima.");
         }
 

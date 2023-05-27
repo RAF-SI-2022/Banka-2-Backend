@@ -1,6 +1,5 @@
 package rs.edu.raf.si.bank2.users.controllers;
 
-import java.util.HashMap;
 import java.util.Optional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,7 +11,6 @@ import rs.edu.raf.si.bank2.users.models.mariadb.User;
 import rs.edu.raf.si.bank2.users.requests.LoginRequest;
 import rs.edu.raf.si.bank2.users.responses.LoginResponse;
 import rs.edu.raf.si.bank2.users.services.AuthorisationService;
-import rs.edu.raf.si.bank2.users.services.MailingService;
 import rs.edu.raf.si.bank2.users.services.UserService;
 import rs.edu.raf.si.bank2.users.utils.JwtUtil;
 
@@ -23,7 +21,6 @@ public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
-    private final MailingService mailingService;
     private final AuthorisationService authorisationService;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
@@ -31,12 +28,10 @@ public class AuthenticationController {
     public AuthenticationController(
             AuthenticationManager authenticationManager,
             JwtUtil jwtUtil,
-            MailingService mailingService,
             AuthorisationService authorisationService,
             UserService userService,
             PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
-        this.mailingService = mailingService;
         this.jwtUtil = jwtUtil;
         this.authorisationService = authorisationService;
         this.userService = userService;
@@ -55,41 +50,7 @@ public class AuthenticationController {
         LoginResponse responseDto = new LoginResponse(
                 jwtUtil.generateToken(loginRequest.getEmail()),
                 userService.getUserPermissions(loginRequest.getEmail()));
-        // TokenResponseDto responseDto = new
-        // TokenResponseDto(jwtUtil.generateToken(tokenRequestDto.getEmail()),
-        // userService.getUserPermissions(tokenRequestDto.getEmail()));
         return ResponseEntity.ok(responseDto);
     }
 
-    @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody HashMap<String, String> email) {
-        this.mailingService.sendResetPasswordMail(email.get("email"));
-        return ResponseEntity.status(200).build();
-    }
-
-    @GetMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestParam String token) {
-        String result = this.authorisationService.validatePasswordResetToken(token);
-        if (result.equals("Token not found")) return ResponseEntity.status(405).body("Token nije pronadjen.");
-        if (result.equals("Token expired")) return ResponseEntity.status(405).body("Token je istekao.");
-
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/change-user-password")
-    public ResponseEntity<?> changeUserPassword(@RequestBody PasswordRecoveryDto passwordRecoveryDto) {
-        String result = this.authorisationService.validatePasswordResetToken(passwordRecoveryDto.getToken());
-        if (result.equals("Token not found")) return ResponseEntity.status(405).body("Token nije pronadjen.");
-        if (result.equals("Token expired")) return ResponseEntity.status(405).body("Token je istekao.");
-
-        Optional<User> user = this.userService.getUserByPasswordResetToken(passwordRecoveryDto.getToken());
-        if (user.isEmpty()) return ResponseEntity.status(405).body("Nije moguce promeniti sifru.");
-
-        this.userService.changePassword(
-                user.get(),
-                this.passwordEncoder.encode(passwordRecoveryDto.getNewPassword()),
-                passwordRecoveryDto.getToken());
-
-        return ResponseEntity.ok().build();
-    }
 }

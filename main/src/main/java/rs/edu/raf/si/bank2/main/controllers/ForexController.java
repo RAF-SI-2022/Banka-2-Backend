@@ -10,7 +10,9 @@ import rs.edu.raf.si.bank2.main.dto.BuySellForexDto;
 import rs.edu.raf.si.bank2.main.exceptions.BalanceNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.Forex;
 import rs.edu.raf.si.bank2.main.services.BalanceService;
+import rs.edu.raf.si.bank2.main.services.CommunicationService;
 import rs.edu.raf.si.bank2.main.services.ForexService;
+import rs.edu.raf.si.bank2.main.services.interfaces.CommunicationInterface;
 
 @RestController
 @CrossOrigin
@@ -19,9 +21,12 @@ public class ForexController {
 
     private final ForexService forexService;
     private final BalanceService balanceService;
+    private final CommunicationInterface communicationInterface;
 
     @Autowired
-    public ForexController(ForexService forexService, BalanceService balanceService) {
+    public ForexController(ForexService forexService, BalanceService balanceService,
+                           CommunicationService communicationService) {
+        this.communicationInterface = communicationService;
         this.forexService = forexService;
         this.balanceService = balanceService;
     }
