@@ -14,6 +14,7 @@ import rs.edu.raf.si.bank2.main.responses.LoginResponse;
 import rs.edu.raf.si.bank2.main.services.AuthorisationService;
 import rs.edu.raf.si.bank2.main.services.MailingService;
 import rs.edu.raf.si.bank2.main.services.UserService;
+import rs.edu.raf.si.bank2.main.services.interfaces.CommunicationInterface;
 import rs.edu.raf.si.bank2.main.utils.JwtUtil;
 
 @RestController

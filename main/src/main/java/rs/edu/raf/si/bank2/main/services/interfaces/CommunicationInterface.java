@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public interface CommunicationInterface {
 
-    String isAuthorised(PermissionName permissionName, String userEmail) throws IOException ;
+    String isAuthorised(PermissionName permissionName, String userEmail) ;
     public String testComs() throws IOException, InterruptedException;
 }
 

@@ -13,10 +13,8 @@ import rs.edu.raf.si.bank2.main.exceptions.StockNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
 import rs.edu.raf.si.bank2.main.models.mariadb.User;
 import rs.edu.raf.si.bank2.main.requests.StockRequest;
-import rs.edu.raf.si.bank2.main.services.AuthorisationService;
-import rs.edu.raf.si.bank2.main.services.StockService;
-import rs.edu.raf.si.bank2.main.services.UserService;
-import rs.edu.raf.si.bank2.main.services.UserStockService;
+import rs.edu.raf.si.bank2.main.services.*;
+import rs.edu.raf.si.bank2.main.services.interfaces.CommunicationInterface;
 
 @RestController
 @CrossOrigin
@@ -27,17 +25,21 @@ public class StockController {
     private final AuthorisationService authorisationService;
     private final UserService userService;
     private final UserStockService userStockService;
+    private final CommunicationInterface communicationInterface;
 
     @Autowired
     public StockController(
             StockService stockService,
             AuthorisationService authorisationService,
             UserService userService,
-            UserStockService userStockService) {
+            UserStockService userStockService,
+            CommunicationService communicationService) {
+        this.communicationInterface = communicationService;
         this.stockService = stockService;
         this.authorisationService = authorisationService;
         this.userService = userService;
         this.userStockService = userStockService;
+
     }
 
     @GetMapping()
@@ -77,7 +79,7 @@ public class StockController {
     @PostMapping(value = "/buy")
     public ResponseEntity<?> buyStock(@RequestBody StockRequest stockRequest) {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
             return ResponseEntity.status(401).body("Nemate dozvolu da kupujete akcije.");
         }
 
@@ -88,7 +90,7 @@ public class StockController {
     @PostMapping(value = "/sell")
     public ResponseEntity<?> sellStock(@RequestBody StockRequest stockRequest) {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
             return ResponseEntity.status(401).body("Nemate dozvolu da prodajete akcije.");
         }
         return stockService.sellStock(stockRequest, null);
@@ -97,7 +99,7 @@ public class StockController {
     @GetMapping(value = "/user-stocks")
     public ResponseEntity<?> getAllUserStocks() {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
             return ResponseEntity.status(401).body("Nemate dozvolu da pristupite svojim akcijama");
         }
 
@@ -109,7 +111,7 @@ public class StockController {
     @PostMapping(value = "/remove/{symbol}")
     public ResponseEntity<?> removeStockFromMarket(@PathVariable String symbol) {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (!authorisationService.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
             return ResponseEntity.status(401).body("Nemate dozvolu da skinete akciju sa marketa.");
         }
         return ResponseEntity.ok()
