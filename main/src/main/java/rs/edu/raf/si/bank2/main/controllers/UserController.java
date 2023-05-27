@@ -1,7 +1,6 @@
 package rs.edu.raf.si.bank2.main.controllers;
 
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,19 +53,10 @@ public class UserController {
     }
 
 
-    @GetMapping("/test")
-    public ResponseEntity<?> testMethod() throws IOException {
-        String signedInUserEmail = getContext().getAuthentication().getName();
-        String result = communicationInterface.isAuthorised(PermissionName.ADMIN_USER ,signedInUserEmail);
-
-        if (result.equals("All good")) return ResponseEntity.ok().body("good job");
-        else return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
-    }
-
     @GetMapping(value = "/permissions")
-    public ResponseEntity<?> getAllPermissions() {
-        String signedInUserEmail = getContext().getAuthentication().getName();
-        if (!authorisationService.isAuthorised(PermissionName.ADMIN_USER, signedInUserEmail)) {
+    public ResponseEntity<?> getAllPermissions() throws IOException {
+        String signedInUserEmail = getContext().getAuthentication().getName();//todo ovo kopiraj svuda
+        if (communicationInterface.isAuthorised(PermissionName.ADMIN_USER ,signedInUserEmail).equals("Nope")) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
         return ResponseEntity.ok(this.permissionService.findAll());

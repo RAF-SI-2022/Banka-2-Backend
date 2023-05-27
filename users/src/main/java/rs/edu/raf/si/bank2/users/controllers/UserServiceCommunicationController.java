@@ -35,7 +35,7 @@ public class UserServiceCommunicationController {
         String signedInUserEmail = getContext().getAuthentication().getName();
 
         if (!authorisationService.isAuthorised(role, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
+            return ResponseEntity.ok().body("Nope");
         }
 
         return ResponseEntity.ok().body("All good");

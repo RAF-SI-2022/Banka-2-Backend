@@ -44,6 +44,7 @@ public class CommunicationService implements CommunicationInterface {
 
         return response.toString();
     }
+
     @Override
     public String isAuthorised(PermissionName permissionName, String userEmail) throws IOException {
 
@@ -55,11 +56,6 @@ public class CommunicationService implements CommunicationInterface {
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Authorization", "Bearer " + jwtUtil.generateToken(userEmail));
 
-
-        int responseCode = connection.getResponseCode();
-
-        System.out.println("Response Code: " + responseCode);
-
         BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String line;
         StringBuilder response = new StringBuilder();
@@ -67,8 +63,6 @@ public class CommunicationService implements CommunicationInterface {
             response.append(line);
         }
         reader.close();
-
-        System.out.println("Response: " + response.toString());
         connection.disconnect();
 
         return response.toString();
