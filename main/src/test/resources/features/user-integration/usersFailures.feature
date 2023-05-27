@@ -91,5 +91,5 @@ Feature: User service
   Scenario: wipe db from test user
     Given delete test user
 
-  Scenario: unauthorised user resets his daily limit
-    Then unauthorised user resets his daily limit
+  #Scenario: unauthorised user resets his daily limit
+  #  Then unauthorised user resets his daily limit

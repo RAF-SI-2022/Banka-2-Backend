@@ -202,12 +202,11 @@ public class OrderFailuresIntegrationSteps extends OrderIntegrationFailuresTestC
     @Then("order denied")
     public void order_denied() {
         try {
-            MvcResult mvcResult = mockMvc.perform(
-                            patch("/api/orders/deny/" + (testOrder.getId()))
-                                    .contentType("application/json")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            MvcResult mvcResult = mockMvc.perform(patch("/api/orders/deny/" + (testOrder.getId()))
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isOk())
                     .andReturn();
         } catch (Exception e) {

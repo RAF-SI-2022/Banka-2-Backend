@@ -11,18 +11,10 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Optional;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import rs.edu.raf.si.bank2.main.models.mariadb.Exchange;
 import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
 import rs.edu.raf.si.bank2.main.models.mariadb.Stock;
 import rs.edu.raf.si.bank2.main.models.mariadb.User;
@@ -355,7 +347,7 @@ public class StockFailureIntegrationSteps extends StockFailureIntegrationTestCon
             fail(e.getMessage());
         }
     }
-/*
+    /*
     @Then("stock by symbol not found")
     public void stockBySymbolNotFound() throws UnsupportedEncodingException, JSONException {
         MvcResult mvcResult = null;
@@ -373,6 +365,5 @@ public class StockFailureIntegrationSteps extends StockFailureIntegrationTestCon
             fail(e.getMessage());
         }
     }*/
-
 
 }
