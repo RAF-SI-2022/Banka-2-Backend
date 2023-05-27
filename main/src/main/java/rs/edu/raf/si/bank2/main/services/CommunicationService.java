@@ -23,23 +23,24 @@ public class CommunicationService implements CommunicationInterface {
 
 //    @Autowired
 //    private Environment env;
-//
+
 //    @Value(value = "test")
 //    String host;
 //
-//    @Value("test")
-//    String test;
-//
+//    @Value("${test}")
+//    private String test;
+
+
 //    Properties properties = new Properties();
-//
+
 //    public CommunicationService() {
 //        try {
 //            System.out.println("KURACCC");
-//
+
 //            System.out.println(host);
 //            System.out.println(test);
 //            System.out.println(env.getProperty("test"));
-//
+
 //            properties.load(new FileInputStream("application.properties"));
 //            System.out.println(properties.getProperty("spring.datasource.username"));
 //        }
@@ -58,7 +59,7 @@ public class CommunicationService implements CommunicationInterface {
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
-        connection.setRequestProperty("Authorization", "Bearer " + "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbmVzaWMzMTE5cm4rYmFua2EyYmFja2VuZCthZG1pbkByYWYucnMiLCJleHAiOjE2ODUyMjg5MjQsImlhdCI6MTY4NTE5MjkyNH0.xZEVFAQVAfrLF97ryuCXhn0YR_MOC3JaUi1xFOwZ0-RrZ3EiDPaQW9F2cAn6DTx_a1ta-xOvraN7s3sfiggddw");
+//        connection.setRequestProperty("Authorization", "Bearer " + "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbmVzaWMzMTE5cm4rYmFua2EyYmFja2VuZCthZG1pbkByYWYucnMiLCJleHAiOjE2ODUyMjg5MjQsImlhdCI6MTY4NTE5MjkyNH0.xZEVFAQVAfrLF97ryuCXhn0YR_MOC3JaUi1xFOwZ0-RrZ3EiDPaQW9F2cAn6DTx_a1ta-xOvraN7s3sfiggddw");
 
         int responseCode = connection.getResponseCode();
         System.out.println("Response Code: " + responseCode);
