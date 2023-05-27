@@ -4,8 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.edu.raf.si.bank2.users.models.mariadb.PermissionName;
+import rs.edu.raf.si.bank2.users.models.mariadb.User;
 import rs.edu.raf.si.bank2.users.requests.CheckPermissionRequest;
 import rs.edu.raf.si.bank2.users.services.*;
+
+import java.util.Optional;
 
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
@@ -34,7 +37,10 @@ public class UserServiceCommunicationController {
 
         String signedInUserEmail = getContext().getAuthentication().getName();
 
-        if (!authorisationService.isAuthorised(role, signedInUserEmail)) {
+        if (authorisationService.isAuthorised(PermissionName.ADMIN_USER, signedInUserEmail)) {
+            return ResponseEntity.ok().body("All good");
+        }
+        else if (!authorisationService.isAuthorised(role, signedInUserEmail)) {
             return ResponseEntity.ok().body("Nope");
         }
 
