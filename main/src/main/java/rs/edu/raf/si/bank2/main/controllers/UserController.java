@@ -2,6 +2,7 @@ package rs.edu.raf.si.bank2.main.controllers;
 
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import rs.edu.raf.si.bank2.main.requests.UpdateProfileRequest;
 import rs.edu.raf.si.bank2.main.requests.UpdateUserRequest;
 import rs.edu.raf.si.bank2.main.responses.RegisterResponse;
 import rs.edu.raf.si.bank2.main.services.*;
+import rs.edu.raf.si.bank2.main.services.interfaces.CommunicationInterface;
 
 @RestController
 @CrossOrigin
@@ -32,6 +34,8 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
     private final CurrencyService currencyService;
     private final BalanceService balanceService;
+
+    private final CommunicationInterface communicationInterface;
 
     @Autowired
     public UserController(
@@ -47,6 +51,13 @@ public class UserController {
         this.passwordEncoder = passwordEncoder;
         this.currencyService = currencyService;
         this.balanceService = balanceService;
+        this.communicationInterface = new CommunicationService();
+    }
+
+
+    @GetMapping("/test")
+    public ResponseEntity<?> testMethod() throws IOException, InterruptedException {
+        return ResponseEntity.ok().body(communicationInterface.testComs());
     }
 
     @GetMapping(value = "/permissions")
