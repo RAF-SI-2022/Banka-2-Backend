@@ -261,7 +261,8 @@ public class BootstrapData implements CommandLineRunner {
             return;
         }
 
-        List<Exchange> exchanges = Files.lines(Paths.get(uri))
+//        List<Exchange> exchanges = Files.lines(Paths.get(uri))//todo promenjen csv path
+        List<Exchange> exchanges = Files.lines(Paths.get("main/src/main/resources/csvs/exchange.csv"))
                 .parallel()
                 .skip(1)
                 .map(line -> line.split(","))
@@ -318,7 +319,8 @@ public class BootstrapData implements CommandLineRunner {
         }
 
         // TODO intellij kaze da treba dodati try-catch
-        List<Future> futures = Files.lines(Paths.get(uri))
+//        List<Future> futures = Files.lines(Paths.get(uri))//todo promenjen csv path
+        List<Future> futures = Files.lines(Paths.get("main/src/main/resources/csvs/future_data.csv"))
                 .parallel()
                 .skip(1)
                 .map(line -> line.split(","))
@@ -383,7 +385,8 @@ public class BootstrapData implements CommandLineRunner {
 
         BufferedReader br;
         try {
-            br = new BufferedReader(new FileReader(url.getPath()));
+//            br = new BufferedReader(new FileReader(url.getPath()));//todo promenjen csv path
+            br = new BufferedReader(new FileReader("main/src/main/resources/stocks.csv"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return;
@@ -438,7 +441,8 @@ public class BootstrapData implements CommandLineRunner {
             Stock mergedStock = (Stock) session.merge(s);
             BufferedReader br1;
             try {
-                br1 = new BufferedReader(new FileReader(url.getPath()));
+//                br1 = new BufferedReader(new FileReader(url.getPath()));//todo promenjen csv path
+                br1 = new BufferedReader(new FileReader("main/src/main/resources/stock_history.csv"));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 return;
