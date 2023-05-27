@@ -1,6 +1,7 @@
 package rs.edu.raf.si.bank2.main.models.mariadb;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serializable;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import lombok.*;
@@ -14,7 +15,7 @@ import lombok.*;
 @Table(
         name = "balances",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"id"})})
-public class Balance {
+public class Balance implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

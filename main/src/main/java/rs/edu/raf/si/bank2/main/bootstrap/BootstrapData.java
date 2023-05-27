@@ -22,6 +22,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import rs.edu.raf.si.bank2.main.bootstrap.readers.CurrencyReader;
@@ -75,6 +76,8 @@ public class BootstrapData implements CommandLineRunner {
 
     private final EntityManagerFactory entityManagerFactory;
 
+    private final RedisConnectionFactory redisConnectionFactory;
+
     @Autowired
     public BootstrapData(
             UserRepository userRepository,
@@ -92,7 +95,8 @@ public class BootstrapData implements CommandLineRunner {
             StockService stockService,
             OptionService optionService,
             OptionRepository optionRepository,
-            EntityManagerFactory entityManagerFactory) {
+            EntityManagerFactory entityManagerFactory,
+            RedisConnectionFactory redisConnectionFactory) {
         this.userRepository = userRepository;
         this.permissionRepository = permissionRepository;
         this.currencyRepository = currencyRepository;
@@ -109,10 +113,14 @@ public class BootstrapData implements CommandLineRunner {
         this.optionService = optionService;
         this.optionRepository = optionRepository;
         this.entityManagerFactory = entityManagerFactory;
+        this.redisConnectionFactory = redisConnectionFactory;
     }
 
     @Override
     public void run(String... args) throws Exception {
+
+        System.out.println("We are pinging redis \nPING");
+        System.out.println(redisConnectionFactory.getConnection().ping());
 
         // If empty, add futures in db from csv
         long numberOfRowsFutures = this.futureRepository.count();
@@ -253,7 +261,8 @@ public class BootstrapData implements CommandLineRunner {
             return;
         }
 
-        List<Exchange> exchanges = Files.lines(Paths.get(uri))
+//        List<Exchange> exchanges = Files.lines(Paths.get(uri))//todo promenjen csv path
+        List<Exchange> exchanges = Files.lines(Paths.get("main/src/main/resources/csvs/exchange.csv"))
                 .parallel()
                 .skip(1)
                 .map(line -> line.split(","))
@@ -310,7 +319,8 @@ public class BootstrapData implements CommandLineRunner {
         }
 
         // TODO intellij kaze da treba dodati try-catch
-        List<Future> futures = Files.lines(Paths.get(uri))
+//        List<Future> futures = Files.lines(Paths.get(uri))//todo promenjen csv path
+        List<Future> futures = Files.lines(Paths.get("main/src/main/resources/csvs/future_data.csv"))
                 .parallel()
                 .skip(1)
                 .map(line -> line.split(","))
@@ -375,7 +385,8 @@ public class BootstrapData implements CommandLineRunner {
 
         BufferedReader br;
         try {
-            br = new BufferedReader(new FileReader(url.getPath()));
+//            br = new BufferedReader(new FileReader(url.getPath()));//todo promenjen csv path
+            br = new BufferedReader(new FileReader("main/src/main/resources/stocks.csv"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return;
@@ -430,7 +441,8 @@ public class BootstrapData implements CommandLineRunner {
             Stock mergedStock = (Stock) session.merge(s);
             BufferedReader br1;
             try {
-                br1 = new BufferedReader(new FileReader(url.getPath()));
+//                br1 = new BufferedReader(new FileReader(url.getPath()));//todo promenjen csv path
+                br1 = new BufferedReader(new FileReader("main/src/main/resources/stock_history.csv"));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 return;

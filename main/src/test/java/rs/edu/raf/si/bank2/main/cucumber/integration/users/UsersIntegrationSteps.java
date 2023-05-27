@@ -193,7 +193,6 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
         }
     }
 
-
     @Then("user resets password")
     public void user_resets_password() {
         try {

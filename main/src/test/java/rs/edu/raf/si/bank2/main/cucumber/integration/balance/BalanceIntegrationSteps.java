@@ -1,10 +1,15 @@
 package rs.edu.raf.si.bank2.main.cucumber.integration.balance;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -13,14 +18,7 @@ import rs.edu.raf.si.bank2.main.models.mariadb.User;
 import rs.edu.raf.si.bank2.main.services.BalanceService;
 import rs.edu.raf.si.bank2.main.services.UserService;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-public class BalanceIntegrationSteps extends BalanceIntegrationTestConfig{
+public class BalanceIntegrationSteps extends BalanceIntegrationTestConfig {
 
     @Autowired
     BalanceService balanceService;
@@ -88,7 +86,8 @@ public class BalanceIntegrationSteps extends BalanceIntegrationTestConfig{
         try {
             mockMvc.perform(post("/api/balances/increase")
                             .contentType("application/json")
-                            .content("""
+                            .content(
+                                    """
                                 {
                                     "userEmail": "anesic3119rn+banka2backend+admin@raf.rs",
                                     "currencyCode": "USD",
@@ -114,7 +113,8 @@ public class BalanceIntegrationSteps extends BalanceIntegrationTestConfig{
         try {
             mockMvc.perform(post("/api/balances/decrease")
                             .contentType("application/json")
-                            .content("""
+                            .content(
+                                    """
                                 {
                                     "userEmail": "anesic3119rn+banka2backend+admin@raf.rs",
                                     "currencyCode": "USD",
@@ -133,7 +133,7 @@ public class BalanceIntegrationSteps extends BalanceIntegrationTestConfig{
         assertEquals(Math.round(oldAmount - 999f), Math.round(newAmount));
     }
 
-    private Float getBalanceAmount (String userEmail, String currencyCode) {
+    private Float getBalanceAmount(String userEmail, String currencyCode) {
         Balance balance = this.balanceService.findBalanceByUserEmailAndCurrencyCode(userEmail, currencyCode);
         return balance.getAmount();
     }

@@ -9,15 +9,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.junit4.SpringRunner;
+import rs.edu.raf.si.bank2.main.configuration.RedisTestConfiguration;
 import rs.edu.raf.si.bank2.main.exceptions.ExchangeNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.Exchange;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.ExchangeRepository;
 
 @SpringBootTest
+@RunWith(SpringRunner.class)
+@ExtendWith(MockitoExtension.class)
+@Import(RedisTestConfiguration.class)
 class ExchangeServiceTest {
+
+    //    @Autowired
+    //    private RedisTemplate<String, Object> redisTemplate;
 
     @Mock
     private ExchangeRepository exchangeRepository;
@@ -53,15 +65,14 @@ class ExchangeServiceTest {
     @Test
     void testFindById() {
         Exchange exchange = new Exchange();
-        exchange.setId(1L);
+        exchange.setId(6L);
         exchange.setExchangeName("Exchange 1");
 
-        when(exchangeRepository.findById(1L)).thenReturn(Optional.of(exchange));
+        when(exchangeRepository.findById(6L)).thenReturn(Optional.of(exchange));
 
-        Optional<Exchange> result = exchangeService.findById(1L);
+        Exchange result = exchangeService.findById(6L);
 
-        assertTrue(result.isPresent());
-        assertEquals(exchange, result.get());
+        assertEquals(exchange, result);
     }
 
     @Test
@@ -73,9 +84,9 @@ class ExchangeServiceTest {
 
         when(exchangeRepository.findExchangeByMicCode("MIC")).thenReturn(Optional.of(exchange));
 
-        Optional<Exchange> result = exchangeService.findByMicCode("MIC");
+        Exchange result = exchangeService.findByMicCode("MIC");
 
-        assertEquals(exchange, result.get());
+        assertEquals(exchange, result);
     }
 
     @Test
@@ -94,9 +105,9 @@ class ExchangeServiceTest {
 
         when(exchangeRepository.findExchangeByAcronym("EX1")).thenReturn(Optional.of(exchange));
 
-        Optional<Exchange> result = exchangeService.findByAcronym("EX1");
+        Exchange result = exchangeService.findByAcronym("EX1");
 
-        assertEquals(exchange, result.get());
+        assertEquals(exchange, result);
     }
 
     @Test

@@ -167,7 +167,6 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
         }
     }
 
-
     // Test admin gets permissions from nonexistent user todo fix
     @When("user doesnt exist in database")
     public void user_doesnt_exist_in_database() {
