@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module version="4">
   <component name="NewModuleRootManager">
-    <content url="file://$MODULE_DIR$/../../main">
-      <sourceFolder url="file://$MODULE_DIR$/../../main/src/main" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../main/src/test" isTestSource="true" />
+    <content url="file://$PROJECT_DIR$/main">
+      <sourceFolder url="file://$PROJECT_DIR$/main/src/main" isTestSource="false" />
+      <sourceFolder url="file://$PROJECT_DIR$/main/src/test" isTestSource="true" />
     </content>
   </component>
 </module>
