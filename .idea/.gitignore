@@ -9,3 +9,6 @@
 /inspectionProfiles/
 aws.xml
 workspace.xml
+dataSources.xml
+uiDesigner.xml
+CoverUsage.xml
