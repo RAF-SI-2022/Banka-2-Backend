@@ -19,7 +19,7 @@ public class CurrencyController {
 
     @Autowired
     public CurrencyController(CurrencyService currencyService, InflationService inflationService,
-                              CommunicationService communicationService) {
+            CommunicationService communicationService) {
         this.communicationInterface = communicationService;
         this.currencyService = currencyService;
         this.inflationService = inflationService;

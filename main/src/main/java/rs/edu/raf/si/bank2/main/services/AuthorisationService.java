@@ -12,6 +12,13 @@ import rs.edu.raf.si.bank2.main.repositories.mariadb.PasswordResetTokenRepositor
 import rs.edu.raf.si.bank2.main.repositories.mariadb.PermissionRepository;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.UserRepository;
 
+/**
+ * TODO THIS CLASS SHOULD BE REMOVED. ITS FUNCTIONALITY HAS BEEN REPLACED BY
+ *   THE USERS SERVICE.
+ *
+ * @deprecated this class should be removed, all authorisation-related things
+ * should be moved over to the users service
+ */
 @Service
 public class AuthorisationService {
 

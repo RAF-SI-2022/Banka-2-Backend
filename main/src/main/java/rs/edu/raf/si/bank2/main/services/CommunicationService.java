@@ -1,22 +1,28 @@
 package rs.edu.raf.si.bank2.main.services;
 
-import org.springframework.stereotype.Service;
-import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
-import rs.edu.raf.si.bank2.main.services.interfaces.CommunicationInterface;
-import rs.edu.raf.si.bank2.main.utils.JwtUtil;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import rs.edu.raf.si.bank2.main.models.mariadb.Permission;
+import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
+import rs.edu.raf.si.bank2.main.models.mariadb.User;
+import rs.edu.raf.si.bank2.main.services.interfaces.CommunicationInterface;
+import rs.edu.raf.si.bank2.main.services.interfaces.UserServiceInterface;
+import rs.edu.raf.si.bank2.main.utils.JwtUtil;
 
 @Service
 public class CommunicationService implements CommunicationInterface {
 
     private final JwtUtil jwtUtil = new JwtUtil();
 
+    @Autowired
+    private UserServiceInterface userServiceInterface;
 
     @Override
     public String testComs() throws IOException, InterruptedException {
@@ -46,32 +52,21 @@ public class CommunicationService implements CommunicationInterface {
     }
 
     @Override
-    public String isAuthorised(PermissionName permissionName, String userEmail) {
+    public boolean isAuthorised(PermissionName permissionName, String userEmail) {
+        if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) return false;
 
-        String host = "127.0.0.1";
-        int port = 8081;
+        Optional<User> optional = userServiceInterface.findByEmail(userEmail);
+        if (optional.isEmpty()) return false;
 
-        URL url = null;
-        try {
-            url = new URL("http", host, port, "/api/userService/isAuth/" + permissionName);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Authorization", "Bearer " + jwtUtil.generateToken(userEmail));
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String line;
-            StringBuilder response = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
-            }
-            reader.close();
-            connection.disconnect();
-
-            return response.toString();
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        // TODO los kod, ovde treba da se vrati verovatno set, pa da se odmah
+        //  proveri da li postoji permission. To zahteva da permission equals
+        //  bude implementiran samo po nazivu, ne i po ID-ju, jer pri
+        //  inicijalizaciji permission-a ne znamo koji je ID za taj
+        //  specificni permission ali znamo njegov naziv. ID polje u
+        //  permissionu ne radi nista (mozda cak i smeta)
+        for (Permission p : optional.get().getPermissions()) {
+            if (p.getPermissionName().equals(permissionName)) return true;
         }
+        return false;
     }
-
 }

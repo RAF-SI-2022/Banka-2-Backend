@@ -14,9 +14,15 @@ import rs.edu.raf.si.bank2.main.responses.LoginResponse;
 import rs.edu.raf.si.bank2.main.services.AuthorisationService;
 import rs.edu.raf.si.bank2.main.services.MailingService;
 import rs.edu.raf.si.bank2.main.services.UserService;
-import rs.edu.raf.si.bank2.main.services.interfaces.CommunicationInterface;
 import rs.edu.raf.si.bank2.main.utils.JwtUtil;
 
+/**
+ * TODO THIS CLASS SHOULD BE REMOVED. ITS FUNCTIONALITY HAS BEEN REPLACED BY
+ *   THE USERS SERVICE.
+ *
+ * @deprecated this class should be removed, all authorisation-related things
+ * should be moved over to the users service
+ */
 @RestController
 @CrossOrigin
 @RequestMapping("/auth")
