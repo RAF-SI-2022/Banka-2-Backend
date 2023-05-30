@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Main [DEV]" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+  <configuration default="false" name="Run Users [local,dev]" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <option name="ACTIVE_PROFILES" value="local,dev" />
-    <module name="main" />
-    <option name="SPRING_BOOT_MAIN_CLASS" value="rs.edu.raf.si.bank2.main.MainApplication" />
+    <module name="users" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="rs.edu.raf.si.bank2.users.UsersApplication" />
     <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
       <option name="credential" />
       <option name="region" />

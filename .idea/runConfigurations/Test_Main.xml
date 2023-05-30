@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Users [format]" type="MavenRunConfiguration" factoryName="Maven" activateToolWindowBeforeRun="false" singleton="false">
+  <configuration default="false" name="Test Main" type="MavenRunConfiguration" factoryName="Maven" singleton="false">
     <MavenSettings>
       <option name="myGeneralSettings" />
       <option name="myRunnerSettings" />
@@ -11,14 +11,20 @@
           <option name="goals">
             <list>
               <option value="spotless:apply" />
+              <option value="clean" />
+              <option value="compile" />
+              <option value="test" />
+              <option value="-DargLine=-Dspring.profiles.active=local,test" />
             </list>
           </option>
           <option name="pomFileName" />
           <option name="profilesMap">
-            <map />
+            <map>
+              <entry key="local,test" value="true" />
+            </map>
           </option>
           <option name="resolveToWorkspace" value="false" />
-          <option name="workingDirPath" value="$PROJECT_DIR$/users" />
+          <option name="workingDirPath" value="$PROJECT_DIR$/main" />
         </MavenRunnerParameters>
       </option>
     </MavenSettings>

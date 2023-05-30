@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Main [format]" type="MavenRunConfiguration" factoryName="Maven" activateToolWindowBeforeRun="false" singleton="false">
+  <configuration default="false" name="Format Main" type="MavenRunConfiguration" factoryName="Maven" activateToolWindowBeforeRun="false" singleton="false">
     <MavenSettings>
       <option name="myGeneralSettings" />
       <option name="myRunnerSettings" />

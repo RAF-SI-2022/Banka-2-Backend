@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Main [TEST]" type="MavenRunConfiguration" factoryName="Maven" singleton="false">
+  <configuration default="false" name="Test Users" type="MavenRunConfiguration" factoryName="Maven" singleton="false">
     <MavenSettings>
       <option name="myGeneralSettings" />
       <option name="myRunnerSettings" />
@@ -24,7 +24,7 @@
             </map>
           </option>
           <option name="resolveToWorkspace" value="false" />
-          <option name="workingDirPath" value="$PROJECT_DIR$/main" />
+          <option name="workingDirPath" value="$PROJECT_DIR$/users" />
         </MavenRunnerParameters>
       </option>
     </MavenSettings>
