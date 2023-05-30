@@ -85,6 +85,7 @@ services:
     networks:
       - bank2_net
 
+  # TODO add health check for users
   users:
     container_name: users
     image: harbor.k8s.elab.rs/banka-2/users
@@ -92,6 +93,24 @@ services:
       - "8081"
     ports:
       - "8081:8081"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
+    networks:
+      - bank2_net
+
+  # TODO add health check for OTC
+  otc:
+    container_name: otc
+    image: harbor.k8s.elab.rs/banka-2/otc
+    expose:
+      - "8082"
+    ports:
+      - "8082:8082"
     depends_on:
       mariadb:
         condition: service_healthy

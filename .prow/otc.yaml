@@ -36,6 +36,7 @@ presubmits:
               docker compose up -d mariadb
               docker compose up -d flyway
               docker compose up -d mongodb
+              docker compose up -d users
               
               cd otc
 
@@ -78,6 +79,7 @@ postsubmits:
               docker compose up -d mariadb
               docker compose up -d flyway
               docker compose up -d mongodb
+              docker compose up -d users
               
               ref=$(git rev-parse --abbrev-ref HEAD)
               
