@@ -54,7 +54,6 @@ public class CommunicationService implements CommunicationInterface {
     @Override
     public boolean isAuthorised(PermissionName permissionName, String userEmail) {
         if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) return false;
-
         Optional<User> optional = userServiceInterface.findByEmail(userEmail);
         if (optional.isEmpty()) return false;
 
@@ -65,8 +64,9 @@ public class CommunicationService implements CommunicationInterface {
         //  specificni permission ali znamo njegov naziv. ID polje u
         //  permissionu ne radi nista (mozda cak i smeta)
         for (Permission p : optional.get().getPermissions()) {
-            if (p.getPermissionName().equals(permissionName)) return true;
+            if (p.getPermissionName().equals(permissionName) || p.getPermissionName().equals(PermissionName.ADMIN_USER)) return true;
         }
         return false;
     }
+
 }
