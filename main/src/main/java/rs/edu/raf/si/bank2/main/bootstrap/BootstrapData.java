@@ -75,6 +75,8 @@ public class BootstrapData implements CommandLineRunner {
 
     private final RedisConnectionFactory redisConnectionFactory;
 
+    private boolean runTestSetup = false;
+
     @Autowired
     public BootstrapData(
             UserRepository userRepository,
@@ -116,6 +118,11 @@ public class BootstrapData implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
+        //todo nameti da ovo radi samo za testiranje
+
+        List<Balance> listOfBalances = balanceRepository.findAll();
+        if (listOfBalances.size() == 0) runTestSetup = true;
+
         // If empty, add futures in db from csv
         long numberOfRowsFutures = this.futureRepository.count();
         if (numberOfRowsFutures == 0) {
@@ -143,32 +150,27 @@ public class BootstrapData implements CommandLineRunner {
             loadStocksTable();
         }
 
-        // New data introduced in V2_2, if we keep this code devs will not
-        // get proper exchanges in db
-        //    long numberOfExchanges = this.exchangeRepository.count();
-        //    if (numberOfExchanges == 0) {
-        //      logger.info("Added exchange markets");
-        //      this.loadExchangeMarkets();
-        //    }
 
         logger.info("Added exchange markets");
         this.loadExchangeMarkets();
         // Includes both initial admin run and permissions run.
-        Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
-        if (adminUser.isPresent()) {
-            logger.info("Started!");
-            return;
+
+        if (runTestSetup){
+            addAdminForTest();
+            addBalancesToAdmin();
+            runTestSetup = false;
         }
 
-        // Get admin
-        Optional<User> optionalAdmin = userRepository.findUserByEmail(ADMIN_EMAIL);
-        if (optionalAdmin.isEmpty()) {
-            throw new RuntimeException("Admin not found: users microservice " + "must be started to "
-                    + "run user bootstrapping before main microservice");
-        }
 
+        logger.info("Started!");
+        System.out.println("Everything started");
+
+    }
+
+    private void addBalancesToAdmin(){
         // Add initial 100_000 RSD to admin
-        User admin = optionalAdmin.get();
+        Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
+        User admin = adminUser.get();
         Balance balance1 = this.getInitialAdminBalance(admin, "RSD");
         Balance balance2 = this.getInitialAdminBalance(admin, "USD");
         List<Balance> balances = new ArrayList<>();
@@ -450,4 +452,69 @@ public class BootstrapData implements CommandLineRunner {
             br1.close();
         }
     }
+
+    private void addAdminForTest() {
+
+        Optional<User> adminCheck = userRepository.findUserByEmail(ADMIN_EMAIL);
+        if (adminCheck.isPresent()) return;
+
+        final String ADMIN_PASS = "admin";
+        final String ADMIN_FNAME = "Admin";
+        final String ADMIN_LNAME = "Adminic";
+        final String ADMIN_JMBG = "2902968000000";
+        final String ADMIN_PHONE = "0657817522";
+        final String ADMIN_JOB = "ADMINISTRATOR";
+        final boolean ADMIN_ACTIVE = true;
+
+        // Set up all permissions
+        Set<PermissionName> allPermissions = EnumSet.allOf(PermissionName.class);
+        System.out.println(allPermissions);
+
+        for (PermissionName pn : allPermissions) {
+            List<Permission> findPerm = permissionRepository.findByPermissionNames(Collections.singletonList(pn));
+
+            if (!findPerm.isEmpty()) {
+                logger.info("Permission " + pn + " already found");
+                continue;
+            }
+
+            Permission addPerm = new Permission(pn);
+            this.permissionRepository.save(addPerm);
+            logger.info("Permission " + pn + "added");
+        }
+
+        // Set up admin user
+        Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
+        if (adminUser.isPresent()) {
+            logger.info("Root admin already added");
+            return;
+        }
+
+        // Build root user object
+        User admin = User.builder()
+                .email(ADMIN_EMAIL)
+                .firstName(ADMIN_FNAME)
+                .lastName(ADMIN_LNAME)
+                .password(this.passwordEncoder.encode(ADMIN_PASS))
+                .jmbg(ADMIN_JMBG)
+                .phone(ADMIN_PHONE)
+                .jobPosition(ADMIN_JOB)
+                .active(ADMIN_ACTIVE)
+                .dailyLimit(1000000d) // usd
+                // .defaultDailyLimit(10000D) // usd
+                .defaultDailyLimit(1000000d) // usd
+                .build();
+
+        // Set admin's perms
+        List<Permission> permissions = new ArrayList<>();
+        permissions.add(permissionRepository
+                .findByPermissionNames(Collections.singletonList(PermissionName.ADMIN_USER))
+                .get(0));
+        admin.setPermissions(permissions);
+
+        // Save admin
+        this.userRepository.save(admin);
+        logger.info("Root admin added");
+    }
+
 }
