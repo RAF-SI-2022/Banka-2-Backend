@@ -8,9 +8,10 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import lombok.*;
+import org.apache.commons.lang3.builder.ToStringExclude;
 
 @Data
-@ToString(exclude = "balances")
+//@ToString(exclude = "balances")
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
@@ -36,11 +37,6 @@ public class User implements Serializable {
 
     @JsonIgnore
     @NotNull(message = "This field is required.")
-    //  @Pattern(
-    //      regexp = "^(?=.*?[a-zA-Z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{10,}$",
-    //      message =
-    //          "Make sure the password has at least 10 characters, one digit, one lowercase and one
-    // uppercase letter and at least one special character.")
     private String password;
 
     @NotNull(message = "This field is required.")
@@ -53,7 +49,6 @@ public class User implements Serializable {
 
     @NotNull(message = "This field is required.")
     @Size(max = 13, message = "Input too long, cannot contain more than 13 characters.")
-    //  @Pattern(regexp = "^\\d+$", message = "Only numbers are allowed in a JMBG identifier.")
     private String jmbg;
 
     @NotNull(message = "This field is required.")
@@ -74,6 +69,7 @@ public class User implements Serializable {
     private List<Permission> permissions;
 
     @JsonIgnore
+    @ToStringExclude
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<Balance> balances; // one balance object for every currency user operates with
 

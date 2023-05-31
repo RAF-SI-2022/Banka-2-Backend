@@ -72,9 +72,8 @@ public class FutureService implements FutureServiceInterface {
     @Override
     @Cacheable(value = "futureID", key = "#id")
     public Optional<Future> findById(Long id) {
-
         System.out.println("Getting future by id first time (caching into redis)");
-        this.clearFindAllCache();
+        if (cacheManager != null) this.clearFindAllCache();
         return futureRepository.findFutureById(id);
     }
 
@@ -93,15 +92,14 @@ public class FutureService implements FutureServiceInterface {
         return futureRepository.findFuturesByFutureName(futureName);
     }
 
-    @CacheEvict
     public Future saveFuture(Future future) {
-        this.evictAllCaches();
+        if (cacheManager != null) this.evictAllCaches();
         return futureRepository.save(future);
     }
 
     @Override
     public ResponseEntity<?> buyFuture(FutureRequestBuySell futureRequest, String userBuyerEmail, Float usersMoneyInCurrency) {
-        this.evictAllCaches();
+        if (cacheManager != null) this.evictAllCaches();
         if (futureRequest.getLimit() == 0
                 && futureRequest.getStop() == 0) { // regular buy - kupuje se odmah, ne ceka se nista;
             return this.regularBuy(futureRequest, userBuyerEmail, usersMoneyInCurrency);
@@ -112,7 +110,7 @@ public class FutureService implements FutureServiceInterface {
 
     @Override
     public ResponseEntity<?> sellFuture(FutureRequestBuySell futureRequest) {
-        this.evictAllCaches();
+        if (cacheManager != null) this.evictAllCaches();
         if (futureRequest.getLimit() == 0 && futureRequest.getStop() == 0) {
             return this.regularSell(futureRequest);
         } else {
