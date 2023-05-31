@@ -20,6 +20,7 @@ import org.hibernate.Hibernate;
         name = "permissions",
         uniqueConstraints = {@UniqueConstraint(columnNames = "permissionName")})
 public class Permission implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,6 +37,12 @@ public class Permission implements Serializable {
         this.permissionName = permissionName;
     }
 
+    /**
+     * TODO zar ovde ne treba porediti dva permission-a samo po nazivu? Zar
+     *   uopste ID igra bilo kakvu ulogu?
+     * @param o
+     * @return
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

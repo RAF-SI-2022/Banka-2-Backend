@@ -1,6 +1,7 @@
 package rs.edu.raf.si.bank2.users.models.mariadb;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.*;
@@ -10,7 +11,6 @@ import javax.validation.constraints.Size;
 import lombok.*;
 
 @Data
-@ToString(exclude = "balances")
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
@@ -19,6 +19,9 @@ import lombok.*;
         name = "users",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"email", "jmbg"})})
 public class User implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 320657560973525070L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -72,14 +75,6 @@ public class User implements Serializable {
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "permission_id", referencedColumnName = "id")})
     private List<Permission> permissions;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private List<Balance> balances; // one balance object for every currency user operates with
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "user")
-    private List<UserStock> stocks;
 
     private Double dailyLimit;
 

@@ -1,7 +1,7 @@
 package rs.edu.raf.si.bank2.main.controllers;
 
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
-import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -53,11 +53,10 @@ public class UserController {
         this.communicationInterface = communicationService;
     }
 
-
     @GetMapping(value = "/permissions")
-    public ResponseEntity<?> getAllPermissions()  {
-        String signedInUserEmail = getContext().getAuthentication().getName();//todo ovo kopiraj svuda
-        if (communicationInterface.isAuthorised(PermissionName.ADMIN_USER ,signedInUserEmail).equals("Nope")) {
+    public ResponseEntity<?> getAllPermissions() {
+        String signedInUserEmail = getContext().getAuthentication().getName(); // todo ovo kopiraj svuda
+        if (!communicationInterface.isAuthorised(PermissionName.ADMIN_USER, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
         return ResponseEntity.ok(this.permissionService.findAll());
@@ -66,7 +65,7 @@ public class UserController {
     @GetMapping(value = "/permissions/{id}")
     public ResponseEntity<?> getAllUserPermissions(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
+        if (!communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
         Optional<User> userOptional = this.userService.findById(id);
@@ -83,7 +82,7 @@ public class UserController {
     public ResponseEntity<?> createUser(@RequestBody RegisterRequest user) {
 
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (communicationInterface.isAuthorised(PermissionName.CREATE_USERS, signedInUserEmail).equals("Nope")) {
+        if (!communicationInterface.isAuthorised(PermissionName.CREATE_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu da kreirate korisnike.");
         }
         Optional<User> existingUser = userService.findByEmail(user.getEmail());
@@ -163,7 +162,7 @@ public class UserController {
     @GetMapping()
     public ResponseEntity<?> findAll() {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
+        if (!communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu da pristupite korisnicima.");
         }
         return ResponseEntity.ok().body(userService.findAll());
@@ -172,7 +171,7 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
+        if (!communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu da pristupite korisnicima.");
         }
         return ResponseEntity.ok().body(userService.findById(id));
@@ -181,7 +180,7 @@ public class UserController {
     @GetMapping("/email")
     public ResponseEntity<?> findByEmail() {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
+        if (!communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu da pristupite korisnicima.");
         }
         return ResponseEntity.ok().body(userService.findByEmail(signedInUserEmail));
@@ -190,7 +189,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteById(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (communicationInterface.isAuthorised(PermissionName.DELETE_USERS, signedInUserEmail).equals("Nope")) {
+        if (!communicationInterface.isAuthorised(PermissionName.DELETE_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu da brisete korisnike.");
         }
         try {
@@ -204,7 +203,7 @@ public class UserController {
     @PostMapping("/reactivate/{id}")
     public ResponseEntity<?> reactivateUser(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (communicationInterface.isAuthorised(PermissionName.ADMIN_USER, signedInUserEmail).equals("Nope")) {
+        if (!communicationInterface.isAuthorised(PermissionName.ADMIN_USER, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu da aktivirate korisnika.");
         }
         Optional<User> userOptional = this.userService.findById(id);
@@ -225,7 +224,7 @@ public class UserController {
     @PostMapping("/deactivate/{id}")
     public ResponseEntity<?> deactivateUser(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (communicationInterface.isAuthorised(PermissionName.ADMIN_USER, signedInUserEmail).equals("Nope")) {
+        if (!communicationInterface.isAuthorised(PermissionName.ADMIN_USER, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu da deaktivirate korisnika.");
         }
         Optional<User> userOptional = this.userService.findById(id);
@@ -277,7 +276,8 @@ public class UserController {
     }
 
     @PutMapping("/password/{id}")
-    public ResponseEntity<?> changePassword(@PathVariable(name = "id") Long id, @RequestBody ChangePasswordRequest user) {
+    public ResponseEntity<?> changePassword(
+            @PathVariable(name = "id") Long id, @RequestBody ChangePasswordRequest user) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         Optional<User> logovan = userService.findByEmail(signedInUserEmail);
 
@@ -311,7 +311,7 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable(name = "id") Long id, @RequestBody UpdateUserRequest user) {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (communicationInterface.isAuthorised(PermissionName.UPDATE_USERS, signedInUserEmail).equals("Nope")) {
+        if (!communicationInterface.isAuthorised(PermissionName.UPDATE_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu da mofidikujete korisnika.");
         }
         Optional<User> updatedUser = userService.findById(id);
@@ -347,7 +347,7 @@ public class UserController {
     @GetMapping(value = "/limit")
     public ResponseEntity<?> getUserDailyLimit() {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
+        if (!communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu da pristupite korisnicima.");
         }
         return ResponseEntity.ok().body(userService.getUsersDailyLimit(signedInUserEmail));
@@ -356,7 +356,7 @@ public class UserController {
     @PatchMapping(value = "/reset-limit/{id}")
     public ResponseEntity<?> resetDailyLimit(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
+        if (!communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu da resetujete limit korisnika.");
         }
         Optional<User> userOptional = userService.findById(id);
@@ -372,7 +372,7 @@ public class UserController {
     public ResponseEntity<?> changeUserDefaultDailyLimit(
             @PathVariable(name = "id") Long id, @PathVariable(name = "limit") Double limit) {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (communicationInterface.isAuthorised(PermissionName.UPDATE_USERS, signedInUserEmail).equals("Nope")) {
+        if (!communicationInterface.isAuthorised(PermissionName.UPDATE_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu da resetujete limit korisnika.");
         }
 
@@ -391,5 +391,4 @@ public class UserController {
             return ResponseEntity.status(400).body("Korisnik ne postoji");
         }
     }
-
 }

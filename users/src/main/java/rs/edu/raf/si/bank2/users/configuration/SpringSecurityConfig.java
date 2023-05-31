@@ -12,17 +12,17 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import rs.edu.raf.si.bank2.users.filters.JwtFilter;
-import rs.edu.raf.si.bank2.users.services.UserService;
+import rs.edu.raf.si.bank2.users.services.interfaces.UserServiceInterface;
 
 @EnableWebSecurity
 @Configuration
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final UserService userService;
+    private final UserServiceInterface userService;
     private final JwtFilter jwtFilter;
 
     @Autowired
-    public SpringSecurityConfig(UserService userService, JwtFilter jwtFilter) {
+    public SpringSecurityConfig(UserServiceInterface userService, JwtFilter jwtFilter) {
         this.userService = userService;
         this.jwtFilter = jwtFilter;
     }
@@ -46,9 +46,18 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/api/**").permitAll()
-                .anyRequest().authenticated()
-                .and().sessionManagement()
+                .antMatchers("/api/auth/**")
+                .permitAll()
+                .antMatchers("/swagger-ui/**")
+                .permitAll()
+                .antMatchers("/swagger-ui.html")
+                .permitAll()
+                .antMatchers("/v3/api-docs/**")
+                .permitAll()
+                .anyRequest()
+                .authenticated()
+                .and()
+                .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         httpSecurity.addFilterBefore(this.jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -59,5 +68,4 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManager();
     }
-
 }

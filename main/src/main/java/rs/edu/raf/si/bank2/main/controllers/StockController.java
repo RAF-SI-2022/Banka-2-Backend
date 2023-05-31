@@ -39,7 +39,6 @@ public class StockController {
         this.authorisationService = authorisationService;
         this.userService = userService;
         this.userStockService = userStockService;
-
     }
 
     @GetMapping()
@@ -79,7 +78,7 @@ public class StockController {
     @PostMapping(value = "/buy")
     public ResponseEntity<?> buyStock(@RequestBody StockRequest stockRequest) {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
+        if (!communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu da kupujete akcije.");
         }
 
@@ -90,7 +89,7 @@ public class StockController {
     @PostMapping(value = "/sell")
     public ResponseEntity<?> sellStock(@RequestBody StockRequest stockRequest) {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
+        if (!communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu da prodajete akcije.");
         }
         return stockService.sellStock(stockRequest, null);
@@ -99,7 +98,7 @@ public class StockController {
     @GetMapping(value = "/user-stocks")
     public ResponseEntity<?> getAllUserStocks() {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
+        if (!communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu da pristupite svojim akcijama");
         }
 
@@ -111,7 +110,7 @@ public class StockController {
     @PostMapping(value = "/remove/{symbol}")
     public ResponseEntity<?> removeStockFromMarket(@PathVariable String symbol) {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail).equals("Nope")) {
+        if (!communicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu da skinete akciju sa marketa.");
         }
         return ResponseEntity.ok()

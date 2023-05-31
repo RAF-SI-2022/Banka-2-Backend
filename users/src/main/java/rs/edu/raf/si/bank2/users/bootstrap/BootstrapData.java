@@ -1,40 +1,24 @@
 package rs.edu.raf.si.bank2.users.bootstrap;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import javax.persistence.EntityManagerFactory;
-import javax.servlet.ServletContextListener;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import rs.edu.raf.si.bank2.users.bootstrap.readers.CurrencyReader;
-import rs.edu.raf.si.bank2.users.exceptions.CurrencyNotFoundException;
-import rs.edu.raf.si.bank2.users.models.mariadb.*;
-import rs.edu.raf.si.bank2.users.models.mariadb.Currency;
-import rs.edu.raf.si.bank2.users.repositories.mariadb.*;
+import rs.edu.raf.si.bank2.users.models.mariadb.Permission;
+import rs.edu.raf.si.bank2.users.models.mariadb.PermissionName;
+import rs.edu.raf.si.bank2.users.models.mariadb.User;
+import rs.edu.raf.si.bank2.users.repositories.mariadb.PermissionRepository;
+import rs.edu.raf.si.bank2.users.repositories.mariadb.UserRepository;
 
 @Component
 public class BootstrapData implements CommandLineRunner {
 
-    public static final String forexApiKey = "OF6BVKZOCXWHD9NS";
+    private static final Logger logger = LoggerFactory.getLogger(BootstrapData.class);
     /**
      * TODO promeniti ovo pre produkcije. Promenjen admin mejl da bismo mu
      * zapravo imali pristup. Mogu
@@ -58,7 +42,6 @@ public class BootstrapData implements CommandLineRunner {
     private final PermissionRepository permissionRepository;
     private final PasswordEncoder passwordEncoder;
 
-
     private final EntityManagerFactory entityManagerFactory;
 
     private final RedisConnectionFactory redisConnectionFactory;
@@ -79,7 +62,55 @@ public class BootstrapData implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        System.out.println("Started user service");
-    }
 
+        // Set up all permissions
+        Set<PermissionName> allPermissions = EnumSet.allOf(PermissionName.class);
+        System.out.println(allPermissions);
+
+        for (PermissionName pn : allPermissions) {
+            List<Permission> findPerm = permissionRepository.findByPermissionNames(Collections.singletonList(pn));
+
+            if (!findPerm.isEmpty()) {
+                logger.info("Permission " + pn + " already found");
+                continue;
+            }
+
+            Permission addPerm = new Permission(pn);
+            this.permissionRepository.save(addPerm);
+            logger.info("Permission " + pn + "added");
+        }
+
+        // Set up admin user
+        Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
+        if (adminUser.isPresent()) {
+            logger.info("Root admin already added");
+            return;
+        }
+
+        // Build root user object
+        User admin = User.builder()
+                .email(ADMIN_EMAIL)
+                .firstName(ADMIN_FNAME)
+                .lastName(ADMIN_LNAME)
+                .password(this.passwordEncoder.encode(ADMIN_PASS))
+                .jmbg(ADMIN_JMBG)
+                .phone(ADMIN_PHONE)
+                .jobPosition(ADMIN_JOB)
+                .active(ADMIN_ACTIVE)
+                .dailyLimit(1000000d) // usd
+                // .defaultDailyLimit(10000D) // usd
+                .defaultDailyLimit(1000000d) // usd
+                .build();
+
+        // Set admin's perms
+        List<Permission> permissions = new ArrayList<>();
+        permissions.add(permissionRepository
+                .findByPermissionNames(Collections.singletonList(PermissionName.ADMIN_USER))
+                .get(0));
+        admin.setPermissions(permissions);
+
+        // Save admin
+        this.userRepository.save(admin);
+        logger.info("Root admin added");
+    }
 }
