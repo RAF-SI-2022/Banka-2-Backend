@@ -15,4 +15,7 @@ public interface OptionServiceInterface {
     List<Option> findByStock(String stockSymbol);
 
     List<Option> findByStockAndDate(String stockSymbol, String dateMils);
+    List<Option> saveAll(List<Option> optionList);
+
+    void deleteAll();
 }

@@ -26,6 +26,7 @@ import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderTradeType;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderType;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
 import rs.edu.raf.si.bank2.main.services.interfaces.OptionServiceInterface;
+import rs.edu.raf.si.bank2.main.services.workerThreads.OptionsRetrieverFromApiWorker;
 
 @Service
 public class OptionService implements OptionServiceInterface {
@@ -40,6 +41,8 @@ public class OptionService implements OptionServiceInterface {
     private final OrderService orderService;
     private final TransactionService transactionService;
     private final BalanceService balanceService;
+
+    private final OptionsRetrieverFromApiWorker optionsRetrieverFromApiWorker;
 
     @Autowired
     public OptionService(
@@ -64,6 +67,8 @@ public class OptionService implements OptionServiceInterface {
         this.orderService = orderService;
         this.transactionService = transactionService;
         this.balanceService = balanceService;
+        this.optionsRetrieverFromApiWorker = new OptionsRetrieverFromApiWorker(this);
+        this.optionsRetrieverFromApiWorker.start();
     }
 
     @Override
@@ -109,6 +114,16 @@ public class OptionService implements OptionServiceInterface {
             optionRepository.saveAll(getFromExternalApi(stockSymbol, parsedDate));
         }
         return optionRepository.findAllByStockSymbolAndExpirationDate(stockSymbol.toUpperCase(), date);
+    }
+
+    @Override
+    public List<Option> saveAll(List<Option> optionList) {
+        return this.optionRepository.saveAll(optionList);
+    }
+
+    @Override
+    public void deleteAll() {
+        this.optionRepository.deleteAll();
     }
 
     public UserStock buyStockUsingOption(Long userOptionId, Long userId)
