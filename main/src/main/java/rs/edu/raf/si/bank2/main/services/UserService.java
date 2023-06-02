@@ -3,11 +3,15 @@ package rs.edu.raf.si.bank2.main.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import rs.edu.raf.si.bank2.main.dto.CommunicationDto;
 import rs.edu.raf.si.bank2.main.exceptions.PasswordResetTokenNotFoundException;
 import rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.PasswordResetToken;
@@ -15,17 +19,22 @@ import rs.edu.raf.si.bank2.main.models.mariadb.Permission;
 import rs.edu.raf.si.bank2.main.models.mariadb.User;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.PasswordResetTokenRepository;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.UserRepository;
+import rs.edu.raf.si.bank2.main.services.interfaces.UserCommunicationInterface;
 import rs.edu.raf.si.bank2.main.services.interfaces.UserServiceInterface;
 
 @Service
 public class UserService implements UserDetailsService, UserServiceInterface {
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final UserCommunicationInterface userCommunicationInterface;
+    ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository) {
+    public UserService(UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository,
+                       UserCommunicationService communicationService) {
         this.userRepository = userRepository;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.userCommunicationInterface = communicationService;
     }
 
     @Override
@@ -34,19 +43,40 @@ public class UserService implements UserDetailsService, UserServiceInterface {
         if (myUser.isEmpty()) {
             throw new UsernameNotFoundException("Korisnik sa email-om: " + username + " nije pronadjen.");
         }
-
-        return new org.springframework.security.core.userdetails.User(
-                myUser.get().getEmail(), myUser.get().getPassword(), new ArrayList<>());
+        return new org.springframework.security.core.userdetails.User(myUser.get().getEmail(), "", new ArrayList<>());
     }
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return userRepository.findUserByEmail(email);
+//        return userRepository.findUserByEmail(email);
+
+        User user = null;
+        CommunicationDto response = userCommunicationInterface.sendGet( email, "/findByEmail");
+
+        System.out.println("ovo je response " + response);
+
+
+        try {
+            user = mapper.readValue(response.getResponseMsg(), User.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (user == null) System.err.println("USER IS NULL");
+
+        return Optional.of(user);
     }
 
     @Override
     public List<User> findAll() {
-        return userRepository.findAll();
+        List<User> user = null;
+        CommunicationDto response = userCommunicationInterface.sendGet( null,"/findAll");
+        try {
+            user = mapper.readValue(response.getResponseMsg(), List.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return user;
     }
 
     @Override

@@ -10,6 +10,7 @@ public class CommunicationDto {
     String responseMsg;
 
     public CommunicationDto(int responseCode, String responseMsg) {
+        System.out.println("NAPRAVILI DTO SA " + responseCode + " " + responseMsg);
         this.responseCode = responseCode;
         this.responseMsg = responseMsg;
     }

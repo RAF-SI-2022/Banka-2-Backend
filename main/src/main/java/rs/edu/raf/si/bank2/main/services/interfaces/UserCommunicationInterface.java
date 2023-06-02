@@ -33,7 +33,7 @@ public interface UserCommunicationInterface {
      */
     public String testComs() throws IOException, InterruptedException;
 
-    public CommunicationDto sendGet(String urlExtension);
+    public CommunicationDto sendGet(String senderEmail, String urlExtension);
 
     public CommunicationDto sendPostLike(String urlExtension, String method);
 

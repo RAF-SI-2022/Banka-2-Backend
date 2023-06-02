@@ -80,17 +80,19 @@ public class UserCommunicationService implements UserCommunicationInterface {
     }
 
     @Override
-    public CommunicationDto sendGet(String urlExtension){
+    public CommunicationDto sendGet(String senderEmail, String urlExtension){
         System.err.println("POSALI SMO SEND GET");
 
-        String token = jwtUtil.generateToken("anesic3119rn+banka2backend+admin@raf.rs");
+        if (senderEmail == null) senderEmail = "anesic3119rn+banka2backend+admin@raf.rs";
+
+        String token = jwtUtil.generateToken(senderEmail);
         String []hostPort = usersServiceHost.split(":");
         BufferedReader reader;
         StringBuilder response = new StringBuilder();
         String line;
 
         try {
-            URL url = new URL("http", hostPort[0], Integer.parseInt(hostPort[1]), "/api/userService/" + urlExtension);
+            URL url = new URL("http", hostPort[0], Integer.parseInt(hostPort[1]), "/api/userService" + urlExtension);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
@@ -112,6 +114,7 @@ public class UserCommunicationService implements UserCommunicationInterface {
             System.out.println("Response: " + response.toString());
             connection.disconnect();
             reader.close();
+            System.out.println("PRAVIMO COM DTO");
             return new CommunicationDto(responseCode, response.toString());
         } catch (IOException e) {
             throw new RuntimeException(e);

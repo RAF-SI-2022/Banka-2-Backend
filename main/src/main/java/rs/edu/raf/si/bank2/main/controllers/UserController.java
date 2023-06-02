@@ -180,9 +180,9 @@ public class UserController {
     @GetMapping("/email")
     public ResponseEntity<?> findByEmail() {
         String signedInUserEmail = getContext().getAuthentication().getName();
-        if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("Nemate dozvolu da pristupite korisnicima.");
-        }
+//        if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+//            return ResponseEntity.status(401).body("Nemate dozvolu da pristupite korisnicima.");
+//        }
         return ResponseEntity.ok().body(userService.findByEmail(signedInUserEmail));
     }
 
