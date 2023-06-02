@@ -35,7 +35,7 @@ public interface UserCommunicationInterface {
 
     public CommunicationDto sendGet(String senderEmail, String urlExtension);
 
-    public CommunicationDto sendPostLike(String urlExtension, String method);
+    public CommunicationDto sendPostLike(String urlExtension, String postObjectBody, String senderEmail, String method);
 
     public CommunicationDto sendDelete(String urlExtension);
 

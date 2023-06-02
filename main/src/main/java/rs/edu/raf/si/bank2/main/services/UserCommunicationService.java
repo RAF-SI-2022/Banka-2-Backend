@@ -1,11 +1,11 @@
 package rs.edu.raf.si.bank2.main.services;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Optional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +21,7 @@ import rs.edu.raf.si.bank2.main.utils.JwtUtil;
 public class UserCommunicationService implements UserCommunicationInterface {
 
     private final JwtUtil jwtUtil;
+
 //
 //    @Autowired
 //    private UserServiceInterface userServiceInterface;
@@ -87,7 +88,7 @@ public class UserCommunicationService implements UserCommunicationInterface {
 
         String token = jwtUtil.generateToken(senderEmail);
         String []hostPort = usersServiceHost.split(":");
-        BufferedReader reader;
+        BufferedReader reader = null;
         StringBuilder response = new StringBuilder();
         String line;
 
@@ -96,6 +97,56 @@ public class UserCommunicationService implements UserCommunicationInterface {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
+            int responseCode = connection.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK && connection.getInputStream() != null){
+                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+            }
+            else if (connection.getErrorStream() != null){
+                reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+            }
+//            System.out.println("Response Code: " + responseCode);
+//            System.out.println("Response: " + response.toString());
+            connection.disconnect();
+            if (reader != null) reader.close();
+            return new CommunicationDto(responseCode, response.toString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public CommunicationDto sendPostLike(String urlExtension, String postObjectBody, String senderEmail, String method){
+        System.err.println("POSALI SMO SEND POST");
+
+        if (senderEmail == null) senderEmail = "anesic3119rn+banka2backend+admin@raf.rs";
+
+        String token = jwtUtil.generateToken(senderEmail);
+        String []hostPort = usersServiceHost.split(":");
+        BufferedReader reader;
+        StringBuilder response = new StringBuilder();
+        String line;
+
+        try {
+            URL url = new URL("http", hostPort[0], Integer.parseInt(hostPort[1]), "/api/userService" + urlExtension);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod(method);
+            connection.setRequestProperty("Authorization", "Bearer " + token);
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            OutputStream outputStream = connection.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+            writer.write(postObjectBody);
+            writer.flush();
+            writer.close();
+
             int responseCode = connection.getResponseCode();
 
             if (responseCode == HttpURLConnection.HTTP_OK){
@@ -110,20 +161,14 @@ public class UserCommunicationService implements UserCommunicationInterface {
                     response.append(line);
                 }
             }
-//            System.out.println("Response Code: " + responseCode);
-//            System.out.println("Response: " + response.toString());
+            System.out.println("Response Code: " + responseCode);
+            System.out.println("Response: " + response.toString());
             connection.disconnect();
             reader.close();
             return new CommunicationDto(responseCode, response.toString());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public CommunicationDto sendPostLike(String urlExtension, String method){
-
-        return null;
     }
 
 

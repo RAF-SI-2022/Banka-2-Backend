@@ -52,14 +52,16 @@ public class UserService implements UserDetailsService, UserServiceInterface {
         User user = null;
         CommunicationDto response = userCommunicationInterface.sendGet( email, "/findByEmail");
 
-        try {
-            user = mapper.readValue(response.getResponseMsg(), User.class);
-        } catch (JsonProcessingException e) { throw new RuntimeException(e); }
-
-        if (user != null) {
+        if (response.getResponseCode() == 200) {
+            try {
+                user = mapper.readValue(response.getResponseMsg(), User.class);
+            } catch (JsonProcessingException e) { throw new RuntimeException(e); }
             return Optional.of(user);
-        } else {
-            throw new UserNotFoundException(email);
+
+        }
+        else{
+            return Optional.empty();
+//            throw new UserNotFoundException(email);
         }
     }
 
@@ -75,10 +77,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
         return user;
     }
 
-    @Override
-    public User save(User user) {
-        return userRepository.save(user);
-    }
+
 
     @Override
     public List<Permission> getUserPermissions(String email) {
@@ -107,8 +106,8 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 
     @Override
     public void deleteById(Long id) throws UserNotFoundException {
-//        userRepository.deleteById(id);
-        userCommunicationInterface.sendDelete("/deleteById/" + id);
+//        userCommunicationInterface.sendDelete("/deleteById/" + id);
+        userRepository.deleteById(id);
     }
 
     @Override
@@ -129,13 +128,19 @@ public class UserService implements UserDetailsService, UserServiceInterface {
                 passwordResetTokenRepository.findPasswordResetTokenByToken(passwordResetToken);
 
         if (passwordResetTokenFromDB.isPresent()) {
-            Optional<User> userFromDB = userRepository.findById(user.getId());
+            Optional<User> userFromDB = this.findById(user.getId());
 
             if (userFromDB.isPresent()) {
                 User userToChangePasswordTo = userFromDB.get();
                 userToChangePasswordTo.setPassword(newPassword);
 
-                userRepository.save(user);
+//                userRepository.save(user);
+
+                try {//todo proveri da li ovo radi pravilno
+                    String userJsonBody = mapper.writeValueAsString(user);
+                    userCommunicationInterface.sendPostLike("/save", userJsonBody, null, "POST");
+                } catch (JsonProcessingException e) { throw new RuntimeException(e); }
+
             } else {
                 throw new UserNotFoundException(user.getId());
             }
@@ -150,12 +155,24 @@ public class UserService implements UserDetailsService, UserServiceInterface {
     public User changeUsersDailyLimit(String userEmail, Double limitChange) {
         User user = findByEmail(userEmail).get();
         user.setDailyLimit(user.getDailyLimit() + limitChange);
-        userRepository.save(user);
+//        userRepository.save(user);
+
+        try {//todo proveri da li ovo radi pravilno
+            String userJsonBody = mapper.writeValueAsString(user);
+            userCommunicationInterface.sendPostLike("/save", userJsonBody, null, "POST");
+        } catch (JsonProcessingException e) { throw new RuntimeException(e); }
+
+
         return user;
     }
 
     @Override
     public Double getUsersDailyLimit(String userEmail) {
         return findByEmail(userEmail).get().getDailyLimit();
+    }
+
+    @Override
+    public User save(User user) {
+        return userRepository.save(user);
     }
 }

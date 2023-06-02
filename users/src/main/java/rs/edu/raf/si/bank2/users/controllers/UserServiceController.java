@@ -7,6 +7,8 @@ import rs.edu.raf.si.bank2.users.dto.ChangePassDto;
 import rs.edu.raf.si.bank2.users.models.mariadb.User;
 import rs.edu.raf.si.bank2.users.services.UserService;
 
+import java.util.Optional;
+
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 
@@ -33,7 +35,10 @@ public class UserServiceController {
     @GetMapping(value = "/findByEmail")
     public ResponseEntity<?> findByEmail() {
         String userEmail = getContext().getAuthentication().getName();
-        return ResponseEntity.ok().body(userService.findByEmail(userEmail));
+
+        Optional<User> user = userService.findByEmail(userEmail);
+        if (user.isPresent()) return ResponseEntity.ok().body(user);
+        else  return ResponseEntity.status(404).body("Korisnik sa email-om: asdf@raf.rs nije pronadjen.");
     }
 
     @GetMapping(value = "/findAll")
@@ -54,7 +59,11 @@ public class UserServiceController {
 
     @GetMapping(value = "/findById/{id}")
     public ResponseEntity<?> findById(@PathVariable(name = "id") Long id) {
-        return ResponseEntity.ok().body(userService.findById(id));
+//        return ResponseEntity.ok().body(userService.findById(id));
+
+        Optional<User> user = userService.findById(id);
+        if (user.isPresent()) return ResponseEntity.ok().body(user);
+        else  return ResponseEntity.status(404).body("Korisnik sa email-om: asdf@raf.rs nije pronadjen.");
     }
 
     @DeleteMapping(value = "/deleteById/{id}")
@@ -85,5 +94,7 @@ public class UserServiceController {
         String userEmail = getContext().getAuthentication().getName();
         return ResponseEntity.ok().body(userService.getUsersDailyLimit(userEmail));
     }
+
+
 
 }
