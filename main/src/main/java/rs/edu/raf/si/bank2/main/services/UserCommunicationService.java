@@ -110,11 +110,10 @@ public class UserCommunicationService implements UserCommunicationInterface {
                     response.append(line);
                 }
             }
-            System.out.println("Response Code: " + responseCode);
-            System.out.println("Response: " + response.toString());
+//            System.out.println("Response Code: " + responseCode);
+//            System.out.println("Response: " + response.toString());
             connection.disconnect();
             reader.close();
-            System.out.println("PRAVIMO COM DTO");
             return new CommunicationDto(responseCode, response.toString());
         } catch (IOException e) {
             throw new RuntimeException(e);

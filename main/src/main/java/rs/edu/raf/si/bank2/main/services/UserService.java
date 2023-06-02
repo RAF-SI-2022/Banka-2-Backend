@@ -43,27 +43,20 @@ public class UserService implements UserDetailsService, UserServiceInterface {
         if (myUser.isEmpty()) {
             throw new UsernameNotFoundException("Korisnik sa email-om: " + username + " nije pronadjen.");
         }
-        return new org.springframework.security.core.userdetails.User(myUser.get().getEmail(), "", new ArrayList<>());
+        return new org.springframework.security.core.userdetails.
+                User(myUser.get().getEmail(), myUser.get().getPassword(), new ArrayList<>());
     }
 
     @Override
     public Optional<User> findByEmail(String email) {
-//        return userRepository.findUserByEmail(email);
-
         User user = null;
         CommunicationDto response = userCommunicationInterface.sendGet( email, "/findByEmail");
 
-        System.out.println("ovo je response " + response);
-
-
         try {
             user = mapper.readValue(response.getResponseMsg(), User.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        } catch (JsonProcessingException e) { throw new RuntimeException(e); }
 
-        if (user == null) System.err.println("USER IS NULL");
-
+        if (user == null) return Optional.empty();
         return Optional.of(user);
     }
 
@@ -86,8 +79,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 
     @Override
     public List<Permission> getUserPermissions(String email) {
-        List<Permission> permissions =
-                new ArrayList<>(userRepository.findUserByEmail(email).get().getPermissions());
+        List<Permission> permissions = new ArrayList<>(this.findByEmail(email).get().getPermissions());
         return permissions;
     }
 
@@ -105,14 +97,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 
     @Override
     public void deleteById(Long id) throws UserNotFoundException {
-
-        //    try {
-
         userRepository.deleteById(id);
-        //    }
-        //    catch (NoSuchElementException e) {
-        //      throw new UserNotFoundException(id);
-        //    }
     }
 
     @Override
