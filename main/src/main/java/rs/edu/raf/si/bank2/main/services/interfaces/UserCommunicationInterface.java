@@ -1,9 +1,15 @@
 package rs.edu.raf.si.bank2.main.services.interfaces;
 
 import java.io.IOException;
-import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
+import java.util.List;
+import java.util.Optional;
 
-public interface CommunicationInterface {
+import rs.edu.raf.si.bank2.main.dto.CommunicationDto;
+import rs.edu.raf.si.bank2.main.models.mariadb.Permission;
+import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
+import rs.edu.raf.si.bank2.main.models.mariadb.User;
+
+public interface UserCommunicationInterface {
 
     /**
      * Used to check whether the user has the adequate permissions.
@@ -26,4 +32,12 @@ public interface CommunicationInterface {
      * @deprecated
      */
     public String testComs() throws IOException, InterruptedException;
+
+    public CommunicationDto sendGet(String urlExtension);
+
+    public CommunicationDto sendPostLike(String urlExtension, String method);
+
+    public CommunicationDto sendDelete(String urlExtension);
+
+
 }
