@@ -138,7 +138,7 @@ public class UserCommunicationService implements UserCommunicationInterface {
         String line;
 
         try {
-            URL url = new URL("http", hostPort[0], Integer.parseInt(hostPort[1]), "/api/userService/" + urlExtension);
+            URL url = new URL("http", hostPort[0], Integer.parseInt(hostPort[1]), "/api/userService" + urlExtension);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("DELETE");
             connection.setRequestProperty("Authorization", "Bearer " + token);
@@ -156,8 +156,8 @@ public class UserCommunicationService implements UserCommunicationInterface {
                     response.append(line);
                 }
             }
-//            System.out.println("Response Code: " + responseCode);
-//            System.out.println("Response: " + response.toString());
+            System.out.println("Response Code: " + responseCode);
+            System.out.println("Response: " + response.toString());
             connection.disconnect();
             reader.close();
             return new CommunicationDto(responseCode, response.toString());

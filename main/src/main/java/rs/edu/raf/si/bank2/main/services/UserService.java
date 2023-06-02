@@ -56,8 +56,11 @@ public class UserService implements UserDetailsService, UserServiceInterface {
             user = mapper.readValue(response.getResponseMsg(), User.class);
         } catch (JsonProcessingException e) { throw new RuntimeException(e); }
 
-        if (user == null) return Optional.empty();
-        return Optional.of(user);
+        if (user != null) {
+            return Optional.of(user);
+        } else {
+            throw new UserNotFoundException(email);
+        }
     }
 
     @Override
@@ -85,11 +88,18 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 
     @Override
     public Optional<User> findById(Long id) throws UserNotFoundException {
+        CommunicationDto response = userCommunicationInterface.sendGet( null,"/findById/" + id);
 
-        Optional<User> user = userRepository.findById(id);
+        User user = null;
 
-        if (user.isPresent()) {
-            return user;
+        try {
+            user = mapper.readValue(response.getResponseMsg(), User.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (user != null) {
+            return Optional.of(user);
         } else {
             throw new UserNotFoundException(id);
         }
@@ -97,7 +107,8 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 
     @Override
     public void deleteById(Long id) throws UserNotFoundException {
-        userRepository.deleteById(id);
+//        userRepository.deleteById(id);
+        userCommunicationInterface.sendDelete("/deleteById/" + id);
     }
 
     @Override
