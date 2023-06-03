@@ -6,7 +6,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.jms.core.JmsTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import rs.edu.raf.si.bank2.otc.dto.ContactPersonDto;
+import rs.edu.raf.si.bank2.otc.dto.ContactsBankAccountsDto;
 import rs.edu.raf.si.bank2.otc.dto.CreateCompanyDto;
 import rs.edu.raf.si.bank2.otc.dto.EditCompanyDto;
 //import rs.edu.raf.si.bank2.otc.listener.MessageHelper;
@@ -50,8 +53,8 @@ public class CompanyController {
     public void test(){
         System.out.println("ZZZZZZZ");
     }
-    @GetMapping(value = "/id/{id}")
-    public ResponseEntity<?> getCompanyById(@RequestHeader("Authorization") String token, @PathVariable Long id) {
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<?> getCompanyById(@RequestHeader("Authorization") String token, @PathVariable String id) {
         Optional<Company> company = companyService.getCompanyById(id);
         if (company.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -75,22 +78,29 @@ public class CompanyController {
     }
 
     @PostMapping(value = "/create")
-    public ResponseEntity<?> createCompanija(@RequestBody CreateCompanyDto companyDto) {
+    public ResponseEntity<?> createCompany(@RequestBody CreateCompanyDto companyDto) {
 
         System.out.println("TU SMO PLZIC");
 //        System.out.println(messageHelper.createTextMessage(companyDto));
         System.out.println(companyDto);
+        companyService.createCompany(new Company(companyDto.getName(),companyDto.getAddress(),companyDto.getTaxNumber(),companyDto.getActivityCode(),companyDto.getRegistrationNumber()));
 //        jmsTemplate.convertAndSend(createCompanyDestination,messageHelper.createTextMessage(companyDto));
 //        List<ContactPerson> employeeList = new ArrayList<>(company.getContactPersons());
 //        for(ContactPerson cp: employeeList){
 //
 //        }
-        return ResponseEntity.ok(HttpEntity.EMPTY);
+        return ResponseEntity.ok().build();
+    }
+    @PostMapping(value = "/add")
+    public ResponseEntity<?> addContactsAndBankAccounts(@RequestBody ContactsBankAccountsDto contactsBankAccountsDto ){
+        return ResponseEntity.ok(companyService.addContactsAndBankAccounts(contactsBankAccountsDto));
     }
 
     @PostMapping(value = "/edit")
     public ResponseEntity<?> editCompany(@RequestHeader("Authorization") String token, @RequestBody EditCompanyDto editCompanyDto) {
-        return ResponseEntity.ok(companyService.updateCompany(editCompanyDto));
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        companyService.updateCompany(editCompanyDto);
+        return ResponseEntity.ok().build();
     }
 
 }
