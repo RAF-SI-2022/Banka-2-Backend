@@ -59,4 +59,4 @@ Feature: Future service
 
   Scenario: user without balacne buys future
     Given user doesnt have a balance
-#    Then user tries to but future
+    Then user tries to but future

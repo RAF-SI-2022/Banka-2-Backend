@@ -85,9 +85,45 @@ services:
     networks:
       - bank2_net
 
-  backend:
-    container_name: backend
-    image: harbor.k8s.elab.rs/banka-2/backend
+  # TODO add health check for users
+  users:
+    container_name: users
+    image: harbor.k8s.elab.rs/banka-2/users
+    expose:
+      - "8081"
+    ports:
+      - "8081:8081"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
+    networks:
+      - bank2_net
+
+  # TODO add health check for OTC
+  otc:
+    container_name: otc
+    image: harbor.k8s.elab.rs/banka-2/otc
+    expose:
+      - "8082"
+    ports:
+      - "8082:8082"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
+    networks:
+      - bank2_net
+
+  main:
+    container_name: main
+    image: harbor.k8s.elab.rs/banka-2/main
     expose:
       - "8080"
     ports:
@@ -99,24 +135,7 @@ services:
         condition: service_healthy
       flyway:
         condition: service_completed_successfully
-    networks:
-      - bank2_net
-
-  phpmyadmin:
-    image: phpmyadmin
-    restart: always
-    expose:
-      - "8081"
-    ports:
-      - "8081:80"
-    environment:
-      PMA_HOST: mariadb
-      PMA_PORT: 3306
-      MYSQL_ROOT_USER: root
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
-    depends_on:
-      mariadb:
+      users:
         condition: service_healthy
     networks:
       - bank2_net

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 import rs.edu.raf.si.bank2.users.models.mariadb.PasswordResetToken;
 
+// TODO nedostaje @Repository?
 public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Long> {
 
     Optional<PasswordResetToken> findPasswordResetTokenByToken(String token);

@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.edu.raf.si.bank2.main.exceptions.CurrencyNotFoundException;
+import rs.edu.raf.si.bank2.main.services.UserCommunicationService;
 import rs.edu.raf.si.bank2.main.services.CurrencyService;
 import rs.edu.raf.si.bank2.main.services.InflationService;
+import rs.edu.raf.si.bank2.main.services.interfaces.UserCommunicationInterface;
 
 @RestController
 @CrossOrigin
@@ -13,9 +15,12 @@ import rs.edu.raf.si.bank2.main.services.InflationService;
 public class CurrencyController {
     private final CurrencyService currencyService;
     private final InflationService inflationService;
+    private final UserCommunicationInterface userCommunicationInterface;
 
     @Autowired
-    public CurrencyController(CurrencyService currencyService, InflationService inflationService) {
+    public CurrencyController(CurrencyService currencyService, InflationService inflationService,
+            UserCommunicationService communicationService) {
+        this.userCommunicationInterface = communicationService;
         this.currencyService = currencyService;
         this.inflationService = inflationService;
     }
