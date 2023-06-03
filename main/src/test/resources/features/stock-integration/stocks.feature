@@ -21,18 +21,18 @@ Feature: Stock service
     When user is logged in
     Then user gets his user stocks
 
-#  Scenario: user gets stock history
-#    When user is logged in
-#    Then user gets stock history
+  Scenario: user gets stock history
+    When user is logged in
+    Then user gets stock history
 
-#  Scenario: user buys stock //todo OVO IMA ERROR POGLEDAJ
-#    When user is logged in
-#    Then user  buys stock
+  Scenario: user buys stock
+    When user is logged in
+    Then user  buys stock
 
   Scenario: user sells stock
     When user is logged in
     Then user sells stock
 
-#  Scenario: user removes stock //todo vrati
-#    When user is logged in
-#    Then user removes stock
+  Scenario: user removes stock
+    When user is logged in
+    Then user removes stock

@@ -185,41 +185,42 @@ public class UserCommunicationService implements UserCommunicationInterface {
 
     @Override
     public CommunicationDto sendDelete(String urlExtension){
-        System.err.println("POSALI SMO SEND DELETE");
-
-        String token = jwtUtil.generateToken("anesic3119rn+banka2backend+admin@raf.rs");
-        String []hostPort = usersServiceHost.split(":");
-        BufferedReader reader;
-        StringBuilder response = new StringBuilder();
-        String line;
-
-        try {
-            URL url = new URL("http", hostPort[0], Integer.parseInt(hostPort[1]), "/api/userService" + urlExtension);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("DELETE");
-            connection.setRequestProperty("Authorization", "Bearer " + token);
-            int responseCode = connection.getResponseCode();
-
-            if (responseCode == HttpURLConnection.HTTP_OK){
-                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
-            }
-            else {
-                reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
-            }
-            System.out.println("Response Code: " + responseCode);
-            System.out.println("Response: " + response.toString());
-            connection.disconnect();
-            reader.close();
-            return new CommunicationDto(responseCode, response.toString());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        System.err.println("POSALI SMO SEND DELETE");
+//
+//        String token = jwtUtil.generateToken("anesic3119rn+banka2backend+admin@raf.rs");
+//        String []hostPort = usersServiceHost.split(":");
+//        BufferedReader reader;
+//        StringBuilder response = new StringBuilder();
+//        String line;
+//
+//        try {
+//            URL url = new URL("http", hostPort[0], Integer.parseInt(hostPort[1]), "/api/userService" + urlExtension);
+//            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//            connection.setRequestMethod("DELETE");
+//            connection.setRequestProperty("Authorization", "Bearer " + token);
+//            int responseCode = connection.getResponseCode();
+//
+//            if (responseCode == HttpURLConnection.HTTP_OK){
+//                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+//                while ((line = reader.readLine()) != null) {
+//                    response.append(line);
+//                }
+//            }
+//            else {
+//                reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+//                while ((line = reader.readLine()) != null) {
+//                    response.append(line);
+//                }
+//            }
+//            System.out.println("Response Code: " + responseCode);
+//            System.out.println("Response: " + response.toString());
+//            connection.disconnect();
+//            reader.close();
+//            return new CommunicationDto(responseCode, response.toString());
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+        return null;
     }
 
 

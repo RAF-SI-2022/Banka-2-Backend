@@ -129,7 +129,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
 
     // Test creating new user
     @When("creating new user")
-    public void creating_new_user() throws UnsupportedEncodingException {
+    public void creating_new_user() {
         MvcResult mvcResult = null;
         try {
             if (userService.findByEmail("testUser@gmail.com").isEmpty()) {

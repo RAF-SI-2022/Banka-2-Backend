@@ -56,28 +56,6 @@ public class UserController {
         this.userCommunicationInterface = communicationService;
     }
 
-    @GetMapping("test")//todo remove later
-    public void test() throws JsonProcessingException {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        User user = User.builder()
-                .id(9L)
-                .firstName("Petar")
-                .lastName("Petrovic")
-                .phone("000000000")
-                .jmbg("000000000")
-                .password("12345")
-                .email("petar@gmail.com")
-                .jobPosition("/")
-                .build();
-
-        String userJsonBody = objectMapper.writeValueAsString(user);
-
-        userCommunicationInterface.sendPostLike("/save",userJsonBody,
-                "anesic3119rn+banka2backend+admin@raf.rs","POST");
-    }
-
     @GetMapping(value = "/permissions")
     public ResponseEntity<?> getAllPermissions() {
         String signedInUserEmail = getContext().getAuthentication().getName(); // todo ovo kopiraj svuda
@@ -116,6 +94,86 @@ public class UserController {
             return ResponseEntity.status(401).body("Nemate dozvolu da pristupite korisnicima.");
         }
         return ResponseEntity.ok().body(userService.findById(id));
+    }
+
+    @PostMapping(value = "/register",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createUser(@RequestBody RegisterRequest user) {
+
+        String signedInUserEmail = getContext().getAuthentication().getName();
+        if (!userCommunicationInterface.isAuthorised(PermissionName.CREATE_USERS, signedInUserEmail)) {
+            return ResponseEntity.status(401).body("Nemate dozvolu da kreirate korisnike.");
+        }
+        Optional<User> existingUser = userService.findByEmail(user.getEmail());
+        if (existingUser.isPresent()) {
+            return ResponseEntity.status(400).body("Korisnik sa email-om " + user.getEmail() + " vec postoji.");
+        }
+
+        List<Permission> permissions = this.permissionService.findByPermissionNames(user.getPermissions());
+
+        User newUser = User.builder()
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .password(this.passwordEncoder.encode(user.getPassword()))
+                .jmbg(user.getJmbg())
+                .phone(user.getPhone())
+                .jobPosition(user.getJobPosition())
+                .active(user.isActive())
+                .permissions(permissions)
+                .dailyLimit(user.getDailyLimit())
+                .defaultDailyLimit(user.getDailyLimit())
+                .build();
+
+        userService.save(newUser); // mora duplo zbog balansa
+        setInitialUserBalance(newUser);
+        userService.save(newUser);
+
+        RegisterResponse response = RegisterResponse.builder()
+                .id(newUser.getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .jmbg(user.getJmbg())
+                .phone(user.getPhone())
+                .jobPosition(user.getJobPosition())
+                .active(user.isActive())
+                .permissions(permissions)
+                .dailyLimit(user.getDailyLimit())
+                .defaultDailyLimit(user.getDailyLimit())
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    private void setInitialUserBalance(User user) { // todo ovo promeni kasnije da nemaju odmah 100.000 $
+        Balance balance = new Balance();
+        balance.setUser(user);
+        Optional<Currency> rsd = this.currencyService.findByCurrencyCode("RSD");
+        if (rsd.isEmpty()) throw new CurrencyNotFoundException("RSD");
+        balance.setCurrency(rsd.get());
+        balance.setFree(100000f);
+        balance.setType(BalanceType.CASH);
+        balance.setReserved(0f);
+        balance.setAmount(100000f);
+
+        Balance balance2 = new Balance();
+        balance2.setUser(user);
+        Optional<Currency> usd = this.currencyService.findByCurrencyCode("USD");
+        if (usd.isEmpty()) throw new CurrencyNotFoundException("USD");
+        balance2.setCurrency(usd.get());
+        balance2.setAmount(100000f);
+        balance2.setFree(100000f);
+        balance2.setType(BalanceType.CASH);
+        balance2.setReserved(0f);
+
+        List<Balance> balances = new ArrayList<>();
+        balances.add(balance);
+        balances.add(balance2);
+        user.setBalances(balances);
+        this.balanceService.save(balance);
+        this.balanceService.save(balance2);
     }
 
     @GetMapping("/email")
@@ -333,85 +391,5 @@ public class UserController {
         }
     }
 
-
-    @PostMapping(value = "/register",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createUser(@RequestBody RegisterRequest user) {
-
-        String signedInUserEmail = getContext().getAuthentication().getName();
-        if (!userCommunicationInterface.isAuthorised(PermissionName.CREATE_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("Nemate dozvolu da kreirate korisnike.");
-        }
-        Optional<User> existingUser = userService.findByEmail(user.getEmail());
-        if (existingUser.isPresent()) {
-            return ResponseEntity.status(400).body("Korisnik sa email-om " + user.getEmail() + " vec postoji.");
-        }
-
-        List<Permission> permissions = this.permissionService.findByPermissionNames(user.getPermissions());
-
-        User newUser = User.builder()
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .password(this.passwordEncoder.encode(user.getPassword()))
-                .jmbg(user.getJmbg())
-                .phone(user.getPhone())
-                .jobPosition(user.getJobPosition())
-                .active(user.isActive())
-                .permissions(permissions)
-                .dailyLimit(user.getDailyLimit())
-                .defaultDailyLimit(user.getDailyLimit())
-                .build();
-
-        userService.save(newUser); // mora duplo zbog balansa
-        setInitialUserBalance(newUser);
-        userService.save(newUser);
-
-        RegisterResponse response = RegisterResponse.builder()
-                .id(newUser.getId())
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .jmbg(user.getJmbg())
-                .phone(user.getPhone())
-                .jobPosition(user.getJobPosition())
-                .active(user.isActive())
-                .permissions(permissions)
-                .dailyLimit(user.getDailyLimit())
-                .defaultDailyLimit(user.getDailyLimit())
-                .build();
-
-        return ResponseEntity.ok(response);
-    }
-
-    private void setInitialUserBalance(User user) { // todo ovo promeni kasnije da nemaju odmah 100.000 $
-        Balance balance = new Balance();
-        balance.setUser(user);
-        Optional<Currency> rsd = this.currencyService.findByCurrencyCode("RSD");
-        if (rsd.isEmpty()) throw new CurrencyNotFoundException("RSD");
-        balance.setCurrency(rsd.get());
-        balance.setFree(100000f);
-        balance.setType(BalanceType.CASH);
-        balance.setReserved(0f);
-        balance.setAmount(100000f);
-
-        Balance balance2 = new Balance();
-        balance2.setUser(user);
-        Optional<Currency> usd = this.currencyService.findByCurrencyCode("USD");
-        if (usd.isEmpty()) throw new CurrencyNotFoundException("USD");
-        balance2.setCurrency(usd.get());
-        balance2.setAmount(100000f);
-        balance2.setFree(100000f);
-        balance2.setType(BalanceType.CASH);
-        balance2.setReserved(0f);
-
-        List<Balance> balances = new ArrayList<>();
-        balances.add(balance);
-        balances.add(balance2);
-        user.setBalances(balances);
-        this.balanceService.save(balance);
-        this.balanceService.save(balance2);
-    }
 
 }

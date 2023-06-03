@@ -41,7 +41,7 @@ public class ExchangeController {
 
     @GetMapping(value = "/status/{micCode}")
     public ResponseEntity<?> isExchangeActive(@PathVariable(name = "micCode") String micCode) {
-        if (exchangeService.findByMicCode(micCode) == null) {
+        if (exchangeService.findByMicCode(micCode) != null) {
             return ResponseEntity.ok().body(exchangeService.isExchangeActive(micCode));
         } else {
             return ResponseEntity.notFound().build();
