@@ -526,7 +526,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                             .content(
                                     """
                                               {
-                                                  "password": "testPass"
+                                                  "password": "admin"
                                               }
                                             """)
                             .header("Content-Type", "application/json")

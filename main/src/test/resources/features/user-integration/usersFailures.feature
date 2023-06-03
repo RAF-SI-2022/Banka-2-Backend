@@ -88,6 +88,6 @@ Feature: User service
     When non privileged user logged in and user exists in database
     Then user still in database
 
-  Scenario: wipe db from test user
-    Given delete test user
+#  Scenario: wipe db from test user
+#    Given delete test user
 

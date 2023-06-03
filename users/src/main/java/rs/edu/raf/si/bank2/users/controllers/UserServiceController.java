@@ -38,7 +38,7 @@ public class UserServiceController {
 
         Optional<User> user = userService.findByEmail(userEmail);
         if (user.isPresent()) return ResponseEntity.ok().body(user);
-        else  return ResponseEntity.status(404).body("Korisnik sa email-om: asdf@raf.rs nije pronadjen.");
+        else  return ResponseEntity.status(404).body("Korisnik nije pronadjen.");
     }
 
     @GetMapping(value = "/findAll")

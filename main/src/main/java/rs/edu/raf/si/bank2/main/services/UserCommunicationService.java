@@ -5,6 +5,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Optional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,7 @@ import rs.edu.raf.si.bank2.main.utils.JwtUtil;
 public class UserCommunicationService implements UserCommunicationInterface {
 
     private final JwtUtil jwtUtil;
+    ObjectMapper mapper = new ObjectMapper();
 
 //
 //    @Autowired
@@ -63,21 +65,30 @@ public class UserCommunicationService implements UserCommunicationInterface {
 
     @Override
     public boolean isAuthorised(PermissionName permissionName, String userEmail) {
-//        if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) return false;
-//        Optional<User> optional = userServiceInterface.findByEmail(userEmail);
-//        if (optional.isEmpty()) return false;
-//
-//        // TODO los kod, ovde treba da se vrati verovatno set, pa da se odmah
-//        //  proveri da li postoji permission. To zahteva da permission equals
-//        //  bude implementiran samo po nazivu, ne i po ID-ju, jer pri
-//        //  inicijalizaciji permission-a ne znamo koji je ID za taj
-//        //  specificni permission ali znamo njegov naziv. ID polje u
-//        //  permissionu ne radi nista (mozda cak i smeta)
-//        for (Permission p : optional.get().getPermissions()) {
-//            if (p.getPermissionName().equals(permissionName) || p.getPermissionName().equals(PermissionName.ADMIN_USER)) return true;
-//        }
-//        return false;
-        return true;
+        if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) return false;
+        User user = null;
+
+        CommunicationDto response = sendGet(userEmail, "/findByEmail");
+
+        if (response.getResponseCode() == 200){
+            try {
+                user = mapper.readValue(response.getResponseMsg(), User.class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else return false;
+
+        // TODO los kod, ovde treba da se vrati verovatno set, pa da se odmah
+        //  proveri da li postoji permission. To zahteva da permission equals
+        //  bude implementiran samo po nazivu, ne i po ID-ju, jer pri
+        //  inicijalizaciji permission-a ne znamo koji je ID za taj
+        //  specificni permission ali znamo njegov naziv. ID polje u
+        //  permissionu ne radi nista (mozda cak i smeta)
+        for (Permission p : user.getPermissions()) {
+            if (p.getPermissionName().equals(permissionName) || p.getPermissionName().equals(PermissionName.ADMIN_USER)) return true;
+        }
+        return false;
     }
 
     @Override
