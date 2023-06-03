@@ -7,10 +7,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import rs.edu.raf.si.bank2.main.exceptions.OrderNotFoundException;
-import rs.edu.raf.si.bank2.main.models.mariadb.Balance;
-import rs.edu.raf.si.bank2.main.models.mariadb.Stock;
-import rs.edu.raf.si.bank2.main.models.mariadb.Transaction;
-import rs.edu.raf.si.bank2.main.models.mariadb.UserStock;
+import rs.edu.raf.si.bank2.main.models.mariadb.*;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.Order;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderStatus;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.StockOrder;
@@ -55,44 +52,44 @@ public class StockSellWorker extends Thread {
         while (true) {
             try {
                 StockOrder stockOrder = stockSellRequestsQueue.take();
-
-                if (stockOrder.getStop() == 0 && stockOrder.getStockLimit() == 0) {
-                    Optional<UserStock> usersStockToChange = userStockService.findUserStockByUserIdAndStockSymbol(
-                            stockOrder.getUser().getId(), stockOrder.getSymbol());
-                    Balance balance = this.balanceService.findBalanceByUserIdAndCurrency(
-                            stockOrder.getUser().getId(), stockOrder.getCurrencyCode());
-                    if (stockOrder.isAllOrNone()) {
+                // These are checks for limit and stop. If they are set and order doesn't meet the requirements we skip that order and try again later.
+                if(!this.stockService.checkLimitAndStopForSell(stockOrder)) {
+                    stockSellRequestsQueue.put(stockOrder); // Put order back at the end of the queue.
+                    continue;
+                }
+                Optional<UserStock> usersStockToChange = userStockService.findUserStockByUserIdAndStockSymbol(
+                        stockOrder.getUser().getId(), stockOrder.getSymbol());
+                Balance balance = this.balanceService.findBalanceByUserIdAndCurrency(
+                        stockOrder.getUser().getId(), stockOrder.getCurrencyCode());
+                Stock stock = this.stockService.findStockBySymbolInDb(stockOrder.getSymbol());
+                if (stockOrder.isAllOrNone()) {
+                    usersStockToChange
+                            .get()
+                            .setAmount(usersStockToChange.get().getAmount() - stockOrder.getAmount());
+                    Transaction transaction = this.transactionService.createTransaction(
+                            stockOrder, balance, stock.getPriceValue().floatValue()*stockOrder.getAmount(), stock.getPriceValue().floatValue()*stockOrder.getAmount());
+                    transactionService.save(transaction);
+                } else {
+                    int stockAmountSum = 0;
+                    BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockOrder.getAmount()));
+                    List<Transaction> transactionList = new ArrayList<>();
+                    while (stockOrder.getAmount() != stockAmountSum) {
+                        int amountBought = random.nextInt(stockOrder.getAmount() - stockAmountSum) + 1;
+                        stockAmountSum += amountBought;
                         usersStockToChange
                                 .get()
-                                .setAmount(usersStockToChange.get().getAmount() - stockOrder.getAmount());
-                        Transaction transaction = this.transactionService.createTransaction(
-                                stockOrder, balance, (float) stockOrder.getPrice());
-                        transactionService.save(transaction);
-                    } else {
-                        int stockAmountSum = 0;
-                        Stock stock = stockService.getStockBySymbol(stockOrder.getSymbol());
-                        BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockOrder.getAmount()));
-                        List<Transaction> transactionList = new ArrayList<>();
-                        while (stockOrder.getAmount() != stockAmountSum) {
-                            int amountBought = random.nextInt(stockOrder.getAmount() - stockAmountSum) + 1;
-                            stockAmountSum += amountBought;
-                            usersStockToChange
-                                    .get()
-                                    .setAmount(usersStockToChange.get().getAmount() - amountBought);
-                            transactionList.add(this.transactionService.createTransaction(
-                                    stockOrder, balance, price.floatValue() * amountBought));
-                        }
-                        this.transactionService.saveAll(transactionList);
+                                .setAmount(usersStockToChange.get().getAmount() - amountBought);
+                        transactionList.add(this.transactionService.createTransaction(
+                                stockOrder, balance, stock.getPriceValue().floatValue() * amountBought, stock.getPriceValue().floatValue()*stockOrder.getAmount()));
                     }
-                    userStockService.save(usersStockToChange.get());
-                    this.balanceService.updateBalance(
-                            stockOrder, stockOrder.getUser().getEmail(), stockOrder.getCurrencyCode());
-                    this.updateOrderStatus(stockOrder.getId(), OrderStatus.COMPLETE);
-                } else {
-                    System.out.println("limit stop sell");
+                    this.transactionService.saveAll(transactionList);
                 }
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
+                userStockService.save(usersStockToChange.get());
+                this.balanceService.updateBalance(
+                        stockOrder, stockOrder.getUser().getEmail(), stockOrder.getCurrencyCode());
+                this.updateOrderStatus(stockOrder.getId(), OrderStatus.COMPLETE);
+                this.transactionService.updateTransactionsStatusesOfOrder(stockOrder.getId(), TransactionStatus.COMPLETE);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

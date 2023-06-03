@@ -287,7 +287,7 @@ public class OptionService implements OptionServiceInterface {
                 // TODO Smanjiti user balance
                 this.orderService.updateOrderStatus(optionOrder.getId(), OrderStatus.COMPLETE);
                 Transaction transaction =
-                        this.transactionService.createTransaction(optionOrder, balance, (float) premium);
+                        this.transactionService.createTransaction(optionOrder, balance, (float) premium, (float)optionOrder.getPrice());
                 this.transactionService.save(transaction);
                 this.balanceService.updateBalance(optionOrder, userFromDB.getEmail(), "USD");
                 return userOptionRepository.save(userOption);

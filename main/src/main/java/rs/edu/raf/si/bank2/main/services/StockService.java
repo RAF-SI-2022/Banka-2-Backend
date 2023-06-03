@@ -118,6 +118,10 @@ public class StockService {
         else throw new StockNotFoundException(id);
     }
 
+    public Stock findStockBySymbolInDb(String symbol) {
+        return this.stockRepository.findStockBySymbol(symbol).orElse(null); // if found return Stock, if not, return null
+    }
+
     @Cacheable(value = "exchangesSymbol", key = "#symbol")
     @Transactional
     public Stock getStockBySymbol(String symbol) throws StockNotFoundException, ExchangeNotFoundException {
@@ -446,16 +450,11 @@ public class StockService {
                     : stockOrder;
             this.orderRepository.save(order);
             return ResponseEntity.status(400).body("Dnevni limit je prekoracen, porudzbina je na cekanju (WAITING).");
-        } else {
-            order = stockOrder == null
-                    ? this.createOrder(
-                            stockRequest, price.doubleValue(), user, OrderStatus.IN_PROGRESS, OrderTradeType.BUY)
-                    : stockOrder;
-            order = this.orderRepository.save(order);
-            user.setDailyLimit(user.getDailyLimit() - price.doubleValue());
-            userService.save(user);
         }
-        this.balanceService.reserveAmount(price.floatValue(), user.getEmail(), order.getCurrencyCode());
+        order = stockOrder == null ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.IN_PROGRESS, OrderTradeType.BUY) : stockOrder;
+        order = this.orderRepository.save(order);
+        user.setDailyLimit(user.getDailyLimit() - price.doubleValue());
+        userService.save(user);
         try {
             stockBuyRequestsQueue.put(order);
         } catch (InterruptedException e) {
@@ -529,6 +528,23 @@ public class StockService {
 
     public List<UserStock> getAllUserStocks(long userId) {
         return userStockService.findAllForUser(userId);
+    }
+
+    public boolean checkLimitAndStopForBuy(StockOrder stockOrder) {
+        // Here we have to find price of the stock referenced in stockOrder and to compare it with order's limit and stop
+        BigDecimal stockPrice = this.findStockBySymbolInDb(stockOrder.getSymbol()).getPriceValue();
+        if(stockOrder.getStockLimit() != null && stockPrice.doubleValue() <= stockOrder.getStockLimit().doubleValue()) {
+            return true;
+        }
+        return stockOrder.getStop() != null && stockPrice.doubleValue() >= stockOrder.getStop().doubleValue();
+    }
+
+    public boolean checkLimitAndStopForSell(StockOrder stockOrder) {
+        BigDecimal stockPrice = this.findStockBySymbolInDb(stockOrder.getSymbol()).getPriceValue();
+        if(stockOrder.getStockLimit() != null && stockPrice.doubleValue() >= stockOrder.getStockLimit().doubleValue()) {
+            return true;
+        }
+        return stockOrder.getStop() != null && stockPrice.doubleValue() <= stockOrder.getStop().doubleValue();
     }
 
     @Transactional
