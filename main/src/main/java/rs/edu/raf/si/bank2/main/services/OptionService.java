@@ -117,13 +117,59 @@ public class OptionService implements OptionServiceInterface {
     }
 
     @Override
-    public List<Option> saveAll(List<Option> optionList) {
-        return this.optionRepository.saveAll(optionList);
+    @Transactional
+    public void updateAllOptionsInDb() {
+        List<Option> freshOptions = this.getFiveMostImportantOptionsFromApi();
+        List<Option> newOptions = new ArrayList<>(); // list of freshOptions which don't have corresponding option in db
+        for (Option freshOption : freshOptions) {
+            Optional<Option> existingOption = this.optionRepository.findByContractSymbolAndStockSymbolAndOptionType(
+                    freshOption.getContractSymbol(),
+                    freshOption.getStockSymbol(),
+                    freshOption
+                            .getOptionType()); // search using a combination of these three fields should always yield a
+            // unique result
+            if (existingOption.isPresent()) {
+                this.optionRepository
+                        .updateOption( // forwarding all fields as arguments because forwarding whole object was
+                                // problematic
+                                existingOption.get().getId(),
+                                freshOption.getStockSymbol(),
+                                freshOption.getContractSymbol(),
+                                freshOption.getOptionType(),
+                                freshOption.getStrike(),
+                                freshOption.getImpliedVolatility(),
+                                freshOption.getPrice(),
+                                freshOption.getExpirationDate(),
+                                freshOption.getOpenInterest(),
+                                freshOption.getContractSize(),
+                                freshOption.getMaintenanceMargin(),
+                                freshOption.getBid(),
+                                freshOption.getAsk(),
+                                freshOption.getChangePrice(),
+                                freshOption.getPercentChange(),
+                                freshOption.getInTheMoney());
+            } else {
+                newOptions.add(freshOption);
+            }
+        }
+        this.optionRepository.saveAll(newOptions);
     }
 
-    @Override
-    public void deleteAll() {
-        this.optionRepository.deleteAll();
+    @Transactional
+    public List<Option> getFiveMostImportantOptionsFromApi() {
+        List<Option> appleOptions = this.getFromExternalApi("AAPL", "");
+        List<Option> googleOptions = this.getFromExternalApi("GOOGL", "");
+        List<Option> amazonOptions = this.getFromExternalApi("AMZN", "");
+        List<Option> teslaOptions = this.getFromExternalApi("TSLA", "");
+        List<Option> netflixOptions = this.getFromExternalApi("NFLX", "");
+
+        List<Option> optionList = new ArrayList<>();
+        optionList.addAll(appleOptions);
+        optionList.addAll(googleOptions);
+        optionList.addAll(amazonOptions);
+        optionList.addAll(teslaOptions);
+        optionList.addAll(netflixOptions);
+        return optionList;
     }
 
     public UserStock buyStockUsingOption(Long userOptionId, Long userId)
