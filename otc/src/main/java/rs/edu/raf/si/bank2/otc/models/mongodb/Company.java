@@ -5,9 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -18,17 +21,11 @@ import java.util.Collection;
 @Document("company")
 public class Company {
 
-    public Company(String name, String registrationNumber, String taxNumber, String activityCode, String address) {
-        this.name = name;
-        this.registrationNumber = registrationNumber;
-        this.taxNumber = taxNumber;
-        this.activityCode = activityCode;
-        this.address = address;
-    }
-
     @Id
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private String id;
     private String name;
+    @Indexed(unique = true)
     private String registrationNumber;
     private String taxNumber;
     private String activityCode;
@@ -37,6 +34,16 @@ public class Company {
     private Collection<ContactPerson> contactPersons;
     @DBRef(lazy = true)
     private Collection<CompanyBankAccount> bankAccounts;
+
+    public Company(String name, String registrationNumber, String taxNumber, String activityCode, String address) {
+        this.name = name;
+        this.registrationNumber = registrationNumber;
+        this.taxNumber = taxNumber;
+        this.activityCode = activityCode;
+        this.address = address;
+        this.contactPersons = new ArrayList<>();
+        this.bankAccounts = new ArrayList<>();
+    }
 
     public Company(String name, String registrationNumber, String taxNumber, String activityCode, String address, Collection<ContactPerson> contactPersons, Collection<CompanyBankAccount> bankAccounts) {
         this.name = name;

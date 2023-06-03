@@ -14,9 +14,11 @@ import java.util.Collection;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class EditCompanyDto {
-    private Long id;
+    private String id;
     private String name;
     private String activityCode;
+    private String registrationNumber;
+    private String taxNumber;
     private String address;
     private Collection<ContactPerson> contactPersons;
     private Collection<CompanyBankAccount> bankAccounts;
