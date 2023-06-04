@@ -9,7 +9,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
 import rs.edu.raf.si.bank2.main.models.mariadb.Future;
@@ -27,7 +26,7 @@ public class FutureServiceTest {
     @InjectMocks
     private FutureService futureService;
 
-//    @Autowired
+    //    @Autowired
     @Mock
     private CacheManager cacheManager;
 
@@ -97,5 +96,4 @@ public class FutureServiceTest {
 
         assertNotEquals(future2, result.get());
     }
-
 }

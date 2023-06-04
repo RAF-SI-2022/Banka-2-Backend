@@ -169,7 +169,7 @@ public class StockServiceTest {
 
         assertEquals(stockFromDB, result);
 
-        verify(stockRepository).findStockBySymbol(symbol);
+        verify(stockRepository, times(1)).findStockBySymbol(symbol);
     }
 
     @Test

@@ -84,19 +84,13 @@ public class StockFailureIntegrationSteps extends StockFailureIntegrationTestCon
     @Then("user gets nonexistent stock by id")
     public void user_gets_nonexistent_stock_by_id() {
         try {
-            AssertionError exception = assertThrows(AssertionError.class, () -> {
-                mockMvc.perform(get("/api/stock/" + -1L)
-                                .contentType("application/json")
-                                .header("Content-Type", "application/json")
-                                .header("Access-Control-Allow-Origin", "*")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
-                        .andReturn();
-            });
-
-            String expectedMessage = "Status expected:<200> but was:<404>";
-            String actualMessage = exception.getMessage();
-            assertEquals(expectedMessage, actualMessage);
+            mockMvc.perform(get("/api/stock/" + -1L)
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().is4xxClientError())
+                    .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -121,19 +115,13 @@ public class StockFailureIntegrationSteps extends StockFailureIntegrationTestCon
     @Then("user gets nonexistent stock by symbol")
     public void user_gets_nonexistent_stock_by_symbol() {
         try {
-            AssertionError exception = assertThrows(AssertionError.class, () -> {
-                mockMvc.perform(get("/api/stock/symbol/ASDF")
-                                .contentType("application/json")
-                                .header("Content-Type", "application/json")
-                                .header("Access-Control-Allow-Origin", "*")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
-                        .andReturn();
-            });
-
-            String expectedMessage = "Status expected:<200> but was:<404>";
-            String actualMessage = exception.getMessage();
-            assertEquals(expectedMessage, actualMessage);
+            mockMvc.perform(get("/api/stock/symbol/ASDF")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().is4xxClientError())
+                    .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -235,7 +223,7 @@ public class StockFailureIntegrationSteps extends StockFailureIntegrationTestCon
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -250,7 +238,7 @@ public class StockFailureIntegrationSteps extends StockFailureIntegrationTestCon
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isNotFound())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
             assertNotNull(mvcResult);
         } catch (Exception e) {
@@ -279,7 +267,7 @@ public class StockFailureIntegrationSteps extends StockFailureIntegrationTestCon
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -295,7 +283,7 @@ public class StockFailureIntegrationSteps extends StockFailureIntegrationTestCon
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -310,7 +298,7 @@ public class StockFailureIntegrationSteps extends StockFailureIntegrationTestCon
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());

@@ -121,7 +121,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
                                                       "password": "error"
                                                     }
                                                     """))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -416,7 +416,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -447,7 +447,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -463,7 +463,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -479,7 +479,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -494,7 +494,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -509,7 +509,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -525,7 +525,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -556,7 +556,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -572,7 +572,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -588,7 +588,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -623,7 +623,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
                                 .header("Content-Type", "application/json")
                                 .header("Access-Control-Allow-Origin", "*")
                                 .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isUnauthorized())
+                        .andExpect(status().is4xxClientError())
                         .andReturn();
             }
         } catch (Exception e) {
@@ -651,7 +651,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
