@@ -26,6 +26,7 @@ import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderTradeType;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderType;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
 import rs.edu.raf.si.bank2.main.services.interfaces.OptionServiceInterface;
+import rs.edu.raf.si.bank2.main.services.workerThreads.OptionsRetrieverFromApiWorker;
 
 @Service
 public class OptionService implements OptionServiceInterface {
@@ -40,6 +41,8 @@ public class OptionService implements OptionServiceInterface {
     private final OrderService orderService;
     private final TransactionService transactionService;
     private final BalanceService balanceService;
+
+    private final OptionsRetrieverFromApiWorker optionsRetrieverFromApiWorker;
 
     @Autowired
     public OptionService(
@@ -64,6 +67,8 @@ public class OptionService implements OptionServiceInterface {
         this.orderService = orderService;
         this.transactionService = transactionService;
         this.balanceService = balanceService;
+        this.optionsRetrieverFromApiWorker = new OptionsRetrieverFromApiWorker(this);
+        this.optionsRetrieverFromApiWorker.start();
     }
 
     @Override
@@ -109,6 +114,62 @@ public class OptionService implements OptionServiceInterface {
             optionRepository.saveAll(getFromExternalApi(stockSymbol, parsedDate));
         }
         return optionRepository.findAllByStockSymbolAndExpirationDate(stockSymbol.toUpperCase(), date);
+    }
+
+    @Override
+    @Transactional
+    public void updateAllOptionsInDb() {
+        List<Option> freshOptions = this.getFiveMostImportantOptionsFromApi();
+        List<Option> newOptions = new ArrayList<>(); // list of freshOptions which don't have corresponding option in db
+        for (Option freshOption : freshOptions) {
+            Optional<Option> existingOption = this.optionRepository.findByContractSymbolAndStockSymbolAndOptionType(
+                    freshOption.getContractSymbol(),
+                    freshOption.getStockSymbol(),
+                    freshOption
+                            .getOptionType()); // search using a combination of these three fields should always yield a
+            // unique result
+            if (existingOption.isPresent()) {
+                this.optionRepository
+                        .updateOption( // forwarding all fields as arguments because forwarding whole object was
+                                // problematic
+                                existingOption.get().getId(),
+                                freshOption.getStockSymbol(),
+                                freshOption.getContractSymbol(),
+                                freshOption.getOptionType(),
+                                freshOption.getStrike(),
+                                freshOption.getImpliedVolatility(),
+                                freshOption.getPrice(),
+                                freshOption.getExpirationDate(),
+                                freshOption.getOpenInterest(),
+                                freshOption.getContractSize(),
+                                freshOption.getMaintenanceMargin(),
+                                freshOption.getBid(),
+                                freshOption.getAsk(),
+                                freshOption.getChangePrice(),
+                                freshOption.getPercentChange(),
+                                freshOption.getInTheMoney());
+            } else {
+                newOptions.add(freshOption);
+            }
+        }
+        this.optionRepository.saveAll(newOptions);
+    }
+
+    @Transactional
+    public List<Option> getFiveMostImportantOptionsFromApi() {
+        List<Option> appleOptions = this.getFromExternalApi("AAPL", "");
+        List<Option> googleOptions = this.getFromExternalApi("GOOGL", "");
+        List<Option> amazonOptions = this.getFromExternalApi("AMZN", "");
+        List<Option> teslaOptions = this.getFromExternalApi("TSLA", "");
+        List<Option> netflixOptions = this.getFromExternalApi("NFLX", "");
+
+        List<Option> optionList = new ArrayList<>();
+        optionList.addAll(appleOptions);
+        optionList.addAll(googleOptions);
+        optionList.addAll(amazonOptions);
+        optionList.addAll(teslaOptions);
+        optionList.addAll(netflixOptions);
+        return optionList;
     }
 
     public UserStock buyStockUsingOption(Long userOptionId, Long userId)
@@ -226,7 +287,7 @@ public class OptionService implements OptionServiceInterface {
                 // TODO Smanjiti user balance
                 this.orderService.updateOrderStatus(optionOrder.getId(), OrderStatus.COMPLETE);
                 Transaction transaction =
-                        this.transactionService.createTransaction(optionOrder, balance, (float) premium);
+                        this.transactionService.createTransaction(optionOrder, balance, (float) premium, (float)optionOrder.getPrice());
                 this.transactionService.save(transaction);
                 this.balanceService.updateBalance(optionOrder, userFromDB.getEmail(), "USD", false);
                 return userOptionRepository.save(userOption);

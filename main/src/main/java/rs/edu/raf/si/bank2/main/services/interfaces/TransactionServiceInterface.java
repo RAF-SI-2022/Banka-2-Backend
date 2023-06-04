@@ -19,7 +19,7 @@ public interface TransactionServiceInterface {
 
     List<Transaction> saveAll(List<Transaction> transactionList);
 
-    Transaction createTransaction(Order order, Balance balance, Float amount);
+    Transaction createTransaction(Order order, Balance balance, Float amount, Float reserved);
 
     Transaction createFutureOrderTransaction(
             FutureOrder futureOrder,
@@ -27,4 +27,6 @@ public interface TransactionServiceInterface {
             Float amount,
             FutureRequestBuySell request,
             TransactionStatus status);
+
+    void updateTransactionsStatusesOfOrder(Long id, TransactionStatus transactionStatus);
 }

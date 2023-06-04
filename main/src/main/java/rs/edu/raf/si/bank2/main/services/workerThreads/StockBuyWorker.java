@@ -7,10 +7,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import rs.edu.raf.si.bank2.main.exceptions.OrderNotFoundException;
-import rs.edu.raf.si.bank2.main.models.mariadb.Balance;
-import rs.edu.raf.si.bank2.main.models.mariadb.Stock;
-import rs.edu.raf.si.bank2.main.models.mariadb.Transaction;
-import rs.edu.raf.si.bank2.main.models.mariadb.UserStock;
+import rs.edu.raf.si.bank2.main.models.mariadb.*;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.Order;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderStatus;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.StockOrder;
@@ -49,14 +46,6 @@ public class StockBuyWorker extends Thread {
     public void run() {
         processBuyRequests();
     }
-
-    // TODO ovo treba popraviti, baca null pointer exception i jos mnogo
-    //  drugih gresaka (foreign key, itd), testirati
-    // 2023-05-09 02:29:19.658 ERROR 18608 --- [       Thread-1] o.h.engine
-    // .jdbc.spi.SqlExceptionHelper   : (conn=323) Cannot add or update a
-    // child row: a foreign key constraint fails (`test`.`transactions`,
-    // CONSTRAINT `transactions_ibfk_2` FOREIGN KEY (`order_id`) REFERENCES
-    // `orders` (`id`))
     // todo dodaj limit i stop kada budemo na kubernetesu sa influxDb
     private void processBuyRequests() {
         while (true) {
@@ -65,64 +54,48 @@ public class StockBuyWorker extends Thread {
                     System.err.println("userStockService is null");
                     return;
                 }
-
                 StockOrder stockOrder = stockBuyRequestsQueue.take();
+                // These are checks for limit and stop. If they are set and order doesn't meet the requirements we skip that order and try again later.
+                if(!this.stockService.checkLimitAndStopForBuy(stockOrder)) {
+                    stockBuyRequestsQueue.put(stockOrder); // Put order back at the end of the queue.
+                    continue;
+                }
 
-                Optional<UserStock> usersStockToChange = userStockService.findUserStockByUserIdAndStockSymbol(
-                        stockOrder.getUser().getId(), stockOrder.getSymbol());
-
+                Optional<UserStock> usersStockToChange = userStockService.findUserStockByUserIdAndStockSymbol(stockOrder.getUser().getId(), stockOrder.getSymbol());
                 // prvi put kupujemo stock
                 if (usersStockToChange.isEmpty() && !stockOrder.getSymbol().isBlank()) {
                     Stock stock = stockService.getStockBySymbol(stockOrder.getSymbol());
                     UserStock userStock = new UserStock(0L, stockOrder.getUser(), stock, 0, 0);
                     userStockService.save(userStock);
-                    usersStockToChange = userStockService.findUserStockByUserIdAndStockSymbol(
-                            stockOrder.getUser().getId(), stockOrder.getSymbol());
+                    usersStockToChange = userStockService.findUserStockByUserIdAndStockSymbol(stockOrder.getUser().getId(), stockOrder.getSymbol());
                 }
-
-                // todo DODATI CHECKOVE ZA LIMIT I STOP
-                Balance balance = this.balanceService.findBalanceByUserIdAndCurrency(
-                        stockOrder.getUser().getId(), stockOrder.getCurrencyCode());
-                //
-                //                if (balance.getAmount() < (stockOrder.getAmount() * stockOrder.getPrice()){
-                //
-                //                }
-
-                //                this.balanceService.reserveAmount( // duplikat - pare se rezervisu pre nego sto se
-                // order doda queue; ovo je zakomentarisano(a ne skroz izbrisano) za svaki slucaj ako se pokaze da je
-                // ipak potrebno u nekim slucajevima
-                //                        (float) (stockOrder.getAmount() * stockOrder.getPrice()),
-                //                        stockOrder.getUser().getEmail(),
-                //                        stockOrder.getCurrencyCode());
+                Balance balance = this.balanceService.findBalanceByUserIdAndCurrency(stockOrder.getUser().getId(), stockOrder.getCurrencyCode());
+                Stock stock = this.stockService.findStockBySymbolInDb(stockOrder.getSymbol());
+                this.balanceService.reserveAmount(stock.getPriceValue().floatValue()*stockOrder.getAmount(), stockOrder.getUser().getEmail(), stockOrder.getCurrencyCode(), true);
 
                 if (stockOrder.isAllOrNone()) {
                     usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + stockOrder.getAmount());
-                    Transaction transaction = this.transactionService.createTransaction(
-                            stockOrder, balance, (float) stockOrder.getPrice());
+                    Transaction transaction = this.transactionService.createTransaction(stockOrder, balance, stock.getPriceValue().floatValue()*stockOrder.getAmount(), stock.getPriceValue().floatValue()*stockOrder.getAmount());
                     this.transactionService.save(transaction);
                 } else {
                     int stockAmountSum = 0;
-                    Stock stock = stockService.getStockBySymbol(stockOrder.getSymbol());
-                    BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockOrder.getAmount()));
                     List<Transaction> transactionList = new ArrayList<>();
-                    while (stockOrder.getAmount() != stockAmountSum) {
+                    while (stockAmountSum < stockOrder.getAmount()) {
                         int amountBought = random.nextInt(stockOrder.getAmount() - stockAmountSum) + 1;
                         stockAmountSum += amountBought;
-                        usersStockToChange
-                                .get()
-                                .setAmount(usersStockToChange.get().getAmount() + amountBought);
-                        Transaction transaction = this.transactionService.createTransaction(
-                                stockOrder, balance, price.floatValue() * amountBought);
+                        usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + amountBought);
+                        Transaction transaction = this.transactionService.createTransaction(stockOrder, balance, stock.getPriceValue().floatValue() * amountBought, stock.getPriceValue().floatValue()*stockOrder.getAmount());
                         transactionList.add(transaction);
                     }
                     this.transactionService.saveAll(transactionList);
                 }
                 userStockService.save(usersStockToChange.get());
-                this.balanceService.updateBalance(
-                        stockOrder, stockOrder.getUser().getEmail(), stockOrder.getCurrencyCode(), true);
+                this.balanceService.updateBalance(stockOrder, stockOrder.getUser().getEmail(), stockOrder.getCurrencyCode(), true);
                 this.updateOrderStatus(stockOrder.getId(), OrderStatus.COMPLETE);
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
+                this.transactionService.updateTransactionsStatusesOfOrder(stockOrder.getId(), TransactionStatus.COMPLETE);
+            } catch (Exception e) {
+                // If unexpected error occurs, we want to print it and to continue.
+                // Exception must not crash this worker thread.
                 e.printStackTrace();
             }
         }

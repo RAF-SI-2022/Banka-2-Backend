@@ -95,7 +95,7 @@ public class BalanceService implements BalanceServiceInterface {
         System.out.println("FO ID: " + fo.getId());
         fo = this.orderRepository.save(fo);
         System.out.println("FO ID: " + fo.getId());
-        Transaction transaction = this.transactionService.createTransaction(fo, balanceForFromCurrency, (float) amount);
+        Transaction transaction = this.transactionService.createTransaction(fo, balanceForFromCurrency, (float) amount, (float)fo.getPrice());
         this.transactionService.save(transaction);
         if (balanceForToCurrency.isPresent()) {
             this.increaseBalance(userEmail, toCurrencyCode, amount * exchangeRate);
