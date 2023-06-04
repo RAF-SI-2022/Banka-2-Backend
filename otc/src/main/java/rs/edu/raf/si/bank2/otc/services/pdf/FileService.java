@@ -12,9 +12,11 @@ import org.springframework.data.mongodb.gridfs.GridFsOperations;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import rs.edu.raf.si.bank2.otc.models.mongodb.Contract;
+import rs.edu.raf.si.bank2.otc.models.mongodb.pdf.CustomMultipartFile;
 import rs.edu.raf.si.bank2.otc.models.mongodb.pdf.LoadFile;
 
-import java.io.IOException;
+import java.io.*;
 
 @Service
 public class FileService {
@@ -25,13 +27,25 @@ public class FileService {
     @Autowired
     private GridFsOperations operations;
 
+    public File createContractFile(Contract contract) throws IOException {
+        File file = new File("Contract.pdf");
+        FileOutputStream fileOut = new FileOutputStream(file);
+        ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+        objectOut.writeObject(contract.toString());
+        objectOut.close();
+        System.out.println("The Object  was succesfully written to a file");
+        return file;
+    }
+
+    public String saveFile(File file) throws IOException {
+        MultipartFile multipartFile = new CustomMultipartFile(file);
+        return addFile(multipartFile);
+    }
     public String addFile(MultipartFile upload) throws IOException {
 
         DBObject metadata = new BasicDBObject();
         metadata.put("fileSize", upload.getSize());
-
         Object fileID = template.store(upload.getInputStream(), upload.getOriginalFilename(), upload.getContentType(), metadata);
-
         return fileID.toString();
     }
 
