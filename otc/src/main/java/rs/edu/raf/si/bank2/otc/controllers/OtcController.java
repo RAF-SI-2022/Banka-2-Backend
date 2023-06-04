@@ -8,6 +8,7 @@ import rs.edu.raf.si.bank2.otc.dto.OtcResponseDto;
 import rs.edu.raf.si.bank2.otc.dto.TransactionElementDto;
 import rs.edu.raf.si.bank2.otc.models.mariadb.PermissionName;
 import rs.edu.raf.si.bank2.otc.models.mongodb.Contract;
+import rs.edu.raf.si.bank2.otc.models.mongodb.TransactionElement;
 import rs.edu.raf.si.bank2.otc.services.OtcService;
 import rs.edu.raf.si.bank2.otc.services.UserCommunicationService;
 import rs.edu.raf.si.bank2.otc.services.interfaces.UserCommunicationInterface;
@@ -80,8 +81,19 @@ public class OtcController {
     }
 
 
-    @DeleteMapping("/close/{id}")
+    @PatchMapping("/close/{id}")
     public ResponseEntity<?> closeContract(@PathVariable(name = "id") String id){
+        String signedInUserEmail = getContext().getAuthentication().getName();
+        if (!userCommunicationInterface.isAuthorised(PermissionName.CREATE_USERS, signedInUserEmail)) {
+            return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
+        }
+
+        OtcResponseDto response = otcService.closeContract(id);
+        return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteContract(@PathVariable(name = "id") String id){
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.CREATE_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
@@ -93,34 +105,37 @@ public class OtcController {
 
     //todo ispod je smece
 
-    @GetMapping("GET_ALL")
+    @GetMapping("/elements")
     public ResponseEntity<?> getAllElements(){
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
 
-        return ResponseEntity.ok().body(otcService.getAllContracts());
+        return ResponseEntity.ok().body(otcService.getAllElements());
     }
 
-    @GetMapping("GET_ELENT")
-    public ResponseEntity<?> getElement(){
+    @GetMapping("/element/{id}")
+    public ResponseEntity<?> getElement(@PathVariable(name = "id") String id){
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
 
-        return ResponseEntity.ok().body(otcService.getAllContracts());
+        Optional<TransactionElement> transactionElement = otcService.getElementById(id);
+        if (transactionElement.isEmpty())
+            return ResponseEntity.status(404).body("Ne postoji element u bazi");
+        return ResponseEntity.ok().body(transactionElement.get());
     }
 
-    @GetMapping("GET_EL_FOR_CONTR")
-    public ResponseEntity<?> getElementsForContract(){
+    @GetMapping("contract_elements/{id}")
+    public ResponseEntity<?> getElementsForContract(@PathVariable(name = "id") String contractId){
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
 
-        return ResponseEntity.ok().body(otcService.getAllContracts());
+        return ResponseEntity.ok().body(otcService.getElementsForContract(contractId));
     }
 
     @PostMapping("/add_element")
@@ -130,9 +145,8 @@ public class OtcController {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
 
-//        OtcResponseDto response = otcService.editContract(contractDto);
-//        return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
-        return null;
+        OtcResponseDto response = otcService.addTransactionElementToContract(transactionElementDto);
+        return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
     @PatchMapping("/edit_element")
@@ -142,23 +156,19 @@ public class OtcController {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
 
-//        OtcResponseDto response = otcService.editContract(contractDto);
-//        return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
-        return null;
-
+        OtcResponseDto response = otcService.editTransactionElement(transactionElementDto);
+        return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
-    @DeleteMapping("/remove_element/{id}")
-    public ResponseEntity<?> removeTransactionElement(@PathVariable(name = "id") String id){
+    @DeleteMapping("/remove_element/{contractId}/{elementId}")
+    public ResponseEntity<?> removeTransactionElement(@PathVariable(name = "contractId") String contractId, @PathVariable(name = "elementId") String elementId){
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
 
-//        OtcResponseDto response = otcService.editContract(contractDto);
-//        return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
-        return null;
-
+        OtcResponseDto response = otcService.removeTransactionElement(contractId, elementId);
+        return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
 }

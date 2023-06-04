@@ -13,11 +13,12 @@ import rs.edu.raf.si.bank2.otc.models.mongodb.ContractElements;
 public class TransactionElementDto {
 
     private String contractId;
+    private String elementId;
     private ContractElements buyOrSell;
     private String transactionElement;// stock forex, koji je ...
-    private String balance; //cache margin
+    private ContractElements balance; //cache margin
     private String currency;
-    private String amount;
+    private Double amount;
     private Double priceOfOneElement;
 
 }

@@ -8,6 +8,7 @@ import rs.edu.raf.si.bank2.otc.dto.OtcResponseDto;
 import rs.edu.raf.si.bank2.otc.dto.TransactionElementDto;
 import rs.edu.raf.si.bank2.otc.models.mongodb.Company;
 import rs.edu.raf.si.bank2.otc.models.mongodb.Contract;
+import rs.edu.raf.si.bank2.otc.models.mongodb.ContractElements;
 import rs.edu.raf.si.bank2.otc.models.mongodb.TransactionElement;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.CompanyRepository;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.TransactionElementRepository;
@@ -110,6 +111,12 @@ public class OtcService {
         //todo uradi checkove da moze da se doda i rezervisi resurse
 
         TransactionElement transactionElement = new TransactionElement();
+        transactionElement.setBuyOrSEll(transactionElementDto.getBuyOrSell());
+        transactionElement.setTransactionElement(transactionElementDto.getTransactionElement());
+        transactionElement.setBalance(transactionElementDto.getBalance());
+        transactionElement.setCurrency(transactionElementDto.getCurrency());
+        transactionElement.setAmount(transactionElementDto.getAmount());
+        transactionElement.setPriceOfOneElement(transactionElementDto.getPriceOfOneElement());
         transactionElementRepository.save(transactionElement);
         contract.get().getTransactionElements().add(transactionElement);
         contactRepository.save(contract.get());
@@ -138,17 +145,29 @@ public class OtcService {
         return  new OtcResponseDto(200, "Element uspesno izbrisan");
     }
 
-    public OtcResponseDto editTransactionElement(String transactionElementId, TransactionElement updatedTElement) {
-        Optional<TransactionElement> transactionElement = transactionElementRepository.findById(transactionElementId);
+    public OtcResponseDto editTransactionElement(TransactionElementDto transactionElementDto) {
+        Optional<TransactionElement> transactionElement = transactionElementRepository.findById(transactionElementDto.getElementId());
+        Optional<Contract> contract = contactRepository.findById(transactionElementDto.getContractId());
 
         if (transactionElement.isEmpty()) {
             System.err.println("element not found");
             return  new OtcResponseDto(404, "Element nije pronadjen u bazi");
         }
-        transactionElement.get().setBalance(updatedTElement.getBalance());
-        transactionElement.get().setCurrency(updatedTElement.getCurrency());
-        transactionElement.get().setAmount(updatedTElement.getAmount());
-        transactionElement.get().setPriceOfOneElement(updatedTElement.getPriceOfOneElement());
+        if (contract.isEmpty()) {
+            System.err.println("contract not found");
+            return  new OtcResponseDto(404, "Ugovor nije pronadjen u bazi");
+        }
+        if (contract.get().getContractStatus() == ContractElements.DRAFT) {
+            System.err.println("contract not editable");
+            return  new OtcResponseDto(500, "Ugovor ne moze da se izmeni");
+        }
+
+        transactionElement.get().setBuyOrSEll(transactionElementDto.getBuyOrSell());//todo ovo mozda skloni kasnije
+        transactionElement.get().setTransactionElement(transactionElementDto.getTransactionElement());
+        transactionElement.get().setBalance(transactionElementDto.getBalance());
+        transactionElement.get().setCurrency(transactionElementDto.getCurrency());
+        transactionElement.get().setAmount(transactionElementDto.getAmount());
+        transactionElement.get().setPriceOfOneElement(transactionElementDto.getPriceOfOneElement());
 
         transactionElementRepository.save(transactionElement.get());
 
@@ -165,6 +184,22 @@ public class OtcService {
 
         contactRepository.deleteById(id);
         return  new OtcResponseDto(200, "Ugovor uspesno izbrisan");
+    }
+
+    public OtcResponseDto closeContract(String id){
+        Optional<Contract> contract = contactRepository.findById(id);
+
+        if (contract.isEmpty()){
+            System.err.println("Ugovor nije u bazi");
+            return  new OtcResponseDto(404, "Ugovor nije u bazi");
+        }
+
+        contract.get().setContractStatus(ContractElements.FINALISED);
+        contactRepository.save(contract.get());
+
+        //todo obradi sve sto treba
+
+        return new OtcResponseDto(200, "Ugovor uspesno kompletiran");
     }
 
 
