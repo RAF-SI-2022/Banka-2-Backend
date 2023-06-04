@@ -445,6 +445,22 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
         }
     }
 
+    //TODO Matejin test
+    @Then("user gets waiting buy future")
+    public void user_gets_waiting_buy_future() {
+        try {
+            mockMvc.perform(get("/api/futures/waiting-futures/type/name")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
     @Then("user gets his futures")
     public void user_gets_his_futures() {
         try {

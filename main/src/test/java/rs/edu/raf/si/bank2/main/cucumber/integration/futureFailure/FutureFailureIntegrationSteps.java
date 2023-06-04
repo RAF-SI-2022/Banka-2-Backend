@@ -594,4 +594,20 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
             fail(e.getMessage());
         }
     }
+
+
+    //TODO Matejin test
+    @Then("user removes waiting future buy but isnt authorized")
+    public void user_removes_waiting_future_buy_but_isnt_authorized() {
+        try {
+            mockMvc.perform(post("/api/futures/remove-waiting-buy/1")
+                            .header("Authorization", "Bearer " + token)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*"))
+                    .andExpect(status().isUnauthorized())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
 }

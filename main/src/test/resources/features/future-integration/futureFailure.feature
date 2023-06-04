@@ -60,3 +60,6 @@ Feature: Future service
   Scenario: user without balacne buys future
     Given user doesnt have a balance
     Then user tries to but future
+
+  Scenario: user removes waiting future buy but isnt authorized
+    Then user removes waiting future buy but isnt authorized
