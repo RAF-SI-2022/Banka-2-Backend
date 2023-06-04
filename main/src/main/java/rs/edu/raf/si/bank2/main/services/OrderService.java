@@ -63,6 +63,8 @@ public class OrderService implements OrderServiceInterface {
     @Override
     public ResponseEntity<?> startOrder(Long id) {
         Optional<Order> o = this.orderRepository.findById(id);
+        boolean approved = true;
+
         if (o.isPresent()) {
             switch (o.get().getOrderType()) {
                 case STOCK:
@@ -70,7 +72,7 @@ public class OrderService implements OrderServiceInterface {
                         return this.stockService.buyStock(
                                 this.orderToStockRequest((StockOrder) o.get()),
                                 o.get().getUser(),
-                                (StockOrder) o.get());
+                                (StockOrder) o.get(), approved);
                     } else {
                         return this.stockService.sellStock(
                                 this.orderToStockRequest((StockOrder) o.get()), (StockOrder) o.get());
@@ -82,7 +84,8 @@ public class OrderService implements OrderServiceInterface {
                             o.get().getSymbol().split(" ")[1],
                             (float) o.get().getPrice(),
                             o.get().getAmount(),
-                            (ForexOrder) o.get());
+                            (ForexOrder) o.get(),
+                            true);
                     if (result) return ResponseEntity.status(HttpStatus.OK).body("Order executed");
                     else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Kornisnik nema dovoljno novca");
                 case FUTURE:

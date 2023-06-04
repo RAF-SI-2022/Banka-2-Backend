@@ -207,7 +207,7 @@ public class OptionService implements OptionServiceInterface {
                 } catch (BalanceNotFoundException e) {
                     throw e;
                 }
-                balanceService.reserveAmount((float) premium, userFromDB.getEmail(), "USD");
+                balanceService.reserveAmount((float) premium, userFromDB.getEmail(), "USD", false);
 
                 UserOption userOption = UserOption.builder()
                         .user(userFromDB)
@@ -228,7 +228,7 @@ public class OptionService implements OptionServiceInterface {
                 Transaction transaction =
                         this.transactionService.createTransaction(optionOrder, balance, (float) premium);
                 this.transactionService.save(transaction);
-                this.balanceService.updateBalance(optionOrder, userFromDB.getEmail(), "USD");
+                this.balanceService.updateBalance(optionOrder, userFromDB.getEmail(), "USD", false);
                 return userOptionRepository.save(userOption);
 
             } else {

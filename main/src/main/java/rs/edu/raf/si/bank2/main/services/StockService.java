@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.main.exceptions.ExchangeNotFoundException;
 import rs.edu.raf.si.bank2.main.exceptions.ExternalAPILimitReachedException;
+import rs.edu.raf.si.bank2.main.exceptions.NotEnoughMoneyException;
 import rs.edu.raf.si.bank2.main.exceptions.StockNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.*;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.*;
@@ -418,16 +419,16 @@ public class StockService {
     }
 
     // todo margin buy i sell
-    public ResponseEntity<?> buyStock(StockRequest stockRequest, User user, StockOrder stockOrder) {
+    public ResponseEntity<?> buyStock(StockRequest stockRequest, User user, StockOrder stockOrder, boolean approved) {
         Stock stock = getStockBySymbol(stockRequest.getStockSymbol());
         BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
 
         StockOrder order;
-        if (user.getDailyLimit() == null || user.getDailyLimit() <= 0) {
+        if (user.getDailyLimit() == null) { //|| user.getDailyLimit() <= 0
             return ResponseEntity.internalServerError().body("Doslo je do neocekivane greske.");
         }
 
-        if (price.doubleValue() > user.getDailyLimit()) {
+        if (!approved && price.doubleValue() > user.getDailyLimit()) {
             order = stockOrder == null
                     ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.WAITING, OrderTradeType.BUY)
                     : stockOrder;
@@ -442,14 +443,16 @@ public class StockService {
             user.setDailyLimit(user.getDailyLimit() - price.doubleValue());
             userService.save(user);
         }
-        this.balanceService.reserveAmount(price.floatValue(), user.getEmail(), order.getCurrencyCode());
         try {
+            this.balanceService.reserveAmount(price.floatValue(), user.getEmail(), order.getCurrencyCode(), approved);
             stockBuyRequestsQueue.put(order);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+        } catch (NotEnoughMoneyException e) {
+            if(!approved) throw new NotEnoughMoneyException();
         }
         Balance usersBalance = balanceService.findBalanceByUserIdAndCurrency(user.getId(), order.getCurrencyCode());
-        if (usersBalance.getAmount() < price.doubleValue()) {
+        if (!approved && usersBalance.getAmount() < price.doubleValue()) {
             return ResponseEntity.status(400).body("Nemate dovoljno novca za ovu operaciju.");
         }
 

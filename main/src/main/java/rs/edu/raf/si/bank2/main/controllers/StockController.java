@@ -83,7 +83,7 @@ public class StockController {
         }
 
         Optional<User> user = userService.findByEmail(signedInUserEmail);
-        return stockService.buyStock(stockRequest, user.get(), null);
+        return stockService.buyStock(stockRequest, user.get(), null, false);
     }
 
     @PostMapping(value = "/sell")

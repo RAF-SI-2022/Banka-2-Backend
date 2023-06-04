@@ -86,7 +86,7 @@ public class StockSellWorker extends Thread {
                     }
                     userStockService.save(usersStockToChange.get());
                     this.balanceService.updateBalance(
-                            stockOrder, stockOrder.getUser().getEmail(), stockOrder.getCurrencyCode());
+                            stockOrder, stockOrder.getUser().getEmail(), stockOrder.getCurrencyCode(), true);
                     this.updateOrderStatus(stockOrder.getId(), OrderStatus.COMPLETE);
                 } else {
                     System.out.println("limit stop sell");

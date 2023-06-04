@@ -322,7 +322,7 @@ public class FutureService implements FutureServiceInterface {
         userService.save(userBuyer);
 
         // Rezervisanje novca za skidanje sa racuna
-        balanceService.reserveAmount(priceDouble.floatValue(), userBuyer.getEmail(), futureRequest.getCurrencyCode());
+        balanceService.reserveAmount(priceDouble.floatValue(), userBuyer.getEmail(), futureRequest.getCurrencyCode(), false);
 
         // Kreiramo transakciju za kupovinu
         Transaction transaction = this.transactionService.createFutureOrderTransaction(
@@ -333,7 +333,7 @@ public class FutureService implements FutureServiceInterface {
         if (userSeller == null) { // Ako je vlasnik future-a null, to znaci da je vlasnik neka "kompanija" tj. ne radimo
             // exchange novca nego samo skidamo novac sa buyer-ovog balance-a.
             balanceService.decreaseBalance(
-                    userBuyer.getEmail(), futureRequest.getCurrencyCode(), priceDouble.floatValue());
+                    userBuyer.getEmail(), futureRequest.getCurrencyCode(), priceDouble.floatValue(), false);
         } else { // Ako vlasnik nije null, to znaci da jedan user kupuje future od nekog drugog user-a.
             balanceService.exchangeMoney(
                     userSeller.getEmail(),

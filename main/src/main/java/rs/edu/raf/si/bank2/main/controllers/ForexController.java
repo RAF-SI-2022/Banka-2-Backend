@@ -57,7 +57,8 @@ public class ForexController {
                     forex.getToCurrencyCode(),
                     Float.parseFloat(forex.getExchangeRate()),
                     dto.getAmount(),
-                    null);
+                    null,
+                    false);
             if (!success) {
                 return ResponseEntity.badRequest()
                         .body("Korisnik sa email-om "

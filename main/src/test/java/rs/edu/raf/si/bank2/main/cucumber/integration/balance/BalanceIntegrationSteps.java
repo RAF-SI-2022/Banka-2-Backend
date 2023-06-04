@@ -109,7 +109,7 @@ public class BalanceIntegrationSteps extends BalanceIntegrationTestConfig {
     @Then("user decreases balance")
     public void userDecreasesBalance() {
         Float oldAmount = this.getBalanceAmount("anesic3119rn+banka2backend+admin@raf.rs", "USD");
-        this.balanceService.reserveAmount(999f, "anesic3119rn+banka2backend+admin@raf.rs", "USD");
+        this.balanceService.reserveAmount(999f, "anesic3119rn+banka2backend+admin@raf.rs", "USD", false);
         try {
             mockMvc.perform(post("/api/balances/decrease")
                             .contentType("application/json")

@@ -48,7 +48,7 @@ public class BalanceController {
     public ResponseEntity<?> decreaseBalance(@RequestBody @Valid BalanceDto dto) {
         try {
             return ResponseEntity.ok(
-                    this.balanceService.decreaseBalance(dto.getUserEmail(), dto.getCurrencyCode(), dto.getAmount()));
+                    this.balanceService.decreaseBalance(dto.getUserEmail(), dto.getCurrencyCode(), dto.getAmount(), false));
         } catch (BalanceNotFoundException e1) {
             return ResponseEntity.badRequest()
                     .body("Balans za korisnika sa email-om "

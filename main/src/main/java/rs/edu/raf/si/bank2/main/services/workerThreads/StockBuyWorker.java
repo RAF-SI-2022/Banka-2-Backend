@@ -119,7 +119,7 @@ public class StockBuyWorker extends Thread {
                 }
                 userStockService.save(usersStockToChange.get());
                 this.balanceService.updateBalance(
-                        stockOrder, stockOrder.getUser().getEmail(), stockOrder.getCurrencyCode());
+                        stockOrder, stockOrder.getUser().getEmail(), stockOrder.getCurrencyCode(), true);
                 this.updateOrderStatus(stockOrder.getId(), OrderStatus.COMPLETE);
                 Thread.sleep(10000);
             } catch (InterruptedException e) {

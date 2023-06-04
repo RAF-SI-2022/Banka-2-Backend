@@ -44,7 +44,8 @@ public class BalanceService implements BalanceServiceInterface {
             String toCurrencyCode,
             Float exchangeRate,
             Integer amount,
-            ForexOrder forexOrder) {
+            ForexOrder forexOrder,
+            boolean approved) {
         // Update existing balance(for fromCurrency)
 
         Optional<User> u = this.userService.findByEmail(userEmail);
@@ -53,23 +54,25 @@ public class BalanceService implements BalanceServiceInterface {
         Balance balanceForFromCurrency = this.findBalanceByUserEmailAndCurrencyCode(userEmail, fromCurrencyCode);
 
         try {
-            this.reserveAmount(amount.floatValue(), userEmail, fromCurrencyCode);
-            this.decreaseBalance(userEmail, fromCurrencyCode, amount.floatValue());
+            this.reserveAmount(amount.floatValue(), userEmail, fromCurrencyCode, approved);
+            this.decreaseBalance(userEmail, fromCurrencyCode, amount.floatValue(), approved);
         } catch (NotEnoughMoneyException | NotEnoughReservedMoneyException e) {
-            ForexOrder fo = forexOrder == null
-                    ? new ForexOrder(
-                            0l,
-                            OrderType.FOREX,
-                            OrderTradeType.BUY,
-                            OrderStatus.WAITING,
-                            fromCurrencyCode + " " + toCurrencyCode,
-                            amount,
-                            exchangeRate,
-                            this.getTimestamp(),
-                            u.get())
-                    : forexOrder;
-            fo = (ForexOrder) this.orderRepository.save(fo);
-            return false;
+            if(!approved) {
+                ForexOrder fo = forexOrder == null
+                        ? new ForexOrder(
+                        0l,
+                        OrderType.FOREX,
+                        OrderTradeType.BUY,
+                        OrderStatus.WAITING,
+                        fromCurrencyCode + " " + toCurrencyCode,
+                        amount,
+                        exchangeRate,
+                        this.getTimestamp(),
+                        u.get())
+                        : forexOrder;
+                fo = (ForexOrder) this.orderRepository.save(fo);
+                return false;
+            }
         }
 
         // Check if balance for toCurrency exists. If yes update it with new amount, if not create it.
@@ -147,9 +150,9 @@ public class BalanceService implements BalanceServiceInterface {
     }
 
     @Override
-    public Balance reserveAmount(Float amount, String userEmail, String currencyCode) {
+    public Balance reserveAmount(Float amount, String userEmail, String currencyCode, boolean approved) {
         Balance balance = this.findBalanceByUserEmailAndCurrencyCode(userEmail, currencyCode);
-        if (balance.getFree() < amount) {
+        if (!approved && balance.getFree() < amount) {
             throw new NotEnoughMoneyException();
         }
         balance.setReserved(balance.getReserved() + amount);
@@ -183,10 +186,10 @@ public class BalanceService implements BalanceServiceInterface {
      * Da bi se ova metoda uspesno izvrsila, prethodno je potrebno rezervisati sumu.
      */
     @Override
-    public Balance decreaseBalance(String userEmail, String currencyCode, Float amount)
+    public Balance decreaseBalance(String userEmail, String currencyCode, Float amount, boolean approved)
             throws BalanceNotFoundException, NotEnoughMoneyException {
         Balance balance = this.findBalanceByUserEmailAndCurrencyCode(userEmail, currencyCode);
-        if (balance.getAmount() < amount) {
+        if (!approved && balance.getAmount() < amount) {
             throw new NotEnoughMoneyException();
         }
         if (balance.getReserved() < amount) {
@@ -203,14 +206,14 @@ public class BalanceService implements BalanceServiceInterface {
      * Ova metoda se zove po zavrsetku svih transakcija iz nekog ordera.
      * */
     @Override
-    public Balance updateBalance(Order order, String userEmail, String currencyCode) {
+    public Balance updateBalance(Order order, String userEmail, String currencyCode, boolean approved) {
         List<Transaction> orderTransactions = this.transactionService.findAllByOrderId(order.getId());
         Float money = 0f;
         for (Transaction transaction : orderTransactions) {
             money += transaction.getAmount();
         }
         if (order.getTradeType().equals(OrderTradeType.BUY)) {
-            return this.decreaseBalance(userEmail, currencyCode, money);
+            return this.decreaseBalance(userEmail, currencyCode, money, approved);
         } else {
             return this.increaseBalance(userEmail, currencyCode, money);
         }
@@ -229,7 +232,7 @@ public class BalanceService implements BalanceServiceInterface {
 
     @Override
     public void exchangeMoney(String userSellerEmail, String userBuyerEmail, Float amount, String currencyCode) {
-        decreaseBalance(userBuyerEmail, currencyCode, amount);
+        decreaseBalance(userBuyerEmail, currencyCode, amount, false);
         increaseBalance(userSellerEmail, currencyCode, amount);
     }
 
