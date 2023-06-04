@@ -659,6 +659,23 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
         }
     }
 
+    //TODO Matejin test
+    @Then("unauthorised user resets his daily limit")
+    public void unauthorised_user_resets_his_daily_limit() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(patch("/api/users/reset-limit/1")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isUnauthorized())
+                    .andReturn();
+            assertNotNull(mvcResult);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
     @Given("delete test user")
     public void delete_test_user() {
         Optional<User> user = userService.findByEmail("nonpriv@gmail.com");
