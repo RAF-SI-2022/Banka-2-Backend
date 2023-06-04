@@ -25,19 +25,24 @@ public class BankAccountController {
         return ResponseEntity.ok(bankAccountService.getBankAccountById(id));
     }
 
-    @PostMapping(value = "/")
-    public ResponseEntity<?> createBankAccount(@RequestBody CompanyBankAccount bankAccount) {
-        return ResponseEntity.ok(bankAccountService.createBankAccount(bankAccount));
+    @GetMapping(value = "/{companyId}")
+    public ResponseEntity<?> getAccountsForCompany(@PathVariable String companyId) {
+        return ResponseEntity.ok(bankAccountService.getBankAccountById(companyId));
+    }
+
+    @PostMapping(value = "/{companyId}")
+    public ResponseEntity<?> createBankAccount(@RequestBody CompanyBankAccountDto bankAccount, @PathVariable(name = "companyId") String companyId) {
+        return ResponseEntity.ok(bankAccountService.createBankAccount(companyId, bankAccount));
     }
 
     @PostMapping(value = "/edit")
-    public ResponseEntity<?> editContactPerson( @RequestBody CompanyBankAccountDto bankAccountRequest) {
+    public ResponseEntity<?> editContactPerson(@RequestBody CompanyBankAccountDto bankAccountRequest) {
         return ResponseEntity.ok(bankAccountService.updateBankAccount(bankAccountRequest));
     }
 
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<?> deleteBankAccount(@PathVariable String id) {
-        bankAccountService.deleteBankAccount(id);
+    @DeleteMapping(value = "/{id}/{companyId}")
+    public ResponseEntity<?> deleteBankAccount(@PathVariable(name = "id") String id, @PathVariable(name = "companyId") String companyId) {
+        bankAccountService.deleteBankAccount(id, companyId);
         return ResponseEntity.noContent().build();
     }
 }

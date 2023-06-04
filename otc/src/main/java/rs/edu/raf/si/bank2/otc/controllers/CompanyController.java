@@ -49,6 +49,16 @@ public class CompanyController {
         return ResponseEntity.ok(companyService.getCompanies());
     }
 
+    @GetMapping(value = "/accounts/{companyId}")
+    public ResponseEntity<?> getBankAccountsForCompany(@PathVariable(name = "companyId") String companyId) {
+        Optional<Company> company = companyService.getCompanyById(companyId);
+        if (company.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(company.get().getBankAccounts());
+    }
+
     @GetMapping(value = "/{id}")
     public ResponseEntity<?> getCompanyById(@PathVariable String id) {
         Optional<Company> company = companyService.getCompanyById(id);
