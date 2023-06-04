@@ -95,7 +95,7 @@ public class OtcController {
 
     //todo ispod je smece
 
-    @GetMapping
+    @GetMapping("GET_ALL")
     public ResponseEntity<?> getAllElements(){
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
@@ -105,7 +105,7 @@ public class OtcController {
         return ResponseEntity.ok().body(otcService.getAllContracts());
     }
 
-    @GetMapping
+    @GetMapping("GET_ELENT")
     public ResponseEntity<?> getElement(){
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
@@ -115,7 +115,7 @@ public class OtcController {
         return ResponseEntity.ok().body(otcService.getAllContracts());
     }
 
-    @GetMapping
+    @GetMapping("GET_EL_FOR_CONTR")
     public ResponseEntity<?> getElementsForContract(){
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
