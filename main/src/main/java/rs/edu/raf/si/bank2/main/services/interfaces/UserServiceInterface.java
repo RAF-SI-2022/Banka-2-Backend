@@ -17,8 +17,6 @@ public interface UserServiceInterface {
 
     List<Permission> getUserPermissions(String email);
 
-    //    User updateUser(User user);
-
     void deleteById(Long id);
 
     Optional<User> getUserByPasswordResetToken(String token);

@@ -74,14 +74,7 @@ public class UserService implements UserServiceInterface {
 
     @Override
     public void deleteById(Long id) throws UserNotFoundException {
-
-        //    try {
-
         userRepository.deleteById(id);
-        //    }
-        //    catch (NoSuchElementException e) {
-        //      throw new UserNotFoundException(id);
-        //    }
     }
 
     @Override
