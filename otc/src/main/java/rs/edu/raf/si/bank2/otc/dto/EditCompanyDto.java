@@ -16,9 +16,9 @@ import java.util.Collection;
 public class EditCompanyDto {
     private String id;
     private String name;
-    private String activityCode;
     private String registrationNumber;
     private String taxNumber;
+    private String activityCode;
     private String address;
     private Collection<ContactPerson> contactPersons;
     private Collection<CompanyBankAccount> bankAccounts;

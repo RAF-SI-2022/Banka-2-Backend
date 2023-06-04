@@ -9,12 +9,7 @@ import lombok.RequiredArgsConstructor;
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class ContactPersonDto {
-
-    private String id;
-    private String name;
-    private String phoneNumber;
-    private String email;
-    private String position;
-    private String note;
+public class OtcResponseDto {
+    int responseCode;
+    String responseMsg;
 }
