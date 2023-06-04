@@ -34,6 +34,16 @@ public class OtcController {
     }
 
 
+    @GetMapping
+    public ResponseEntity<?> getAllContracts(){
+        String signedInUserEmail = getContext().getAuthentication().getName();
+        if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+            return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
+        }
+
+        return ResponseEntity.ok().body(otcService.getAllContracts());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getContract(@PathVariable(name = "id") String id){
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -45,18 +55,6 @@ public class OtcController {
         if (contract.isEmpty()) return ResponseEntity.status(404).body("Trazeni ugovor ne postoji");
         return ResponseEntity.ok().body(contract.get());
     }
-
-
-    @GetMapping
-    public ResponseEntity<?> getAllContracts(){
-        String signedInUserEmail = getContext().getAuthentication().getName();
-        if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
-        }
-
-        return ResponseEntity.ok().body(otcService.getAllContracts());
-    }
-
 
     @PostMapping("/open")
     public ResponseEntity<?> openContract(@RequestBody ContractDto contractDto){

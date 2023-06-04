@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class CompanyBankAccountDto {
-    private Long id;
+    private String id;
     private String accountNumber;
+    private String currency;
     private String bankName;
-    private String accountType;
 }

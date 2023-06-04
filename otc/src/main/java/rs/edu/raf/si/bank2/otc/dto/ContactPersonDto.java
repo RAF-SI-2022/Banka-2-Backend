@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ContactPersonDto {
 
-    private Long id;
+    private String id;
     private String name;
     private String phoneNumber;
     private String email;

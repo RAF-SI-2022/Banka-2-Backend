@@ -71,7 +71,7 @@ public class OtcService {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         LocalDate now = LocalDate.now();
         Contract newContract = new Contract();
-        newContract.setContactStatus(contractDto.getContractStatus());
+        newContract.setContractStatus(contractDto.getContractStatus());
         newContract.setCreationDate(dtf.format(now));
         newContract.setLastUpdatedDate(dtf.format(now));
         newContract.setContractNumber(contractDto.getContractNumber());
@@ -92,7 +92,7 @@ public class OtcService {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         LocalDate now = LocalDate.now();
-        contract.get().setContactStatus(updatedContract.getContractStatus());
+        contract.get().setContractStatus(updatedContract.getContractStatus());
         contract.get().setLastUpdatedDate(dtf.format(now));
         contract.get().setDescription(updatedContract.getDescription());
         contract.get().setNote(updatedContract.getNote());

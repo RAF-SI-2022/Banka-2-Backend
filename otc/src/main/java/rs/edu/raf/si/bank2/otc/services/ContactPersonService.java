@@ -21,7 +21,7 @@ public class ContactPersonService {
         return contactPersonRepository.findAll();
     }
 
-    public ContactPerson getContactPersonById(Long id) {
+    public ContactPerson getContactPersonById(String id) {
         return contactPersonRepository.findById(id).orElseThrow(() -> new ContactPersonNotFoundException("ContactPerson not found."));
     }
 
@@ -41,7 +41,7 @@ public class ContactPersonService {
         return contactPersonRepository.save(contactPerson);
     }
 
-    public void deleteContactPerson(Long id) {
+    public void deleteContactPerson(String id) {
         ContactPerson contactPerson = getContactPersonById(id);
         contactPersonRepository.delete(contactPerson);
     }

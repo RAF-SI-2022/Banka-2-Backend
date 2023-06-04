@@ -21,7 +21,7 @@ public class CompanyBankAccountService {
         return bankAccountRepository.findAll();
     }
 
-    public CompanyBankAccount getBankAccountById(Long id) {
+    public CompanyBankAccount getBankAccountById(String id) {
         Optional<CompanyBankAccount> bankAccount = bankAccountRepository.findById(id);
         if (bankAccount.isPresent()) {
             return bankAccount.get();
@@ -40,14 +40,13 @@ public class CompanyBankAccountService {
             CompanyBankAccount companyBankAccount = existingBankAccount.get();
             companyBankAccount.setAccountNumber(bankAccountDto.getAccountNumber());
             companyBankAccount.setBankName(bankAccountDto.getBankName());
-            companyBankAccount.setAccountType(bankAccountDto.getAccountType());
             return bankAccountRepository.save(companyBankAccount);
         } else {
             throw new BankAccountNotFoundException("Bank account not found with id: " + bankAccountDto.getId());
         }
     }
 
-    public void deleteBankAccount(Long id) {
+    public void deleteBankAccount(String id) {
         Optional<CompanyBankAccount> bankAccount = bankAccountRepository.findById(id);
         if (bankAccount.isPresent()) {
             bankAccountRepository.deleteById(id);
