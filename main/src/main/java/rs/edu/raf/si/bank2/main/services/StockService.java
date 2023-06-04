@@ -96,7 +96,8 @@ public class StockService {
                 balanceService,
                 currencyService,
                 transactionService,
-                orderRepository);
+                orderRepository,
+                userService);
         this.stockSellWorker = new StockSellWorker(
                 stockSellRequestsQueue, userStockService, this, transactionService, orderRepository, balanceService);
         stockBuyWorker.start();
@@ -454,8 +455,6 @@ public class StockService {
         }
         order = stockOrder == null ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.IN_PROGRESS, OrderTradeType.BUY) : stockOrder;
         order = this.orderRepository.save(order);
-        user.setDailyLimit(user.getDailyLimit() - price.doubleValue());
-        userService.save(user);
         try {
             stockBuyRequestsQueue.put(order);
         } catch (InterruptedException e) {
