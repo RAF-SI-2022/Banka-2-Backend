@@ -21,22 +21,22 @@ public class BankAccountController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<?> getBankAccount(@RequestHeader("Authorization") String token, @PathVariable String id) {
+    public ResponseEntity<?> getBankAccount(@PathVariable String id) {
         return ResponseEntity.ok(bankAccountService.getBankAccountById(id));
     }
 
     @PostMapping(value = "/")
-    public ResponseEntity<?> createBankAccount(@RequestHeader("Authorization") String token, @RequestBody CompanyBankAccount bankAccount) {
+    public ResponseEntity<?> createBankAccount(@RequestBody CompanyBankAccount bankAccount) {
         return ResponseEntity.ok(bankAccountService.createBankAccount(bankAccount));
     }
 
     @PostMapping(value = "/edit")
-    public ResponseEntity<?> editContactPerson(@RequestHeader("Authorization") String token, @RequestBody CompanyBankAccountDto bankAccountRequest) {
+    public ResponseEntity<?> editContactPerson( @RequestBody CompanyBankAccountDto bankAccountRequest) {
         return ResponseEntity.ok(bankAccountService.updateBankAccount(bankAccountRequest));
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<?> deleteBankAccount(@RequestHeader("Authorization") String token, @PathVariable String id) {
+    public ResponseEntity<?> deleteBankAccount(@PathVariable String id) {
         bankAccountService.deleteBankAccount(id);
         return ResponseEntity.noContent().build();
     }

@@ -77,6 +77,7 @@ public class OtcService {
         newContract.setLastUpdatedDate(dtf.format(now));
         newContract.setContractNumber(contractDto.getContractNumber());
         newContract.setDescription(contractDto.getDescription());
+        newContract.setTransactionElements(new ArrayList<>());
         contactRepository.save(newContract);
 
         return new OtcResponseDto(200, "Ugovor je uspesno otvoren");
