@@ -3,13 +3,18 @@ package rs.edu.raf.si.bank2.otc.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import rs.edu.raf.si.bank2.otc.dto.ContactsBankAccountsDto;
 import rs.edu.raf.si.bank2.otc.dto.EditCompanyDto;
 import rs.edu.raf.si.bank2.otc.exceptions.CompanyIdNotProvidedException;
 import rs.edu.raf.si.bank2.otc.exceptions.CompanyIdProvidedException;
 import rs.edu.raf.si.bank2.otc.exceptions.CompanyNotFoundException;
 import rs.edu.raf.si.bank2.otc.models.mongodb.Company;
+import rs.edu.raf.si.bank2.otc.models.mongodb.CompanyBankAccount;
+import rs.edu.raf.si.bank2.otc.models.mongodb.ContactPerson;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.CompanyRepository;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +40,20 @@ public class CompanyService {
         return companyRepository.save(company);
     }
 
+    public Company addContactsAndBankAccounts(ContactsBankAccountsDto contactsBankAccountsDto){
+        Optional<Company> companyOptional = companyRepository.findById(contactsBankAccountsDto.getId());
+        if(companyOptional.isEmpty()) {
+            throw new CompanyNotFoundException("There is no company with this ID.");
+        }
+        Company company = companyOptional.get();
+        ArrayList<ContactPerson> contactPeople = new ArrayList<>(contactsBankAccountsDto.getContactPeople());
+        ArrayList<CompanyBankAccount> bankAccounts = new ArrayList<>(contactsBankAccountsDto.getCompanyBankAccounts());
+        company.setContactPersons(contactPeople);
+        company.setBankAccounts(bankAccounts);
+        companyRepository.save(company);
+        return company;
+    }
+
     public Company updateCompany(EditCompanyDto editCompanyDto) {
         if(editCompanyDto.getId() == null) {
             throw new CompanyIdNotProvidedException("Id must be present for you to edit the company.");
@@ -48,13 +67,15 @@ public class CompanyService {
         Company company = companyOptional.get();
         company.setName(editCompanyDto.getName());
         company.setAddress(editCompanyDto.getAddress());
+        company.setRegistrationNumber(editCompanyDto.getRegistrationNumber());
+        company.setTaxNumber(editCompanyDto.getTaxNumber());
         company.setActivityCode(editCompanyDto.getActivityCode());
-//        company.setContactPersons(editCompanyDto.getContactPersons());
-//        company.setBankAccounts(editCompanyDto.getBankAccounts());
+        company.setContactPersons(editCompanyDto.getContactPersons());
+        company.setBankAccounts(editCompanyDto.getBankAccounts());
         return companyRepository.save(company);
     }
 
-    public Optional<Company> getCompanyById(Long id) {
+    public Optional<Company> getCompanyById(String id) {
         return companyRepository.findById(id);
     }
 

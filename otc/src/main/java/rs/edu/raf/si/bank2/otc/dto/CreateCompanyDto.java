@@ -21,8 +21,4 @@ public class CreateCompanyDto {
     private String taxNumber;
     private String activityCode;
     private String address;
-    @DBRef(lazy = true)
-    private Collection<ContactPerson> contactPersons;
-    @DBRef(lazy = true)
-    private Collection<CompanyBankAccount> bankAccounts;
 }

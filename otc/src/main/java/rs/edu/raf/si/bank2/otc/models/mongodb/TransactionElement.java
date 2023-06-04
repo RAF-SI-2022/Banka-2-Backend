@@ -4,24 +4,24 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import javax.persistence.Id;
 
 @Data
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
-@Document("companyBankAccount")
-public class CompanyBankAccount {
-
-
+@Document("transactionElement")
+public class TransactionElement {
 
     @Id
     private String id;
-//    @DBRef(lazy = true)
-//    private Company company;
-    private String accountNumber;
+    private ContractElements buyOrSEll;
+    private String transactionElement; //koji stock forex ili sta vec
+    private ContractElements balance; //da li je cash ili margin
     private String currency;
-    private String bankName;
+    private Double amount;
+    private Double priceOfOneElement;
+
 }

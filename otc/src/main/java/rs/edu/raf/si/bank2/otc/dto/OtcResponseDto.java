@@ -9,9 +9,7 @@ import lombok.RequiredArgsConstructor;
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class CompanyBankAccountDto {
-    private String id;
-    private String accountNumber;
-    private String currency;
-    private String bankName;
+public class OtcResponseDto {
+    int responseCode;
+    String responseMsg;
 }
