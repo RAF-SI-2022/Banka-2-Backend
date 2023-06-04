@@ -44,12 +44,13 @@ public class CompanyController {
 //        this.createCompanyDestination = createCompanyDestination;
     }
 
-    @GetMapping(value = "/")
+    @GetMapping(value = "")
     public ResponseEntity<?> getCompanies(@RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(companyService.getCompanies());
     }
 
     @GetMapping(value = "/test")
+
     public void test(){
         System.out.println("ZZZZZZZ");
     }

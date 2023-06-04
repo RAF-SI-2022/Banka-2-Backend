@@ -19,6 +19,6 @@ public class TransactionElement {
     private ContractElements balance; //da li je cash ili margin
     private String currency;
     private Double amount;
-    private Double priceForOneElement;
+    private Double priceOfOneElement;
 
 }

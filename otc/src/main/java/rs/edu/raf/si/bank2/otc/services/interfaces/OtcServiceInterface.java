@@ -16,9 +16,9 @@ public interface OtcServiceInterface {
 
     Contract addTransactionElement(String id, TransactionElement transactionElement);
 
-    Contract removeTransactionElement(String id, TransactionElement transactionElement);
+    Contract removeTransactionElement(String contractId, String transactionElementId);
 
-    Contract editTransactionElement(String id, TransactionElement transactionElement);
+    Contract editTransactionElement(String transactionElementId, TransactionElement updatedTransactionElement);
 
     void deleteContract(String id);
 }
