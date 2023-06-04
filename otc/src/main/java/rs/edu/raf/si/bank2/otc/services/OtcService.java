@@ -113,10 +113,21 @@ public class OtcService {
         }
 
         //todo if buy (da li imamo dovoljno para)
-
+        /*
+        kontaktiraj reserved service da proveri
+        -da li je vec rezervisano
+        -da li imamo dovoljno para
+        -da ga stavi na rezervisano
+        */
 
 
         //todo if sell (rezervisi objekat)
+        /*
+        kontaktirati reserved service da proveri
+        -da nije obj vec rezervisan
+        -da ga stavi na rezervaciju
+
+         */
 
         TransactionElement transactionElement = new TransactionElement();
         transactionElement.setBuyOrSEll(transactionElementDto.getBuyOrSell());

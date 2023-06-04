@@ -11,6 +11,7 @@ import rs.edu.raf.si.bank2.otc.models.mongodb.CompanyBankAccount;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.CompanyBankAccountRepository;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.CompanyRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +35,15 @@ public class CompanyBankAccountService {
         } else {
             throw new BankAccountNotFoundException("Bank account not found with id: " + id);
         }
+    }
+
+    public List<CompanyBankAccount> getAccountsForCompany(String companyId){
+        Optional<Company> companyOptional = companyRepository.findById(companyId);
+        if(companyOptional.isEmpty()) {
+            throw new CompanyNotFoundException("There is no company with this ID.");
+        }
+
+        return new ArrayList<>(companyOptional.get().getBankAccounts());
     }
 
     public CompanyBankAccount createBankAccount(String companyId, CompanyBankAccountDto accountDto) {

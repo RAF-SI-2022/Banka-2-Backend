@@ -25,9 +25,9 @@ public class BankAccountController {
         return ResponseEntity.ok(bankAccountService.getBankAccountById(id));
     }
 
-    @GetMapping(value = "/{companyId}")
+    @GetMapping(value = "/company/{companyId}")
     public ResponseEntity<?> getAccountsForCompany(@PathVariable String companyId) {
-        return ResponseEntity.ok(bankAccountService.getBankAccountById(companyId));
+        return ResponseEntity.ok(bankAccountService.getAccountsForCompany(companyId));
     }
 
     @PostMapping(value = "/{companyId}")
