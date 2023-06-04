@@ -21,7 +21,7 @@ public class BankAccountController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<?> getBankAccount(@RequestHeader("Authorization") String token, @PathVariable Long id) {
+    public ResponseEntity<?> getBankAccount(@RequestHeader("Authorization") String token, @PathVariable String id) {
         return ResponseEntity.ok(bankAccountService.getBankAccountById(id));
     }
 
@@ -36,7 +36,7 @@ public class BankAccountController {
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<?> deleteBankAccount(@RequestHeader("Authorization") String token, @PathVariable Long id) {
+    public ResponseEntity<?> deleteBankAccount(@RequestHeader("Authorization") String token, @PathVariable String id) {
         bankAccountService.deleteBankAccount(id);
         return ResponseEntity.noContent().build();
     }

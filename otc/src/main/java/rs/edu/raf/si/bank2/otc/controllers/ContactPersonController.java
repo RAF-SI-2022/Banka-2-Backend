@@ -30,7 +30,7 @@ public class ContactPersonController {
     }
 
     @GetMapping(value = "/id/{id}")
-    public ResponseEntity<?> getContactPerson(@RequestHeader("Authorization") String token, @PathVariable Long id) {
+    public ResponseEntity<?> getContactPerson(@RequestHeader("Authorization") String token, @PathVariable String id) {
         return ResponseEntity.ok(contactPersonService.getContactPersonById(id));
     }
 
@@ -45,7 +45,7 @@ public class ContactPersonController {
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<?> deleteContactPerson(@RequestHeader("Authorization") String token, @PathVariable Long id) {
+    public ResponseEntity<?> deleteContactPerson(@RequestHeader("Authorization") String token, @PathVariable String id) {
         contactPersonService.deleteContactPerson(id);
         return ResponseEntity.noContent().build();
     }

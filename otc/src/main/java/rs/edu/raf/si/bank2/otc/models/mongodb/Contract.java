@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Id;
 import java.util.Collection;
-import java.util.List;
 
 @Data
 @Builder
@@ -18,15 +17,14 @@ import java.util.List;
 @Document("contract")
 public class Contract {
 
-    public Contract(String id, ContractElements contactStatus, String creationDate,
+    public Contract(String id, ContractElements contractStatus, String creationDate,
                     String lastUpdatedDate, String contractNumber, String description, String note, Collection<TransactionElement> transactionElements) {
         this.id = id;
-        this.contactStatus = contactStatus;
+        this.contractStatus = contractStatus;
         this.creationDate = creationDate;
         this.lastUpdatedDate = lastUpdatedDate;
         this.contractNumber = contractNumber;
         this.description = description;
-        this.note = note;
         this.transactionElements = transactionElements;
     }
 
@@ -34,12 +32,11 @@ public class Contract {
     private String id;
     @DBRef(lazy = true)
     private Company company;
-    private ContractElements contactStatus;
+    private ContractElements contractStatus;
     private String creationDate;
     private String lastUpdatedDate;
     private String contractNumber;
     private String description;
-    private String note;
 //    @DBRef(lazy = true)
     private Collection<TransactionElement> transactionElements;
 

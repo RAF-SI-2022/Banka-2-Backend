@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.persistence.Id;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -13,7 +15,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document("transactionElement")
 public class TransactionElement {
 
-
+    @Id
+    private String id;
     private ContractElements buyOrSEll;
     private String transactionElement; //koji stock forex ili sta vec
     private ContractElements balance; //da li je cash ili margin
