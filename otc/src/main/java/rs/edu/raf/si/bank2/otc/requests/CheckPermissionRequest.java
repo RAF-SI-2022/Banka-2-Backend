@@ -7,9 +7,4 @@ import rs.edu.raf.si.bank2.otc.models.mariadb.PermissionName;
 public class CheckPermissionRequest {
     PermissionName permissionName;
     String userEmail;
-
-    public CheckPermissionRequest(PermissionName permissionName, String userEmail) {
-        this.permissionName = permissionName;
-        this.userEmail = userEmail;
-    }
 }

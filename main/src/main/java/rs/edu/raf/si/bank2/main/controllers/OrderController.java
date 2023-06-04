@@ -7,22 +7,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.Order;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderStatus;
-import rs.edu.raf.si.bank2.main.services.CommunicationService;
+import rs.edu.raf.si.bank2.main.services.UserCommunicationService;
 import rs.edu.raf.si.bank2.main.services.OrderService;
-import rs.edu.raf.si.bank2.main.services.interfaces.CommunicationInterface;
+import rs.edu.raf.si.bank2.main.services.interfaces.UserCommunicationInterface;
 
 @RestController
 @CrossOrigin
 @RequestMapping("/api/orders")
 public class OrderController {
     private final OrderService orderService;
-    private final CommunicationInterface communicationInterface;
+    private final UserCommunicationInterface userCommunicationInterface;
 
 
     @Autowired
     public OrderController(OrderService orderService,
-            CommunicationService communicationService) {
-        this.communicationInterface = communicationService;
+            UserCommunicationService communicationService) {
+        this.userCommunicationInterface = communicationService;
         this.orderService = orderService;
     }
 

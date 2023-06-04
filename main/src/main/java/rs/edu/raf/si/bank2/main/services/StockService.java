@@ -12,6 +12,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,11 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import rs.edu.raf.si.bank2.main.exceptions.ExchangeNotFoundException;
 import rs.edu.raf.si.bank2.main.exceptions.ExternalAPILimitReachedException;
 import rs.edu.raf.si.bank2.main.exceptions.StockNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.*;
-import rs.edu.raf.si.bank2.main.models.mariadb.orders.*;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderStatus;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderTradeType;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderType;
@@ -35,6 +37,7 @@ import rs.edu.raf.si.bank2.main.repositories.mariadb.StockRepository;
 import rs.edu.raf.si.bank2.main.requests.StockRequest;
 import rs.edu.raf.si.bank2.main.services.workerThreads.StockBuyWorker;
 import rs.edu.raf.si.bank2.main.services.workerThreads.StockSellWorker;
+import rs.edu.raf.si.bank2.main.services.workerThreads.StocksRetrieverFromApiWorker;
 
 @Service
 public class StockService {
@@ -59,14 +62,13 @@ public class StockService {
     private final UserStockService userStockService;
     private final StockSellWorker stockSellWorker;
     private final StockBuyWorker stockBuyWorker;
-
     private final OrderRepository orderRepository;
-
-    private CurrencyService currencyService;
-    private TransactionService transactionService;
-
+    private final StocksRetrieverFromApiWorker stocksRetrieverFromApiWorker;
     private static final BlockingQueue<StockOrder> stockBuyRequestsQueue = new LinkedBlockingQueue<>();
     private static final BlockingQueue<StockOrder> stockSellRequestsQueue = new LinkedBlockingQueue<>();
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     public StockService(
@@ -98,6 +100,8 @@ public class StockService {
                 stockSellRequestsQueue, userStockService, this, transactionService, orderRepository, balanceService);
         stockBuyWorker.start();
         stockSellWorker.start();
+        this.stocksRetrieverFromApiWorker = new StocksRetrieverFromApiWorker(this);
+        this.stocksRetrieverFromApiWorker.start();
     }
 
     @Cacheable(value = "stockALL")
@@ -114,11 +118,16 @@ public class StockService {
         else throw new StockNotFoundException(id);
     }
 
+    public Stock findStockBySymbolInDb(String symbol) {
+        return this.stockRepository.findStockBySymbol(symbol).orElse(null); // if found return Stock, if not, return null
+    }
+
     @Cacheable(value = "exchangesSymbol", key = "#symbol")
+    @Transactional
     public Stock getStockBySymbol(String symbol) throws StockNotFoundException, ExchangeNotFoundException {
         Optional<Stock> stockFromDB = stockRepository.findStockBySymbol(symbol);
 
-        System.out.println("Getting stock by symbol- fist time (caching into redis)");
+        System.out.println("Getting stock by symbol- first time (caching into redis)");
 
         if (stockFromDB.isPresent()) return stockFromDB.get();
         else {
@@ -159,12 +168,20 @@ public class StockService {
                 JSONObject assetProfile = result.getJSONObject(0).getJSONObject("assetProfile");
                 String website = assetProfile.getString("website");
 
-                Optional<Exchange> exchange =
+                Optional<Exchange> exchangeOptional =
                         exchangeRepository.findExchangeByAcronym(companyOverview.getString("Exchange"));
 
-                if (exchange.isPresent()) {
+                if (exchangeOptional.isPresent()) {
+                    // This method is called from separate thread.
+                    // In that case error occurs: "detached entity passed to persist:
+                    // rs.edu.raf.si.bank2.main.models.mariadb.Exchange"
+                    // To avoid that we check if exchange entity is in detached state. If it is, merge it.
+                    Exchange exchange = exchangeOptional.get();
+                    if (!entityManager.contains(exchange)) {
+                        exchange = this.entityManager.merge(exchange);
+                    }
                     stock = Stock.builder()
-                            .exchange(exchange.get())
+                            .exchange(exchange)
                             .symbol(symbol)
                             .companyName(companyOverview.getString("Name"))
                             .dividendYield(new BigDecimal(companyOverview.getString("DividendYield")))
@@ -433,16 +450,11 @@ public class StockService {
                     : stockOrder;
             this.orderRepository.save(order);
             return ResponseEntity.status(400).body("Dnevni limit je prekoracen, porudzbina je na cekanju (WAITING).");
-        } else {
-            order = stockOrder == null
-                    ? this.createOrder(
-                            stockRequest, price.doubleValue(), user, OrderStatus.IN_PROGRESS, OrderTradeType.BUY)
-                    : stockOrder;
-            order = this.orderRepository.save(order);
-            user.setDailyLimit(user.getDailyLimit() - price.doubleValue());
-            userService.save(user);
         }
-        this.balanceService.reserveAmount(price.floatValue(), user.getEmail(), order.getCurrencyCode());
+        order = stockOrder == null ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.IN_PROGRESS, OrderTradeType.BUY) : stockOrder;
+        order = this.orderRepository.save(order);
+        user.setDailyLimit(user.getDailyLimit() - price.doubleValue());
+        userService.save(user);
         try {
             stockBuyRequestsQueue.put(order);
         } catch (InterruptedException e) {
@@ -516,5 +528,68 @@ public class StockService {
 
     public List<UserStock> getAllUserStocks(long userId) {
         return userStockService.findAllForUser(userId);
+    }
+
+    public boolean checkLimitAndStopForBuy(StockOrder stockOrder) {
+        // Here we have to find price of the stock referenced in stockOrder and to compare it with order's limit and stop
+        BigDecimal stockPrice = this.findStockBySymbolInDb(stockOrder.getSymbol()).getPriceValue();
+        if(stockOrder.getStockLimit() != null && stockPrice.doubleValue() <= stockOrder.getStockLimit().doubleValue()) {
+            return true;
+        }
+        return stockOrder.getStop() != null && stockPrice.doubleValue() >= stockOrder.getStop().doubleValue();
+    }
+
+    public boolean checkLimitAndStopForSell(StockOrder stockOrder) {
+        BigDecimal stockPrice = this.findStockBySymbolInDb(stockOrder.getSymbol()).getPriceValue();
+        if(stockOrder.getStockLimit() != null && stockPrice.doubleValue() >= stockOrder.getStockLimit().doubleValue()) {
+            return true;
+        }
+        return stockOrder.getStop() != null && stockPrice.doubleValue() <= stockOrder.getStop().doubleValue();
+    }
+
+    @Transactional
+    public List<Stock> getFromExternalApi() {
+        Stock appleStock = this.getStockBySymbol("AAPL");
+        Stock googleStock = this.getStockBySymbol("GOOGL");
+        Stock amazonStock = this.getStockBySymbol("AMZN");
+        Stock teslaStock = this.getStockBySymbol("TSLA");
+        Stock netflixStock = this.getStockBySymbol("NFLX");
+
+        List<Stock> stockList = new ArrayList<>();
+        stockList.add(appleStock);
+        stockList.add(googleStock);
+        stockList.add(amazonStock);
+        stockList.add(teslaStock);
+        stockList.add(netflixStock);
+        return stockList;
+    }
+
+    @Transactional
+    public void updateAllStocksInDb() {
+        List<Stock> freshStocks = this.getFromExternalApi();
+        for (Stock freshStock : freshStocks) {
+            Optional<Stock> existingStock = this.stockRepository.findStockBySymbol(freshStock.getSymbol());
+            if (existingStock.isPresent()) {
+                this.stockRepository
+                        .updateStock( // forwarding all fields as arguments because forwarding whole object was
+                                // problematic
+                                freshStock.getSymbol(),
+                                freshStock.getCompanyName(),
+                                freshStock.getOutstandingShares(),
+                                freshStock.getDividendYield(),
+                                freshStock.getPriceValue(),
+                                freshStock.getOpenValue(),
+                                freshStock.getLowValue(),
+                                freshStock.getHighValue(),
+                                freshStock.getChangeValue(),
+                                freshStock.getPreviousClose(),
+                                freshStock.getVolumeValue(),
+                                freshStock.getLastUpdated(),
+                                freshStock.getChangePercent(),
+                                freshStock.getWebsiteUrl());
+            } else {
+                this.stockRepository.save(freshStock);
+            }
+        }
     }
 }

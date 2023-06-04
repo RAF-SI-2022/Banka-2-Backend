@@ -5,9 +5,9 @@ Feature: Stock service
     When stock doesnt exist
     Then user gets nonexistent stock by id
 
-#  Scenario: get stock by nonexistent symbol
-#    When stock with symbol doesnt exist
-#    Then user gets nonexistent stock by symbol
+  Scenario: get stock by nonexistent symbol
+    When stock with symbol doesnt exist
+    Then user gets nonexistent stock by symbol
 
   Scenario: user without buy perms tries to buy stock
     Given user without permissions logs in

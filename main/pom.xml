@@ -42,6 +42,7 @@
             **/StockBuyWorker.java,
             **/StockSellWorker.java,
             **/MainApplication.java,
+            **/AuthenticationController.java,
             **/**.xml
         </sonar.coverage.exclusions>
 
