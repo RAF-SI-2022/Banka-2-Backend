@@ -9,10 +9,15 @@ import java.io.*;
 public class CustomMultipartFile implements MultipartFile {
     private final File file;
 
+    private String subType = "vnd.openxmlformats-officedocument.wordprocessingml.document";
+
     public CustomMultipartFile(File file) {
         this.file = file;
     }
-
+    public CustomMultipartFile(File file, String type) {
+        this.file = file;
+        this.subType=type;
+    }
     @Override
     public String getName() {
         return file.getName();
@@ -26,7 +31,7 @@ public class CustomMultipartFile implements MultipartFile {
     @Override
     public String getContentType() {
         // Replace this with the appropriate content type for your file
-        return "application/octet-stream";
+        return "application/" + subType;
     }
 
     @Override

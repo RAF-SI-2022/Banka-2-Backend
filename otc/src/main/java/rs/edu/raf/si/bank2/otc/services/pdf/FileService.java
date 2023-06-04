@@ -28,17 +28,21 @@ public class FileService {
     private GridFsOperations operations;
 
     public File createContractFile(Contract contract) throws IOException {
-        File file = new File("Contract.pdf");
+        File file = new File("Contract");
         FileOutputStream fileOut = new FileOutputStream(file);
         ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
         objectOut.writeObject(contract.toString());
         objectOut.close();
-        System.out.println("The Object  was succesfully written to a file");
+        System.out.println("The Object  was successfully written to a file");
         return file;
     }
 
-    public String saveFile(File file) throws IOException {
-        MultipartFile multipartFile = new CustomMultipartFile(file);
+    public String saveAsPDFFile(File file) throws IOException {
+        MultipartFile multipartFile = new CustomMultipartFile(file, "pdf");
+        return addFile(multipartFile);
+    }
+    public String saveAsDOCXFile(File file) throws IOException {
+        MultipartFile multipartFile = new CustomMultipartFile(file, "vnd.openxmlformats-officedocument.wordprocessingml.document");
         return addFile(multipartFile);
     }
     public String addFile(MultipartFile upload) throws IOException {

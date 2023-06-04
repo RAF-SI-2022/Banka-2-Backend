@@ -29,13 +29,14 @@ public class FileController {
 
     @PostMapping("/upload")
     public ResponseEntity<?> upload(@RequestParam("file")MultipartFile file) throws IOException {
-        ContractElements contractElements1 = ContractElements.FINALISED;
-        TransactionElement transactionElement = new TransactionElement("1234",ContractElements.SELL,"STOCK",ContractElements.FINALISED,"USD",45.5,12.2);
-        TransactionElement transactionElement2 = new TransactionElement("1234",ContractElements.SELL,"STOCK",ContractElements.FINALISED,"USD",45.5,12.2);
-        TransactionElement transactionElement3 = new TransactionElement("1234",ContractElements.SELL,"STOCK",ContractElements.FINALISED,"USD",45.5,12.2);
-        Contract contract = new Contract("123", contractElements1,"creation","last","number","desc", List.of(transactionElement, transactionElement2, transactionElement3));
-        File f = fileService.createContractFile(contract);
-        fileService.saveFile(f);
+//        ContractElements contractElements1 = ContractElements.FINALISED;
+//        TransactionElement transactionElement = new TransactionElement("1234",ContractElements.SELL,"STOCK",ContractElements.FINALISED,"USD",45.5,12.2);
+//        TransactionElement transactionElement2 = new TransactionElement("1234",ContractElements.SELL,"STOCK",ContractElements.FINALISED,"USD",45.5,12.2);
+//        TransactionElement transactionElement3 = new TransactionElement("1234",ContractElements.SELL,"STOCK",ContractElements.FINALISED,"USD",45.5,12.2);
+//        Contract contract = new Contract("123", contractElements1,"creation","last","number","desc", List.of(transactionElement, transactionElement2, transactionElement3));
+//        File f = fileService.createContractFile(contract);
+//        fileService.saveAsPDFFile(f);
+//        fileService.saveAsDOCXFile(f);
         return new ResponseEntity<>(fileService.addFile(file), HttpStatus.OK);
     }
 
