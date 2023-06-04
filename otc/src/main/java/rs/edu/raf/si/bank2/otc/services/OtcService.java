@@ -63,10 +63,10 @@ public class OtcService {
     public OtcResponseDto openContract(ContractDto contractDto){
         Optional<Company> company = companyRepository.findById(contractDto.getCompanyId());
 
-        if (company.isEmpty()){
+        /*if (company.isEmpty()){
             System.err.println("Company not found");
             return new OtcResponseDto(404, "Selektovana kompanija nije u bazi!");
-        }
+        }*/
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         LocalDate now = LocalDate.now();

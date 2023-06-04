@@ -18,7 +18,7 @@ import java.util.List;
 @Document("contract")
 public class Contract {
 
-    public Contract(Long id, ContractElements contactStatus, String creationDate,
+    public Contract(String id, ContractElements contactStatus, String creationDate,
                     String lastUpdatedDate, String contractNumber, String description, String note, Collection<TransactionElement> transactionElements) {
         this.id = id;
         this.contactStatus = contactStatus;
@@ -31,7 +31,7 @@ public class Contract {
     }
 
     @Id
-    private Long id;
+    private String id;
     @DBRef(lazy = true)
     private Company company;
     private ContractElements contactStatus;
