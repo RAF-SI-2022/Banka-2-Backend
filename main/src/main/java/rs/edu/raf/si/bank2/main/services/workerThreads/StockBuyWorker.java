@@ -23,6 +23,7 @@ public class StockBuyWorker extends Thread {
     BalanceService balanceService;
     CurrencyService currencyService;
     TransactionService transactionService;
+    UserService userService;
     OrderRepository orderRepository;
 
     public StockBuyWorker(
@@ -32,7 +33,8 @@ public class StockBuyWorker extends Thread {
             BalanceService balanceService,
             CurrencyService currencyService,
             TransactionService transactionService,
-            OrderRepository orderRepository) {
+            OrderRepository orderRepository,
+            UserService userService) {
         this.stockBuyRequestsQueue = blockingQueue;
         this.stockService = stockService;
         this.userStockService = userStockService;
@@ -40,6 +42,7 @@ public class StockBuyWorker extends Thread {
         this.currencyService = currencyService;
         this.transactionService = transactionService;
         this.orderRepository = orderRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -72,6 +75,10 @@ public class StockBuyWorker extends Thread {
                 Balance balance = this.balanceService.findBalanceByUserIdAndCurrency(stockOrder.getUser().getId(), stockOrder.getCurrencyCode());
                 Stock stock = this.stockService.findStockBySymbolInDb(stockOrder.getSymbol());
                 this.balanceService.reserveAmount(stock.getPriceValue().floatValue()*stockOrder.getAmount(), stockOrder.getUser().getEmail(), stockOrder.getCurrencyCode(), true);
+
+                User user = stockOrder.getUser();
+                user.setDailyLimit(user.getDailyLimit() - stock.getPriceValue().floatValue() * stockOrder.getAmount());
+                this.userService.save(user);
 
                 if (stockOrder.isAllOrNone()) {
                     usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + stockOrder.getAmount());
