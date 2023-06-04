@@ -49,13 +49,8 @@ public class CompanyController {
         return ResponseEntity.ok(companyService.getCompanies());
     }
 
-    @GetMapping(value = "/test")
-
-    public void test(){
-        System.out.println("ZZZZZZZ");
-    }
     @GetMapping(value = "/{id}")
-    public ResponseEntity<?> getCompanyById(@RequestHeader("Authorization") String token, @PathVariable String id) {
+    public ResponseEntity<?> getCompanyById(@PathVariable String id) {
         Optional<Company> company = companyService.getCompanyById(id);
         if (company.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -64,27 +59,25 @@ public class CompanyController {
     }
 
     @GetMapping(value = "/name/{name}")
-    public ResponseEntity<?> getCompanyByNaziv(@RequestHeader("Authorization") String token, @PathVariable String name) {
+    public ResponseEntity<?> getCompanyByNaziv(@PathVariable String name) {
         return ResponseEntity.ok(companyService.getCompanyByName(name));
     }
 
     @GetMapping(value = "/registrationNumber/{registrationNumber}")
-    public ResponseEntity<?> getCompanyByMaticniBroj(@RequestHeader("Authorization") String token, @PathVariable String registrationNumber) {
+    public ResponseEntity<?> getCompanyByMaticniBroj(@PathVariable String registrationNumber) {
         return ResponseEntity.ok(companyService.getCompanyByRegistrationNumber(registrationNumber));
     }
 
     @GetMapping(value = "/taxNumber/{taxNumber}")
-    public ResponseEntity<?> getCompanyByPib(@RequestHeader("Authorization") String token, @PathVariable String taxNumber) {
+    public ResponseEntity<?> getCompanyByPib(@PathVariable String taxNumber) {
         return ResponseEntity.ok(companyService.getCompanyByTaxNumber(taxNumber));
     }
 
     @PostMapping(value = "/create")
     public ResponseEntity<?> createCompany(@RequestBody CreateCompanyDto companyDto) {
-
-        System.out.println("TU SMO PLZIC");
 //        System.out.println(messageHelper.createTextMessage(companyDto));
         System.out.println(companyDto);
-        companyService.createCompany(new Company(companyDto.getName(),companyDto.getAddress(),companyDto.getTaxNumber(),companyDto.getActivityCode(),companyDto.getRegistrationNumber()));
+        companyService.createCompany(new Company(companyDto.getName(),companyDto.getRegistrationNumber(), companyDto.getTaxNumber(),companyDto.getActivityCode(), companyDto.getAddress()));
 //        jmsTemplate.convertAndSend(createCompanyDestination,messageHelper.createTextMessage(companyDto));
 //        List<ContactPerson> employeeList = new ArrayList<>(company.getContactPersons());
 //        for(ContactPerson cp: employeeList){
@@ -92,13 +85,14 @@ public class CompanyController {
 //        }
         return ResponseEntity.ok().build();
     }
+
     @PostMapping(value = "/add")
     public ResponseEntity<?> addContactsAndBankAccounts(@RequestBody ContactsBankAccountsDto contactsBankAccountsDto ){
         return ResponseEntity.ok(companyService.addContactsAndBankAccounts(contactsBankAccountsDto));
     }
 
     @PostMapping(value = "/edit")
-    public ResponseEntity<?> editCompany(@RequestHeader("Authorization") String token, @RequestBody EditCompanyDto editCompanyDto) {
+    public ResponseEntity<?> editCompany(@RequestBody EditCompanyDto editCompanyDto) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         companyService.updateCompany(editCompanyDto);
         return ResponseEntity.ok().build();
