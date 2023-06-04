@@ -76,7 +76,6 @@ public class OtcService {
         newContract.setLastUpdatedDate(dtf.format(now));
         newContract.setContractNumber(contractDto.getContractNumber());
         newContract.setDescription(contractDto.getDescription());
-        newContract.setNote(contractDto.getNote());
         contactRepository.save(newContract);
 
         return new OtcResponseDto(200, "Ugovor je uspesno otvoren");
@@ -95,7 +94,6 @@ public class OtcService {
         contract.get().setContractStatus(updatedContract.getContractStatus());
         contract.get().setLastUpdatedDate(dtf.format(now));
         contract.get().setDescription(updatedContract.getDescription());
-        contract.get().setNote(updatedContract.getNote());
         contactRepository.save(contract.get());
 
         return new OtcResponseDto(200, "Ugovor je uspesno promenjen");
