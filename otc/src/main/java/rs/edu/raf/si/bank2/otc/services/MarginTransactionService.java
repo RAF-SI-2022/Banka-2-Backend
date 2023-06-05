@@ -76,10 +76,10 @@ public class MarginTransactionService {
                 .interest(orderType.equals("FOREX") ? loanVal * 0.05 : 0.0)
                 .build();
         Optional<MarginBalance> marginBalanceFromDb = marginBalanceRepository.findMarginBalanceByListingGroup(ListingGroup.valueOf(orderType));
-        if(tradeType != marginTransactionDto.getTransactionType().toString()){
-            //TODO
-            System.out.println("is this error?");
-        }
+//        if(tradeType != marginTransactionDto.getTransactionType().toString()){
+//            //TODO
+//            System.out.println("is this error?");
+//        }
         if(marginBalanceFromDb.isPresent()){
             System.out.println("TU");
             MarginBalance marginBalance = marginBalanceFromDb.get();
