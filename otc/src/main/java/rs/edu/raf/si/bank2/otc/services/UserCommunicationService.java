@@ -23,10 +23,6 @@ public class UserCommunicationService implements UserCommunicationInterface {
     private final JwtUtil jwtUtil;
     ObjectMapper mapper = new ObjectMapper();
 
-//
-//    @Autowired
-//    private UserServiceInterface userServiceInterface;
-
     @Value("${services.users.host}")
     private String usersServiceHost;
     @Value("${services.main.host}")
@@ -35,33 +31,6 @@ public class UserCommunicationService implements UserCommunicationInterface {
     @Autowired
     public UserCommunicationService(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
-    }
-
-    @Override
-    public String testComs() throws IOException, InterruptedException {
-
-        String host = "127.0.0.1";
-        int port = 8081;
-
-        URL url = new URL("http", host, port, "/api/userService/testMethod");
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        int responseCode = connection.getResponseCode();
-
-        System.out.println("Response Code: " + responseCode);
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String line;
-        StringBuilder response = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            response.append(line);
-        }
-        reader.close();
-
-        System.out.println("Response: " + response.toString());
-        connection.disconnect();
-
-        return response.toString();
     }
 
     @Override

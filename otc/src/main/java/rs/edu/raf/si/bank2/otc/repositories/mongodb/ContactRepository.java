@@ -6,8 +6,10 @@ import org.springframework.stereotype.Repository;
 import rs.edu.raf.si.bank2.otc.models.mongodb.ContactPerson;
 import rs.edu.raf.si.bank2.otc.models.mongodb.Contract;
 
+import java.util.List;
+
 @Repository
 public interface ContactRepository extends MongoRepository<Contract, String> {
 
-
+    List<Contract> findByUserId(Long userId);
 }

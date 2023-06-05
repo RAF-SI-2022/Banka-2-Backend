@@ -31,6 +31,7 @@ public class Contract {
 
     @Id
     private String id;
+    private Long userId;
     @DBRef(lazy = true)
     private Company company;
     private ContractElements contractStatus;
