@@ -124,12 +124,8 @@ public class ReserveController {
         //!!! NIJE HARTIJA NEGO CURRENCY ID !!!
         if (userBalance.isEmpty()) return ResponseEntity.status(404).body("Balans nije pronadjen");
 
-        //todo nemoj amount neko iseci iz polja
-        System.err.println("kurac");
-        System.err.println(reserveDto.getFutureStorage());
-        Float priceChange = Float.parseFloat(reserveDto.getFutureStorage());
-        System.err.println(priceChange);
 
+        Float priceChange = Float.parseFloat(reserveDto.getFutureStorage());
         if (userBalance.get().getFree() < priceChange)
             return ResponseEntity.status(500).body("Nemas dovoljno ška");
 
@@ -147,12 +143,7 @@ public class ReserveController {
         //!!! NIJE HARTIJA NEGO CURRENCY ID !!!
         if (userBalance.isEmpty()) return ResponseEntity.status(404).body("Balans nije pronadjen");
 
-        //todo nemoj amount neko iseci iz polja
-        System.err.println("kurac");
-        System.err.println(reserveDto.getFutureStorage());
         Float priceChange = Float.parseFloat(reserveDto.getFutureStorage());
-        System.err.println(priceChange);
-
         userBalance.get().setAmount(userBalance.get().getAmount() + priceChange);
         userBalance.get().setFree(userBalance.get().getFree() + priceChange);
 
