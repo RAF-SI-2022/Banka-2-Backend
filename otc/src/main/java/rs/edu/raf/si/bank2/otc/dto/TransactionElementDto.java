@@ -17,7 +17,7 @@ public class TransactionElementDto {
     private ContractElements buyOrSell;
     private String transactionElement;// stock forex, koji je ...
     private ContractElements balance; //cache margin
-    private String currency;
+    private String currency;// USD, RSD
     private Double amount;
     private Double priceOfOneElement;
 

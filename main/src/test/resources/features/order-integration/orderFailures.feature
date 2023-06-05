@@ -30,3 +30,9 @@ Feature: order service
     And there is order in non waiting status in db
     When user logged in
     Then order not denied
+
+  Scenario: logged user denies order
+    Given user logs in
+    And there is order in waiting status in db
+    When user logged in
+    Then order denied

@@ -1,5 +1,6 @@
 package rs.edu.raf.si.bank2.otc.models.mongodb;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,7 +38,8 @@ public class Contract {
     private String lastUpdatedDate;
     private String contractNumber;
     private String description;
-//    @DBRef(lazy = true)
+    @DBRef(lazy = true)
+//    @JsonIgnore
     private Collection<TransactionElement> transactionElements;
 
 }

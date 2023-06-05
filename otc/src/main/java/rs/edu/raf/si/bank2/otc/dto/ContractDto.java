@@ -16,6 +16,5 @@ public class ContractDto {
       private ContractElements contractStatus;
       private String contractNumber;
       private String description;
-      private String note;
 
 }

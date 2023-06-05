@@ -25,27 +25,27 @@ public class ContactPersonController {
     }
 
     @GetMapping(value = "")
-    public ResponseEntity<?> getContactPersons(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> getContactPersons() {
         return ResponseEntity.ok(contactPersonService.getAllContactPersons());
     }
 
     @GetMapping(value = "/id/{id}")
-    public ResponseEntity<?> getContactPerson(@RequestHeader("Authorization") String token, @PathVariable String id) {
+    public ResponseEntity<?> getContactPerson(@PathVariable String id) {
         return ResponseEntity.ok(contactPersonService.getContactPersonById(id));
     }
 
     @PostMapping(value = "")
-    public ResponseEntity<?> createContactPerson(@RequestHeader("Authorization") String token, @RequestBody ContactPerson contactPerson) {
+    public ResponseEntity<?> createContactPerson(@RequestBody ContactPerson contactPerson) {
         return ResponseEntity.ok(contactPersonService.addContactPerson(contactPerson));
     }
 
     @PostMapping(value = "/edit")
-    public ResponseEntity<?> editContactPerson(@RequestHeader("Authorization") String token, @RequestBody ContactPersonDto contactPersonDto) {
+    public ResponseEntity<?> editContactPerson(@RequestBody ContactPersonDto contactPersonDto) {
         return ResponseEntity.ok(contactPersonService.updateContactPerson(contactPersonDto));
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<?> deleteContactPerson(@RequestHeader("Authorization") String token, @PathVariable String id) {
+    public ResponseEntity<?> deleteContactPerson(@PathVariable String id) {
         contactPersonService.deleteContactPerson(id);
         return ResponseEntity.noContent().build();
     }

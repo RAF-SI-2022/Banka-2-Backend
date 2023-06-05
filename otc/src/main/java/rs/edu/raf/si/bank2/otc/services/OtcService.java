@@ -13,7 +13,6 @@ import rs.edu.raf.si.bank2.otc.models.mongodb.TransactionElement;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.CompanyRepository;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.TransactionElementRepository;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.ContactRepository;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -77,6 +76,7 @@ public class OtcService {
         newContract.setLastUpdatedDate(dtf.format(now));
         newContract.setContractNumber(contractDto.getContractNumber());
         newContract.setDescription(contractDto.getDescription());
+        newContract.setTransactionElements(new ArrayList<>());
         contactRepository.save(newContract);
 
         return new OtcResponseDto(200, "Ugovor je uspesno otvoren");
@@ -107,8 +107,27 @@ public class OtcService {
             System.err.println("contract not found");
             return  new OtcResponseDto(404, "Selektovani ugovor ne postoji u bazi");
         }
+        if (contract.get().getContractStatus() == ContractElements.FINALISED){
+            System.err.println("contract not editable");
+            return new OtcResponseDto(500, "Ugovor se ne moze promeniti");
+        }
 
-        //todo uradi checkove da moze da se doda i rezervisi resurse
+        //todo if buy (da li imamo dovoljno para)
+        /*
+        kontaktiraj reserved service da proveri
+        -da li je vec rezervisano
+        -da li imamo dovoljno para
+        -da ga stavi na rezervisano
+        */
+
+
+        //todo if sell (rezervisi objekat)
+        /*
+        kontaktirati reserved service da proveri
+        -da nije obj vec rezervisan
+        -da ga stavi na rezervaciju
+
+         */
 
         TransactionElement transactionElement = new TransactionElement();
         transactionElement.setBuyOrSEll(transactionElementDto.getBuyOrSell());
@@ -135,8 +154,12 @@ public class OtcService {
             System.err.println("element not found");
             return  new OtcResponseDto(404, "Ugovor ne postoji u bazi");
         }
-
         //todo skloni stvari sa rezervacije
+
+
+
+
+
 
         contract.get().getTransactionElements().remove(transactionElement.get());
         contactRepository.save(contract.get());
@@ -157,10 +180,13 @@ public class OtcService {
             System.err.println("contract not found");
             return  new OtcResponseDto(404, "Ugovor nije pronadjen u bazi");
         }
-        if (contract.get().getContractStatus() == ContractElements.DRAFT) {
+        if (contract.get().getContractStatus() == ContractElements.FINALISED) {
             System.err.println("contract not editable");
             return  new OtcResponseDto(500, "Ugovor ne moze da se izmeni");
         }
+
+        //todo promeniti stvari na rezervaciji
+
 
         transactionElement.get().setBuyOrSEll(transactionElementDto.getBuyOrSell());//todo ovo mozda skloni kasnije
         transactionElement.get().setTransactionElement(transactionElementDto.getTransactionElement());

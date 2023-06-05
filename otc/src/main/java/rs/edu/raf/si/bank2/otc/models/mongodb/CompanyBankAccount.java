@@ -14,6 +14,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @RequiredArgsConstructor
 @Document("companyBankAccount")
 public class CompanyBankAccount {
+
+
+
     @Id
     private String id;
 //    @DBRef(lazy = true)
