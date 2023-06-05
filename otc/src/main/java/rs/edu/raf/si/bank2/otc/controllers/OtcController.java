@@ -103,6 +103,8 @@ public class OtcController {
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
+    //ISPOD SU TRANSACTION ELEMENTI
+
     @GetMapping("/elements")
     public ResponseEntity<?> getAllElements(){
         String signedInUserEmail = getContext().getAuthentication().getName();

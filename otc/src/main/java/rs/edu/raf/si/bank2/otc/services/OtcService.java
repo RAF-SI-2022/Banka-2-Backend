@@ -134,7 +134,7 @@ public class OtcService {
         if (transactionElementDto.getTransactionElement() == TransactionElements.FUTURE) {//sacuvamo future da ga mozemo vratiti ako ubijemo element
             System.err.println(response.getResponseMsg());
             transactionElement.setFutureStorageField(response.getResponseMsg());
-        }
+        } else transactionElement.setFutureStorageField("");
         transactionElementRepository.save(transactionElement);
         contract.get().getTransactionElements().add(transactionElement);
         contactRepository.save(contract.get());
