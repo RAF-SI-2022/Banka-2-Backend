@@ -18,10 +18,13 @@ public class TransactionElement {
     @Id
     private String id;
     private ContractElements buyOrSEll;
-    private String transactionElement; //koji stock forex ili sta vec
+    private TransactionElements transactionElement; //koji stock forex ili sta vec
     private ContractElements balance; //da li je cash ili margin
     private String currency;
-    private Double amount;
+    private Integer amount;
     private Double priceOfOneElement;
+    private Long userId;
+    private Long mariaDbId;
+    private String futureStorageField; //ako nije future bice null, sluzi da se recoveruje future nakon brisanja
 
 }

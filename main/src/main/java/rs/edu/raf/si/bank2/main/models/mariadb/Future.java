@@ -72,4 +72,10 @@ public class Future implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user; // owner of this future
+
+    @Override
+    public String toString() {
+        return "id=" + id + ",futureName=" + futureName + ",contractSize=" + contractSize + ",contractUnit=" + contractUnit +
+                ",maintenanceMargin=" + maintenanceMargin + ",type=" + type + ",settlementDate=" + settlementDate +  ",forSale=" + forSale + ",user=" + user.getId();
+    }
 }

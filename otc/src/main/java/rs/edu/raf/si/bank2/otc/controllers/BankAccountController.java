@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.edu.raf.si.bank2.otc.dto.CompanyBankAccountDto;
-import rs.edu.raf.si.bank2.otc.models.mongodb.CompanyBankAccount;
 import rs.edu.raf.si.bank2.otc.services.CompanyBankAccountService;
 
 @RestController
@@ -36,7 +35,7 @@ public class BankAccountController {
     }
 
     @PostMapping(value = "/edit")
-    public ResponseEntity<?> editContactPerson(@RequestBody CompanyBankAccountDto bankAccountRequest) {
+    public ResponseEntity<?> editBankAccount(@RequestBody CompanyBankAccountDto bankAccountRequest) {
         return ResponseEntity.ok(bankAccountService.updateBankAccount(bankAccountRequest));
     }
 
