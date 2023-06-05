@@ -16,7 +16,6 @@ import rs.edu.raf.si.bank2.otc.utils.JwtUtil;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
 
 @Service
 public class ReservedService {
@@ -33,30 +32,28 @@ public class ReservedService {
     }
 
 
-    public CommunicationDto sendReservation(TransactionElementDto teDto){
+    public CommunicationDto sendReservation(TransactionElementDto teDto) {
         String reserveJson;
         String url = "";
 
         ReserveDto reserveDto = new ReserveDto(teDto.getUserId(), teDto.getMariaDbId(), teDto.getAmount());
 
         //todo HARD CODE NA USD
-        if (teDto.getBuyOrSell() == ContractElements.BUY){
-            switch (teDto.getBalance()){
-                case CASH  -> {
-                    url = "/reserveMoney";//u ovom slucaju mariaDbId je null
-                    switch (teDto.getTransactionElement()){
-                        case STOCK -> reserveDto.setFutureStorage(teDto.getFutureStorageField());//direktno cenu imamo sacuvanu
-                        case OPTION -> reserveDto.setFutureStorage(teDto.getFutureStorageField().split(",")[6]);
+        if (teDto.getBuyOrSell() == ContractElements.BUY) {
+            switch (teDto.getBalance()) {
+                case CASH -> {
+                    url = "/reserveMoney"; //u ovom slucaju mariaDbId je null
+                    switch (teDto.getTransactionElement()) {
+                        case STOCK ->reserveDto.setFutureStorage(teDto.getFutureStorageField());//direktno cenu imamo sacuvanu
                         case FUTURE -> reserveDto.setFutureStorage(teDto.getFutureStorageField().split(",")[4]);
+                        case OPTION -> reserveDto.setFutureStorage(teDto.getFutureStorageField().split(",")[6]);
                     }
-                    System.err.println(reserveDto.getFutureStorage().toString());
-//                    reserveDto.setFutureStorage(teDto.getFutureStorageField());
                 }
                 case MARGIN -> System.err.println("NIJE JOS DODATO"); //todo DODAJ ZA MARZNI RACUN
             }
         }
-        else if (teDto.getBuyOrSell() == ContractElements.SELL){
-            switch (teDto.getTransactionElement()){
+        else if (teDto.getBuyOrSell() == ContractElements.SELL) {
+            switch (teDto.getTransactionElement()) {
                 case STOCK -> url = "/reserveStock";
                 case OPTION -> url = "/reserveOption";
                 case FUTURE -> url = "/reserveFuture";
@@ -65,35 +62,35 @@ public class ReservedService {
 
         try {
             reserveJson = mapper.writeValueAsString(reserveDto);
-        } catch (JsonProcessingException e) { throw new RuntimeException(e); }
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
         return sendReservePost(url, reserveJson);
     }
 
-    public CommunicationDto sendUndoReservation(TransactionElement TElement){
+    public CommunicationDto sendUndoReservation(TransactionElement TElement) {
         String reserveJson;
         String url = "";
         ReserveDto reserveDto = new ReserveDto(TElement.getUserId(), TElement.getMariaDbId(), TElement.getAmount());
 
         //todo HARD CODE NA USD
-        if (TElement.getBuyOrSell() == ContractElements.BUY){
-            switch (TElement.getBalance()){
-                case CASH  -> {
+        if (TElement.getBuyOrSell() == ContractElements.BUY) {
+            switch (TElement.getBalance()) {
+                case CASH -> {
                     url = "/undoReserveMoney";//u ovom slucaju mariaDbId je null
-                    switch (TElement.getTransactionElement()){
-                        case STOCK ->  reserveDto.setFutureStorage(TElement.getFutureStorageField());//direktno cenu imamo sacuvanu
-                        case OPTION -> reserveDto.setFutureStorage(TElement.getFutureStorageField().split(",")[6]);
+                    switch (TElement.getTransactionElement()) {
+                        case STOCK -> reserveDto.setFutureStorage(TElement.getFutureStorageField());//direktno cenu imamo sacuvanu
                         case FUTURE -> reserveDto.setFutureStorage(TElement.getFutureStorageField().split(",")[4]);
-
+                        case OPTION -> reserveDto.setFutureStorage(TElement.getFutureStorageField().split(",")[6]);
                     }
-//                    reserveDto.setFutureStorage(TElement.getFutureStorageField());
                 }
                 case MARGIN -> System.err.println("NIJE JOS DODATO"); //todo DODAJ ZA MARZNI RACUN
             }
         }
-        else if (TElement.getBuyOrSell() == ContractElements.SELL){
-            switch (TElement.getTransactionElement()){
-                case STOCK  -> url = "/undoReserveStock";
+        else if (TElement.getBuyOrSell() == ContractElements.SELL) {
+            switch (TElement.getTransactionElement()) {
+                case STOCK -> url = "/undoReserveStock";
                 case OPTION -> url = "/undoReserveOption";
                 case FUTURE -> {
                     url = "/undoReserveFuture";
@@ -102,40 +99,37 @@ public class ReservedService {
             }
         }
 
-
         try {
             reserveJson = mapper.writeValueAsString(reserveDto);
-        } catch (JsonProcessingException e) { throw new RuntimeException(e); }
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
         return sendReservePost(url, reserveJson);
     }
 
-    public CommunicationDto finalizeElement(TransactionElement TElement){
+    public CommunicationDto finalizeElement(TransactionElement TElement) {
         String reserveJson;
         String url = "";
 
         ReserveDto reserveDto = new ReserveDto(TElement.getUserId(), TElement.getMariaDbId(), TElement.getAmount());
 
-
-        if (TElement.getBuyOrSell() == ContractElements.SELL){//AKO JE SELL SAMO MI DODJA PARE
-            switch (TElement.getBalance()){
-                case CASH  -> {
-                    url = "/undoReserveMoney";//u ovom slucaju mariaDbId je null
-
-                    switch (TElement.getTransactionElement()){
+        if (TElement.getBuyOrSell() == ContractElements.SELL) {//AKO JE SELL SAMO MI DODJA PARE
+            switch (TElement.getBalance()) {
+                case CASH -> {
+                    url = "/undoReserveMoney"; //u ovom slucaju mariaDbId je null
+                    switch (TElement.getTransactionElement()) {
                         case STOCK -> reserveDto.setFutureStorage(TElement.getFutureStorageField());//direktno cenu imamo sacuvanu
-                        case OPTION -> reserveDto.setFutureStorage(TElement.getFutureStorageField().split(",")[6]);
                         case FUTURE -> reserveDto.setFutureStorage(TElement.getFutureStorageField().split(",")[4]);
-
+                        case OPTION -> reserveDto.setFutureStorage(TElement.getFutureStorageField().split(",")[6]);
                     }
-                    reserveDto.setFutureStorage(TElement.getFutureStorageField());
                 }
                 case MARGIN -> System.err.println("NIJE JOS DODATO"); //todo DODAJ ZA MARZNI RACUN
             }
         }
-        else if (TElement.getBuyOrSell() == ContractElements.BUY){//AKO JE BUY MORAS DA MI DODAS ELEMENTE U BAZU
-            switch (TElement.getTransactionElement()){
-                case STOCK  -> {
+        else if (TElement.getBuyOrSell() == ContractElements.BUY) {//AKO JE BUY MORAS DA MI DODAS ELEMENTE U BAZU
+            switch (TElement.getTransactionElement()) {
+                case STOCK -> {
                     url = "/finalizeStock";
                     reserveDto.setFutureStorage(TElement.getFutureStorageField());
                 }
@@ -152,20 +146,20 @@ public class ReservedService {
 
         try {
             reserveJson = mapper.writeValueAsString(reserveDto);
-        } catch (JsonProcessingException e) { throw new RuntimeException(e); }
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
         return sendReservePost(url, reserveJson);
 
     }
 
 
-
-
-    private CommunicationDto sendReservePost(String urlExtension, String postObjectBody){
+    private CommunicationDto sendReservePost(String urlExtension, String postObjectBody) {
         System.err.println("POSALI SMO SEND RESERVE");
 
         String token = jwtUtil.generateToken("anesic3119rn+banka2backend+admin@raf.rs");
-        String []hostPort = usersServiceHost.split(":");
+        String[] hostPort = usersServiceHost.split(":");
         BufferedReader reader;
         StringBuilder response = new StringBuilder();
         String line;
@@ -186,13 +180,12 @@ public class ReservedService {
 
             int responseCode = connection.getResponseCode();
 
-            if (responseCode == HttpURLConnection.HTTP_OK){
+            if (responseCode == HttpURLConnection.HTTP_OK) {
                 reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 while ((line = reader.readLine()) != null) {
                     response.append(line);
                 }
-            }
-            else {
+            } else {
                 reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
                 while ((line = reader.readLine()) != null) {
                     response.append(line);
@@ -203,8 +196,7 @@ public class ReservedService {
             connection.disconnect();
             reader.close();
             return new CommunicationDto(responseCode, response.toString());
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

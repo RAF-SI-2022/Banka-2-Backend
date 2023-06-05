@@ -176,12 +176,6 @@ public class ReserveController {
         return ResponseEntity.ok("Stockovi su dodati");
     }
 
-//    @PostMapping("finalizeFuture")
-//    public ResponseEntity<?> finalizeFutureSale() {
-//
-//
-//        return null;
-//    }
 
     @PostMapping("finalizeOption")
     public ResponseEntity<?> finalizeOptionBuy(@RequestBody ReserveDto reserveDto) {
@@ -192,6 +186,8 @@ public class ReserveController {
         Optional<Option> option = optionRepository.findById(Long.parseLong(cut[0]));
 
         //1,20,CALL,2023-06-09,85,AAPL, cena
+        //option ffield
+        //- option id - premium - type (CALL ...) - expiriation date - strke - stock_symbol - price
 
         UserOption newUserOption = new UserOption();
         newUserOption.setUser(user.get());
