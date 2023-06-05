@@ -143,6 +143,8 @@ public class ReserveController {
         //!!! NIJE HARTIJA NEGO CURRENCY ID !!!
         if (userBalance.isEmpty()) return ResponseEntity.status(404).body("Balans nije pronadjen");
 
+        System.err.println("kurac");
+        System.err.println(reserveDto.getFutureStorage());
         Float priceChange = Float.parseFloat(reserveDto.getFutureStorage());
         userBalance.get().setAmount(userBalance.get().getAmount() + priceChange);
         userBalance.get().setFree(userBalance.get().getFree() + priceChange);
@@ -202,6 +204,26 @@ public class ReserveController {
 
         userOptionRepository.save(newUserOption);
         return ResponseEntity.ok("Stockovi su dodati");
+    }
+
+    @PostMapping("/finalizeFuture")
+    public ResponseEntity<?> finalizeFutureStock(@RequestBody ReserveDto reserveDto) {
+        String[] data = reserveDto.getFutureStorage().split(",");
+        Optional<User> user = userRepository.findById(reserveDto.getUserId());
+
+        if (user.isEmpty()) return ResponseEntity.status(404).body("Korisnik nije pronadjen");
+
+        Future future = new Future(
+                Long.parseLong(data[0]),
+                data[1],
+                Integer.parseInt(data[2]),
+                data[3],
+                Integer.parseInt(data[4]),
+                data[5],
+                data[6],
+                false,
+                user.get());
+        return ResponseEntity.ok(futureRepository.save(future));
     }
 
 }

@@ -119,7 +119,7 @@ public class OtcController {
     }
 
 
-    @PatchMapping("/finalize/{id}") //finalizuj
+    @PatchMapping("/finalize/{id}")
     public ResponseEntity<?> finalizeContract(@PathVariable(name = "id") String id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.CREATE_USERS, signedInUserEmail)) {
