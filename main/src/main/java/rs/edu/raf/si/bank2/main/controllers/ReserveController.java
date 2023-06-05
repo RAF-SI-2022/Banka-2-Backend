@@ -115,7 +115,7 @@ public class ReserveController {
     @PostMapping("/reserveMoney")
     public ResponseEntity<?> reserveMoney(@RequestBody ReserveDto reserveDto) {
         //todo trenutno hard code na USD
-        Optional<Balance> userBalance = balanceRepository.findBalanceByUserIdAndCurrencyId(reserveDto.getUserId(), reserveDto.getHartijaId());
+        Optional<Balance> userBalance = balanceRepository.findBalanceByUserIdAndCurrencyId(reserveDto.getUserId(), 138L);
         //!!! NIJE HARTIJA NEGO CURRENCY ID !!!
         if (userBalance.isEmpty()) return ResponseEntity.status(404).body("Balans nije pronadjen");
         if (userBalance.get().getFree() < reserveDto.getAmount())
@@ -131,7 +131,7 @@ public class ReserveController {
     @PostMapping("/undoReserveMoney")
     public ResponseEntity<?> undoReserveMoney(@RequestBody ReserveDto reserveDto) {
         //todo trenutno hard code na USD
-        Optional<Balance> userBalance = balanceRepository.findBalanceByUserIdAndCurrencyId(reserveDto.getUserId(), reserveDto.getHartijaId());
+        Optional<Balance> userBalance = balanceRepository.findBalanceByUserIdAndCurrencyId(reserveDto.getUserId(), 138L);
         //!!! NIJE HARTIJA NEGO CURRENCY ID !!!
         if (userBalance.isEmpty()) return ResponseEntity.status(404).body("Balans nije pronadjen");
 
@@ -160,21 +160,38 @@ public class ReserveController {
 
 
     @PostMapping("finalizeStock")
-    public ResponseEntity<?> finalizeStockSale(){
+    public ResponseEntity<?> finalizeStockSale(@RequestBody ReserveDto reserveDto) {
+        Optional<UserStock> userStock = userStocksRepository.findUserStockByUserIdAndStockId(reserveDto.getUserId(), reserveDto.getHartijaId());
 
+        if (userStock.isEmpty()) {
+            Optional<User> user = userRepository.findById(reserveDto.getUserId());
+            if (user.isEmpty()) return ResponseEntity.status(404).body("Korisnik nije pronadjen");
+            Optional<Stock> stock = stockRepository.findById(reserveDto.getHartijaId());
 
-        return null;
+            UserStock newUserStock = new UserStock();
+            newUserStock.setId(0L);
+            newUserStock.setUser(user.get());
+            newUserStock.setStock(stock.get());
+            newUserStock.setAmount(reserveDto.getAmount());
+            newUserStock.setAmountForSale(0);
+            return ResponseEntity.ok(userStocksRepository.save(newUserStock));
+        }
+
+        userStock.get().setAmount(userStock.get().getAmount() + reserveDto.getAmount());
+        userStocksRepository.save(userStock.get());
+
+        return ResponseEntity.ok("Stockovi su dodati");
     }
 
     @PostMapping("finalizeFuture")
-    public ResponseEntity<?> finalizeFutureSale(){
+    public ResponseEntity<?> finalizeFutureSale() {
 
 
         return null;
     }
 
     @PostMapping("finalizeOption")
-    public ResponseEntity<?> finalizeOptionSale(){
+    public ResponseEntity<?> finalizeOptionSale() {
 
 
         return null;

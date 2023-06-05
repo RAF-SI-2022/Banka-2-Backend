@@ -146,7 +146,7 @@ public class OtcService {
             else transactionElement.setFutureStorageField("");
         }
         else if (transactionElementDto.getBuyOrSell() == ContractElements.BUY){
-            transactionElement.setFutureStorageField(response.getResponseMsg());
+            transactionElement.setFutureStorageField(transactionElementDto.getFutureStorageField());
         }
 
 

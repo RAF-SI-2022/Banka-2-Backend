@@ -42,7 +42,7 @@ public class ReservedService {
             switch (teDto.getBalance()){
                 case CASH  -> {
                     url = "/reserveMoney";//u ovom slucaju mariaDbId je null
-                    teDto.setMariaDbId(138L);
+//                    teDto.setMariaDbId(138L);
                 }
                 case MARGIN -> System.err.println("NIJE JOS DODATO"); //todo DODAJ ZA MARZNI RACUN
             }
@@ -72,7 +72,7 @@ public class ReservedService {
             switch (TElement.getBalance()){
                 case CASH  -> {
                     url = "/undoReserveMoney";//u ovom slucaju mariaDbId je null
-                    TElement.setMariaDbId(138L);
+//                    TElement.setMariaDbId(138L);
                 }
                 case MARGIN -> System.err.println("NIJE JOS DODATO"); //todo DODAJ ZA MARZNI RACUN
             }
@@ -107,7 +107,7 @@ public class ReservedService {
             switch (TElement.getBalance()){
                 case CASH  -> {
                     url = "/undoReserveMoney";//u ovom slucaju mariaDbId je null
-                    TElement.setMariaDbId(138L);
+//                    TElement.setMariaDbId(138L);
                 }
                 case MARGIN -> System.err.println("NIJE JOS DODATO"); //todo DODAJ ZA MARZNI RACUN
             }
