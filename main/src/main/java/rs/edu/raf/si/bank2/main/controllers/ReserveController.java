@@ -20,14 +20,16 @@ public class ReserveController {
     private final FutureRepository futureRepository;
     private final BalanceRepository balanceRepository;
     private final UserRepository userRepository;
+    private final StockRepository stockRepository;
 
     @Autowired
-    public ReserveController(UserOptionRepository userOptionRepository, UserStocksRepository userStocksRepository, FutureRepository futureRepository, BalanceRepository balanceRepository, UserRepository userRepository) {
+    public ReserveController(UserOptionRepository userOptionRepository, UserStocksRepository userStocksRepository, FutureRepository futureRepository, BalanceRepository balanceRepository, UserRepository userRepository, StockRepository stockRepository) {
         this.userOptionRepository = userOptionRepository;
         this.userStocksRepository = userStocksRepository;
         this.futureRepository = futureRepository;
         this.balanceRepository = balanceRepository;
         this.userRepository = userRepository;
+        this.stockRepository = stockRepository;
     }
 
     @PostMapping("/reserveOption")
@@ -52,7 +54,7 @@ public class ReserveController {
         userOption.get().setAmount(userOption.get().getAmount() + reserveDto.getAmount());
         userOptionRepository.save(userOption.get());
 
-        return ResponseEntity.ok("Opcije su rezervisane");
+        return ResponseEntity.ok("Opcije su dodate");
     }
 
     @PostMapping("/reserveStock")
@@ -77,7 +79,7 @@ public class ReserveController {
         userStock.get().setAmount(userStock.get().getAmount() + reserveDto.getAmount());
         userStocksRepository.save(userStock.get());
 
-        return ResponseEntity.ok("Stockovi su rezervisani");
+        return ResponseEntity.ok("Stockovi su dodati");
     }
 
     @PostMapping("/reserveFuture")
@@ -137,7 +139,45 @@ public class ReserveController {
         userBalance.get().setFree(userBalance.get().getFree() + reserveDto.getAmount());
 
         balanceRepository.save(userBalance.get());
-        return ResponseEntity.ok("Novac uspesno rezervisan");
+        return ResponseEntity.ok("Novac uspesno dodat");
+    }
+
+    //            Optional<User> user = userRepository.findById(reserveDto.getUserId());
+    //            if (user.isEmpty()) return ResponseEntity.status(404).body("Korisnik nije pronadjen");
+    //
+    //            Long stockId = Long.parseLong(reserveDto.getFutureStorage());//todo pomeri dole
+    //            System.err.println(stockId);
+    //            Optional<Stock> stock = stockRepository.findById(stockId);
+    //
+    //            UserStock newUserStock = new UserStock();
+    //            newUserStock.setId(0L);
+    //            newUserStock.setUser(user.get());
+    //            newUserStock.setStock(stock.get());
+    //            newUserStock.setAmount(reserveDto.getAmount());
+    //            newUserStock.setAmountForSale(0);
+    //
+    //            return ResponseEntity.ok(userStocksRepository.save(newUserStock));
+
+
+    @PostMapping("finalizeStock")
+    public ResponseEntity<?> finalizeStockSale(){
+
+
+        return null;
+    }
+
+    @PostMapping("finalizeFuture")
+    public ResponseEntity<?> finalizeFutureSale(){
+
+
+        return null;
+    }
+
+    @PostMapping("finalizeOption")
+    public ResponseEntity<?> finalizeOptionSale(){
+
+
+        return null;
     }
 
 }

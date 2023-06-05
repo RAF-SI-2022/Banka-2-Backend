@@ -128,7 +128,7 @@ public class OtcService {
         if (response.getResponseCode() != 200) return new OtcResponseDto(500, response.getResponseMsg());
 
         //ako sve prodje napravi element i sacuvaj ga u bazicu
-        TransactionElement transactionElement = new TransactionElement();//nemamo contract id jer ih contract sve suva u sebi //todo proveri dal je ok
+        TransactionElement transactionElement = new TransactionElement();//nemamo contract id jer ih contract sve suva u sebi
         transactionElement.setBuyOrSell(transactionElementDto.getBuyOrSell());
         transactionElement.setTransactionElement(transactionElementDto.getTransactionElement());
         transactionElement.setBalance(transactionElementDto.getBalance());
@@ -137,10 +137,20 @@ public class OtcService {
         transactionElement.setPriceOfOneElement(transactionElementDto.getPriceOfOneElement());
         transactionElement.setUserId(transactionElementDto.getUserId());
         transactionElement.setMariaDbId(transactionElementDto.getMariaDbId());
-        if (transactionElementDto.getTransactionElement() == TransactionElements.FUTURE) {//sacuvamo future da ga mozemo vratiti ako ubijemo element
+        //sacuvamo podatke o hartiji da ga mozemo vratiti/dodati posle//todo remove
+
+        if (transactionElementDto.getBuyOrSell() == ContractElements.SELL){
             System.err.println(response.getResponseMsg());
+            if (transactionElementDto.getTransactionElement() == TransactionElements.FUTURE)
+                transactionElement.setFutureStorageField(response.getResponseMsg());
+            else transactionElement.setFutureStorageField("");
+        }
+        else if (transactionElementDto.getBuyOrSell() == ContractElements.BUY){
             transactionElement.setFutureStorageField(response.getResponseMsg());
-        } else transactionElement.setFutureStorageField("");
+        }
+
+
+
         transactionElementRepository.save(transactionElement);
         contract.get().getTransactionElements().add(transactionElement);
         contactRepository.save(contract.get());
@@ -159,7 +169,6 @@ public class OtcService {
             System.err.println("Contract not found");
             return new OtcResponseDto(404, "Ugovor ne postoji u bazi");
         }
-        //todo skloni stvari sa rezervacije
 
         CommunicationDto response = reservedService.sendUndoReservation(transactionElement.get());
         if (response.getResponseCode() != 200) return new OtcResponseDto(500, response.getResponseMsg());
@@ -196,10 +205,17 @@ public class OtcService {
             return new OtcResponseDto(404, "Ugovor nije u bazi");
         }
 
+        //todo obradi sve sto treba
+
+        List<TransactionElement> contractElements = new ArrayList<>(contract.get().getTransactionElements());
+
+        for (TransactionElement tl: contractElements){
+            CommunicationDto communicationDto = reservedService.finalizeElement(tl);
+            if (communicationDto.getResponseCode() != 200) return new OtcResponseDto(communicationDto.getResponseCode(), communicationDto.getResponseMsg());
+        }
+
         contract.get().setContractStatus(ContractElements.FINALISED);
         contactRepository.save(contract.get());
-
-        //todo obradi sve sto treba
 
         return new OtcResponseDto(200, "Ugovor uspesno kompletiran");
     }

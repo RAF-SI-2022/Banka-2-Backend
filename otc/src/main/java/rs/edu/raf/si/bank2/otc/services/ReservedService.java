@@ -16,6 +16,7 @@ import rs.edu.raf.si.bank2.otc.utils.JwtUtil;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 @Service
 public class ReservedService {
@@ -94,6 +95,50 @@ public class ReservedService {
 
         return sendReservePost(url, reserveJson);
     }
+
+    public CommunicationDto finalizeElement(TransactionElement TElement){
+        String reserveJson;
+        String url = "";
+
+        ReserveDto reserveDto = new ReserveDto(TElement.getUserId(), TElement.getMariaDbId(), TElement.getAmount());
+
+
+        if (TElement.getBuyOrSell() == ContractElements.SELL){//AKO JE SELL SAMO MI DODJA PARE
+            switch (TElement.getBalance()){
+                case CASH  -> {
+                    url = "/undoReserveMoney";//u ovom slucaju mariaDbId je null
+                    TElement.setMariaDbId(138L);
+                }
+                case MARGIN -> System.err.println("NIJE JOS DODATO"); //todo DODAJ ZA MARZNI RACUN
+            }
+        }
+        else if (TElement.getBuyOrSell() == ContractElements.BUY){//AKO JE BUY MORAS DA MI DODAS ELEMENTE U BAZU
+            switch (TElement.getTransactionElement()){
+                case STOCK  -> {
+                    url = "/finalizeStock";
+                    reserveDto.setFutureStorage("1");//todo PROMENI
+                }
+                case OPTION -> {
+                    url = "/finalizeOption";
+                    reserveDto.setFutureStorage("8");//todo PROMENI
+                }
+                case FUTURE -> {
+                    url = "/finalizeFuture";
+                    reserveDto.setFutureStorage(TElement.getFutureStorageField());//OVAJ MOZE DA OSTANE
+                }
+            }
+        }
+
+        try {
+            reserveJson = mapper.writeValueAsString(reserveDto);
+        } catch (JsonProcessingException e) { throw new RuntimeException(e); }
+
+        return sendReservePost(url, reserveJson);
+
+    }
+
+
+
 
     private CommunicationDto sendReservePost(String urlExtension, String postObjectBody){
         System.err.println("POSALI SMO SEND RESERVE");
