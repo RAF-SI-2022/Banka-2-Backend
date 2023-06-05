@@ -49,6 +49,9 @@ Feature: Future service
   Scenario: user gets waiting-futures
     Then user gets waiting-futures
 
+  Scenario: user tries to get waiting-futures
+    Then user gets waiting buy future
+
   Scenario: user gets his futures
     Then user gets his futures
 
