@@ -119,8 +119,8 @@ public class OtcController {
     }
 
 
-    @PatchMapping("/close/{id}")
-    public ResponseEntity<?> closeContract(@PathVariable(name = "id") String id) {
+    @PatchMapping("/finalize/{id}") //finalizuj
+    public ResponseEntity<?> finalizeContract(@PathVariable(name = "id") String id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.CREATE_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");

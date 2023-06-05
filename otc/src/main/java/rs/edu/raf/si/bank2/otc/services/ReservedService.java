@@ -37,12 +37,14 @@ public class ReservedService {
         String reserveJson;
         String url = "";
 
+        ReserveDto reserveDto = new ReserveDto(teDto.getUserId(), teDto.getMariaDbId(), teDto.getAmount());
+
         //todo HARD CODE NA USD
         if (teDto.getBuyOrSell() == ContractElements.BUY){
             switch (teDto.getBalance()){
                 case CASH  -> {
                     url = "/reserveMoney";//u ovom slucaju mariaDbId je null
-//                    teDto.setMariaDbId(138L);
+                    reserveDto.setFutureStorage(teDto.getFutureStorageField());
                 }
                 case MARGIN -> System.err.println("NIJE JOS DODATO"); //todo DODAJ ZA MARZNI RACUN
             }
@@ -56,7 +58,7 @@ public class ReservedService {
         }
 
         try {
-            reserveJson = mapper.writeValueAsString(new ReserveDto(teDto.getUserId(), teDto.getMariaDbId(), teDto.getAmount()));
+            reserveJson = mapper.writeValueAsString(reserveDto);
         } catch (JsonProcessingException e) { throw new RuntimeException(e); }
 
         return sendReservePost(url, reserveJson);
@@ -72,7 +74,7 @@ public class ReservedService {
             switch (TElement.getBalance()){
                 case CASH  -> {
                     url = "/undoReserveMoney";//u ovom slucaju mariaDbId je null
-//                    TElement.setMariaDbId(138L);
+                    reserveDto.setFutureStorage(TElement.getFutureStorageField());
                 }
                 case MARGIN -> System.err.println("NIJE JOS DODATO"); //todo DODAJ ZA MARZNI RACUN
             }
@@ -107,7 +109,6 @@ public class ReservedService {
             switch (TElement.getBalance()){
                 case CASH  -> {
                     url = "/undoReserveMoney";//u ovom slucaju mariaDbId je null
-//                    TElement.setMariaDbId(138L);
                 }
                 case MARGIN -> System.err.println("NIJE JOS DODATO"); //todo DODAJ ZA MARZNI RACUN
             }
@@ -116,14 +117,14 @@ public class ReservedService {
             switch (TElement.getTransactionElement()){
                 case STOCK  -> {
                     url = "/finalizeStock";
-                    reserveDto.setFutureStorage("1");//todo PROMENI
+                    reserveDto.setFutureStorage(TElement.getFutureStorageField());//todo PROMENI
                 }
                 case OPTION -> {
                     url = "/finalizeOption";
-                    reserveDto.setFutureStorage("8");//todo PROMENI
+                    reserveDto.setFutureStorage(TElement.getFutureStorageField());//todo PROMENI
                 }
                 case FUTURE -> {
-                    url = "/finalizeFuture";
+                    url = "/undoReserveFuture";
                     reserveDto.setFutureStorage(TElement.getFutureStorageField());//OVAJ MOZE DA OSTANE
                 }
             }
