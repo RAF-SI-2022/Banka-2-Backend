@@ -8,6 +8,7 @@ import rs.edu.raf.si.bank2.main.dto.ReserveDto;
 import rs.edu.raf.si.bank2.main.models.mariadb.*;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @RestController
@@ -21,15 +22,19 @@ public class ReserveController {
     private final BalanceRepository balanceRepository;
     private final UserRepository userRepository;
     private final StockRepository stockRepository;
+    private final OptionRepository optionRepository;
 
     @Autowired
-    public ReserveController(UserOptionRepository userOptionRepository, UserStocksRepository userStocksRepository, FutureRepository futureRepository, BalanceRepository balanceRepository, UserRepository userRepository, StockRepository stockRepository) {
+    public ReserveController(UserOptionRepository userOptionRepository, UserStocksRepository userStocksRepository,
+                             FutureRepository futureRepository, BalanceRepository balanceRepository, UserRepository
+                                         userRepository, StockRepository stockRepository, OptionRepository optionRepository) {
         this.userOptionRepository = userOptionRepository;
         this.userStocksRepository = userStocksRepository;
         this.futureRepository = futureRepository;
         this.balanceRepository = balanceRepository;
         this.userRepository = userRepository;
         this.stockRepository = stockRepository;
+        this.optionRepository = optionRepository;
     }
 
     @PostMapping("/reserveOption")
@@ -118,6 +123,9 @@ public class ReserveController {
         Optional<Balance> userBalance = balanceRepository.findBalanceByUserIdAndCurrencyId(reserveDto.getUserId(), 138L);
         //!!! NIJE HARTIJA NEGO CURRENCY ID !!!
         if (userBalance.isEmpty()) return ResponseEntity.status(404).body("Balans nije pronadjen");
+
+        //todo nemoj amount neko iseci iz polja
+
         if (userBalance.get().getFree() < reserveDto.getAmount())
             return ResponseEntity.status(500).body("Nemas dovoljno ška");
 
@@ -135,6 +143,8 @@ public class ReserveController {
         //!!! NIJE HARTIJA NEGO CURRENCY ID !!!
         if (userBalance.isEmpty()) return ResponseEntity.status(404).body("Balans nije pronadjen");
 
+        //todo nemoj amount neko iseci iz polja
+
         userBalance.get().setAmount(userBalance.get().getAmount() + reserveDto.getAmount());
         userBalance.get().setFree(userBalance.get().getFree() + reserveDto.getAmount());
 
@@ -142,25 +152,9 @@ public class ReserveController {
         return ResponseEntity.ok("Novac uspesno dodat");
     }
 
-    //            Optional<User> user = userRepository.findById(reserveDto.getUserId());
-    //            if (user.isEmpty()) return ResponseEntity.status(404).body("Korisnik nije pronadjen");
-    //
-    //            Long stockId = Long.parseLong(reserveDto.getFutureStorage());//todo pomeri dole
-    //            System.err.println(stockId);
-    //            Optional<Stock> stock = stockRepository.findById(stockId);
-    //
-    //            UserStock newUserStock = new UserStock();
-    //            newUserStock.setId(0L);
-    //            newUserStock.setUser(user.get());
-    //            newUserStock.setStock(stock.get());
-    //            newUserStock.setAmount(reserveDto.getAmount());
-    //            newUserStock.setAmountForSale(0);
-    //
-    //            return ResponseEntity.ok(userStocksRepository.save(newUserStock));
-
 
     @PostMapping("finalizeStock")
-    public ResponseEntity<?> finalizeStockSale(@RequestBody ReserveDto reserveDto) {
+    public ResponseEntity<?> finalizeStockBuy(@RequestBody ReserveDto reserveDto) {
         Optional<UserStock> userStock = userStocksRepository.findUserStockByUserIdAndStockId(reserveDto.getUserId(), reserveDto.getHartijaId());
 
         if (userStock.isEmpty()) {
@@ -183,18 +177,36 @@ public class ReserveController {
         return ResponseEntity.ok("Stockovi su dodati");
     }
 
-    @PostMapping("finalizeFuture")
-    public ResponseEntity<?> finalizeFutureSale() {
-
-
-        return null;
-    }
+//    @PostMapping("finalizeFuture")
+//    public ResponseEntity<?> finalizeFutureSale() {
+//
+//
+//        return null;
+//    }
 
     @PostMapping("finalizeOption")
-    public ResponseEntity<?> finalizeOptionSale() {
+    public ResponseEntity<?> finalizeOptionBuy(@RequestBody ReserveDto reserveDto) {
 
+        String[] cut = reserveDto.getFutureStorage().split(",");
+        Optional<User> user = userRepository.findById(reserveDto.getUserId());
+        if (user.isEmpty()) return ResponseEntity.status(404).body("Korisnik nije pronadjen");
+        Optional<Option> option = optionRepository.findById(Long.parseLong(cut[0]));
 
-        return null;
+        //1,20,CALL,2023-06-09,85,AAPL, cena
+
+        UserOption newUserOption = new UserOption();
+        newUserOption.setUser(user.get());
+        newUserOption.setOption(option.get());
+        newUserOption.setPremium(Double.parseDouble(cut[1]));
+        newUserOption.setAmount(reserveDto.getAmount());
+        newUserOption.setType(cut[2]);
+        LocalDate date = LocalDate.parse(cut[3]);
+        newUserOption.setExpirationDate(date);
+        newUserOption.setStrike(Double.parseDouble(cut[4]));
+        newUserOption.setStockSymbol(cut[5]);
+
+        userOptionRepository.save(newUserOption);
+        return ResponseEntity.ok("Stockovi su dodati");
     }
 
 }
