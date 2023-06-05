@@ -99,7 +99,6 @@ public class CompanyController {
 
     @PostMapping(value = "/edit")
     public ResponseEntity<?> editCompany(@RequestHeader("Authorization") String token, @RequestBody EditCompanyDto editCompanyDto) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
         companyService.updateCompany(editCompanyDto);
         return ResponseEntity.ok().build();
     }
