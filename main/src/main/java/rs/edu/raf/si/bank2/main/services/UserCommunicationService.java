@@ -93,7 +93,7 @@ public class UserCommunicationService implements UserCommunicationInterface {
 
     @Override
     public CommunicationDto sendGet(String senderEmail, String urlExtension){
-        System.err.println("POSALI SMO SEND GET");
+//        System.err.println("POSALI SMO SEND GET");
 
         if (senderEmail == null) senderEmail = "anesic3119rn+banka2backend+admin@raf.rs";
 

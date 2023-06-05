@@ -41,7 +41,7 @@ public class ReserveController {
     public ResponseEntity<?> reserveUserOption(@RequestBody ReserveDto reserveDto) {
         Optional<UserOption> userOption = userOptionRepository.findByIdAndUserId(reserveDto.getHartijaId(), reserveDto.getUserId());
 
-        if (userOption.isEmpty()) return ResponseEntity.status(404).body("Stock nije pronadjen");
+        if (userOption.isEmpty()) return ResponseEntity.status(404).body("User opcija nije pronadjena");
         if (userOption.get().getAmount() < reserveDto.getAmount())
             return ResponseEntity.status(500).body("Nema dovoljno hartije za rezervaciju");
 
@@ -54,7 +54,7 @@ public class ReserveController {
     @PostMapping("/undoReserveOption")
     public ResponseEntity<?> undoReserveUserOption(@RequestBody ReserveDto reserveDto) {
         Optional<UserOption> userOption = userOptionRepository.findByIdAndUserId(reserveDto.getHartijaId(), reserveDto.getUserId());
-        if (userOption.isEmpty()) return ResponseEntity.status(404).body("Stock nije pronadjen");
+        if (userOption.isEmpty()) return ResponseEntity.status(404).body("User opcija nije pronadjena");
 
         userOption.get().setAmount(userOption.get().getAmount() + reserveDto.getAmount());
         userOptionRepository.save(userOption.get());
@@ -90,7 +90,7 @@ public class ReserveController {
     @PostMapping("/reserveFuture")
     public ResponseEntity<?> reserveFutureStock(@RequestBody ReserveDto reserveDto) {
         Optional<Future> userFuture = futureRepository.findByIdAndUserId(reserveDto.getHartijaId(), reserveDto.getUserId());
-        if (userFuture.isEmpty()) return ResponseEntity.status(404).body("Stock nije pronadjen");
+        if (userFuture.isEmpty()) return ResponseEntity.status(404).body("Future nije pronadjen");
 
         String saveString = userFuture.get().toString();
         futureRepository.delete(userFuture.get());
@@ -125,12 +125,16 @@ public class ReserveController {
         if (userBalance.isEmpty()) return ResponseEntity.status(404).body("Balans nije pronadjen");
 
         //todo nemoj amount neko iseci iz polja
+        System.err.println("kurac");
+        System.err.println(reserveDto.getFutureStorage());
+        Float priceChange = Float.parseFloat(reserveDto.getFutureStorage());
+        System.err.println(priceChange);
 
-        if (userBalance.get().getFree() < reserveDto.getAmount())
+        if (userBalance.get().getFree() < priceChange)
             return ResponseEntity.status(500).body("Nemas dovoljno ška");
 
-        userBalance.get().setAmount(userBalance.get().getAmount() - reserveDto.getAmount());
-        userBalance.get().setFree(userBalance.get().getFree() - reserveDto.getAmount());
+        userBalance.get().setAmount(userBalance.get().getAmount() - priceChange);
+        userBalance.get().setFree(userBalance.get().getFree() - priceChange);
 
         balanceRepository.save(userBalance.get());
         return ResponseEntity.ok("Novac uspesno rezervisan");
@@ -144,9 +148,13 @@ public class ReserveController {
         if (userBalance.isEmpty()) return ResponseEntity.status(404).body("Balans nije pronadjen");
 
         //todo nemoj amount neko iseci iz polja
+        System.err.println("kurac");
+        System.err.println(reserveDto.getFutureStorage());
+        Float priceChange = Float.parseFloat(reserveDto.getFutureStorage());
+        System.err.println(priceChange);
 
-        userBalance.get().setAmount(userBalance.get().getAmount() + reserveDto.getAmount());
-        userBalance.get().setFree(userBalance.get().getFree() + reserveDto.getAmount());
+        userBalance.get().setAmount(userBalance.get().getAmount() + priceChange);
+        userBalance.get().setFree(userBalance.get().getFree() + priceChange);
 
         balanceRepository.save(userBalance.get());
         return ResponseEntity.ok("Novac uspesno dodat");

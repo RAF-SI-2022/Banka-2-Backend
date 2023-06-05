@@ -44,7 +44,13 @@ public class ReservedService {
             switch (teDto.getBalance()){
                 case CASH  -> {
                     url = "/reserveMoney";//u ovom slucaju mariaDbId je null
-                    reserveDto.setFutureStorage(teDto.getFutureStorageField());
+                    switch (teDto.getTransactionElement()){
+                        case STOCK -> reserveDto.setFutureStorage(teDto.getFutureStorageField());//direktno cenu imamo sacuvanu
+                        case OPTION -> reserveDto.setFutureStorage(teDto.getFutureStorageField().split(",")[6]);
+                        case FUTURE -> reserveDto.setFutureStorage(teDto.getFutureStorageField().split(",")[4]);
+                    }
+                    System.err.println(reserveDto.getFutureStorage().toString());
+//                    reserveDto.setFutureStorage(teDto.getFutureStorageField());
                 }
                 case MARGIN -> System.err.println("NIJE JOS DODATO"); //todo DODAJ ZA MARZNI RACUN
             }
@@ -74,7 +80,13 @@ public class ReservedService {
             switch (TElement.getBalance()){
                 case CASH  -> {
                     url = "/undoReserveMoney";//u ovom slucaju mariaDbId je null
-                    reserveDto.setFutureStorage(TElement.getFutureStorageField());
+                    switch (TElement.getTransactionElement()){
+                        case STOCK ->  reserveDto.setFutureStorage(TElement.getFutureStorageField());//direktno cenu imamo sacuvanu
+                        case OPTION -> reserveDto.setFutureStorage(TElement.getFutureStorageField().split(",")[6]);
+                        case FUTURE -> reserveDto.setFutureStorage(TElement.getFutureStorageField().split(",")[4]);
+
+                    }
+//                    reserveDto.setFutureStorage(TElement.getFutureStorageField());
                 }
                 case MARGIN -> System.err.println("NIJE JOS DODATO"); //todo DODAJ ZA MARZNI RACUN
             }
@@ -109,6 +121,14 @@ public class ReservedService {
             switch (TElement.getBalance()){
                 case CASH  -> {
                     url = "/undoReserveMoney";//u ovom slucaju mariaDbId je null
+
+                    switch (TElement.getTransactionElement()){
+                        case STOCK -> reserveDto.setFutureStorage(TElement.getFutureStorageField());//direktno cenu imamo sacuvanu
+                        case OPTION -> reserveDto.setFutureStorage(TElement.getFutureStorageField().split(",")[6]);
+                        case FUTURE -> reserveDto.setFutureStorage(TElement.getFutureStorageField().split(",")[4]);
+
+                    }
+                    reserveDto.setFutureStorage(TElement.getFutureStorageField());
                 }
                 case MARGIN -> System.err.println("NIJE JOS DODATO"); //todo DODAJ ZA MARZNI RACUN
             }
@@ -117,15 +137,15 @@ public class ReservedService {
             switch (TElement.getTransactionElement()){
                 case STOCK  -> {
                     url = "/finalizeStock";
-                    reserveDto.setFutureStorage(TElement.getFutureStorageField());//todo PROMENI
+                    reserveDto.setFutureStorage(TElement.getFutureStorageField());
                 }
                 case OPTION -> {
                     url = "/finalizeOption";
-                    reserveDto.setFutureStorage(TElement.getFutureStorageField());//todo PROMENI
+                    reserveDto.setFutureStorage(TElement.getFutureStorageField());
                 }
                 case FUTURE -> {
                     url = "/undoReserveFuture";
-                    reserveDto.setFutureStorage(TElement.getFutureStorageField());//OVAJ MOZE DA OSTANE
+                    reserveDto.setFutureStorage(TElement.getFutureStorageField());
                 }
             }
         }
