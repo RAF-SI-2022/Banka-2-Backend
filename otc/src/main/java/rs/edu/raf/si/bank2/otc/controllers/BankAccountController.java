@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.edu.raf.si.bank2.otc.dto.CompanyBankAccountDto;
-import rs.edu.raf.si.bank2.otc.models.mongodb.CompanyBankAccount;
 import rs.edu.raf.si.bank2.otc.services.CompanyBankAccountService;
 
 @RestController
@@ -21,23 +20,28 @@ public class BankAccountController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<?> getBankAccount(@RequestHeader("Authorization") String token, @PathVariable String id) {
+    public ResponseEntity<?> getBankAccount(@PathVariable String id) {
         return ResponseEntity.ok(bankAccountService.getBankAccountById(id));
     }
 
-    @PostMapping(value = "/")
-    public ResponseEntity<?> createBankAccount(@RequestHeader("Authorization") String token, @RequestBody CompanyBankAccount bankAccount) {
-        return ResponseEntity.ok(bankAccountService.createBankAccount(bankAccount));
+    @GetMapping(value = "/company/{companyId}")
+    public ResponseEntity<?> getAccountsForCompany(@PathVariable String companyId) {
+        return ResponseEntity.ok(bankAccountService.getAccountsForCompany(companyId));
+    }
+
+    @PostMapping(value = "/{companyId}")
+    public ResponseEntity<?> createBankAccount(@RequestBody CompanyBankAccountDto bankAccount, @PathVariable(name = "companyId") String companyId) {
+        return ResponseEntity.ok(bankAccountService.createBankAccount(companyId, bankAccount));
     }
 
     @PostMapping(value = "/edit")
-    public ResponseEntity<?> editContactPerson(@RequestHeader("Authorization") String token, @RequestBody CompanyBankAccountDto bankAccountRequest) {
+    public ResponseEntity<?> editBankAccount(@RequestBody CompanyBankAccountDto bankAccountRequest) {
         return ResponseEntity.ok(bankAccountService.updateBankAccount(bankAccountRequest));
     }
 
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<?> deleteBankAccount(@RequestHeader("Authorization") String token, @PathVariable String id) {
-        bankAccountService.deleteBankAccount(id);
+    @DeleteMapping(value = "/{id}/{companyId}")
+    public ResponseEntity<?> deleteBankAccount(@PathVariable(name = "id") String id, @PathVariable(name = "companyId") String companyId) {
+        bankAccountService.deleteBankAccount(id, companyId);
         return ResponseEntity.noContent().build();
     }
 }

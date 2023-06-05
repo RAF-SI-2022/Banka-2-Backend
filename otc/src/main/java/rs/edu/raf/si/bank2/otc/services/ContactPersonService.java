@@ -32,7 +32,8 @@ public class ContactPersonService {
     public ContactPerson updateContactPerson(ContactPersonDto updatedContactPerson) {
         ContactPerson contactPerson = getContactPersonById(updatedContactPerson.getId());
 
-        contactPerson.setName(updatedContactPerson.getName());
+        contactPerson.setFirstName(updatedContactPerson.getFirstName());
+        contactPerson.setLastName(updatedContactPerson.getLastName());
         contactPerson.setPhoneNumber(updatedContactPerson.getPhoneNumber());
         contactPerson.setEmail(updatedContactPerson.getEmail());
         contactPerson.setPosition(updatedContactPerson.getPosition());
