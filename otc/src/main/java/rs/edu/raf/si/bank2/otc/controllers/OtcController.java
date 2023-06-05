@@ -103,8 +103,6 @@ public class OtcController {
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
-    //todo ispod je smece
-
     @GetMapping("/elements")
     public ResponseEntity<?> getAllElements(){
         String signedInUserEmail = getContext().getAuthentication().getName();

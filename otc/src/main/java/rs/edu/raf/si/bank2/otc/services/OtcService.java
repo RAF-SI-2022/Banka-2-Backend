@@ -174,6 +174,10 @@ public class OtcService {
             return new OtcResponseDto(404, "Ugovor nije u bazi");
         }
 
+        for (TransactionElement te : contract.get().getTransactionElements()){//sklonimo sve rezervacije koje imamo
+            this.removeTransactionElement(contract.get().getId(), te.getId());
+        }
+
         contactRepository.deleteById(id);
         return new OtcResponseDto(200, "Ugovor uspesno izbrisan");
     }
