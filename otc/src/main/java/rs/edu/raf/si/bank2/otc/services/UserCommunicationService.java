@@ -69,7 +69,7 @@ public class UserCommunicationService implements UserCommunicationInterface {
 //        if(args[2] != null){
 //            service = args[2];
 //        }
-        System.err.println("POSALI SMO SEND GET");
+//        System.err.println("POSALI SMO SEND GET");
 
         if (senderEmail == null) senderEmail = "anesic3119rn+banka2backend+admin@raf.rs";
 
@@ -117,7 +117,7 @@ public class UserCommunicationService implements UserCommunicationInterface {
 //        if(args[2] != null){
 //            service = args[2];
 //        }
-        System.err.println("POSALI SMO SEND GET");
+//        System.err.println("POSALI SMO SEND GET");
 
         if (senderEmail == null) senderEmail = "anesic3119rn+banka2backend+admin@raf.rs";
 

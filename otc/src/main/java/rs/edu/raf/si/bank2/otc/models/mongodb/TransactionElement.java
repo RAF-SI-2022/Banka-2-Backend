@@ -26,5 +26,4 @@ public class TransactionElement {
     private Long userId;
     private Long mariaDbId;
     private String futureStorageField; //ako nije future bice null, sluzi da se recoveruje future nakon brisanja
-
 }
