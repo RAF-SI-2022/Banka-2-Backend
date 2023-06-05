@@ -58,7 +58,6 @@ public class CompanyController {
 
         return ResponseEntity.ok(company.get().getBankAccounts());
     }
-
     @GetMapping(value = "/{id}")
     public ResponseEntity<?> getCompanyById(@PathVariable String id) {
         Optional<Company> company = companyService.getCompanyById(id);
@@ -85,9 +84,11 @@ public class CompanyController {
 
     @PostMapping(value = "/create")
     public ResponseEntity<?> createCompany(@RequestBody CreateCompanyDto companyDto) {
+
+        System.out.println("TU SMO PLZIC");
 //        System.out.println(messageHelper.createTextMessage(companyDto));
         System.out.println(companyDto);
-        companyService.createCompany(new Company(companyDto.getName(),companyDto.getRegistrationNumber(), companyDto.getTaxNumber(),companyDto.getActivityCode(), companyDto.getAddress()));
+        companyService.createCompany(new Company(companyDto.getName(),companyDto.getAddress(),companyDto.getTaxNumber(),companyDto.getActivityCode(),companyDto.getRegistrationNumber()));
 //        jmsTemplate.convertAndSend(createCompanyDestination,messageHelper.createTextMessage(companyDto));
 //        List<ContactPerson> employeeList = new ArrayList<>(company.getContactPersons());
 //        for(ContactPerson cp: employeeList){
@@ -95,14 +96,13 @@ public class CompanyController {
 //        }
         return ResponseEntity.ok().build();
     }
-
     @PostMapping(value = "/add")
     public ResponseEntity<?> addContactsAndBankAccounts(@RequestBody ContactsBankAccountsDto contactsBankAccountsDto ){
         return ResponseEntity.ok(companyService.addContactsAndBankAccounts(contactsBankAccountsDto));
     }
 
     @PostMapping(value = "/edit")
-    public ResponseEntity<?> editCompany(@RequestBody EditCompanyDto editCompanyDto) {
+    public ResponseEntity<?> editCompany(@RequestHeader("Authorization") String token, @RequestBody EditCompanyDto editCompanyDto) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         companyService.updateCompany(editCompanyDto);
         return ResponseEntity.ok().build();
