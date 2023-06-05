@@ -120,8 +120,6 @@ public class ReservedService {
                     url = "/undoReserveMoney"; //u ovom slucaju mariaDbId je null
                     double price = TElement.getAmount() * TElement.getPriceOfOneElement();
                     reserveDto.setFutureStorage(Double.toString(price));
-
-                    System.err.println(reserveDto.getFutureStorage());
                 }
                 case MARGIN -> System.err.println("NIJE JOS DODATO"); //todo DODAJ ZA MARZNI RACUN
             }
@@ -155,7 +153,7 @@ public class ReservedService {
 
 
     private CommunicationDto sendReservePost(String urlExtension, String postObjectBody) {
-        System.err.println("POSALI SMO SEND RESERVE");
+//        System.err.println("POSALI SMO SEND RESERVE");
 
         String token = jwtUtil.generateToken("anesic3119rn+banka2backend+admin@raf.rs");
         String[] hostPort = usersServiceHost.split(":");

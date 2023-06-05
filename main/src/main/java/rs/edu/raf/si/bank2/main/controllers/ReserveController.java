@@ -143,8 +143,6 @@ public class ReserveController {
         //!!! NIJE HARTIJA NEGO CURRENCY ID !!!
         if (userBalance.isEmpty()) return ResponseEntity.status(404).body("Balans nije pronadjen");
 
-        System.err.println("kurac");
-        System.err.println(reserveDto.getFutureStorage());
         Float priceChange = Float.parseFloat(reserveDto.getFutureStorage());
         userBalance.get().setAmount(userBalance.get().getAmount() + priceChange);
         userBalance.get().setFree(userBalance.get().getFree() + priceChange);
