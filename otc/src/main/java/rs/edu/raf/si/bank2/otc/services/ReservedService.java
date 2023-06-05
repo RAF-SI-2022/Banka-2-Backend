@@ -10,7 +10,7 @@ import rs.edu.raf.si.bank2.otc.dto.CommunicationDto;
 import rs.edu.raf.si.bank2.otc.dto.ReserveDto;
 import rs.edu.raf.si.bank2.otc.dto.TransactionElementDto;
 import rs.edu.raf.si.bank2.otc.models.mongodb.ContractElements;
-import rs.edu.raf.si.bank2.otc.models.mongodb.TransactionElements;
+import rs.edu.raf.si.bank2.otc.models.mongodb.TransactionElement;
 import rs.edu.raf.si.bank2.otc.utils.JwtUtil;
 
 import java.io.*;
@@ -36,9 +36,15 @@ public class ReservedService {
         String reserveJson;
         String url = "";
 
+        //todo HARD CODE NA USD
         if (teDto.getBuyOrSell() == ContractElements.BUY){
-            url = "/reserveMoney";//u ovom slucaju mariaDbId je null
-            teDto.setMariaDbId(138L);//todo HARD CODE NA USD
+            switch (teDto.getBalance()){
+                case CASH  -> {
+                    url = "/reserveMoney";//u ovom slucaju mariaDbId je null
+                    teDto.setMariaDbId(138L);
+                }
+                case MARGIN -> System.err.println("NIJE JOS DODATO"); //todo DODAJ ZA MARZNI RACUN
+            }
         }
         else if (teDto.getBuyOrSell() == ContractElements.SELL){
             switch (teDto.getTransactionElement()){
@@ -52,7 +58,39 @@ public class ReservedService {
             reserveJson = mapper.writeValueAsString(new ReserveDto(teDto.getUserId(), teDto.getMariaDbId(), teDto.getAmount()));
         } catch (JsonProcessingException e) { throw new RuntimeException(e); }
 
-        System.out.println("RESERVE - " + reserveJson);
+        return sendReservePost(url, reserveJson);
+    }
+
+    public CommunicationDto sendUndoReservation(TransactionElement TElement){
+        String reserveJson;
+        String url = "";
+        ReserveDto reserveDto = new ReserveDto(TElement.getUserId(), TElement.getMariaDbId(), TElement.getAmount());
+
+        //todo HARD CODE NA USD
+        if (TElement.getBuyOrSell() == ContractElements.BUY){
+            switch (TElement.getBalance()){
+                case CASH  -> {
+                    url = "/undoReserveMoney";//u ovom slucaju mariaDbId je null
+                    TElement.setMariaDbId(138L);
+                }
+                case MARGIN -> System.err.println("NIJE JOS DODATO"); //todo DODAJ ZA MARZNI RACUN
+            }
+        }
+        else if (TElement.getBuyOrSell() == ContractElements.SELL){
+            switch (TElement.getTransactionElement()){
+                case STOCK  -> url = "/undoReserveStock";
+                case OPTION -> url = "/undoReserveOption";
+                case FUTURE -> {
+                    url = "/undoReserveFuture";
+                    reserveDto.setFutureStorage(TElement.getFutureStorageField());
+                }
+            }
+        }
+
+
+        try {
+            reserveJson = mapper.writeValueAsString(reserveDto);
+        } catch (JsonProcessingException e) { throw new RuntimeException(e); }
 
         return sendReservePost(url, reserveJson);
     }

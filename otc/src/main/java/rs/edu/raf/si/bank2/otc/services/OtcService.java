@@ -119,11 +119,11 @@ public class OtcService {
         CommunicationDto response = reservedService.sendReservation(transactionElementDto);
 
         //ako je true znaci da je prosla rezervacija, nastavi sa cuvanjem
-        if (response.getResponseCode() != 200) return new OtcResponseDto(500, "Rezervacija neuspesna");
+        if (response.getResponseCode() != 200) return new OtcResponseDto(500, response.getResponseMsg());
 
         //ako sve prodje napravi element i sacuvaj ga u bazicu
         TransactionElement transactionElement = new TransactionElement();//nemamo contract id jer ih contract sve suva u sebi //todo proveri dal je ok
-        transactionElement.setBuyOrSEll(transactionElementDto.getBuyOrSell());
+        transactionElement.setBuyOrSell(transactionElementDto.getBuyOrSell());
         transactionElement.setTransactionElement(transactionElementDto.getTransactionElement());
         transactionElement.setBalance(transactionElementDto.getBalance());
         transactionElement.setCurrency(transactionElementDto.getCurrency());
@@ -146,54 +146,25 @@ public class OtcService {
         Optional<Contract> contract = contactRepository.findById(contractId);
 
         if (transactionElement.isEmpty()) {
-            System.err.println("element not found");
+            System.err.println("Element not found");
             return new OtcResponseDto(404, "Element ne postoji u bazi");
         }
         if (contract.isEmpty()) {
-            System.err.println("element not found");
+            System.err.println("Contract not found");
             return new OtcResponseDto(404, "Ugovor ne postoji u bazi");
         }
         //todo skloni stvari sa rezervacije
 
+        CommunicationDto response = reservedService.sendUndoReservation(transactionElement.get());
+        if (response.getResponseCode() != 200) return new OtcResponseDto(500, response.getResponseMsg());
 
         contract.get().getTransactionElements().remove(transactionElement.get());
         contactRepository.save(contract.get());
-        transactionElementRepository.deleteById(transactionElementId);
+        transactionElementRepository.delete(transactionElement.get());
 
-        return new OtcResponseDto(200, "Element uspesno izbrisan");
+        return new OtcResponseDto(200, "Rezervacija uspesno sklonjena");
     }
 
-    public OtcResponseDto editTransactionElement(TransactionElementDto transactionElementDto) {
-        Optional<TransactionElement> transactionElement = transactionElementRepository.findById(transactionElementDto.getElementId());
-        Optional<Contract> contract = contactRepository.findById(transactionElementDto.getContractId());
-
-        if (transactionElement.isEmpty()) {
-            System.err.println("element not found");
-            return new OtcResponseDto(404, "Element nije pronadjen u bazi");
-        }
-        if (contract.isEmpty()) {
-            System.err.println("contract not found");
-            return new OtcResponseDto(404, "Ugovor nije pronadjen u bazi");
-        }
-        if (contract.get().getContractStatus() == ContractElements.FINALISED) {
-            System.err.println("contract not editable");
-            return new OtcResponseDto(500, "Ugovor ne moze da se izmeni");
-        }
-
-        //todo promeniti stvari na rezervaciji
-
-
-        transactionElement.get().setBuyOrSEll(transactionElementDto.getBuyOrSell());//todo ovo mozda skloni kasnije
-        transactionElement.get().setTransactionElement(transactionElementDto.getTransactionElement());
-        transactionElement.get().setBalance(transactionElementDto.getBalance());
-        transactionElement.get().setCurrency(transactionElementDto.getCurrency());
-        transactionElement.get().setAmount(transactionElementDto.getAmount());
-        transactionElement.get().setPriceOfOneElement(transactionElementDto.getPriceOfOneElement());
-
-        transactionElementRepository.save(transactionElement.get());
-
-        return new OtcResponseDto(200, "Element je uspesno izmenjen");
-    }
 
     public OtcResponseDto deleteContract(String id) {
         Optional<Contract> contract = contactRepository.findById(id);

@@ -50,6 +50,7 @@ public class Future implements Serializable {
         this.forSale = future.forSale;
     }
 
+
     @NotNull
     private String futureName;
 
@@ -75,7 +76,7 @@ public class Future implements Serializable {
 
     @Override
     public String toString() {
-        return "id=" + id + ",futureName=" + futureName + ",contractSize=" + contractSize + ",contractUnit=" + contractUnit +
-                ",maintenanceMargin=" + maintenanceMargin + ",type=" + type + ",settlementDate=" + settlementDate +  ",forSale=" + forSale + ",user=" + user.getId();
+        return id + "," + futureName + "," + contractSize + "," + contractUnit + "," + maintenanceMargin + ","
+                + type + "," + settlementDate +  "," + forSale + "," + user.getId();
     }
 }

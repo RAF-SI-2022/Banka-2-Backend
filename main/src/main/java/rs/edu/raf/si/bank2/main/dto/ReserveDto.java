@@ -14,4 +14,5 @@ public class ReserveDto {
     Long userId;
     Long hartijaId; //:)
     Integer amount;
+    String futureStorage;
 }

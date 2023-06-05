@@ -149,16 +149,6 @@ public class OtcController {
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
-    @PatchMapping("/edit_element")
-    public ResponseEntity<?> editTransactionElement(@RequestBody TransactionElementDto transactionElementDto){
-        String signedInUserEmail = getContext().getAuthentication().getName();
-        if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
-        }
-
-        OtcResponseDto response = otcService.editTransactionElement(transactionElementDto);
-        return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
-    }
 
     @DeleteMapping("/remove_element/{contractId}/{elementId}")
     public ResponseEntity<?> removeTransactionElement(@PathVariable(name = "contractId") String contractId, @PathVariable(name = "elementId") String elementId){

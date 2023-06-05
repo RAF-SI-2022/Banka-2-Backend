@@ -17,7 +17,7 @@ public class TransactionElement {
 
     @Id
     private String id;
-    private ContractElements buyOrSEll;
+    private ContractElements buyOrSell;
     private TransactionElements transactionElement; //koji stock forex ili sta vec
     private ContractElements balance; //da li je cash ili margin
     private String currency;
