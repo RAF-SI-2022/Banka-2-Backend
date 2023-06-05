@@ -1,12 +1,17 @@
 package rs.edu.raf.si.bank2.otc.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import rs.edu.raf.si.bank2.otc.dto.CommunicationDto;
 import rs.edu.raf.si.bank2.otc.dto.ContractDto;
 import rs.edu.raf.si.bank2.otc.dto.OtcResponseDto;
 import rs.edu.raf.si.bank2.otc.dto.TransactionElementDto;
+import rs.edu.raf.si.bank2.otc.models.mariadb.Permission;
 import rs.edu.raf.si.bank2.otc.models.mariadb.PermissionName;
+import rs.edu.raf.si.bank2.otc.models.mariadb.User;
 import rs.edu.raf.si.bank2.otc.models.mongodb.Contract;
 import rs.edu.raf.si.bank2.otc.models.mongodb.TransactionElement;
 import rs.edu.raf.si.bank2.otc.services.OtcService;
@@ -27,6 +32,7 @@ public class OtcController {
 
     private final OtcService otcService;
     private final UserCommunicationInterface userCommunicationInterface;
+    ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     public OtcController(OtcService otcService, UserCommunicationService communicationService) {
@@ -36,17 +42,38 @@ public class OtcController {
 
 
     @GetMapping
-    public ResponseEntity<?> getAllContracts(){
+    public ResponseEntity<?> getAllContracts() {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
 
-        return ResponseEntity.ok().body(otcService.getAllContracts());
+        User user = null;
+        CommunicationDto response = userCommunicationInterface.sendGet(signedInUserEmail, "/findByEmail");
+
+        if (response.getResponseCode() == 200) {
+            try {
+                user = mapper.readValue(response.getResponseMsg(), User.class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        } else return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
+
+        System.err.println(user);
+
+        Permission permission = user.getPermissions().get(0);
+        if (permission.getPermissionName() == PermissionName.ADMIN_USER){
+            return ResponseEntity.ok().body(otcService.getAllContracts());
+        }
+
+        if (user.getPermissions().size() > 1) {
+            return ResponseEntity.ok().body(otcService.getAllContracts());
+        } else return ResponseEntity.ok().body(otcService.getAllContractsForUserId(user.getId()));
+
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getContract(@PathVariable(name = "id") String id){
+    public ResponseEntity<?> getContract(@PathVariable(name = "id") String id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
@@ -58,19 +85,30 @@ public class OtcController {
     }
 
     @PostMapping("/open")
-    public ResponseEntity<?> openContract(@RequestBody ContractDto contractDto){
+    public ResponseEntity<?> openContract(@RequestBody ContractDto contractDto) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
 
-        OtcResponseDto response = otcService.openContract(contractDto);
+        User user = null;
+        CommunicationDto userResponse = userCommunicationInterface.sendGet(signedInUserEmail, "/findByEmail");
+
+        if (userResponse.getResponseCode() == 200) {
+            try {
+                user = mapper.readValue(userResponse.getResponseMsg(), User.class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        } else return ResponseEntity.status(userResponse.getResponseCode()).body(userResponse.getResponseMsg());
+
+        OtcResponseDto response = otcService.openContract(user.getId(), contractDto);
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
 
     @PatchMapping("/edit")
-    public ResponseEntity<?> editContract(@RequestBody ContractDto contractDto){
+    public ResponseEntity<?> editContract(@RequestBody ContractDto contractDto) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
@@ -82,7 +120,7 @@ public class OtcController {
 
 
     @PatchMapping("/close/{id}")
-    public ResponseEntity<?> closeContract(@PathVariable(name = "id") String id){
+    public ResponseEntity<?> closeContract(@PathVariable(name = "id") String id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.CREATE_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
@@ -93,7 +131,7 @@ public class OtcController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteContract(@PathVariable(name = "id") String id){
+    public ResponseEntity<?> deleteContract(@PathVariable(name = "id") String id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.CREATE_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
@@ -106,7 +144,7 @@ public class OtcController {
     //ISPOD SU TRANSACTION ELEMENTI
 
     @GetMapping("/elements")
-    public ResponseEntity<?> getAllElements(){
+    public ResponseEntity<?> getAllElements() {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
@@ -116,7 +154,7 @@ public class OtcController {
     }
 
     @GetMapping("/element/{id}")
-    public ResponseEntity<?> getElement(@PathVariable(name = "id") String id){
+    public ResponseEntity<?> getElement(@PathVariable(name = "id") String id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
@@ -129,7 +167,7 @@ public class OtcController {
     }
 
     @GetMapping("contract_elements/{id}")
-    public ResponseEntity<?> getElementsForContract(@PathVariable(name = "id") String contractId){
+    public ResponseEntity<?> getElementsForContract(@PathVariable(name = "id") String contractId) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
@@ -139,7 +177,7 @@ public class OtcController {
     }
 
     @PostMapping("/add_element")
-    public ResponseEntity<?> addTransactionElement(@RequestBody TransactionElementDto transactionElementDto){
+    public ResponseEntity<?> addTransactionElement(@RequestBody TransactionElementDto transactionElementDto) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
@@ -151,7 +189,7 @@ public class OtcController {
 
 
     @DeleteMapping("/remove_element/{contractId}/{elementId}")
-    public ResponseEntity<?> removeTransactionElement(@PathVariable(name = "contractId") String contractId, @PathVariable(name = "elementId") String elementId){
+    public ResponseEntity<?> removeTransactionElement(@PathVariable(name = "contractId") String contractId, @PathVariable(name = "elementId") String elementId) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");

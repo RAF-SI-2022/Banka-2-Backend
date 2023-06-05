@@ -38,8 +38,13 @@ public class OtcService {
         return contactRepository.findById(id);
     }
 
+
     public List<Contract> getAllContracts() {
         return contactRepository.findAll();
+    }
+
+    public List<Contract> getAllContractsForUserId(Long userId) {
+        return contactRepository.findByUserId(userId);
     }
 
     public List<TransactionElement> getAllElements() {
@@ -61,7 +66,7 @@ public class OtcService {
         return new ArrayList<>(contract.get().getTransactionElements());
     }
 
-    public OtcResponseDto openContract(ContractDto contractDto) {
+    public OtcResponseDto openContract(Long userId, ContractDto contractDto) {
         Optional<Company> company = companyRepository.findById(contractDto.getCompanyId());
 
         if (company.isEmpty()) {
@@ -72,6 +77,7 @@ public class OtcService {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         LocalDate now = LocalDate.now();
         Contract newContract = new Contract();
+        newContract.setUserId(userId);
         newContract.setContractStatus(contractDto.getContractStatus());
         newContract.setCreationDate(dtf.format(now));
         newContract.setLastUpdatedDate(dtf.format(now));
