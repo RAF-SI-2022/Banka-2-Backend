@@ -4,6 +4,8 @@ postsubmits:
       preset-harbor-robot-push: "true"
     decorate: true
     always_run: true
+    branches:
+      - ^main$
     spec:
       serviceAccountName: prow-admin
       containers:
