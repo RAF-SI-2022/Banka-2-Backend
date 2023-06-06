@@ -33,7 +33,6 @@ postsubmits:
               services=$(echo $services | xargs)
 
               image_tags="latest"
-              image_tags="latest-stable"
               image_tags+=" ${commit_hash}"
               image_tags+=" ${tag_name}"
               image_tags=$(echo $image_tags | xargs)
@@ -44,12 +43,12 @@ postsubmits:
 
               for service in $services
               do
-                for tag in $image_tags
-                do
-                  docker build -t harbor.k8s.elab.rs/banka-2/$service:builder -f ./docker/$service.Dockerfile .
-                  docker tag harbor.k8s.elab.rs/banka-2/$service:builder harbor.k8s.elab.rs/banka-2/$service:$tag
-                  docker push harbor.k8s.elab.rs/banka-2/$service:$tag
-                done
+                  for tag in $image_tags
+                  do
+                      docker build -t harbor.k8s.elab.rs/banka-2/$service:builder -f ./docker/$service.Dockerfile .
+                      docker tag harbor.k8s.elab.rs/banka-2/$service:builder harbor.k8s.elab.rs/banka-2/$service:$tag
+                      docker push harbor.k8s.elab.rs/banka-2/$service:$tag
+                  done
               done
               
               ########################
@@ -60,22 +59,23 @@ postsubmits:
               domainPrefix="banka-2"
               imageVer="$commit_hash"
               
+              apt-get -y install grep
               installed=$(helm list --no-headers 2>/dev/null | grep "banka-2-prod")
               
               cd kubernetes
               
               if [[ -n "${installed}" ]]; then
-                helm upgrade banka-2-prod . --reuse-values \
-                  --set namespace=$namespace \
-                  --set domainPrefix=$domainPrefix \
-                  --set backend.imageVer=$imageVer \
-                  -n banka-2-prod
+                  helm upgrade banka-2-prod . --reuse-values \
+                      --set namespace=$namespace \
+                      --set domainPrefix=$domainPrefix \
+                      --set backend.imageVer=$imageVer \
+                      -n banka-2-prod
               else
-                helm install banka-2-prod . --reuse-values \
-                  --set namespace=$namespace \
-                  --set domainPrefix=$domainPrefix \
-                  --set backend.imageVer=$imageVer \
-                  -n banka-2-prod
+                  helm install banka-2-prod . --reuse-values \
+                      --set namespace=$namespace \
+                      --set domainPrefix=$domainPrefix \
+                      --set backend.imageVer=$imageVer \
+                      -n banka-2-prod
               fi
 
           securityContext:
