@@ -27,7 +27,6 @@ public interface UserCommunicationInterface {
      * @throws InterruptedException
      * @deprecated
      */
-    public String testComs() throws IOException, InterruptedException;
 
     public CommunicationDto sendGet(String senderEmail, String urlExtension);
 

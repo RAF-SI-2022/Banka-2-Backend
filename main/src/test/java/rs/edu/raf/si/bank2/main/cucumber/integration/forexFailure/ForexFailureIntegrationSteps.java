@@ -93,6 +93,26 @@ public class ForexFailureIntegrationSteps extends ForexFailureIntegrationTestCon
         }
     }
 
+    //TODO Matejin test
+    @Given("there is a forex record in database")
+    public void there_is_a_forex_record_in_database() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String systemTime = dateFormat.format(new Date());
+        testForex = Forex.builder()
+                .id(1L)
+                .fromCurrencyName("United States Dollar")
+                .toCurrencyName("Australian Dollar")
+                .fromCurrencyCode("USD")
+                .toCurrencyCode("AUD")
+                .bidPrice("30")
+                .askPrice("50")
+                .exchangeRate("1.85")
+                .timeZone("UTC")
+                .lastRefreshed(systemTime)
+                .build();
+        forexRepository.save(testForex);
+    }
+
     @Then("user cant find forex in database or by api")
     public void user_cant_find_forex_in_database_or_by_api() {
         BuySellForexDto dto = new BuySellForexDto();
@@ -165,4 +185,28 @@ public class ForexFailureIntegrationSteps extends ForexFailureIntegrationTestCon
                         + ", nema dovoljno novca u valuti Serbian Dinar za kupovinu 10000000 USD(United States Dollar)",
                 errorMsg);
     }
+
+    //TODO Matejin test
+    @Then("user converts from one currency to another with db without enough money")
+    public void user_converts_from_one_currency_to_another_with_db_without_enough_money()
+            throws JsonProcessingException, UnsupportedEncodingException {
+        BuySellForexDto dto = new BuySellForexDto();
+        dto.setFromCurrencyCode("USD");
+        dto.setToCurrencyCode("AUD");
+        dto.setAmount(999999999);
+        MvcResult mvcResult = null;
+        String body = new ObjectMapper().writeValueAsString(dto);
+        try {
+            mvcResult = mockMvc.perform(post("/api/forex/buy-sell")
+                            .header("Authorization", "Bearer " + token)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .content(body))
+                    .andExpect(status().isBadRequest())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
 }

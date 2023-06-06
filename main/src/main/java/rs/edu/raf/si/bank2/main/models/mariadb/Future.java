@@ -50,6 +50,7 @@ public class Future implements Serializable {
         this.forSale = future.forSale;
     }
 
+
     @NotNull
     private String futureName;
 
@@ -72,4 +73,10 @@ public class Future implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user; // owner of this future
+
+    @Override
+    public String toString() {
+        return id + "," + futureName + "," + contractSize + "," + contractUnit + "," + maintenanceMargin + ","
+                + type + "," + settlementDate +  "," + forSale + "," + user.getId();
+    }
 }

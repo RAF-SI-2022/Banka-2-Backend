@@ -14,11 +14,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @RequiredArgsConstructor
 @Document("companyBankAccount")
 public class CompanyBankAccount {
+
+
+
     @Id
-    private Long id;
-    @DBRef(lazy = true)
-    private Company company;
+    private String id;
+//    @DBRef(lazy = true)
+//    private Company company;
     private String accountNumber;
+    private String currency;
     private String bankName;
-    private String accountType;
 }

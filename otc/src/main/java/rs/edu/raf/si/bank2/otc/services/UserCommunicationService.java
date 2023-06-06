@@ -23,43 +23,14 @@ public class UserCommunicationService implements UserCommunicationInterface {
     private final JwtUtil jwtUtil;
     ObjectMapper mapper = new ObjectMapper();
 
-//
-//    @Autowired
-//    private UserServiceInterface userServiceInterface;
-
     @Value("${services.users.host}")
     private String usersServiceHost;
+    @Value("${services.main.host}")
+    private String mainServiceHost;
 
     @Autowired
     public UserCommunicationService(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
-    }
-
-    @Override
-    public String testComs() throws IOException, InterruptedException {
-
-        String host = "127.0.0.1";
-        int port = 8081;
-
-        URL url = new URL("http", host, port, "/api/userService/testMethod");
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        int responseCode = connection.getResponseCode();
-
-        System.out.println("Response Code: " + responseCode);
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String line;
-        StringBuilder response = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            response.append(line);
-        }
-        reader.close();
-
-        System.out.println("Response: " + response.toString());
-        connection.disconnect();
-
-        return response.toString();
     }
 
     @Override
@@ -92,7 +63,13 @@ public class UserCommunicationService implements UserCommunicationInterface {
 
     @Override
     public CommunicationDto sendGet(String senderEmail, String urlExtension){
-        System.err.println("POSALI SMO SEND GET");
+//        String senderEmail = args[0];
+//        String urlExtension = args[1];
+//        String service = null;
+//        if(args[2] != null){
+//            service = args[2];
+//        }
+//        System.err.println("POSALI SMO SEND GET");
 
         if (senderEmail == null) senderEmail = "anesic3119rn+banka2backend+admin@raf.rs";
 
@@ -103,7 +80,10 @@ public class UserCommunicationService implements UserCommunicationInterface {
         String line;
 
         try {
-            URL url = new URL("http", hostPort[0], Integer.parseInt(hostPort[1]), "/api/userService" + urlExtension);
+            URL url;
+            url = new URL("http", hostPort[0], Integer.parseInt(hostPort[1]), "/api/userService" + urlExtension);// zar nismo mogli
+            // samo da izbacimo ovo userService iz rute i da gadjamo bilo sta anyways napravio sam ispod funkciju koja to radi da ne bih zajebao
+            // vec postojeci kod (kasno je ne znam vise sta se desava u kodu)
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
@@ -123,6 +103,52 @@ public class UserCommunicationService implements UserCommunicationInterface {
             }
 //            System.out.println("Response Code: " + responseCode);
 //            System.out.println("Response: " + response.toString());
+            connection.disconnect();
+            if (reader != null) reader.close();
+            return new CommunicationDto(responseCode, response.toString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public CommunicationDto sendGet(String senderEmail, String urlExtension,String service){
+//        String senderEmail = args[0];
+//        String urlExtension = args[1];
+//        String service = null;
+//        if(args[2] != null){
+//            service = args[2];
+//        }
+//        System.err.println("POSALI SMO SEND GET");
+
+        if (senderEmail == null) senderEmail = "anesic3119rn+banka2backend+admin@raf.rs";
+
+        String token = jwtUtil.generateToken(senderEmail);
+        String []hostPort = mainServiceHost.split(":");
+        BufferedReader reader = null;
+        StringBuilder response = new StringBuilder();
+        String line;
+
+        try {
+            URL url;
+            url = new URL("http", hostPort[0], Integer.parseInt(hostPort[1]), "/api" + urlExtension);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Authorization", "Bearer " + token);
+            int responseCode = connection.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK && connection.getInputStream() != null){
+                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+            }
+            else if (connection.getErrorStream() != null){
+                reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+            }
+            System.out.println("Response Code: " + responseCode);
+            System.out.println("Response: " + response.toString());
             connection.disconnect();
             if (reader != null) reader.close();
             return new CommunicationDto(responseCode, response.toString());
