@@ -26,7 +26,7 @@ public class BootstrapData implements CommandLineRunner {
                     .accountType(AccountType.MARGIN)
                     .maintenanceMargin(2000.00)
                     .marginCall(false)
-                    .currencyCode("USA")
+                    .currencyCode("USD")
                     .investedResources(300000.00)
                     .loanedResources(650.00)
                     .listingGroup(listingGroup)
