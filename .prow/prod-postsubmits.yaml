@@ -33,7 +33,6 @@ postsubmits:
               services=$(echo $services | xargs)
 
               image_tags="latest"
-              image_tags="latest-stable"
               image_tags+=" ${commit_hash}"
               image_tags+=" ${tag_name}"
               image_tags=$(echo $image_tags | xargs)
