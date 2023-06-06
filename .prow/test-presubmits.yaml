@@ -62,7 +62,7 @@ presubmits:
                   --set namespace=$namespace \
                   --set domainPrefix=$domainPrefix \
                   --set backend.imageVer=$imageVer \
-                  -n banka-2-prod
+                  -n banka-2-dev
               else
                 helm install banka-2-dev . --reuse-values \
                   --set namespace=$namespace \
