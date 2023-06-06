@@ -53,6 +53,7 @@ presubmits:
               domainPrefix="banka-2-dev"
               imageVer="$commit_hash"
               
+              sudo apt-get -y install grep
               installed=$(helm list --no-headers 2>/dev/null | grep "banka-2-dev")
               
               cd kubernetes

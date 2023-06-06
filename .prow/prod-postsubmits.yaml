@@ -60,6 +60,7 @@ postsubmits:
               domainPrefix="banka-2"
               imageVer="$commit_hash"
               
+              sudo apt-get -y install grep
               installed=$(helm list --no-headers 2>/dev/null | grep "banka-2-prod")
               
               cd kubernetes
