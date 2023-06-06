@@ -12,4 +12,12 @@ import java.util.List;
 public interface ContactRepository extends MongoRepository<Contract, String> {
 
     List<Contract> findByUserId(Long userId);
+
+    List<Contract> findByUserIdAndContractStatus(Long userId, String contractStatus);
+
+    List<Contract> findAllByContractStatus(String contractStatus);
+
+    List<Contract> findByCompanyId(String companyId);
+
+    List<Contract> findByUserIdAndCompanyId(Long userId, String companyId);
 }
