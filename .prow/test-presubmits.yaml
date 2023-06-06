@@ -35,7 +35,7 @@ presubmits:
               image_tags+=" ${tag_name}"
               image_tags=$(echo $image_tags | xargs)
 
-              for $service in $services
+              for service in $services
               do
                 for tag in $image_tags
                 do
@@ -53,19 +53,24 @@ presubmits:
               domainPrefix="banka-2-dev"
               imageVer="$commit_hash"
               
+              installed=$(helm list --no-headers 2>/dev/null | grep "banka-2-dev")
+              
               cd kubernetes
-              helm upgrade banka-2-dev . --reuse-values \
-                --set namespace=$namespace \
-                --set domainPrefix=$domainPrefix \
-                --set backend.imageVer=$imageVer \
-                -n banka-2-dev || \
-              helm install banka-2-dev . --reuse-values \
-                --set namespace=$namespace \
-                --set domainPrefix=$domainPrefix \
-                --set backend.imageVer=$imageVer \
-                -n banka-2-dev
+              
+              if [[ -n "${installed}" ]]; then
+                helm upgrade banka-2-dev . --reuse-values \
+                  --set namespace=$namespace \
+                  --set domainPrefix=$domainPrefix \
+                  --set backend.imageVer=$imageVer \
+                  -n banka-2-prod
+              else
+                helm install banka-2-dev . --reuse-values \
+                  --set namespace=$namespace \
+                  --set domainPrefix=$domainPrefix \
+                  --set backend.imageVer=$imageVer \
+                  -n banka-2-dev
+              fi
 
-              kubectl apply -f .
           securityContext:
             privileged: true
           imagePullPolicy: Always

@@ -42,7 +42,7 @@ postsubmits:
               docker build -t harbor.k8s.elab.rs/banka-2/otc:builder -f ./docker/otc.Dockerfile .
               docker build -t harbor.k8s.elab.rs/banka-2/main:builder -f ./docker/main.Dockerfile .
 
-              for $service in $services
+              for service in $services
               do
                 for tag in $image_tags
                 do
@@ -60,17 +60,23 @@ postsubmits:
               domainPrefix="banka-2"
               imageVer="$commit_hash"
               
+              installed=$(helm list --no-headers 2>/dev/null | grep "banka-2-prod")
+              
               cd kubernetes
-              helm upgrade banka-2-prod . --reuse-values \
-                --set namespace=$namespace \
-                --set domainPrefix=$domainPrefix \
-                --set backend.imageVer=$imageVer \
-                -n banka-2-prod || \
-              helm install banka-2-prod . --reuse-values \
-                --set namespace=$namespace \
-                --set domainPrefix=$domainPrefix \
-                --set backend.imageVer=$imageVer \
-                -n banka-2-prod
+              
+              if [[ -n "${installed}" ]]; then
+                helm upgrade banka-2-prod . --reuse-values \
+                  --set namespace=$namespace \
+                  --set domainPrefix=$domainPrefix \
+                  --set backend.imageVer=$imageVer \
+                  -n banka-2-prod
+              else
+                helm install banka-2-prod . --reuse-values \
+                  --set namespace=$namespace \
+                  --set domainPrefix=$domainPrefix \
+                  --set backend.imageVer=$imageVer \
+                  -n banka-2-prod
+              fi
 
           securityContext:
             privileged: true
