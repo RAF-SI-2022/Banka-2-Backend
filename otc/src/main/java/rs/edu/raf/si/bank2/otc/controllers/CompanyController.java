@@ -49,13 +49,17 @@ public class CompanyController {
         return ResponseEntity.ok(companyService.getCompanies());
     }
 
-    @GetMapping(value = "/test")
+    @GetMapping(value = "/accounts/{companyId}")
+    public ResponseEntity<?> getBankAccountsForCompany(@PathVariable(name = "companyId") String companyId) {
+        Optional<Company> company = companyService.getCompanyById(companyId);
+        if (company.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
 
-    public void test(){
-        System.out.println("ZZZZZZZ");
+        return ResponseEntity.ok(company.get().getBankAccounts());
     }
     @GetMapping(value = "/{id}")
-    public ResponseEntity<?> getCompanyById(@RequestHeader("Authorization") String token, @PathVariable String id) {
+    public ResponseEntity<?> getCompanyById(@PathVariable String id) {
         Optional<Company> company = companyService.getCompanyById(id);
         if (company.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -64,17 +68,17 @@ public class CompanyController {
     }
 
     @GetMapping(value = "/name/{name}")
-    public ResponseEntity<?> getCompanyByNaziv(@RequestHeader("Authorization") String token, @PathVariable String name) {
+    public ResponseEntity<?> getCompanyByNaziv(@PathVariable String name) {
         return ResponseEntity.ok(companyService.getCompanyByName(name));
     }
 
     @GetMapping(value = "/registrationNumber/{registrationNumber}")
-    public ResponseEntity<?> getCompanyByMaticniBroj(@RequestHeader("Authorization") String token, @PathVariable String registrationNumber) {
+    public ResponseEntity<?> getCompanyByMaticniBroj(@PathVariable String registrationNumber) {
         return ResponseEntity.ok(companyService.getCompanyByRegistrationNumber(registrationNumber));
     }
 
     @GetMapping(value = "/taxNumber/{taxNumber}")
-    public ResponseEntity<?> getCompanyByPib(@RequestHeader("Authorization") String token, @PathVariable String taxNumber) {
+    public ResponseEntity<?> getCompanyByPib(@PathVariable String taxNumber) {
         return ResponseEntity.ok(companyService.getCompanyByTaxNumber(taxNumber));
     }
 

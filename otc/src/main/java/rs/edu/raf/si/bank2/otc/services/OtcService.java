@@ -3,15 +3,14 @@ package rs.edu.raf.si.bank2.otc.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import rs.edu.raf.si.bank2.otc.dto.CommunicationDto;
 import rs.edu.raf.si.bank2.otc.dto.ContractDto;
 import rs.edu.raf.si.bank2.otc.dto.OtcResponseDto;
 import rs.edu.raf.si.bank2.otc.dto.TransactionElementDto;
-import rs.edu.raf.si.bank2.otc.models.mongodb.Company;
-import rs.edu.raf.si.bank2.otc.models.mongodb.Contract;
-import rs.edu.raf.si.bank2.otc.models.mongodb.TransactionElement;
+import rs.edu.raf.si.bank2.otc.models.mongodb.*;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.CompanyRepository;
-import rs.edu.raf.si.bank2.otc.repositories.mongodb.TransactionElementRepository;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.ContactRepository;
+import rs.edu.raf.si.bank2.otc.repositories.mongodb.TransactionElementRepository;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -24,12 +23,14 @@ public class OtcService {
 
     private final ContactRepository contactRepository;
     private final CompanyRepository companyRepository;
+    private final ReservedService reservedService;
     private final TransactionElementRepository transactionElementRepository;
 
     @Autowired
-    public OtcService(ContactRepository contactRepository, CompanyRepository companyRepository, TransactionElementRepository transactionElementRepository) {
+    public OtcService(ContactRepository contactRepository, CompanyRepository companyRepository, ReservedService reservedService, TransactionElementRepository transactionElementRepository) {
         this.contactRepository = contactRepository;
         this.companyRepository = companyRepository;
+        this.reservedService = reservedService;
         this.transactionElementRepository = transactionElementRepository;
     }
 
@@ -37,8 +38,30 @@ public class OtcService {
         return contactRepository.findById(id);
     }
 
+
     public List<Contract> getAllContracts() {
         return contactRepository.findAll();
+    }
+
+    public List<Contract> getAllDraftContracts() {
+        return contactRepository.findAllByContractStatus("DRAFT");
+    }
+
+
+    public List<Contract> getAllContractsForUserId(Long userId) {
+        return contactRepository.findByUserId(userId);
+    }
+
+    public List<Contract> getAllDraftContractsForUserId(Long userId) {
+        return contactRepository.findByUserIdAndContractStatus(userId, "DRAFT");
+    }
+
+    public List<Contract> getAllContractsByCompanyId(String companyId) {
+        return contactRepository.findByCompanyId(companyId);
+    }
+
+    public List<Contract> getAllContractsForUserIdAndCompany(Long userId, String companyId) {
+        return contactRepository.findByUserIdAndCompanyId(userId, companyId);
     }
 
     public List<TransactionElement> getAllElements() {
@@ -60,10 +83,10 @@ public class OtcService {
         return new ArrayList<>(contract.get().getTransactionElements());
     }
 
-    public OtcResponseDto openContract(ContractDto contractDto){
+    public OtcResponseDto openContract(Long userId, ContractDto contractDto) {
         Optional<Company> company = companyRepository.findById(contractDto.getCompanyId());
 
-        if (company.isEmpty()){
+        if (company.isEmpty()) {
             System.err.println("Company not found");
             return new OtcResponseDto(404, "Selektovana kompanija nije u bazi!");
         }
@@ -71,12 +94,14 @@ public class OtcService {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         LocalDate now = LocalDate.now();
         Contract newContract = new Contract();
-        newContract.setContactStatus(contractDto.getContractStatus());
+        newContract.setUserId(userId);
+        newContract.setCompanyId(contractDto.getCompanyId());
+        newContract.setContractStatus(contractDto.getContractStatus());
         newContract.setCreationDate(dtf.format(now));
         newContract.setLastUpdatedDate(dtf.format(now));
         newContract.setContractNumber(contractDto.getContractNumber());
         newContract.setDescription(contractDto.getDescription());
-        newContract.setNote(contractDto.getNote());
+        newContract.setTransactionElements(new ArrayList<>());
         contactRepository.save(newContract);
 
         return new OtcResponseDto(200, "Ugovor je uspesno otvoren");
@@ -92,10 +117,9 @@ public class OtcService {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         LocalDate now = LocalDate.now();
-        contract.get().setContactStatus(updatedContract.getContractStatus());
+        contract.get().setContractStatus(updatedContract.getContractStatus());
         contract.get().setLastUpdatedDate(dtf.format(now));
         contract.get().setDescription(updatedContract.getDescription());
-        contract.get().setNote(updatedContract.getNote());
         contactRepository.save(contract.get());
 
         return new OtcResponseDto(200, "Ugovor je uspesno promenjen");
@@ -106,16 +130,49 @@ public class OtcService {
 
         if (contract.isEmpty()) {
             System.err.println("contract not found");
-            return  new OtcResponseDto(404, "Selektovani ugovor ne postoji u bazi");
+            return new OtcResponseDto(404, "Selektovani ugovor ne postoji u bazi");
+        }
+        if (contract.get().getContractStatus() == ContractElements.FINALISED) {
+            System.err.println("contract not editable");
+            return new OtcResponseDto(500, "Ugovor se ne moze promeniti");
         }
 
-        //todo uradi checkove da moze da se doda i rezervisi resurse
+        //kontaktira main service, i skloni resurse (rezervise) tj pemesti ih u transElBazu
+        //ili
+        //kontaktira main service i rezervise pare za zeljenu hartiju
+        CommunicationDto response = reservedService.sendReservation(transactionElementDto);
 
-        TransactionElement transactionElement = new TransactionElement();
+        //ako je true znaci da je prosla rezervacija, nastavi sa cuvanjem
+        if (response.getResponseCode() != 200) return new OtcResponseDto(500, response.getResponseMsg());
+
+        //ako sve prodje napravi element i sacuvaj ga u bazicu
+        TransactionElement transactionElement = new TransactionElement();//nemamo contract id jer ih contract sve suva u sebi
+        transactionElement.setBuyOrSell(transactionElementDto.getBuyOrSell());
+        transactionElement.setTransactionElement(transactionElementDto.getTransactionElement());
+        transactionElement.setBalance(transactionElementDto.getBalance());
+        transactionElement.setCurrency(transactionElementDto.getCurrency());
+        transactionElement.setAmount(transactionElementDto.getAmount());
+        transactionElement.setPriceOfOneElement(transactionElementDto.getPriceOfOneElement());
+        transactionElement.setUserId(transactionElementDto.getUserId());
+        transactionElement.setMariaDbId(transactionElementDto.getMariaDbId());
+        //sacuvamo podatke o hartiji da ga mozemo vratiti/dodati posle//todo remove
+
+        if (transactionElementDto.getBuyOrSell() == ContractElements.SELL){
+            System.err.println(response.getResponseMsg());
+            if (transactionElementDto.getTransactionElement() == TransactionElements.FUTURE)
+                transactionElement.setFutureStorageField(response.getResponseMsg());
+            else transactionElement.setFutureStorageField("");
+        }
+        else if (transactionElementDto.getBuyOrSell() == ContractElements.BUY){
+            transactionElement.setFutureStorageField(transactionElementDto.getFutureStorageField());
+        }
+
+
+
         transactionElementRepository.save(transactionElement);
         contract.get().getTransactionElements().add(transactionElement);
         contactRepository.save(contract.get());
-        return  new OtcResponseDto(200, "Element uspesno dodat");
+        return new OtcResponseDto(200, "Element uspesno dodat");
     }
 
     public OtcResponseDto removeTransactionElement(String contractId, String transactionElementId) {
@@ -123,50 +180,62 @@ public class OtcService {
         Optional<Contract> contract = contactRepository.findById(contractId);
 
         if (transactionElement.isEmpty()) {
-            System.err.println("element not found");
-            return  new OtcResponseDto(404, "Element ne postoji u bazi");
+            System.err.println("Element not found");
+            return new OtcResponseDto(404, "Element ne postoji u bazi");
         }
         if (contract.isEmpty()) {
-            System.err.println("element not found");
-            return  new OtcResponseDto(404, "Ugovor ne postoji u bazi");
+            System.err.println("Contract not found");
+            return new OtcResponseDto(404, "Ugovor ne postoji u bazi");
         }
 
-        //todo skloni stvari sa rezervacije
+        CommunicationDto response = reservedService.sendUndoReservation(transactionElement.get());
+        if (response.getResponseCode() != 200) return new OtcResponseDto(500, response.getResponseMsg());
 
         contract.get().getTransactionElements().remove(transactionElement.get());
         contactRepository.save(contract.get());
-        transactionElementRepository.deleteById(transactionElementId);
+        transactionElementRepository.delete(transactionElement.get());
 
-        return  new OtcResponseDto(200, "Element uspesno izbrisan");
+        return new OtcResponseDto(200, "Rezervacija uspesno sklonjena");
     }
 
-    public OtcResponseDto editTransactionElement(String transactionElementId, TransactionElement updatedTElement) {
-        Optional<TransactionElement> transactionElement = transactionElementRepository.findById(transactionElementId);
-
-        if (transactionElement.isEmpty()) {
-            System.err.println("element not found");
-            return  new OtcResponseDto(404, "Element nije pronadjen u bazi");
-        }
-        transactionElement.get().setBalance(updatedTElement.getBalance());
-        transactionElement.get().setCurrency(updatedTElement.getCurrency());
-        transactionElement.get().setAmount(updatedTElement.getAmount());
-        transactionElement.get().setPriceOfOneElement(updatedTElement.getPriceOfOneElement());
-
-        transactionElementRepository.save(transactionElement.get());
-
-        return  new OtcResponseDto(200, "Element je uspesno izmenjen");
-    }
 
     public OtcResponseDto deleteContract(String id) {
         Optional<Contract> contract = contactRepository.findById(id);
 
-        if (contract.isEmpty()){
+        if (contract.isEmpty()) {
             System.err.println("Ugovor nije u bazi");
-            return  new OtcResponseDto(404, "Ugovor nije u bazi");
+            return new OtcResponseDto(404, "Ugovor nije u bazi");
+        }
+
+        for (TransactionElement te : contract.get().getTransactionElements()){//sklonimo sve rezervacije koje imamo
+            this.removeTransactionElement(contract.get().getId(), te.getId());
         }
 
         contactRepository.deleteById(id);
-        return  new OtcResponseDto(200, "Ugovor uspesno izbrisan");
+        return new OtcResponseDto(200, "Ugovor uspesno izbrisan");
+    }
+
+    public OtcResponseDto closeContract(String id) {
+        Optional<Contract> contract = contactRepository.findById(id);
+
+        if (contract.isEmpty()) {
+            System.err.println("Ugovor nije u bazi");
+            return new OtcResponseDto(404, "Ugovor nije u bazi");
+        }
+
+        //todo obradi sve sto treba
+
+        List<TransactionElement> contractElements = new ArrayList<>(contract.get().getTransactionElements());
+
+        for (TransactionElement tl: contractElements){
+            CommunicationDto communicationDto = reservedService.finalizeElement(tl);
+            if (communicationDto.getResponseCode() != 200) return new OtcResponseDto(communicationDto.getResponseCode(), communicationDto.getResponseMsg());
+        }
+
+        contract.get().setContractStatus(ContractElements.FINALISED);
+        contactRepository.save(contract.get());
+
+        return new OtcResponseDto(200, "Ugovor uspesno kompletiran");
     }
 
 

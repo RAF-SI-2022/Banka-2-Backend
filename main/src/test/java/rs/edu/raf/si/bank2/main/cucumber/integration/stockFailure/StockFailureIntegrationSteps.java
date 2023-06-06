@@ -39,6 +39,17 @@ public class StockFailureIntegrationSteps extends StockFailureIntegrationTestCon
     private static Stock testStock;
     private static String token;
 
+    //TODO Matejin test
+    @When("user is logged in")
+    public void user_is_logged_in() {
+        try {
+            assertNotEquals(token, null);
+            assertNotEquals(token, "");
+        } catch (Exception e) {
+            fail("User token null or empty - not logged in properly");
+        }
+    }
+
     @Given("user logged in")
     public void user_logged_in() {
         Optional<User> user = userService.findByEmail("anesic3119rn+banka2backend+admin@raf.rs");
@@ -63,6 +74,29 @@ public class StockFailureIntegrationSteps extends StockFailureIntegrationTestCon
             token = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.token");
         } catch (Exception e) {
             fail(e.getMessage());
+        }
+    }
+
+
+    //TODO Matejin test
+    @Given("user logs in")
+    public void user_logs_in() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(
+                            post("/auth/login")
+                                    .contentType("application/json")
+                                    .content(
+                                            """
+                                                    {
+                                                      "email": "anesic3119rn+banka2backend+admin@raf.rs",
+                                                      "password": "admin"
+                                                    }
+                                                    """))
+                    .andExpect(status().isOk())
+                    .andReturn();
+            token = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.token");
+        } catch (Exception e) {
+            fail("User failed to login");
         }
     }
 
