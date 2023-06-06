@@ -50,10 +50,13 @@ presubmits:
               ########################
               
               namespace="banka-2-dev"
-              imageVer="latest"
+              imageVer="$commit_hash"
               
               cd kubernetes
-              helm upgrade banka-2-dev . --reuse-values --set backend.imageVer=$commit_hash -n banka-2-dev
+              helm upgrade banka-2-dev . --reuse-values \
+                --set namespace=$namespace \
+                --set backend.imageVer=$imageVer \
+                -n banka-2-dev
 
               kubectl apply -f .
           securityContext:

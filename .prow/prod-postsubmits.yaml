@@ -55,10 +55,13 @@ postsubmits:
               ########################
               
               namespace="banka-2-prod"
-              imageVer="latest-stable"
+              imageVer="$commit_hash"
               
               cd kubernetes
-              helm upgrade banka-2-prod . --reuse-values --set backend.imageVer=$commit_hash -n banka-2-prod
+              helm upgrade banka-2-prod . --reuse-values \
+                --set namespace=$namespace \
+                --set backend.imageVer=$imageVer \
+                -n banka-2-prod
 
           securityContext:
             privileged: true
