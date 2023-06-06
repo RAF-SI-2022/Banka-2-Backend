@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.CacheManager;
 import rs.edu.raf.si.bank2.main.models.mariadb.Future;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.FutureRepository;
 
@@ -24,6 +25,10 @@ public class FutureServiceTest {
 
     @InjectMocks
     private FutureService futureService;
+
+    //    @Autowired
+    @Mock
+    private CacheManager cacheManager;
 
     @Test
     void testFindAll() {
@@ -91,39 +96,4 @@ public class FutureServiceTest {
 
         assertNotEquals(future2, result.get());
     }
-
-    @Test
-    void testBuyFuture() {}
-
-    @Test
-    void testSellFuture() {}
-
-    @Test
-    void testRemoveFromMarket() {}
-
-    @Test
-    void testRemoveWaitingSellFuture() {}
-
-    @Test // ovo vrv ne
-    void testWaitingFuturesForUser() {}
-
-    @Test
-    void testRegularSell() {}
-
-    @Test
-    void testRegularBuy() {}
-
-    @Test
-    void testCreateFutureOrder() {}
-
-    @Test
-    void testGetTimeStamp() {
-        //        LocalDateTime currentDateTime = LocalDateTime.now();
-        //        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        //
-        //        when(futureService)
-    }
-
-    @Test
-    void testProcessFutureBuyRequest() {}
 }

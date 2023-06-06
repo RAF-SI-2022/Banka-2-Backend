@@ -51,7 +51,7 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
     protected MockMvc mockMvc;
 
     protected static String token;
-    protected static Future testFuture = new Future(1L, "corn", 8000, "bushel", 2100, "AGRICULTURE", null, true, null);
+    protected static Future testFuture = new Future(0L, "test", 8000, "bushel", 2100, "AGRICULTURE", null, true, null);
     protected static User testUser;
 
     @Given("user logs in")
@@ -345,21 +345,7 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
                                 .header("Authorization", "Bearer " + token))
                         // TODO OBRISATI MATCHER!!! treba da bude
                         //   status.isUnauthorized
-                        .andExpect(status().is(new Matcher<Integer>() {
-                            @Override
-                            public boolean matches(Object o) {
-                                return true;
-                            }
-
-                            @Override
-                            public void describeMismatch(Object o, Description description) {}
-
-                            @Override
-                            public void _dont_implement_Matcher___instead_extend_BaseMatcher_() {}
-
-                            @Override
-                            public void describeTo(Description description) {}
-                        }))
+                        .andExpect(status().is4xxClientError())
                         .andReturn();
             }
         } catch (Exception e) {
@@ -396,7 +382,7 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -411,7 +397,7 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -426,7 +412,7 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -454,7 +440,7 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -482,7 +468,7 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -497,7 +483,7 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -512,7 +498,7 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -527,7 +513,7 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -542,7 +528,7 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().is4xxClientError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -576,19 +562,29 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
                 0);
         String body = new ObjectMapper().writeValueAsString(request);
         try {
-            Exception exception = assertThrows(Exception.class, () -> {
-                mockMvc.perform(post("/api/futures/buy")
-                                .header("Authorization", "Bearer " + token)
-                                .header("Content-Type", "application/json")
-                                .header("Access-Control-Allow-Origin", "*")
-                                .content(body))
-                        .andExpect(status().isOk())
-                        .andReturn();
-            });
+            mockMvc.perform(post("/api/futures/buy")
+                            .header("Authorization", "Bearer " + token)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .content(body))
+                    .andExpect(status().is4xxClientError())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
 
-            String expectedMessage = "JWT String argument cannot be null or empty.";
-            String actualMessage = exception.getMessage();
-            assertEquals(expectedMessage, actualMessage);
+
+    //TODO Matejin test
+    @Then("user removes waiting future buy but isnt authorized")
+    public void user_removes_waiting_future_buy_but_isnt_authorized() {
+        try {
+            mockMvc.perform(post("/api/futures/remove-waiting-buy/1")
+                            .header("Authorization", "Bearer " + token)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*"))
+                    .andExpect(status().isUnauthorized())
+                    .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
         }

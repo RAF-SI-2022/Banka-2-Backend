@@ -1,52 +1,24 @@
 package rs.edu.raf.si.bank2.users.services;
 
-import java.util.Optional;
 import java.util.Properties;
-import java.util.UUID;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import rs.edu.raf.si.bank2.users.models.mariadb.PasswordResetToken;
-import rs.edu.raf.si.bank2.users.models.mariadb.User;
-import rs.edu.raf.si.bank2.users.repositories.mariadb.PasswordResetTokenRepository;
-import rs.edu.raf.si.bank2.users.repositories.mariadb.UserRepository;
+import rs.edu.raf.si.bank2.users.services.interfaces.MailingServiceInterface;
 
 @Service
-public class MailingService {
+public class MailingService implements MailingServiceInterface {
+
+    private static final Logger logger = LoggerFactory.getLogger(MailingService.class);
     private static final String from = "banka2backend@gmail.com";
     private static final String password = "idxegskltunedxog";
-    private UserRepository userRepo;
-    private PasswordResetTokenRepository passwordResetTokenRepo;
 
     @Autowired
-    public MailingService(UserRepository userRepo, PasswordResetTokenRepository passwordResetTokenRepo) {
-        this.userRepo = userRepo;
-        this.passwordResetTokenRepo = passwordResetTokenRepo;
-    }
-
-    public String sendResetPasswordMail(String recipient) {
-        Optional<User> user = userRepo.findUserByEmail(recipient);
-        if (user.isEmpty()) {
-            return "user not found";
-        }
-
-        User client = user.get();
-
-        try {
-            String token = UUID.randomUUID().toString();
-            passwordResetTokenRepo.save(new PasswordResetToken(client, token));
-            this.sendMail(recipient, "Password Recovery", this.composeResetPasswordMail(token));
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        }
-        return "";
-    }
-
-    private String composeResetPasswordMail(String token) {
-        return "To reset password please visit: http://localhost:4200/auth/change-password?token=" + token;
-    }
+    public MailingService() {}
 
     private void sendMail(String recipient, String subject, String content) throws MessagingException {
         // Setting up STMP server
@@ -67,11 +39,33 @@ public class MailingService {
 
         MimeMessage email = new MimeMessage(session);
 
-        email.setFrom(new InternetAddress(this.from));
+        email.setFrom(new InternetAddress(from));
         email.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
         email.setSubject(subject);
         email.setText(content);
 
         Transport.send(email);
+
+        // TODO: da li ovde treba nesto da se zatvori? npr session ili
+        //  transport?
+    }
+
+    @Override
+    public void sendResetPasswordEmail(String email, String link) {
+        String template =
+                """
+                Hello,
+
+                A password reset was requested for your account. To reset your password, please visit the following link:
+
+                %s
+
+                If you did not request a password reset, please ignore this email.
+                """;
+        try {
+            sendMail(email, "Password Reset", String.format(template, link));
+        } catch (MessagingException e) {
+            logger.error("Failed to send password reset email", e);
+        }
     }
 }

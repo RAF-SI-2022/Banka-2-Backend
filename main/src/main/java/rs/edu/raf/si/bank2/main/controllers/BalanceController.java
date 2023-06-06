@@ -7,15 +7,21 @@ import org.springframework.web.bind.annotation.*;
 import rs.edu.raf.si.bank2.main.dto.BalanceDto;
 import rs.edu.raf.si.bank2.main.exceptions.*;
 import rs.edu.raf.si.bank2.main.services.BalanceService;
+import rs.edu.raf.si.bank2.main.services.UserCommunicationService;
+import rs.edu.raf.si.bank2.main.services.interfaces.UserCommunicationInterface;
 
 @RestController
 @CrossOrigin
 @RequestMapping("/api/balances")
 public class BalanceController {
+
     private final BalanceService balanceService;
+    private final UserCommunicationInterface userCommunicationInterface;
 
     @Autowired
-    public BalanceController(BalanceService balanceService) {
+    public BalanceController(BalanceService balanceService,
+                UserCommunicationService communicationService) {
+        this.userCommunicationInterface = communicationService;
         this.balanceService = balanceService;
     }
 
@@ -42,7 +48,7 @@ public class BalanceController {
     public ResponseEntity<?> decreaseBalance(@RequestBody @Valid BalanceDto dto) {
         try {
             return ResponseEntity.ok(
-                    this.balanceService.decreaseBalance(dto.getUserEmail(), dto.getCurrencyCode(), dto.getAmount()));
+                    this.balanceService.decreaseBalance(dto.getUserEmail(), dto.getCurrencyCode(), dto.getAmount(), false));
         } catch (BalanceNotFoundException e1) {
             return ResponseEntity.badRequest()
                     .body("Balans za korisnika sa email-om "

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.users.exceptions.PasswordResetTokenNotFoundException;
@@ -18,7 +17,7 @@ import rs.edu.raf.si.bank2.users.repositories.mariadb.UserRepository;
 import rs.edu.raf.si.bank2.users.services.interfaces.UserServiceInterface;
 
 @Service
-public class UserService implements UserDetailsService, UserServiceInterface {
+public class UserService implements UserServiceInterface {
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
 
@@ -75,14 +74,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 
     @Override
     public void deleteById(Long id) throws UserNotFoundException {
-
-        //    try {
-
         userRepository.deleteById(id);
-        //    }
-        //    catch (NoSuchElementException e) {
-        //      throw new UserNotFoundException(id);
-        //    }
     }
 
     @Override

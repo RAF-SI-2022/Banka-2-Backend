@@ -2,10 +2,11 @@ package rs.edu.raf.si.bank2.users.services.interfaces;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import rs.edu.raf.si.bank2.users.models.mariadb.Permission;
 import rs.edu.raf.si.bank2.users.models.mariadb.User;
 
-public interface UserServiceInterface {
+public interface UserServiceInterface extends UserDetailsService {
 
     List<User> findAll();
 

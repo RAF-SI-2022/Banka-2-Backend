@@ -46,7 +46,7 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
     protected MockMvc mockMvc;
 
     protected static String token;
-    protected static Future testFuture = new Future(1L, "corn", 8000, "bushel", 2100, "AGRICULTURE", null, true, null);
+    protected static Future testFuture = new Future(25L, "corn", 8000, "bushel", 2100, "AGRICULTURE", null, true, null);
     protected static User testUser;
 
     @Given("user logs in")
@@ -213,8 +213,7 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
         }
         balance = this.balanceService.findBalanceByUserEmailAndCurrencyCode(
                 "anesic3119rn+banka2backend+admin@raf.rs", "USD");
-        assertEquals(
-                Math.round(oldFree - testFuture.getMaintenanceMargin().floatValue()), Math.round(balance.getFree()));
+        assertEquals(Math.round(oldFree - testFuture.getMaintenanceMargin().floatValue()), Math.round(balance.getFree()));
     }
 
     @Then("user buys future from company with limit or stop")
@@ -440,6 +439,22 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*"))
                     .andExpect(status().isNotFound())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    //TODO Matejin test
+    @Then("user gets waiting buy future")
+    public void user_gets_waiting_buy_future() {
+        try {
+            mockMvc.perform(get("/api/futures/waiting-futures/type/name")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());

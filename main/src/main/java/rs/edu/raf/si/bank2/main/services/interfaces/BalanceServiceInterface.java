@@ -12,13 +12,14 @@ public interface BalanceServiceInterface {
             String toCurrencyCode,
             Float exchangeRate,
             Integer amountOfMoney,
-            ForexOrder forexOrder);
+            ForexOrder forexOrder,
+            boolean approved);
 
     List<Balance> findAllByUserId(Long userId);
 
     Balance increaseBalance(String userEmail, String currencyCode, Float amount);
 
-    Balance decreaseBalance(String userEmail, String currencyCode, Float amount);
+    Balance decreaseBalance(String userEmail, String currencyCode, Float amount, boolean approved);
 
     Balance save(Balance balance);
 
@@ -28,7 +29,7 @@ public interface BalanceServiceInterface {
 
     Balance findBalanceByUserEmailAndCurrencyCode(String userEmail, String currencyCode);
 
-    Balance reserveAmount(Float amount, String userEmail, String currencyCode);
+    Balance reserveAmount(Float amount, String userEmail, String currencyCode, boolean approved);
 
     /**
      * Pre pocetka svake kupovine pozvati ovu metodu, ako se vrati true, pozvati metodu reserveAmount.
@@ -38,5 +39,5 @@ public interface BalanceServiceInterface {
     /**
      * Kada se izvrse sve transakcije iz ordera, order sa stavlja u status complete i tada treba da se zove ova metoda updateBalance.
      */
-    Balance updateBalance(Order order, String userEmail, String currencyCode);
+    Balance updateBalance(Order order, String userEmail, String currencyCode, boolean approved);
 }

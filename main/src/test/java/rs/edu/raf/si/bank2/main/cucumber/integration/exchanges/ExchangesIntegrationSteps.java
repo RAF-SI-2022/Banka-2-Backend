@@ -141,7 +141,7 @@ public class ExchangesIntegrationSteps extends ExchangesIntegrationTestConfig {
     @Then("user gets activity of exchange by MIC Code from database")
     public void user_gets_activity_of_exchange_by_mic_code_from_database() {
         try {
-            mockMvc.perform(get("/api/exchange/status/" + testExchange.getMicCode())
+            mockMvc.perform(get("/api/exchange/status/XNYS")
                             .contentType("application/json")
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")

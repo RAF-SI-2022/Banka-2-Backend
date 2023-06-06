@@ -1,6 +1,9 @@
 package rs.edu.raf.si.bank2.main.services;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -80,7 +83,7 @@ public class TransactionService implements TransactionServiceInterface {
     }
 
     @Override
-    public Transaction createTransaction(Order order, Balance balance, Float amount) {
+    public Transaction createTransaction(Order order, Balance balance, Float amount, Float reserved) {
         String currencyCode = "RSD";
         if (order instanceof StockOrder) currencyCode = ((StockOrder) order).getCurrencyCode();
         Currency c;
@@ -94,7 +97,7 @@ public class TransactionService implements TransactionServiceInterface {
                 .description(order.getOrderType() + " " + order.getTradeType().toString() + " transaction")
                 .currency(c)
                 .amount(amount)
-                .reserved((float) order.getPrice())
+                .reserved(reserved)
                 .status(TransactionStatus.WAITING)
                 .build();
     }
@@ -119,5 +122,10 @@ public class TransactionService implements TransactionServiceInterface {
                 .reserved((float) futureOrder.getPrice())
                 .status(status)
                 .build();
+    }
+
+    @Override
+    public void updateTransactionsStatusesOfOrder(Long orderId, TransactionStatus transactionStatus) {
+        this.transactionRepository.updateTransactionStatusesByOrderId(orderId, transactionStatus);
     }
 }

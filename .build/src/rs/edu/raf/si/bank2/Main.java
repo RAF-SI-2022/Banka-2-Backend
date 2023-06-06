@@ -23,7 +23,8 @@ public class Main {
      * Array of names of all microservices.
      */
     private static final String[] MICROSERVICES = new String[]{
-            "main"
+            "main",
+            "users"
     };
     /**
      * Helper Docker services.
