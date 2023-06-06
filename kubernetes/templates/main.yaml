@@ -1,13 +1,12 @@
 # Main service.
 
-#TODO change all latest to __COMMIT_HASH__ and all banka-2-dev to __NAMESPACE__
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
     app: main
   name: main
-  namespace: banka-2-dev
+  namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
   selector:
@@ -20,7 +19,7 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-        - image: harbor.k8s.elab.rs/banka-2/main:latest
+        - image: harbor.k8s.elab.rs/banka-2/main:{{ .Values.backend.imageVer }}
           imagePullPolicy: Always
           name: main
           env:
@@ -73,9 +72,9 @@ spec:
           command: ["/bin/sh", "-c"]
           args: ["until echo PING | redis-cli -h redis -p 6379 > /dev/null 2>&1; do echo Waiting for Redis cache; sleep 30; done"]
 
-        # Migrate schema to latest version
+        # Migrate schema to {{ .Values.backend.imageVer }} version
         - name: flyway
-          image: harbor.k8s.elab.rs/banka-2/flyway:latest
+          image: harbor.k8s.elab.rs/banka-2/flyway:{{ .Values.backend.imageVer }}
           env:
             - name: url
               value: jdbc:mysql://relational:3306/backend?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true
@@ -102,7 +101,7 @@ metadata:
   labels:
     app: main
   name: main
-  namespace: banka-2-dev
+  namespace: {{ .Values.namespace }}
 spec:
   ports:
     - port: 8081

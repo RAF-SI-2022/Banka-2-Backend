@@ -1,28 +1,27 @@
-# OTC service.
+# Users service.
 
-#TODO change all latest to __COMMIT_HASH__ and all banka-2-dev to __NAMESPACE__
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: otc
-  name: otc
-  namespace: banka-2-dev
+    app: users
+  name: users
+  namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: otc
+      app: users
   template:
     metadata:
       labels:
-        app: otc
+        app: users
     spec:
       restartPolicy: Always
       containers:
-        - image: harbor.k8s.elab.rs/banka-2/otc:latest
+        - image: harbor.k8s.elab.rs/banka-2/users:{{ .Values.backend.imageVer }}
           imagePullPolicy: Always
-          name: otc
+          name: users
           env:
             - name: spring.datasource.url
               value: jdbc:mysql://relational:3306/backend?allowPublicKeyRetrieval=true&useSSL=false&autoReconnect=true
@@ -46,10 +45,8 @@ spec:
               value: "6379"
             - name: spring.cache.redis.time-to-live
               value: "900000"
-            - name: service.users.host
-              value: users
-            - name: service.users.port
-              value: "8080"
+            - name: service.frontend.host
+              value: TODO_add_value
           ports:
             - containerPort: 8080
           command: ["java", "-jar", "app.jar"]
@@ -73,9 +70,9 @@ spec:
           command: ["/bin/sh", "-c"]
           args: ["until echo PING | redis-cli -h redis -p 6379 > /dev/null 2>&1; do echo Waiting for Redis cache; sleep 30; done"]
 
-        # Migrate schema to latest version
+        # Migrate schema to {{ .Values.backend.imageVer }} version
         - name: flyway
-          image: harbor.k8s.elab.rs/banka-2/flyway:latest
+          image: harbor.k8s.elab.rs/banka-2/flyway:{{ .Values.backend.imageVer }}
           env:
             - name: url
               value: jdbc:mysql://relational:3306/backend?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true
@@ -100,14 +97,14 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: otc
-  name: otc
-  namespace: banka-2-dev
+    app: users
+  name: users
+  namespace: {{ .Values.namespace }}
 spec:
   ports:
-    - port: 8081
+    - port: 8080
       protocol: TCP
-      targetPort: 8081
+      targetPort: 8080
   selector:
-    app: otc
+    app: users
   type: ClusterIP

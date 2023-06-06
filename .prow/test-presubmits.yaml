@@ -35,10 +35,6 @@ presubmits:
               image_tags+=" ${tag_name}"
               image_tags=$(echo $image_tags | xargs)
 
-              docker build -t harbor.k8s.elab.rs/banka-2/users:builder -f ./docker/users.Dockerfile .
-              docker build -t harbor.k8s.elab.rs/banka-2/otc:builder -f ./docker/otc.Dockerfile .
-              docker build -t harbor.k8s.elab.rs/banka-2/main:builder -f ./docker/main.Dockerfile .
-
               for $service in $services
               do
                 for tag in $image_tags
@@ -54,11 +50,10 @@ presubmits:
               ########################
               
               namespace="banka-2-dev"
+              imageVer="latest"
               
               cd kubernetes
-              
-              find . -type f -exec sed -i.bak "s;__COMMIT_HASH__;$commit_hash;g" {} \;
-              find . -type f -exec sed -i.bak "s;__NAMESPACE__;$namespace;g" {} \;
+              helm upgrade banka-2-dev . --reuse-values --set backend.imageVer=$commit_hash -n banka-2-dev
 
               kubectl apply -f .
           securityContext:

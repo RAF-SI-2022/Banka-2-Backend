@@ -1,10 +1,12 @@
+# Redis caching.
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
     app: redis
   name: redis
-  namespace: banka-2-dev
+  namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
   selector:
@@ -27,7 +29,7 @@ metadata:
   labels:
     app: redis
   name: redis
-  namespace: banka-2-dev
+  namespace: {{ .Values.namespace }}
 spec:
   ports:
     - port: 6379

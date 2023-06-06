@@ -4,7 +4,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: mongodb-secret-reader
-  namespace: banka-2-dev
+  namespace: {{ .Values.namespace }}
 rules:
   - apiGroups: [""]
     resources: ["secrets", "pods"]
@@ -15,7 +15,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: mongodb-secret-reader-binding
-  namespace: banka-2-dev
+  namespace: {{ .Values.namespace }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -23,7 +23,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: mongodb-database
-    namespace: banka-2-dev
+    namespace: {{ .Values.namespace }}
 
 ---
 
@@ -31,7 +31,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: mongo-creds
-  namespace: banka-2-dev
+  namespace: {{ .Values.namespace }}
 type: Opaque
 stringData:
   password: raf-si
@@ -42,7 +42,7 @@ apiVersion: mongodbcommunity.mongodb.com/v1
 kind: MongoDBCommunity
 metadata:
   name: mongo
-  namespace: banka-2-dev
+  namespace: {{ .Values.namespace }}
 spec:
   members: 3
   type: ReplicaSet
@@ -70,7 +70,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mongo-service
-  namespace: banka-2-dev
+  namespace: {{ .Values.namespace }}
 spec:
   selector:
     app: mongo-svc

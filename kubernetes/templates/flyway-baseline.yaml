@@ -5,7 +5,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: flyway-baseline
-  namespace: banka-2-dev
+  namespace: {{ .Values.namespace }}
   labels:
     app:
       flyway-baseline

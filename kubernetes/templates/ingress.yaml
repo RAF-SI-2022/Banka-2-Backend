@@ -3,7 +3,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  namespace: banka-2-dev
+  namespace: {{ .Values.namespace }}
   name: banka-2-ingress-frontend
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
@@ -12,10 +12,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - banka-2-dev.k8s.elab.rs
+        - {{ .Values.namespace }}.k8s.elab.rs
       secretName: banka-2-https-certs
   rules:
-    - host: banka-2-dev.k8s.elab.rs
+    - host: {{ .Values.namespace }}.k8s.elab.rs
       http:
         paths:
           - pathType: Prefix
@@ -32,7 +32,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: banka-2-ingress-backend
-  namespace: banka-2-dev
+  namespace: {{ .Values.namespace }}
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
@@ -42,10 +42,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - banka-2-dev.k8s.elab.rs
+        - {{ .Values.namespace }}.k8s.elab.rs
       secretName: banka-2-https-certs
   rules:
-    - host: banka-2-dev.k8s.elab.rs
+    - host: {{ .Values.namespace }}.k8s.elab.rs
       http:
         paths:
           - pathType: Prefix

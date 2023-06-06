@@ -1,3 +1,5 @@
+# MySQL relational database.
+
 apiVersion: v1
 kind: Secret
 data:
@@ -9,13 +11,15 @@ data:
   rootUser: cm9vdA==
 metadata:
   name: relational-creds
-  namespace: banka-2-dev
+  namespace: {{ .Values.namespace }}
+
 ---
+
 apiVersion: mysql.oracle.com/v2
 kind: InnoDBCluster
 metadata:
   name: relational
-  namespace: banka-2-dev
+  namespace: {{ .Values.namespace }}
 spec:
   secretName: relational-creds
   tlsUseSelfSigned: true

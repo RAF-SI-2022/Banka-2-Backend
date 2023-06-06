@@ -31,6 +31,7 @@ postsubmits:
               services=$(echo $services | xargs)
 
               image_tags="latest"
+              image_tags="latest-stable"
               image_tags+=" ${commit_hash}"
               image_tags+=" ${tag_name}"
               image_tags=$(echo $image_tags | xargs)
@@ -53,16 +54,12 @@ postsubmits:
               # Deploy to production #
               ########################
               
-              namespace="banka-2-dev"
+              namespace="banka-2-prod"
+              imageVer="latest-stable"
               
-              if [[ -n "${tag_name}" ]]; then
-                namespace="banka-2-prod"
-              fi
-              
-              find . -type f -exec sed -i.bak "s;__COMMIT_HASH__;$commit_hash;g" {} \;
-              find . -type f -exec sed -i.bak "s;__NAMESPACE__;$namespace;g" {} \;
+              cd kubernetes
+              helm upgrade banka-2-prod . --reuse-values --set backend.imageVer=$commit_hash -n banka-2-prod
 
-              kubectl apply -f kubernetes/
           securityContext:
             privileged: true
           imagePullPolicy: Always
