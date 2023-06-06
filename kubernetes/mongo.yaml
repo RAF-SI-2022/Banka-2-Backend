@@ -1,0 +1,80 @@
+# MongoDB document database.
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: mongodb-secret-reader
+  namespace: banka-2-dev
+rules:
+  - apiGroups: [""]
+    resources: ["secrets", "pods"]
+    verbs: ["get", "watch", "list", "patch"]
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: mongodb-secret-reader-binding
+  namespace: banka-2-dev
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: mongodb-secret-reader
+subjects:
+  - kind: ServiceAccount
+    name: mongodb-database
+    namespace: banka-2-dev
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongo-creds
+  namespace: banka-2-dev
+type: Opaque
+stringData:
+  password: raf-si
+
+---
+
+apiVersion: mongodbcommunity.mongodb.com/v1
+kind: MongoDBCommunity
+metadata:
+  name: mongo
+  namespace: banka-2-dev
+spec:
+  members: 3
+  type: ReplicaSet
+  version: "6.0.5"
+  security:
+    authentication:
+      modes: ["SCRAM"]
+  users:
+    - name: root
+      db: admin
+      passwordSecretRef:
+        name: mongo-creds
+      roles:
+        - name: clusterAdmin
+          db: admin
+        - name: userAdminAnyDatabase
+          db: admin
+      scramCredentialsSecretName: mongo-scram
+  additionalMongodConfig:
+    storage.wiredTiger.engineConfig.journalCompressor: zlib
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-service
+  namespace: banka-2-dev
+spec:
+  selector:
+    app: mongo-svc
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017

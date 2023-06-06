@@ -3,12 +3,12 @@ FROM maven:3.8.5-openjdk-17-slim as base
 # Caching
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
-ADD ./main/pom.xml /usr/src/app
+ADD ./otc/pom.xml /usr/src/app
 RUN mvn verify clean --fail-never
 
 # Build
 FROM base AS stage1
-ADD ./main /usr/src/app
+ADD ./otc /usr/src/app
 RUN mvn package -DskipTests
 
 # Prepare JAR
@@ -18,5 +18,5 @@ RUN cp /usr/src/app/target/*.jar /usr/src/app/app.jar
 # Entrypoint
 FROM stage2 AS stage3
 WORKDIR /usr/src/app
-EXPOSE 8081
+EXPOSE 8082
 ENTRYPOINT ["bash"]
