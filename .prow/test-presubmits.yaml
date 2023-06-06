@@ -1,0 +1,76 @@
+presubmits:
+  - name: post-banka-2-backend-test-presubmits
+    labels:
+      preset-harbor-robot-push: "true"
+    decorate: true
+    always_run: true
+    spec:
+      serviceAccountName: prow-admin
+      containers:
+        - image: harbor.k8s.elab.rs/base-images/base:java-17-node-18-docker
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -euo pipefail
+
+              ################################
+              # Build and push Docker images #
+              ################################
+
+              start-docker.sh
+              docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD harbor.k8s.elab.rs
+
+              commit_hash=$(git rev-parse HEAD)
+              tag_name=$(git tag --points-at HEAD)
+              
+              services="flyway"
+              services+=" users"
+              services+=" main"
+              services+=" otc"
+              services=$(echo $services | xargs)
+
+              image_tags="latest"
+              image_tags+=" ${commit_hash}"
+              image_tags+=" ${tag_name}"
+              image_tags=$(echo $image_tags | xargs)
+
+              for service in $services
+              do
+                for tag in $image_tags
+                do
+                  docker build -t harbor.k8s.elab.rs/banka-2/$service:builder -f ./docker/$service.Dockerfile . 2>/dev/null
+                  docker tag harbor.k8s.elab.rs/banka-2/$service:builder harbor.k8s.elab.rs/banka-2/$service:$tag
+                  docker push harbor.k8s.elab.rs/banka-2/$service:$tag
+                done
+              done
+              
+              ########################
+              # Deploy and run tests #
+              ########################
+              
+              namespace="banka-2-dev"
+              domainPrefix="banka-2-dev"
+              imageVer="$commit_hash"
+              
+              installed=$(helm list --no-headers 2>/dev/null | grep "banka-2-dev")
+              
+              cd kubernetes
+              
+              if [[ -n "${installed}" ]]; then
+                helm upgrade banka-2-dev . --reuse-values \
+                  --set namespace=$namespace \
+                  --set domainPrefix=$domainPrefix \
+                  --set backend.imageVer=$imageVer \
+                  -n banka-2-dev
+              else
+                helm install banka-2-dev . --reuse-values \
+                  --set namespace=$namespace \
+                  --set domainPrefix=$domainPrefix \
+                  --set backend.imageVer=$imageVer \
+                  -n banka-2-dev
+              fi
+
+          securityContext:
+            privileged: true
+          imagePullPolicy: Always

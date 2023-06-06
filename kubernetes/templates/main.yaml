@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: main
+  name: main
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: main
+  template:
+    metadata:
+      labels:
+        app: main
+    spec:
+      restartPolicy: Always
+      containers:
+        - image: harbor.k8s.elab.rs/banka-2/main:{{ .Values.backend.imageVer }}
+          imagePullPolicy: Always
+          name: main
+          env:
+            - name: spring.datasource.url
+              value: jdbc:mysql://relational:3306/backend?allowPublicKeyRetrieval=true&useSSL=false&autoReconnect=true
+            - name: spring.datasource.username
+              valueFrom:
+                secretKeyRef:
+                  name: relational-creds
+                  key: rootUser
+            - name: spring.datasource.password
+              valueFrom:
+                secretKeyRef:
+                  name: relational-creds
+                  key: rootPassword
+            - name: spring.data.mongodb.uri
+              value: mongodb://root:raf-si@mongo-service:27017/backend?authSource=admin
+            - name: spring.cache.type
+              value: redis
+            - name: spring.data.redis.host
+              value: redis
+            - name: spring.data.redis.port
+              value: "6379"
+            - name: spring.cache.redis.time-to-live
+              value: "900000"
+            - name: service.users.host
+              value: users:8080
+          ports:
+            - containerPort: 8080
+          command: ["java", "-jar", "app.jar"]
+
+      initContainers:
+        # Check that MySQL is running
+        - name: assert-mysql
+          image: alpine
+          command: ["/bin/sh", "-c"]
+          args: ["apk add --no-cache netcat-openbsd; until nc -z -v relational 3306; do echo Waiting for MySQL database; sleep 30; done"]
+
+        # Check that MongoDB is running
+        - name: assert-mongo
+          image: mongo
+          command: ["/bin/sh", "-c"]
+          args: ["until mongosh \"mongodb://root:raf-si@mongo-service:27017/backend?authSource=admin\" --eval \"db.stats()\" > /dev/null 2>&1; do echo Waiting for MongoDB database; sleep 30; done"]
+
+        # Check that MongoDB is running
+        - name: assert-redis
+          image: redis:7.0.11-alpine
+          command: ["/bin/sh", "-c"]
+          args: ["until echo PING | redis-cli -h redis -p 6379 > /dev/null 2>&1; do echo Waiting for Redis cache; sleep 30; done"]
+
+        # Migrate schema to {{ .Values.backend.imageVer }} version
+        - name: flyway
+          image: harbor.k8s.elab.rs/banka-2/flyway:{{ .Values.backend.imageVer }}
+          env:
+            - name: url
+              value: jdbc:mysql://relational:3306/backend?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true
+            - name: user
+              valueFrom:
+                secretKeyRef:
+                  name: relational-creds
+                  key: rootUser
+            - name: password
+              valueFrom:
+                secretKeyRef:
+                  name: relational-creds
+                  key: rootPassword
+            - name: schemas
+              value: backend
+          command: ["/bin/sh", "-c"]
+          args: ["flyway migrate -url=$url -user=$user -password=$password"]
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: main
+  name: main
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - port: 8081
+      protocol: TCP
+      targetPort: 8081
+  selector:
+    app: main
+  type: ClusterIP

@@ -54,6 +54,7 @@ public class ArgParser {
             case "stop":
             case "help":
             case "clean":
+            case "build":
             case "devenv":
                 return c;
             default:
