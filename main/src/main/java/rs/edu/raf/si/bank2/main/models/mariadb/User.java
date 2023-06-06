@@ -1,15 +1,17 @@
 package rs.edu.raf.si.bank2.main.models.mariadb;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serializable;
 import java.util.List;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import lombok.*;
+import org.apache.commons.lang3.builder.ToStringExclude;
 
 @Data
-@ToString(exclude = "balances")
+//@ToString(exclude = "balances")
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
@@ -17,7 +19,7 @@ import lombok.*;
 @Table(
         name = "users",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"email", "jmbg"})})
-public class User {
+public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,21 +27,10 @@ public class User {
 
     @NotNull(message = "This field is required.")
     @Size(max = 50, message = "Input too long, cannot contain more than 50 characters.")
-    //  @Pattern(
-    //      regexp =
-    //
-    // "^[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$",
-    //      message = "Must enter a valid email.")
     @Email
     private String email;
 
-    @JsonIgnore
     @NotNull(message = "This field is required.")
-    //  @Pattern(
-    //      regexp = "^(?=.*?[a-zA-Z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{10,}$",
-    //      message =
-    //          "Make sure the password has at least 10 characters, one digit, one lowercase and one
-    // uppercase letter and at least one special character.")
     private String password;
 
     @NotNull(message = "This field is required.")
@@ -52,7 +43,6 @@ public class User {
 
     @NotNull(message = "This field is required.")
     @Size(max = 13, message = "Input too long, cannot contain more than 13 characters.")
-    //  @Pattern(regexp = "^\\d+$", message = "Only numbers are allowed in a JMBG identifier.")
     private String jmbg;
 
     @NotNull(message = "This field is required.")
@@ -72,6 +62,8 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "permission_id", referencedColumnName = "id")})
     private List<Permission> permissions;
 
+    @JsonIgnore
+    @ToStringExclude
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<Balance> balances; // one balance object for every currency user operates with
 

@@ -129,7 +129,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
 
     // Test creating new user
     @When("creating new user")
-    public void creating_new_user() throws UnsupportedEncodingException {
+    public void creating_new_user() {
         MvcResult mvcResult = null;
         try {
             if (userService.findByEmail("testUser@gmail.com").isEmpty()) {
@@ -188,6 +188,28 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                     .andExpect(status().isOk())
                     .andReturn();
             assertNotNull(mvcResult);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Then("user resets password")
+    public void user_resets_password() {
+        try {
+            mockMvc.perform(post("/auth/reset-password")
+                            .contentType("application/json")
+                            .content(
+                                    """
+                                            {
+                                                  "email": "anesic3119rn+banka2backend+admin@raf.rs",
+                                                  "password": "admin"
+                                            }
+                                            """)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -504,7 +526,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                             .content(
                                     """
                                               {
-                                                  "password": "testPass"
+                                                  "password": "admin"
                                               }
                                             """)
                             .header("Content-Type", "application/json")

@@ -7,15 +7,21 @@ import org.springframework.web.bind.annotation.*;
 import rs.edu.raf.si.bank2.main.dto.BalanceDto;
 import rs.edu.raf.si.bank2.main.exceptions.*;
 import rs.edu.raf.si.bank2.main.services.BalanceService;
+import rs.edu.raf.si.bank2.main.services.UserCommunicationService;
+import rs.edu.raf.si.bank2.main.services.interfaces.UserCommunicationInterface;
 
 @RestController
 @CrossOrigin
 @RequestMapping("/api/balances")
 public class BalanceController {
+
     private final BalanceService balanceService;
+    private final UserCommunicationInterface userCommunicationInterface;
 
     @Autowired
-    public BalanceController(BalanceService balanceService) {
+    public BalanceController(BalanceService balanceService,
+                UserCommunicationService communicationService) {
+        this.userCommunicationInterface = communicationService;
         this.balanceService = balanceService;
     }
 

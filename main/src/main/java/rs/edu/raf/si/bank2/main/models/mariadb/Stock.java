@@ -1,5 +1,6 @@
 package rs.edu.raf.si.bank2.main.models.mariadb;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import javax.persistence.*;
@@ -18,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Table(
         name = "stocks",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"symbol"})})
-public class Stock {
+public class Stock implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

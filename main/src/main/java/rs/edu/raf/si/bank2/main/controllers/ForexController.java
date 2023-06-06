@@ -10,7 +10,9 @@ import rs.edu.raf.si.bank2.main.dto.BuySellForexDto;
 import rs.edu.raf.si.bank2.main.exceptions.BalanceNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.Forex;
 import rs.edu.raf.si.bank2.main.services.BalanceService;
+import rs.edu.raf.si.bank2.main.services.UserCommunicationService;
 import rs.edu.raf.si.bank2.main.services.ForexService;
+import rs.edu.raf.si.bank2.main.services.interfaces.UserCommunicationInterface;
 
 @RestController
 @CrossOrigin
@@ -19,9 +21,12 @@ public class ForexController {
 
     private final ForexService forexService;
     private final BalanceService balanceService;
+    private final UserCommunicationInterface userCommunicationInterface;
 
     @Autowired
-    public ForexController(ForexService forexService, BalanceService balanceService) {
+    public ForexController(ForexService forexService, BalanceService balanceService,
+                           UserCommunicationService communicationService) {
+        this.userCommunicationInterface = communicationService;
         this.forexService = forexService;
         this.balanceService = balanceService;
     }
@@ -53,7 +58,7 @@ public class ForexController {
                     Float.parseFloat(forex.getExchangeRate()),
                     dto.getAmount(),
                     null);
-            if (!success)
+            if (!success) {
                 return ResponseEntity.badRequest()
                         .body("Korisnik sa email-om "
                                 + signedInUserEmail
@@ -66,6 +71,7 @@ public class ForexController {
                                 + "("
                                 + forex.getToCurrencyName()
                                 + ")");
+            }
             return ResponseEntity.ok(forex);
         } catch (BalanceNotFoundException e1) {
             return ResponseEntity.badRequest()

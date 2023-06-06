@@ -19,8 +19,10 @@ import rs.edu.raf.si.bank2.main.exceptions.StockNotFoundException;
 import rs.edu.raf.si.bank2.main.exceptions.TooLateToBuyOptionException;
 import rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.User;
+import rs.edu.raf.si.bank2.main.services.UserCommunicationService;
 import rs.edu.raf.si.bank2.main.services.OptionService;
 import rs.edu.raf.si.bank2.main.services.UserService;
+import rs.edu.raf.si.bank2.main.services.interfaces.UserCommunicationInterface;
 import rs.edu.raf.si.bank2.main.utils.OptionDateScraper;
 
 @RestController
@@ -30,10 +32,13 @@ public class OptionController {
 
     private OptionService optionService;
     private final UserService userService;
-    OptionDateScraper optionDateScraper;
+    private final OptionDateScraper optionDateScraper;
+    private final UserCommunicationInterface userCommunicationInterface;
 
     @Autowired
-    public OptionController(OptionService optionService, UserService userService) {
+    public OptionController(OptionService optionService, UserService userService,
+                            UserCommunicationService communicationService) {
+        this.userCommunicationInterface = communicationService;
         this.optionService = optionService;
         this.userService = userService;
         this.optionDateScraper = new OptionDateScraper();

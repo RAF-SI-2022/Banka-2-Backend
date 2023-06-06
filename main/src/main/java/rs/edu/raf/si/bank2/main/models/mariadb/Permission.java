@@ -1,6 +1,7 @@
 package rs.edu.raf.si.bank2.main.models.mariadb;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Objects;
 import javax.persistence.*;
@@ -10,7 +11,7 @@ import org.hibernate.Hibernate;
 
 @Getter
 @Setter
-@ToString
+//@ToString
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
@@ -18,7 +19,8 @@ import org.hibernate.Hibernate;
 @Table(
         name = "permissions",
         uniqueConstraints = {@UniqueConstraint(columnNames = "permissionName")})
-public class Permission {
+public class Permission implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,6 +37,12 @@ public class Permission {
         this.permissionName = permissionName;
     }
 
+    /**
+     * TODO zar ovde ne treba porediti dva permission-a samo po nazivu? Zar
+     *   uopste ID igra bilo kakvu ulogu?
+     * @param o
+     * @return
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

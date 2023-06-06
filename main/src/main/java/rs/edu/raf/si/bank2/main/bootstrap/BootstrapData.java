@@ -1,9 +1,13 @@
 package rs.edu.raf.si.bank2.main.bootstrap;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.ParseException;
@@ -13,19 +17,20 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import javax.persistence.EntityManagerFactory;
+import javax.servlet.ServletContextListener;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import rs.edu.raf.si.bank2.main.bootstrap.readers.CurrencyReader;
 import rs.edu.raf.si.bank2.main.exceptions.CurrencyNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.*;
 import rs.edu.raf.si.bank2.main.models.mariadb.Currency;
-import rs.edu.raf.si.bank2.main.models.mariadb.Exchange;
-import rs.edu.raf.si.bank2.main.models.mariadb.Permission;
-import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
 import rs.edu.raf.si.bank2.main.services.ForexService;
 import rs.edu.raf.si.bank2.main.services.OptionService;
@@ -34,27 +39,22 @@ import rs.edu.raf.si.bank2.main.services.StockService;
 @Component
 public class BootstrapData implements CommandLineRunner {
 
+    public static final String forexApiKey = "OF6BVKZOCXWHD9NS";
     /**
-     * TODO promeniti ovo pre produkcije. Promenjen admin mejl da bismo mu zapravo imali pristup. Mogu
+     * TODO promeniti ovo pre produkcije. Promenjen admin mejl da bismo mu
+     * zapravo imali pristup. Mogu
      * da podesim forwardovanje ako je potrebno nekom drugom jos pristup.
      */
-    private static final String ADMIN_EMAIL = "anesic3119rn+banka2backend+admin@raf.rs";
+    private static final String ADMIN_EMAIL = "anesic3119rn+banka2backend" + "+admin@raf.rs";
+
+    private final Logger logger = LoggerFactory.getLogger(CommandLineRunner.class);
     /**
-     * TODO promeniti password ovde da bude jaci! Eventualno TODO napraviti da se auto-generise novi
+     * TODO promeniti password ovde da bude jaci! Eventualno TODO napraviti
+     * da se auto-generise novi
      * password pri TODO svakoj migraciji.
      */
-    private static final String ADMIN_PASS = "admin";
-
-    private static final String ADMIN_FNAME = "Admin";
-    private static final String ADMIN_LNAME = "Adminic";
-    private static final String ADMIN_JMBG = "2902968000000";
-    private static final String ADMIN_PHONE = "0657817522";
-    private static final String ADMIN_JOB = "ADMINISTRATOR";
-    private static final boolean ADMIN_ACTIVE = true;
-
-    public static final String forexApiKey = "6DL0Q8YP76H9K9T6";
-
     private final UserRepository userRepository;
+
     private final PermissionRepository permissionRepository;
     private final CurrencyRepository currencyRepository;
     private final InflationRepository inflationRepository;
@@ -73,6 +73,10 @@ public class BootstrapData implements CommandLineRunner {
 
     private final EntityManagerFactory entityManagerFactory;
 
+    private final RedisConnectionFactory redisConnectionFactory;
+
+    private boolean runTestSetup = false;
+
     @Autowired
     public BootstrapData(
             UserRepository userRepository,
@@ -90,7 +94,8 @@ public class BootstrapData implements CommandLineRunner {
             StockService stockService,
             OptionService optionService,
             OptionRepository optionRepository,
-            EntityManagerFactory entityManagerFactory) {
+            EntityManagerFactory entityManagerFactory,
+            RedisConnectionFactory redisConnectionFactory) {
         this.userRepository = userRepository;
         this.permissionRepository = permissionRepository;
         this.currencyRepository = currencyRepository;
@@ -107,86 +112,65 @@ public class BootstrapData implements CommandLineRunner {
         this.optionService = optionService;
         this.optionRepository = optionRepository;
         this.entityManagerFactory = entityManagerFactory;
+        this.redisConnectionFactory = redisConnectionFactory;
     }
 
     @Override
     public void run(String... args) throws Exception {
 
+        //todo nameti da ovo radi samo za testiranje
+
+        List<Balance> listOfBalances = balanceRepository.findAll();
+        if (listOfBalances.size() == 0) runTestSetup = true;
+
         // If empty, add futures in db from csv
         long numberOfRowsFutures = this.futureRepository.count();
         if (numberOfRowsFutures == 0) {
-            System.out.println("Added futures");
+            logger.info("Added futures");
             this.loadFutureTable();
         }
 
         // If empty, add currencies in db from csv
         long numberOfRowsCurrency = this.currencyRepository.count();
         if (numberOfRowsCurrency == 0) {
-            System.out.println("Added currencies");
+            logger.info("Added currencies");
             this.loadCurrenciesAndInflationTable();
         }
 
         // If empty, add exchange markets in db from csv
         long numberOfExchanges = this.exchangeRepository.count();
         if (numberOfExchanges == 0) {
-            System.out.println("Added exchange markets");
+            logger.info("Added exchange markets");
             this.loadExchangeMarkets();
         }
 
         long numberOfStocks = stockRepository.count();
         if (numberOfStocks == 0) {
-            System.out.println("Adding stocks");
+            logger.info("Adding stocks");
             loadStocksTable();
         }
 
-        // New data introduced in V2_2, if we keep this code devs will not get proper exchanges in db
-        //    long numberOfExchanges = this.exchangeRepository.count();
-        //    if (numberOfExchanges == 0) {
-        //      System.out.println("Added exchange markets");
-        //      this.loadExchangeMarkets();
-        //    }
 
-        System.out.println("Added exchange markets");
+        logger.info("Added exchange markets");
         this.loadExchangeMarkets();
         // Includes both initial admin run and permissions run.
-        Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
-        if (adminUser.isPresent()) {
-            System.out.println("Started!");
-            return;
+
+        if (runTestSetup){
+            addAdminForTest();
+            addBalancesToAdmin();
+            runTestSetup = false;
         }
 
-        // Add admin
-        User admin = User.builder()
-                .email(ADMIN_EMAIL)
-                .firstName(ADMIN_FNAME)
-                .lastName(ADMIN_LNAME)
-                .password(this.passwordEncoder.encode(ADMIN_PASS))
-                .jmbg(ADMIN_JMBG)
-                .phone(ADMIN_PHONE)
-                .jobPosition(ADMIN_JOB)
-                .active(ADMIN_ACTIVE)
-                .dailyLimit(1000000d) // USD
-                //                        .defaultDailyLimit(10000D) // usd
-                .defaultDailyLimit(1000000d) // usd
-                .build();
 
-        // Add initial perms
-        List<Permission> permissions = new ArrayList<>();
-        Permission adminPermission = new Permission(PermissionName.ADMIN_USER);
-        Permission readPermission = new Permission(PermissionName.READ_USERS);
-        Permission createPermission = new Permission(PermissionName.CREATE_USERS);
-        Permission updatePermission = new Permission(PermissionName.UPDATE_USERS);
-        Permission deletePermission = new Permission(PermissionName.DELETE_USERS);
-        permissions.add(adminPermission);
-        this.permissionRepository.save(adminPermission);
-        this.permissionRepository.save(readPermission);
-        this.permissionRepository.save(createPermission);
-        this.permissionRepository.save(updatePermission);
-        this.permissionRepository.save(deletePermission);
+        logger.info("Started!");
+        System.out.println("Everything started");
 
-        // Add admin perms
-        admin.setPermissions(permissions);
+    }
+
+    private void addBalancesToAdmin(){
         // Add initial 100_000 RSD to admin
+        Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
+        User admin = adminUser.get();
         Balance balance1 = this.getInitialAdminBalance(admin, "RSD");
         Balance balance2 = this.getInitialAdminBalance(admin, "USD");
         List<Balance> balances = new ArrayList<>();
@@ -197,7 +181,6 @@ public class BootstrapData implements CommandLineRunner {
         this.balanceRepository.save(balance1);
         this.balanceRepository.save(balance2);
         giveAdminStocks(admin);
-        System.out.println("Loaded!");
     }
 
     private void giveAdminStocks(User user) { // todo popravi
@@ -234,7 +217,23 @@ public class BootstrapData implements CommandLineRunner {
     private void loadExchangeMarkets() throws IOException {
         // Do this only on the first ever run of the app.
         // read from file
-        List<Exchange> exchanges = Files.lines(Paths.get("src/main/resources/csvs/exchange.csv"))
+
+        String resPath = "csvs/exchange.csv";
+        URL url = ServletContextListener.class.getClassLoader().getResource(resPath);
+        if (url == null) {
+            logger.error("Could not find resource: " + resPath);
+            return;
+        }
+
+        URI uri;
+        try {
+            uri = url.toURI();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        List<Exchange> exchanges = Files.lines(Paths.get(uri))
                 .parallel()
                 .skip(1)
                 .map(line -> line.split(","))
@@ -262,19 +261,36 @@ public class BootstrapData implements CommandLineRunner {
             for (int j = i + 1; j < exchanges.size(); j++) {
                 Exchange e = exchanges.get(i);
                 Exchange e1 = exchanges.get(j);
-                if (e.getAcronym() == e1.getAcronym()) {
-                    System.out.println("id " + e.getId() + "id " + e1.getId());
+                if (Objects.equals(e.getAcronym(), e1.getAcronym())) {
+                    logger.info("id " + e.getId() + "id " + e1.getId());
                 }
             }
         }
         exchangeRepository.saveAll(exchanges);
     }
 
-    private void loadFutureTable() throws IOException, ParseException { // todo promeni da ucitava sa id
+    private void loadFutureTable() throws IOException, ParseException { //
+        // todo promeni da ucitava sa id
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yyyy");
         String formattedDate = dateFormat.format(new Date());
 
-        List<Future> futures = Files.lines(Paths.get("src/main/resources/csvs/future_data.csv"))
+        String resPath = "csvs/future_data.csv";
+        URL url = ServletContextListener.class.getClassLoader().getResource(resPath);
+        if (url == null) {
+            logger.error("Could not find resource: " + resPath);
+            return;
+        }
+
+        URI uri;
+        try {
+            uri = url.toURI();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // TODO intellij kaze da treba dodati try-catch
+        List<Future> futures = Files.lines(Paths.get(uri))
                 .parallel()
                 .skip(1)
                 .map(line -> line.split(","))
@@ -294,7 +310,8 @@ public class BootstrapData implements CommandLineRunner {
         randomiseFutureTableData();
     }
 
-    private void randomiseFutureTableData() throws ParseException { // calendar.add(Calendar.MONTH, 1);
+    private void randomiseFutureTableData() throws ParseException { //
+        // calendar.add(Calendar.MONTH, 1);
         List<Future> allFutures = futureRepository.findAll();
         List<Future> newRandomisedFutures = new ArrayList<>();
         Random randomGenerator = new Random();
@@ -329,7 +346,20 @@ public class BootstrapData implements CommandLineRunner {
         SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
         Session session = sessionFactory.openSession();
 
-        BufferedReader br = new BufferedReader(new FileReader("src/main/resources/stocks.csv"));
+        String resPath = "stocks.csv";
+        URL url = ServletContextListener.class.getClassLoader().getResource(resPath);
+        if (url == null) {
+            logger.error("Could not find resource: " + resPath);
+            return;
+        }
+
+        BufferedReader br;
+        try {
+            br = new BufferedReader(new FileReader(url.getPath()));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return;
+        }
 
         String header = br.readLine();
         String line = br.readLine();
@@ -370,8 +400,21 @@ public class BootstrapData implements CommandLineRunner {
 
         for (Stock s : stockRepository.findAll()) {
 
+            resPath = "stock_history.csv";
+            url = ServletContextListener.class.getClassLoader().getResource(resPath);
+            if (url == null) {
+                logger.error("Could not find resource: " + resPath);
+                return;
+            }
+
             Stock mergedStock = (Stock) session.merge(s);
-            BufferedReader br1 = new BufferedReader(new FileReader("src/main/resources/stock_history.csv"));
+            BufferedReader br1;
+            try {
+                br1 = new BufferedReader(new FileReader(url.getPath()));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return;
+            }
 
             String header1 = br1.readLine();
             String line1 = br1.readLine();
@@ -391,10 +434,10 @@ public class BootstrapData implements CommandLineRunner {
                             .onDate(
                                     data[5].contains(" ")
                                             ? LocalDateTime.parse(
-                                                    data[5], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                                                    data[5], DateTimeFormatter.ofPattern("yyyy" + "-MM-dd HH:mm:ss"))
                                             : LocalDateTime.parse(
                                                     data[5] + " 00:00:00",
-                                                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                                                    DateTimeFormatter.ofPattern("yyyy" + "-MM-dd HH:mm:ss")))
                             .stock(mergedStock)
                             .type(StockHistoryType.valueOf(data[7]))
                             .build();
@@ -409,4 +452,69 @@ public class BootstrapData implements CommandLineRunner {
             br1.close();
         }
     }
+
+    private void addAdminForTest() {
+
+        Optional<User> adminCheck = userRepository.findUserByEmail(ADMIN_EMAIL);
+        if (adminCheck.isPresent()) return;
+
+        final String ADMIN_PASS = "admin";
+        final String ADMIN_FNAME = "Admin";
+        final String ADMIN_LNAME = "Adminic";
+        final String ADMIN_JMBG = "2902968000000";
+        final String ADMIN_PHONE = "0657817522";
+        final String ADMIN_JOB = "ADMINISTRATOR";
+        final boolean ADMIN_ACTIVE = true;
+
+        // Set up all permissions
+        Set<PermissionName> allPermissions = EnumSet.allOf(PermissionName.class);
+        System.out.println(allPermissions);
+
+        for (PermissionName pn : allPermissions) {
+            List<Permission> findPerm = permissionRepository.findByPermissionNames(Collections.singletonList(pn));
+
+            if (!findPerm.isEmpty()) {
+                logger.info("Permission " + pn + " already found");
+                continue;
+            }
+
+            Permission addPerm = new Permission(pn);
+            this.permissionRepository.save(addPerm);
+            logger.info("Permission " + pn + "added");
+        }
+
+        // Set up admin user
+        Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
+        if (adminUser.isPresent()) {
+            logger.info("Root admin already added");
+            return;
+        }
+
+        // Build root user object
+        User admin = User.builder()
+                .email(ADMIN_EMAIL)
+                .firstName(ADMIN_FNAME)
+                .lastName(ADMIN_LNAME)
+                .password(this.passwordEncoder.encode(ADMIN_PASS))
+                .jmbg(ADMIN_JMBG)
+                .phone(ADMIN_PHONE)
+                .jobPosition(ADMIN_JOB)
+                .active(ADMIN_ACTIVE)
+                .dailyLimit(1000000d) // usd
+                // .defaultDailyLimit(10000D) // usd
+                .defaultDailyLimit(1000000d) // usd
+                .build();
+
+        // Set admin's perms
+        List<Permission> permissions = new ArrayList<>();
+        permissions.add(permissionRepository
+                .findByPermissionNames(Collections.singletonList(PermissionName.ADMIN_USER))
+                .get(0));
+        admin.setPermissions(permissions);
+
+        // Save admin
+        this.userRepository.save(admin);
+        logger.info("Root admin added");
+    }
+
 }

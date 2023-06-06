@@ -1,5 +1,6 @@
 package rs.edu.raf.si.bank2.main.models.mariadb;
 
+import java.io.Serializable;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -14,7 +15,7 @@ import lombok.ToString;
 // @RequiredArgsConstructor
 @Entity
 @Table(name = "futureTable")
-public class Future {
+public class Future implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,6 +50,7 @@ public class Future {
         this.forSale = future.forSale;
     }
 
+
     @NotNull
     private String futureName;
 
@@ -71,4 +73,10 @@ public class Future {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user; // owner of this future
+
+    @Override
+    public String toString() {
+        return id + "," + futureName + "," + contractSize + "," + contractUnit + "," + maintenanceMargin + ","
+                + type + "," + settlementDate +  "," + forSale + "," + user.getId();
+    }
 }

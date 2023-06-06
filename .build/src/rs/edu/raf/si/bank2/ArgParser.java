@@ -57,7 +57,7 @@ public class ArgParser {
             case "devenv":
                 return c;
             default:
-                return "dev";
+                return null;
         }
     }
 

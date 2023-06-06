@@ -16,6 +16,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.main.exceptions.ExchangeNotFoundException;
@@ -99,21 +100,25 @@ public class StockService {
         stockSellWorker.start();
     }
 
+    @Cacheable(value = "stockALL")
     public List<Stock> getAllStocks() {
+        System.out.println("Getting all stock - fist time (caching into redis)");
         return stockRepository.findAll();
     }
 
+    @Cacheable(value = "stockID", key = "#id")
     public Stock getStockById(Long id) throws StockNotFoundException {
-
         Optional<Stock> stockOptional = stockRepository.findById(id);
-
+        System.out.println("Getting stock by id- fist time (caching into redis)");
         if (stockOptional.isPresent()) return stockOptional.get();
         else throw new StockNotFoundException(id);
     }
 
+    @Cacheable(value = "exchangesSymbol", key = "#symbol")
     public Stock getStockBySymbol(String symbol) throws StockNotFoundException, ExchangeNotFoundException {
-
         Optional<Stock> stockFromDB = stockRepository.findStockBySymbol(symbol);
+
+        System.out.println("Getting stock by symbol- fist time (caching into redis)");
 
         if (stockFromDB.isPresent()) return stockFromDB.get();
         else {
@@ -276,7 +281,7 @@ public class StockService {
 
         try {
             timeSeries = fullResponse.getJSONObject(key);
-            System.out.println(timeSeries);
+            //            System.out.println(timeSeries);
         } catch (JSONException e) {
             throw new ExternalAPILimitReachedException();
         }

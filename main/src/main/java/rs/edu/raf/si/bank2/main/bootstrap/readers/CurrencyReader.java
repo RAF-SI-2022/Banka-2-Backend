@@ -2,8 +2,14 @@ package rs.edu.raf.si.bank2.main.bootstrap.readers;
 
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
-import java.io.*;
-import java.util.*;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import javax.servlet.ServletContextListener;
 import org.springframework.util.ResourceUtils;
 import rs.edu.raf.si.bank2.main.models.mariadb.Inflation;
 
@@ -11,8 +17,16 @@ public class CurrencyReader {
     private List<Inflation> inflations = new ArrayList<>();
 
     public List<CurrencyCSV> getCurrenciesFromCsv() throws FileNotFoundException {
-        return new CsvToBeanBuilder<CurrencyCSV>(
-                        new FileReader(ResourceUtils.getFile("src/main/resources/currencies/currencies.csv")))
+        // TODO da li ovo treba da vrati praznu listu ili null ako neuspesno?
+
+        String resPath = "currencies/currencies.csv";
+        URL url = ServletContextListener.class.getClassLoader().getResource(resPath);
+        if (url == null) {
+            System.err.println("Could not find resource: " + resPath);
+            return new ArrayList<>();
+        }
+
+        return new CsvToBeanBuilder<CurrencyCSV>(new FileReader(ResourceUtils.getFile(url.getPath())))
                 .withType(CurrencyCSV.class)
                 .withSkipLines(1)
                 .build()
@@ -52,15 +66,33 @@ public class CurrencyReader {
     private List<Inflation> getInflationList(rs.edu.raf.si.bank2.main.models.mariadb.Currency currency)
             throws IOException {
         List<Inflation> result = new ArrayList<>();
-        String csvFilePath = "src/main/resources/currencies/inflations.csv";
-        CSVReader csvReader = new CSVReader(new FileReader(csvFilePath));
+
+        // TODO da li ovo treba da vrati praznu listu ili null ako neuspesno?
+
+        String resPath = "currencies/inflations.csv";
+        URL url = ServletContextListener.class.getClassLoader().getResource(resPath);
+        if (url == null) {
+            System.err.println("Could not find resource: " + resPath);
+            return result;
+        }
+
+        CSVReader csvReader;
+        try {
+            csvReader = new CSVReader(new FileReader(url.getPath()));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return result;
+        }
+
         String[] headerRow = csvReader.readNext();
         String[] dataRow;
         int yearIndex = 2;
         String currencyCountryCode = CountryCodeMapper.getCountryCode(currency.getPolity());
-        // Explanation for if: In data source inflation is tracked by countries, not by currencies.
+        // Explanation for if: In data source inflation is tracked by
+        // countries, not by currencies.
         // European Union is not a country,
-        // so if currency code is EUR, we read inflation data for some European country, e.g. Germany ->
+        // so if currency code is EUR, we read inflation data for some
+        // European country, e.g. Germany ->
         // country code is DEU.
         if (currency.getCurrencyCode().equalsIgnoreCase("EUR")) {
             currencyCountryCode = "DEU";

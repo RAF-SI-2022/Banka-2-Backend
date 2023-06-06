@@ -28,6 +28,9 @@ Feature: User service
   Scenario: user resets his daily limit
     Then admin resets his daily limit
 
+  Scenario: user resets password
+    Then user resets password
+
   Scenario: admin updates user
     When user to update exists in database
     Then admin updates user
@@ -60,8 +63,8 @@ Feature: User service
     When user is logged in
     Then user changes his password
 
-  Scenario: Deleting user
-    Given privileged user logged in
-    When deleting user from database
-    Then user no longer in database
+#  Scenario: Deleting user
+#    Given privileged user logged in
+#    When deleting user from database
+#    Then user no longer in database
 

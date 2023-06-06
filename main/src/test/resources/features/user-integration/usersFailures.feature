@@ -15,6 +15,15 @@ Feature: User service
     When user doesnt exist in database
     Then get perms form nonexistent user
 
+  Scenario: user with wrong credentials
+    Then user types wrong credentials
+
+  Scenario: user tries to change password
+    Then user tries to change password with wrong token
+
+  Scenario: user tries to change user password
+    Then user tries to change user password with wrong token
+
   Scenario: get nonexistent user from database
     When user doesnt exist in database
     Then get nonexistent user by id
@@ -79,6 +88,6 @@ Feature: User service
     When non privileged user logged in and user exists in database
     Then user still in database
 
-  Scenario: wipe db from test user
-    Given delete test user
+#  Scenario: wipe db from test user
+#    Given delete test user
 

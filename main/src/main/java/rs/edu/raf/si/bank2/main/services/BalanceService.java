@@ -46,9 +46,12 @@ public class BalanceService implements BalanceServiceInterface {
             Integer amount,
             ForexOrder forexOrder) {
         // Update existing balance(for fromCurrency)
+
         Optional<User> u = this.userService.findByEmail(userEmail);
+
         if (!u.isPresent()) throw new UserNotFoundException(userEmail);
         Balance balanceForFromCurrency = this.findBalanceByUserEmailAndCurrencyCode(userEmail, fromCurrencyCode);
+
         try {
             this.reserveAmount(amount.floatValue(), userEmail, fromCurrencyCode);
             this.decreaseBalance(userEmail, fromCurrencyCode, amount.floatValue());
@@ -135,8 +138,8 @@ public class BalanceService implements BalanceServiceInterface {
 
     @Override
     public Balance findBalanceByUserEmailAndCurrencyCode(String userEmail, String currencyCode) {
-        Optional<Balance> balance =
-                this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(userEmail, currencyCode);
+        System.out.println(userEmail + " " + currencyCode);
+        Optional<Balance> balance = this.balanceRepository.findBalanceByUser_EmailAndCurrency_CurrencyCode(userEmail, currencyCode);
         if (balance.isEmpty()) {
             throw new BalanceNotFoundException(userEmail, currencyCode);
         }
