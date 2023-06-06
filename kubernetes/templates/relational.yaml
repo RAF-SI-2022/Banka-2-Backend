@@ -1,5 +1,3 @@
-# MySQL relational database.
-
 apiVersion: v1
 kind: Secret
 data:

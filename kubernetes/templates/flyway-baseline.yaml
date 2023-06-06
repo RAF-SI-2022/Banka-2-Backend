@@ -1,6 +1,3 @@
-# Flyway baseline migration pod. Will keep spinning until it's connected to the
-# database and completed its job.
-
 apiVersion: v1
 kind: Pod
 metadata:

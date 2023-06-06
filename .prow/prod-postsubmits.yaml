@@ -57,11 +57,13 @@ postsubmits:
               ########################
               
               namespace="banka-2-prod"
+              domainPrefix="banka-2"
               imageVer="$commit_hash"
               
               cd kubernetes
               helm upgrade banka-2-prod . --reuse-values \
                 --set namespace=$namespace \
+                --set domainPrefix=$domainPrefix \
                 --set backend.imageVer=$imageVer \
                 -n banka-2-prod
 
