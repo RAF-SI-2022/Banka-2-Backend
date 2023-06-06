@@ -1,0 +1,55 @@
+Exchange Name,Exchange Acronym,Exchange Mic Code,Country,Currency,Time Zone,Open Time,Close Time
+New York Stock Exchange,NYSE,XNYS,USA,USD,America/New_York, 09:30, 16:00
+Nasdaq,NASDAQ,XNAS,USA,USD,America/New_York, 09:30, 16:00
+Tokyo Stock Exchange,TSE,XTKS,Japan,JPY,Asia/Tokyo, 09:00, 15:00
+Shanghai Stock Exchange,SSE,XSHG,China,CNY,Asia/Shanghai, 09:30, 15:00
+Hong Kong Stock Exchange,HKEX,XHKG,Hong Kong,HKD,Asia/Hong_Kong, 09:30, 16:00
+London Stock Exchange,LSE,XLON,United Kingdom,GBP,Europe/London, 08:00, 16:30
+Euronext Paris,ENXTPA,XPAR,France,EUR,Europe/Paris, 09:00, 17:30
+Frankfurt Stock Exchange,FSE,XFRA,Germany,EUR,Europe/Berlin, 08:00, 20:00
+Toronto Stock Exchange,TSX,XTSE,Canada,CAD,America/Toronto, 09:30, 16:00
+Australian Securities Exchange,ASX,XASX,Australia,AUD,Australia/Sydney, 10:00, 16:00
+Korea Exchange,KRX,XKRX,South Korea,KRW,Asia/Seoul, 09:00, 15:30
+Bolsa de Madrid,BME,XTSM,Spain,EUR,Europe/Madrid, 09:00, 17:30
+Moscow Exchange,MOEX,XMOS,Russia,RUB,Europe/Moscow, 10:00, 18:40
+Taiwan Stock Exchange,TWSE,XTAI,Taiwan,TWD,Asia/Taipei, 09:00, 13:45
+Bombay Stock Exchange,BSE,XBOM,India,INR,Asia/Kolkata, 09:15, 15:30
+Mexican Stock Exchange,BMV,XMEX,Mexico,MXN,America/Mexico_City, 08:30, 15:00
+SIXSwiss Exchange,SIX,XSWX,Switzerland,CHF,Europe/Zurich, 09:00, 17:30
+São Paulo Stock Exchange,B3,XBSP,Brazil,BRL,America/Sao_Paulo, 10:00, 17:00
+Oslo Stock Exchange,OSE,XOSL,Norway,NOK,Europe/Oslo, 09:00, 16:20
+Stockholm Stock Exchange,OMX,XSTO,Sweden,SEK,Europe/Stockholm, 09:00, 17:30
+Bolsade Valores de Lima,BVL,XLIM,Peru,PEN,America/Lima, 09:30, 16:00
+Borsa Italiana,MTA,XMIL,Italy,EUR,Europe/Rome, 09:00, 17:25
+Johannesburg Stock Exchange,JSE,XJSE,South Africa,ZAR,Africa/Johannesburg, 09:00, 17:00
+Tel Aviv Stock Exchange,TASE,XTAE,Israel,ILS,Asia/Jerusalem, 09:30, 16:30
+New Zealand Stock Exchange,NZX,XNZE,New Zealand,NZD,Pacific/Auckland, 10:00, 16:45
+Singapore Exchange,SGX,XSES,Singapore,SGD,Asia/Singapore, 09:00, 17:00
+Toronto Venture Exchange,TSXV,XTSX,Canada,CAD,America/Toronto, 09:30, 16:00
+Stock Exchange of Thailand,SET,XBKK,Thailand,THB,Asia/Bangkok, 09:30, 16:30
+Indonesia Stock Exchange,IDX,XIDX,Indonesia,IDR,Asia/Jakarta, 09:00, 15:00
+Budapest Stock Exchange,BET,XBUD,Hungary,HUF,Europe/Budapest, 09:00, 16:00
+Warsaw Stock Exchange,WSE,XWAR,Poland,PLN,Europe/Warsaw, 09:00, 17:00
+Athens Stock Exchange,ASE,ATHEX,Greece,EUR,Europe/Athens, 10:00, 17:20
+Bucharest Stock Exchange,BVB,XBSE,Romania,RON,Europe/Bucharest, 09:30, 16:45
+Egyptian Exchange,EGX,XCAI,Egypt,EGP,Africa/Cairo, 10:00, 14:30
+Istanbul Stock Exchange,ISE,XIST,Turkey,TRY,Europe/Istanbul, 09:40, 18:10
+Stock Exchange of Mauritius,SEM,XSEM,Mauritius,MUR,Indian/Mauritius, 09:30, 13:30
+Nigerian Stock Exchange,NGSE,XNSA,Nigeria,NGN,Africa/Lagos, 09:30, 14:30
+Saudi Stock Exchange,TADAWUL,XSAU,Saudi Arabia,SAR,Asia/Riyadh, 10:00, 15:30
+Dubai Financial Market,DFM,XDFM,United Arab Emirates,AED,Asia/Dubai, 10:00, 14:00
+Intercontinental Exchange(ICE),ICE,XNYM,USA,USD,America/New_York, 09:00, 14:30
+Chicago Mercantile Exchange(CME),CME,XCBT,USA,USD,America/Chicago, 17:00, 16:00
+Philippine Stock Exchange,PSE,XPSE,Philippines,PHP,Asia/Manila, 09:30, 15:30
+Santiago Stock Exchange,BCS,XSGO,Chile,CLP,America/Santiago, 09:30, 16:00
+Bolsa de Comercio de Buenos Aires,BCBA,XBUE,Argentina,ARS,America/Argentina/Buenos_Aires, 10:00, 17:00
+Bolsa de Valores de Colombia,BVC,XBOG,Colombia,COP,America/Bogota, 09:30, 16:00
+Casablanca Stock Exchange,CSE,XCAS,Morocco,MAD,Africa/Casablanca, 09:30, 15:30
+Vienna Stock Exchange,WBAG,XWBO,Austria,EUR,Europe/Vienna, 09:00, 17:35
+Irish Stock Exchange,ISE,XDUB,Ireland,EUR,Europe/Dublin, 08:00, 16:30
+Osaka Exchange,OSE,XOSA,Japan,JPY,Asia/Tokyo, 09:00, 15:00
+Brussels Stock Exchange,EBR,XBRU,Belgium,EUR,Europe/Brussels, 09:00, 17:30
+Copenhagen Stock Exchange,CSE,XCSE,Denmark,DKK,Europe/Copenhagen, 09:00, 17:00
+Helsinki Stock Exchange,HEX,XHEL,Finland,EUR,Europe/Helsinki, 10:00, 18:30
+Lisbon Stock Exchange,PSI-20,XLIS,Portugal,EUR,Europe/Lisbon, 08:00, 16:30
+Luxembourg Stock Exchange,Bourse de Luxembourg,XLUX,Luxembourg,EUR,Europe/Luxembourg, 09:00, 17:30

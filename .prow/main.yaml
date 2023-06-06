@@ -1,4 +1,3 @@
-
 presubmits:
   - name: pull-banka-2-backend-main-sonarqube
     labels:
@@ -37,6 +36,9 @@ presubmits:
               docker compose up -d mariadb
               docker compose up -d flyway
               docker compose up -d mongodb
+              docker compose up -d users
+              
+              cd main
 
               mvn clean verify sonar:sonar -Pcoverage \
                 -Dsonar.host.url=https://sonar.k8s.elab.rs \
@@ -77,8 +79,11 @@ postsubmits:
               docker compose up -d mariadb
               docker compose up -d flyway
               docker compose up -d mongodb
+              docker compose up -d users
               
               ref=$(git rev-parse --abbrev-ref HEAD)
+              
+              cd main
 
               mvn clean verify sonar:sonar -Pcoverage \
                 -Dsonar.host.url=https://sonar.k8s.elab.rs \
