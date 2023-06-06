@@ -58,6 +58,11 @@ presubmits:
                 --set namespace=$namespace \
                 --set domainPrefix=$domainPrefix \
                 --set backend.imageVer=$imageVer \
+                -n banka-2-dev || \
+              helm install banka-2-dev . --reuse-values \
+                --set namespace=$namespace \
+                --set domainPrefix=$domainPrefix \
+                --set backend.imageVer=$imageVer \
                 -n banka-2-dev
 
               kubectl apply -f .
