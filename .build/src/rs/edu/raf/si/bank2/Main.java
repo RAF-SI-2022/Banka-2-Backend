@@ -178,6 +178,9 @@ public class Main {
             case "dist" -> {
                 dist();
             }
+            case "build" -> {
+                build();
+            }
             case "stack" -> {
                 stack();
             }
@@ -1091,6 +1094,32 @@ public class Main {
     }
 
     /**
+     * Builds all specified microservices' images.
+     */
+    public void build() {
+        assertDockerDaemonRunning();
+
+        // fetch microservices to build
+
+        List<String> microservicesToTest = new LinkedList<>();
+        for (String t : argParser.args()) {
+            for (String m : MICROSERVICES) {
+                if (m.equals(t)) {
+                    microservicesToTest.add(m);
+                }
+            }
+        }
+
+        if (microservicesToTest.isEmpty()) {
+            microservicesToTest = List.of(MICROSERVICES);
+        }
+
+        for (String m : microservicesToTest) {
+            buildDockerImage(m);
+        }
+    }
+
+    /**
      * Prints the help menu.
      */
     public void help() {
@@ -1135,6 +1164,13 @@ public class Main {
                                 "console instead in the logs folder, and the " +
                                 "process fails on first test failure (no more" +
                                 " tests executed after first failure)\n")
+                        .concat(Logger.ANSI_CYAN)
+                        .concat("\nbuild [<microservice>*]")
+                        .concat(Logger.ANSI_RESET + "\n")
+                        .concat("builds the image of each specified " +
+                                "microservice; if none specified, builds the " +
+                                "image of ALL microservices" +
+                                "\n")
                         .concat(Logger.ANSI_CYAN)
                         .concat("\ndist [<microservice>*] [-y]")
                         .concat(Logger.ANSI_RESET + "\n")

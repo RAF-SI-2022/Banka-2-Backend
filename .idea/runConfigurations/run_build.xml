@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="run test [Docker]" type="ShConfigurationType">
-    <option name="SCRIPT_TEXT" value="./run test" />
+  <configuration default="false" name="run build" type="ShConfigurationType">
+    <option name="SCRIPT_TEXT" value="./run build" />
     <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
     <option name="SCRIPT_PATH" value="" />
     <option name="SCRIPT_OPTIONS" value="" />
