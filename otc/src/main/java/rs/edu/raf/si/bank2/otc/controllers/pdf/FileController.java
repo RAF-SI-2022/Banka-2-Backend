@@ -1,6 +1,5 @@
 package rs.edu.raf.si.bank2.otc.controllers.pdf;
 
-import com.itextpdf.text.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -30,7 +29,7 @@ public class FileController {
     private FileService fileService;
 
     @PostMapping("/upload")
-    public ResponseEntity<?> upload(@RequestParam("file")MultipartFile file) throws IOException, DocumentException {
+    public ResponseEntity<?> upload(@RequestParam("file")MultipartFile file) throws IOException {
 //        ContractElements contractElements1 = ContractElements.FINALISED;
 //        TransactionElement transactionElement = new TransactionElement("123",ContractElements.SELL,TransactionElements.STOCK,ContractElements.CASH,"USD",12,12.2,1l,2l,"future");
 //        TransactionElement transactionElement2 = new TransactionElement("123",ContractElements.SELL,TransactionElements.STOCK,ContractElements.CASH,"USD",12,12.2,1l,2l,"future");

@@ -52,7 +52,7 @@ public class AuthorisationServiceTest {
     AuthorisationService authorisationService;
 
     @Test
-    public void isAuthorised_success() {
+    public void isAuthorised_permissionRequiredSuccess() {
 
         long id = 1L;
 
@@ -78,6 +78,35 @@ public class AuthorisationServiceTest {
         authorisationService.isAuthorised(permission, email);
 
         assertTrue(user.getPermissions().stream().anyMatch(perm -> permission.equals(perm.getPermissionName())));
+    }
+
+    @Test
+    public void isAuthorised_AdminPermissionSuccess() {
+
+        long id = 1L;
+
+        PermissionName permission = PermissionName.READ_USERS;
+        String email = "darko@gmail.com";
+
+        User user = User.builder()
+                .id(id)
+                .firstName("Darko")
+                .lastName("Darkovic")
+                .phone("000000000")
+                .jmbg("000000000")
+                .password("12345")
+                .email("darko@gmail.com")
+                .jobPosition("/")
+                .permissions(Collections.singletonList(Permission.builder()
+                        .permissionName(PermissionName.ADMIN_USER)
+                        .build()))
+                .build();
+
+        when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(user));
+
+        boolean result = authorisationService.isAuthorised(permission, email);
+
+        assertTrue(result);
     }
 
     @Test
