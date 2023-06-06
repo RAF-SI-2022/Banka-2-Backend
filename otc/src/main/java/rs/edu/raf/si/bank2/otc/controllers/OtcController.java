@@ -63,12 +63,42 @@ public class OtcController {
 
         Permission permission = user.getPermissions().get(0);
         if (permission.getPermissionName() == PermissionName.ADMIN_USER){
-            return ResponseEntity.ok().body(otcService.getAllContracts());
+            return ResponseEntity.ok().body(otcService.getAllDraftContracts());
         }
 
         if (user.getPermissions().size() > 1) {
-            return ResponseEntity.ok().body(otcService.getAllContracts());
-        } else return ResponseEntity.ok().body(otcService.getAllContractsForUserId(user.getId()));
+            return ResponseEntity.ok().body(otcService.getAllDraftContracts());
+        } else return ResponseEntity.ok().body(otcService.getAllDraftContractsForUserId(user.getId()));
+    }
+
+    @GetMapping("/byCompany/{companyId}")
+    public ResponseEntity<?> getAllContracts(@PathVariable(name = "companyId") String companyId) {
+        String signedInUserEmail = getContext().getAuthentication().getName();
+        if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+            return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
+        }
+
+        User user = null;
+        CommunicationDto response = userCommunicationInterface.sendGet(signedInUserEmail, "/findByEmail");
+
+        if (response.getResponseCode() == 200) {
+            try {
+                user = mapper.readValue(response.getResponseMsg(), User.class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        } else return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
+
+        System.err.println(user);
+
+        Permission permission = user.getPermissions().get(0);
+        if (permission.getPermissionName() == PermissionName.ADMIN_USER){
+            return ResponseEntity.ok().body(otcService.getAllContractsByCompanyId(companyId));
+        }
+
+        if (user.getPermissions().size() > 1) {
+            return ResponseEntity.ok().body(otcService.getAllContractsByCompanyId(companyId));
+        } else return ResponseEntity.ok().body(otcService.getAllContractsForUserIdAndCompany(user.getId(), companyId));
 
     }
 
