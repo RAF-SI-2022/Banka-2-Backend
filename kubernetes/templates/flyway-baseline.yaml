@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: flyway-baseline
+  namespace: {{ .Values.namespace }}
+  labels:
+    app:
+      flyway-baseline
+spec:
+  restartPolicy: OnFailure
+  containers:
+    - name: flyway-baseline
+      image: flyway/flyway:9
+      env:
+        - name: url
+          value: jdbc:mysql://relational:3306/backend?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true
+        - name: user
+          valueFrom:
+            secretKeyRef:
+              name: relational-creds
+              key: rootUser
+        - name: password
+          valueFrom:
+            secretKeyRef:
+              name: relational-creds
+              key: rootPassword
+        - name: schemas
+          value: backend
+      command: ["/bin/sh", "-c"]
+      args: ["flyway baseline -baselineVersion=0 -url=$url -user=$user -password=$password"]
+  initContainers:
+    # Check that MySQL is running
+    - name: assert-mysql
+      image: alpine
+      command: ["/bin/sh", "-c"]
+      args: ["sleep 300; apk add --no-cache netcat-openbsd; until nc -z -v relational 3306; do echo Waiting for MySQL database; sleep 30; done"]

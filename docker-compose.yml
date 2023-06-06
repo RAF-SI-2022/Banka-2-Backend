@@ -62,7 +62,7 @@ services:
               -url=jdbc:mariadb://mariadb:3306/prod -schemas=users -user=root -password=root -connectRetries=60 migrate"
     volumes:
       - ./flyway/sql:/flyway/sql
-      - ./flyway/config:/flyway/conf
+      - ./flyway/conf:/flyway/conf
     depends_on:
       mariadb:
         condition: service_healthy
@@ -90,6 +90,24 @@ services:
     container_name: users
     image: harbor.k8s.elab.rs/banka-2/users
     expose:
+      - "8080"
+    ports:
+      - "8080:8080"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
+    networks:
+      - bank2_net
+
+  # TODO add health check for main
+  main:
+    container_name: main
+    image: harbor.k8s.elab.rs/banka-2/main
+    expose:
       - "8081"
     ports:
       - "8081:8081"
@@ -100,6 +118,8 @@ services:
         condition: service_healthy
       flyway:
         condition: service_completed_successfully
+      users:
+        condition: service_healthy
     networks:
       - bank2_net
 
@@ -118,25 +138,6 @@ services:
         condition: service_healthy
       flyway:
         condition: service_completed_successfully
-    networks:
-      - bank2_net
-
-  main:
-    container_name: main
-    image: harbor.k8s.elab.rs/banka-2/main
-    expose:
-      - "8080"
-    ports:
-      - "8080:8080"
-    depends_on:
-      mariadb:
-        condition: service_healthy
-      mongodb:
-        condition: service_healthy
-      flyway:
-        condition: service_completed_successfully
-      users:
-        condition: service_healthy
     networks:
       - bank2_net
 
