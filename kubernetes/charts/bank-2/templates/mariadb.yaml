@@ -16,10 +16,8 @@ metadata:
 spec:
   database: backend
   username:
-    valueFrom:
-      secretKeyRef:
-        name: relational-creds
-        key: username
+    name: relational-creds
+    key: username
 
   passwordSecretKeyRef:
     name: relational-creds
