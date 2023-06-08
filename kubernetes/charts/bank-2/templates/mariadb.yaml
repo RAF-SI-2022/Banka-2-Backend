@@ -23,7 +23,7 @@ spec:
         key: username
 
   passwordSecretKeyRef:
-    name: mariadb
+    name: relational-creds
     key: password
 
   rootPasswordSecretKeyRef:

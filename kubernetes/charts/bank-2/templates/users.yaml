@@ -70,7 +70,7 @@ spec:
 
         # Migrate schema to {{ .Values.backend.imageVer }} version
         - name: flyway
-          image: harbor.k8s.elab.rs/banka-2/flyway:{{ .Values.backend.imageVer }}
+          image: "harbor.k8s.elab.rs/banka-2/flyway:{{ .Values.backend.imageVer }}"
           env:
             - name: url
               value: jdbc:mysql://relational:3306/backend?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true
