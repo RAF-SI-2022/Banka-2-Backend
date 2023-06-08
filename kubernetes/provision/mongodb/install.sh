@@ -19,7 +19,7 @@ helm repo update
 # Install MongoDB chart
 helm upgrade --install mongodb bitnami/mongodb-sharded \
   --set auth.enabled=true \
-  --NAMESPACE "${NAMESPACE}"
+  --namespace "${NAMESPACE}"
 
 # Provision DB
 chmod +x provision.sh

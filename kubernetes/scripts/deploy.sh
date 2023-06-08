@@ -56,7 +56,7 @@ else
   # Install helm chart
   echo "Installing Helm chart"
   cd ../charts/bank-2
-  helm install ${NAMESPACE} ${NAMESPACE} \
+  helm install ${NAMESPACE} . \
     --set ${SIDE}.imageVer=$imageVer \
     -f values-${ENV}.yaml \
     -n ${NAMESPACE}
