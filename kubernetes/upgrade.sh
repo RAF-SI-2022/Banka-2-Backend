@@ -74,6 +74,7 @@ installed=$(helm list --no-headers 2>/dev/null | grep "$namespace")
 cd kubernetes
 
 if [[ -n "${installed}" ]]; then
+  echo "Upgrading Helm chart"
   cd charts/bank-2
   helm upgrade $namespace . \
     --reuse-values \
@@ -81,6 +82,7 @@ if [[ -n "${installed}" ]]; then
     -n $namespace
 else
   # Provision all services
+  echo "Provisioning services"
   cd provision
   for extra in $extras
   do
@@ -91,8 +93,9 @@ else
   done
 
   # Install helm chart
+  echo "Installing Helm chart"
   cd ../charts/bank-2
-  helm install $namespace \
+  helm install $namespace $namespace \
     --set $side.imageVer=$imageVer \
     -f values-$env.yaml \
     -n $namespace
