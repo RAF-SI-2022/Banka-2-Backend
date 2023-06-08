@@ -2,24 +2,24 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: users
-  name: users
+    app: otc
+  name: otc
   namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: users
+      app: otc
   template:
     metadata:
       labels:
-        app: users
+        app: otc
     spec:
       restartPolicy: Always
       containers:
-        - image: harbor.k8s.elab.rs/banka-2/users:{{ .Values.backend.imageVer }}
+        - image: harbor.k8s.elab.rs/banka-2/otc:{{ .Values.backend.imageVer }}
           imagePullPolicy: Always
-          name: users
+          name: otc
           env:
             - name: spring.datasource.url
               value: jdbc:mysql://relational:3306/backend?allowPublicKeyRetrieval=true&useSSL=false&autoReconnect=true
@@ -27,14 +27,14 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: relational-creds
-                  key: rootUser
+                  key: username
             - name: spring.datasource.password
               valueFrom:
                 secretKeyRef:
                   name: relational-creds
-                  key: rootPassword
+                  key: password
             - name: spring.data.mongodb.uri
-              value: mongodb://root:raf-si@mongo-service:27017/backend?authSource=admin
+              value: mongodb://{{ .Values.mongodb.username }}:{{ .Values.mongodb.password }}@{{ .Values.mongodb.service }}:27017/backend?authSource=admin
             - name: spring.cache.type
               value: redis
             - name: spring.data.redis.host
@@ -43,8 +43,10 @@ spec:
               value: "6379"
             - name: spring.cache.redis.time-to-live
               value: "900000"
-            - name: service.frontend.host
-              value: TODO_add_value
+            - name: service.users.host
+              value: users:8080
+            - name: service.main.host
+              value: main:8081
           ports:
             - containerPort: 8080
           command: ["java", "-jar", "app.jar"]
@@ -60,7 +62,7 @@ spec:
         - name: assert-mongo
           image: mongo
           command: ["/bin/sh", "-c"]
-          args: ["until mongosh \"mongodb://root:raf-si@mongo-service:27017/backend?authSource=admin\" --eval \"db.stats()\" > /dev/null 2>&1; do echo Waiting for MongoDB database; sleep 30; done"]
+          args: ["until mongosh \"mongodb://{{ .Values.mongodb.username }}:{{ .Values.mongodb.password }}@{{ .Values.mongodb.service }}:27017/backend?authSource=admin\" --eval \"db.stats()\" > /dev/null 2>&1; do echo Waiting for MongoDB database; sleep 30; done"]
 
         # Check that MongoDB is running
         - name: assert-redis
@@ -78,12 +80,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: relational-creds
-                  key: rootUser
+                  key: username
             - name: password
               valueFrom:
                 secretKeyRef:
                   name: relational-creds
-                  key: rootPassword
+                  key: password
             - name: schemas
               value: backend
           command: ["/bin/sh", "-c"]
@@ -95,14 +97,14 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: users
-  name: users
+    app: otc
+  name: otc
   namespace: {{ .Values.namespace }}
 spec:
   ports:
-    - port: 8080
+    - port: 8081
       protocol: TCP
-      targetPort: 8080
+      targetPort: 8081
   selector:
-    app: users
+    app: otc
   type: ClusterIP

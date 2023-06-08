@@ -1,6 +1,0 @@
-namespace: banka-2-dev
-domainPrefix: banka-2-dev
-backend:
-  imageVer: latest
-frontend:
-  imageVer: latest

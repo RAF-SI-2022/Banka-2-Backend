@@ -27,14 +27,14 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: relational-creds
-                  key: rootUser
+                  key: username
             - name: spring.datasource.password
               valueFrom:
                 secretKeyRef:
                   name: relational-creds
-                  key: rootPassword
+                  key: password
             - name: spring.data.mongodb.uri
-              value: mongodb://root:raf-si@mongo-service:27017/backend?authSource=admin
+              value: mongodb://{{ .Values.mongodb.username }}:{{ .Values.mongodb.password }}@{{ .Values.mongodb.service }}:27017/backend?authSource=admin
             - name: spring.cache.type
               value: redis
             - name: spring.data.redis.host
@@ -60,7 +60,7 @@ spec:
         - name: assert-mongo
           image: mongo
           command: ["/bin/sh", "-c"]
-          args: ["until mongosh \"mongodb://root:raf-si@mongo-service:27017/backend?authSource=admin\" --eval \"db.stats()\" > /dev/null 2>&1; do echo Waiting for MongoDB database; sleep 30; done"]
+          args: ["until mongosh \"mongodb://{{ .Values.mongodb.username }}:{{ .Values.mongodb.password }}@{{ .Values.mongodb.service }}:27017/backend?authSource=admin\" --eval \"db.stats()\" > /dev/null 2>&1; do echo Waiting for MongoDB database; sleep 30; done"]
 
         # Check that MongoDB is running
         - name: assert-redis
@@ -78,12 +78,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: relational-creds
-                  key: rootUser
+                  key: username
             - name: password
               valueFrom:
                 secretKeyRef:
                   name: relational-creds
-                  key: rootPassword
+                  key: password
             - name: schemas
               value: backend
           command: ["/bin/sh", "-c"]
