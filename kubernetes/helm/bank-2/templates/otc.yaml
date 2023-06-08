@@ -17,7 +17,9 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-        - image: "harbor.k8s.elab.rs/banka-2/otc:{{ .Values.backend.imageVer }}"
+        - image:
+            name: harbor.k8s.elab.rs/banka-2/otc
+            tag: {{ .Values.backend.imageVer }}
           imagePullPolicy: Always
           name: otc
           env:
@@ -72,7 +74,9 @@ spec:
 
         # Migrate schema to {{ .Values.backend.imageVer }} version
         - name: flyway
-          image: "harbor.k8s.elab.rs/banka-2/flyway:{{ .Values.backend.imageVer }}"
+          image:
+            name: harbor.k8s.elab.rs/banka-2/flyway
+            tag: {{ .Values.backend.imageVer }}
           env:
             - name: url
               value: jdbc:mysql://relational:3306/backend?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true
@@ -89,7 +93,7 @@ spec:
             - name: schemas
               value: backend
           command: ["/bin/sh", "-c"]
-          args: ["flyway migrate -url=$url -user=$user -password=$password"]
+          args: ["until flyway migrate -url=$url -user=$user -password=$password; do echo Waiting for Flyway migration; sleep 60; done"]
 
 ---
 
