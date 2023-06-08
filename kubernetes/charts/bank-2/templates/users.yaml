@@ -17,7 +17,7 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-        - image: harbor.k8s.elab.rs/banka-2/users:{{ .Values.backend.imageVer }}
+        - image: "harbor.k8s.elab.rs/banka-2/users:{{ .Values.backend.imageVer }}"
           imagePullPolicy: Always
           name: users
           env:
