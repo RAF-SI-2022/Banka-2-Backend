@@ -11,13 +11,16 @@ set -euo pipefail
 ################################################################################
 
 
-#################
-# Remove charts #
-#################
+#############################
+# Remove charts and residue #
+#############################
 
 echo "Deleting chart"
 
 helm uninstall ${NAMESPACE} || true
+kubectl delete pvc storage-relational-0 || true
+kubectl delete pvc storage-relational-1 || true
+kubectl delete pvc storage-relational-2 || true
 
 ###################
 # Remove services #
