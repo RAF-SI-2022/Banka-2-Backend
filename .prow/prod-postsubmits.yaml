@@ -29,6 +29,8 @@ postsubmits:
               ##############
   
               start-docker.sh
+              docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD harbor.k8s.elab.rs
+              
               chmod +x kubernetes/upgrade.sh
               bash kubernetes/upgrade.sh
 
