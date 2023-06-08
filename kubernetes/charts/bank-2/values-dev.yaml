@@ -1,4 +1,4 @@
-namespace: banka-2-prod
+namespace: banka-2-dev
 domain: banka-2-dev.k8s.elab.rs
 mongodb:
   service: mongodb
