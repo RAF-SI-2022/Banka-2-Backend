@@ -26,7 +26,7 @@ helm uninstall ${NAMESPACE} || true
 echo "Removing services"
 
 chmod +x kubernetes/scripts/vars.sh
-kubernetes/scripts/vars.sh
+. kubernetes/scripts/vars.sh
 
 cd kubernetes/provision
 extras=$(echo ${EXTRA_SERVICES} | xargs)
