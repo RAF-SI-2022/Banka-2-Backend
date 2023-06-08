@@ -17,7 +17,9 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: "harbor.k8s.elab.rs/banka-2/frontend:{{ .Values.frontend.imageVer }}"
+          image:
+            name: harbor.k8s.elab.rs/banka-2/frontend
+            tag: "{{ .Values.frontend.imageVer }}"
           imagePullPolicy: Always
           ports:
             - name: frontend

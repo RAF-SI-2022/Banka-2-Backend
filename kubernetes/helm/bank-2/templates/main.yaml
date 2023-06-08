@@ -19,7 +19,7 @@ spec:
       containers:
         - image:
             name: harbor.k8s.elab.rs/banka-2/main
-            tag: {{ .Values.backend.imageVer }}
+            tag: "{{ .Values.backend.imageVer }}"
           imagePullPolicy: Always
           name: main
           env:
@@ -70,11 +70,11 @@ spec:
           command: ["/bin/sh", "-c"]
           args: ["until echo PING | redis-cli -h redis -p 6379 > /dev/null 2>&1; do echo Waiting for Redis cache; sleep 60; done"]
 
-        # Migrate schema to {{ .Values.backend.imageVer }} version
+        # Migrate schema to "{{ .Values.backend.imageVer }}" version
         - name: flyway
           image:
             name: harbor.k8s.elab.rs/banka-2/flyway
-            tag: {{ .Values.backend.imageVer }}
+            tag: "{{ .Values.backend.imageVer }}"
           env:
             - name: url
               value: jdbc:mysql://relational:3306/backend?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true
