@@ -20,7 +20,7 @@ presubmits:
               
               export ENV="prod"
               export SIDE="backend"
-              export NAMESPACE="banka-2-$env"
+              export NAMESPACE="banka-2-$ENV"
               
               ##############
               # Call setup #
