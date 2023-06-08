@@ -20,9 +20,9 @@ postsubmits:
               # Define environment/namespace vars #
               #####################################
               
-              export env=prod
-              export side=backend
-              export namespace=banka-2-$env
+              export ENV="prod"
+              export SIDE="backend"
+              export NAMESPACE="banka-2-$env"
               
               ##############
               # Call setup #

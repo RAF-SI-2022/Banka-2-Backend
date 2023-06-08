@@ -2,10 +2,12 @@
 
 set -euo pipefail
 
-NAMESPACE="$(kubectl config view --minify | grep -Po 'namespace: \K.*')"
-
 if [[ -n "${NAMESPACE}" ]]; then
-  echo "Namespace not declared"
+  NAMESPACE="$(kubectl config view --minify | grep -Po 'namespace: \K.*')"
+fi
+if [[ -n "${NAMESPACE}" ]]; then
+  echo "NAMESPACE not declared"
+  exit 1
 fi
 
 # Add Helm repo
@@ -17,7 +19,7 @@ helm repo update
 # Install MongoDB chart
 helm upgrade --install mongodb bitnami/mongodb-sharded \
   --set auth.enabled=true \
-  --namespace "${NAMESPACE}"
+  --NAMESPACE "${NAMESPACE}"
 
 # Provision DB
 chmod +x provision.sh
