@@ -4,7 +4,7 @@ set -euo pipefail
 
 NAMESPACE="${namespace}"
 NEW_MONGODB_DB="${NEW_MONGODB_DB:-backend}"
-NEW_MONGODB_USER="${NEW_MONGODB_USER:-admin}"
+NEW_MONGODB_USER="${NEW_MONGODB_USER:-raf}"
 NEW_MONGODB_USER_PASSWORD="${NEW_MONGODB_USER_PASSWORD:-raf-si}"
 
 export MONGODB_ROOT_PASSWORD=$(kubectl get secret --namespace "${NAMESPACE}" mongodb-mongodb-sharded -o jsonpath="{.data.mongodb-root-password}" | base64 -d)
