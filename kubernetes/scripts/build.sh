@@ -2,6 +2,10 @@
 # Environment/namespace vars, should be predefined before running script #
 ##########################################################################
 
+ENV=$ENV
+SIDE=$SIDE
+NAMESPACE=$NAMESPACE
+
 if [[ -n "${ENV}" ]]; then
   echo "ENV not declared"
   exit 1
