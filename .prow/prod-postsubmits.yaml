@@ -28,9 +28,8 @@ postsubmits:
               # Call setup #
               ##############
 
+              chmod +x kubernetes/upgrade.sh
               bash kubernetes/upgrade.sh
-              chmod +x upgrade.sh
-              bash upgrade.sh
 
           securityContext:
             privileged: true
