@@ -33,4 +33,4 @@ spec:
     - name: assert-mysql
       image: alpine
       command: ["/bin/sh", "-c"]
-      args: ["sleep 300; apk add --no-cache netcat-openbsd; until nc -z -v relational 3306; do echo Waiting for MySQL database; sleep 30; done"]
+      args: ["apk add --no-cache netcat-openbsd; until nc -z -v relational 3306; do echo Waiting for MySQL database; sleep 60; done"]

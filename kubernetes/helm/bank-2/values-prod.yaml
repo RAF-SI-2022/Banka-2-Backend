@@ -1,8 +1,8 @@
 namespace: banka-2-prod
 domain: banka-2.k8s.elab.rs
 mongodb:
-  service: mongodb
-  username: raf
+  service: document
+  username: admin
   password: raf-si
 backend:
   imageVer: latest

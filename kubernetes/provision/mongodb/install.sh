@@ -18,6 +18,7 @@ helm repo update
 
 # Install MongoDB chart
 helm upgrade --install mongodb bitnami/mongodb-sharded \
+  --set service.nameOverride=document \
   --set auth.enabled=true \
   --namespace "${NAMESPACE}"
 

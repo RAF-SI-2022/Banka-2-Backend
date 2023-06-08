@@ -54,19 +54,19 @@ spec:
         - name: assert-mysql
           image: alpine
           command: ["/bin/sh", "-c"]
-          args: ["apk add --no-cache netcat-openbsd; until nc -z -v relational 3306; do echo Waiting for MySQL database; sleep 30; done"]
+          args: ["apk add --no-cache netcat-openbsd; until nc -z -v relational 3306; do echo Waiting for MySQL database; sleep 60; done"]
 
         # Check that MongoDB is running
         - name: assert-mongo
           image: mongo
           command: ["/bin/sh", "-c"]
-          args: ["until mongosh \"mongodb://{{ .Values.mongodb.username }}:{{ .Values.mongodb.password }}@{{ .Values.mongodb.service }}:27017/backend?authSource=admin\" --eval \"db.stats()\" > /dev/null 2>&1; do echo Waiting for MongoDB database; sleep 30; done"]
+          args: ["until mongosh \"mongodb://{{ .Values.mongodb.username }}:{{ .Values.mongodb.password }}@{{ .Values.mongodb.service }}:27017/backend?authSource=admin\" --eval \"db.stats()\" > /dev/null 2>&1; do echo Waiting for MongoDB database; sleep 60; done"]
 
         # Check that MongoDB is running
         - name: assert-redis
           image: redis:7.0.11-alpine
           command: ["/bin/sh", "-c"]
-          args: ["until echo PING | redis-cli -h redis -p 6379 > /dev/null 2>&1; do echo Waiting for Redis cache; sleep 30; done"]
+          args: ["until echo PING | redis-cli -h redis -p 6379 > /dev/null 2>&1; do echo Waiting for Redis cache; sleep 60; done"]
 
         # Migrate schema to {{ .Values.backend.imageVer }} version
         - name: flyway
