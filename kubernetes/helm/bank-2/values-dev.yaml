@@ -1,7 +1,7 @@
 namespace: banka-2-dev
 domain: banka-2-dev.k8s.elab.rs
 mongodb:
-  service: document
+  service: mongodb-mongodb-sharded
   username: admin
   password: raf-si
 backend:
