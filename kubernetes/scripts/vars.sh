@@ -2,11 +2,11 @@
 # Define all service names here #
 #################################
 
-services="flyway"
-services+=" users"
-services+=" main"
-services+=" otc"
-export SERVICES=${SERVICES}
+SERVICES="flyway"
+SERVICES+=" users"
+SERVICES+=" main"
+SERVICES+=" otc"
+export SERVICES="${SERVICES}"
 
 #######################################################################
 # Define all non-Helm services here; each must have its own folder in #
@@ -14,4 +14,4 @@ export SERVICES=${SERVICES}
 #######################################################################
 
 EXTRA_SERVICES="mongodb"
-export EXTRA_SERVICES=${EXTRA_SERVICES}
+export EXTRA_SERVICES="${EXTRA_SERVICES}"
