@@ -49,6 +49,7 @@ for service in $services
 do
   for tag in $image_tags
   do
+    echo "Building image for service '$service'"
     docker build -t harbor.k8s.elab.rs/banka-2/$service:builder -f ./docker/$service.Dockerfile .
     docker tag harbor.k8s.elab.rs/banka-2/$service:builder harbor.k8s.elab.rs/banka-2/$service:$tag
     docker push harbor.k8s.elab.rs/banka-2/$service:$tag

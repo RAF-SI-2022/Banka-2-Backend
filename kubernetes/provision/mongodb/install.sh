@@ -5,7 +5,7 @@ set -euo pipefail
 NAMESPACE="$(kubectl config view --minify | grep -Po 'namespace: \K.*')"
 
 if [[ -n "${NAMESPACE}" ]]; then
-  echo Namespace not declared
+  echo "Namespace not declared"
 fi
 
 # Add Helm repo
