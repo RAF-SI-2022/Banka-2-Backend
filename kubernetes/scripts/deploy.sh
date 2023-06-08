@@ -38,7 +38,7 @@ if [[ -n "${installed}" ]]; then
   echo "Upgrading Helm chart"
   cd charts/bank-2
   helm upgrade --install ${NAMESPACE} . \
-    --reuse-values \
+    -f values-${ENV}.yaml \
     --set ${SIDE}.imageVer=$image_ver \
     -n ${NAMESPACE}
 else
