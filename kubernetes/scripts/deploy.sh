@@ -30,7 +30,7 @@ installed=$(helm list --no-headers 2>/dev/null | grep "${NAMESPACE}")
 
 cd kubernetes
 
-if [[ -n "${installed}" ]]; then
+if [[ "$1" == "--update" || -n "${installed}" ]]; then
   echo "Upgrading Helm chart"
   cd helm/bank-2
   helm upgrade --install ${NAMESPACE} . \

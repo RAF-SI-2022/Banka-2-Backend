@@ -13,4 +13,4 @@ chmod +x kubernetes/scripts/build.sh
 chmod +x kubernetes/scripts/deploy.sh
 . kubernetes/scripts/vars.sh
 bash kubernetes/scripts/build.sh
-bash kubernetes/scripts/deploy.sh
+bash kubernetes/scripts/deploy.sh $1
