@@ -8,7 +8,9 @@
 #                                                                              #
 ################################################################################
 
+chmod +x kubernetes/scripts/vars.sh
 chmod +x kubernetes/scripts/build.sh
 chmod +x kubernetes/scripts/deploy.sh
+bash kubernetes/scripts/vars.sh
 bash kubernetes/scripts/build.sh
 bash kubernetes/scripts/deploy.sh

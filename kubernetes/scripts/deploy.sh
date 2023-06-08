@@ -14,14 +14,10 @@ if [[ -z "${NAMESPACE}" ]]; then
   echo "NAMESPACE not declared"
   exit 1
 fi
-
-#######################################################################
-# Define all non-Helm services here; each must have its own folder in #
-# kubernetes/provision, with an install.sh file                       #
-#######################################################################
-
-extras="mongodb"
-extras=$(echo $extras | xargs)
+if [[ -z "${EXTRA_SERVICES}" ]]; then
+  echo "EXTRA_SERVICES not declared"
+  exit 1
+fi
 
 ########################
 # Deploy to production #
@@ -45,6 +41,7 @@ else
   # Provision all services
   echo "Provisioning services"
   cd provision
+  extras=$(echo ${EXTRA_SERVICES} | xargs)
   for extra in $extras
   do
     cd $extra

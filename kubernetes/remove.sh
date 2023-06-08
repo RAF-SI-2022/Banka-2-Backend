@@ -25,14 +25,15 @@ helm uninstall ${NAMESPACE} || true
 
 echo "Removing services"
 
-extras="mongodb"
-extras=$(echo $extras | xargs)
+chmod +x kubernetes/scripts/vars.sh
+bash kubernetes/scripts/vars.sh
 
 cd kubernetes/provision
+extras=$(echo ${EXTRA_SERVICES} | xargs)
 for extra in $extras
 do
   cd $extra
   chmod +x remove.sh
-  bash ./remove.sh
+  bash ./remove.sh || true
   cd ..
 done
