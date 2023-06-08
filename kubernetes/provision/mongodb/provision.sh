@@ -2,7 +2,14 @@
 
 set -euo pipefail
 
-NAMESPACE="${namespace}"
+if [[ -z "${NAMESPACE}" ]]; then
+  NAMESPACE="$(kubectl config view --minify | grep -Po 'namespace: \K.*')"
+fi
+if [[ -z "${NAMESPACE}" ]]; then
+  echo "NAMESPACE not declared"
+  exit 1
+fi
+
 NEW_MONGODB_DB="${NEW_MONGODB_DB:-backend}"
 NEW_MONGODB_USER="${NEW_MONGODB_USER:-raf}"
 NEW_MONGODB_USER_PASSWORD="${NEW_MONGODB_USER_PASSWORD:-raf-si}"
