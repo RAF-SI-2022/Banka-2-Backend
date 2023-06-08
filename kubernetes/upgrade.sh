@@ -12,7 +12,6 @@
 # Build and push Docker images #
 ################################
 
-start-docker.sh
 docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD harbor.k8s.elab.rs
 
 commit_hash=$(git rev-parse HEAD)

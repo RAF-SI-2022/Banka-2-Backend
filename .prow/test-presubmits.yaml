@@ -26,6 +26,7 @@ presubmits:
               # Call setup #
               ##############
 
+              start-docker.sh
               chmod +x kubernetes/upgrade.sh
               bash kubernetes/upgrade.sh
 
