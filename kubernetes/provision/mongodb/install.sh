@@ -2,10 +2,10 @@
 
 set -euo pipefail
 
-if [[ -n "${NAMESPACE}" ]]; then
+if [[ -z "${NAMESPACE}" ]]; then
   NAMESPACE="$(kubectl config view --minify | grep -Po 'namespace: \K.*')"
 fi
-if [[ -n "${NAMESPACE}" ]]; then
+if [[ -z "${NAMESPACE}" ]]; then
   echo "NAMESPACE not declared"
   exit 1
 fi

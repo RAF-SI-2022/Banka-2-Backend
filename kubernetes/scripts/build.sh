@@ -2,19 +2,15 @@
 # Environment/namespace vars, should be predefined before running script #
 ##########################################################################
 
-ENV=$ENV
-SIDE=$SIDE
-NAMESPACE=$NAMESPACE
-
-if [[ -n "${ENV}" ]]; then
+if [[ -z "${ENV}" ]]; then
   echo "ENV not declared"
   exit 1
 fi
-if [[ -n "${SIDE}" ]]; then
+if [[ -z "${SIDE}" ]]; then
   echo "SIDE not declared"
   exit 1
 fi
-if [[ -n "${NAMESPACE}" ]]; then
+if [[ -z "${NAMESPACE}" ]]; then
   echo "NAMESPACE not declared"
   exit 1
 fi
