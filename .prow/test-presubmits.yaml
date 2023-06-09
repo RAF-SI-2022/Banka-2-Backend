@@ -18,7 +18,7 @@ presubmits:
               # Define environment/namespace vars #
               #####################################
               
-              export ENV="prod"
+              export ENV="dev"
               export SIDE="backend"
               export NAMESPACE="banka-2-$ENV"
               
