@@ -356,9 +356,9 @@ public class OptionService implements OptionServiceInterface {
                 Object o = callsArray.get(i);
 
                 JSONObject json = (JSONObject) o;
-                System.out.println(json);
+//                System.out.println(json);
                 //                System.out.println(json.length() + " ovo je velicina");
-                System.out.println(json.getDouble("change") + " bidovi ");
+//                System.out.println(json.getDouble("change") + " bidovi ");
 
                 Integer contractSize = 100;
                 Double price = json.getDouble("lastPrice");
