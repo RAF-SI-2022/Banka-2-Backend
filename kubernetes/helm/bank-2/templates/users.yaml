@@ -21,6 +21,10 @@ spec:
           imagePullPolicy: Always
           name: users
           env:
+            - name: server.address
+              value: users
+            - name: server.port
+              value: "8080"
             - name: spring.datasource.url
               value: jdbc:mysql://relational:3306/backend?allowPublicKeyRetrieval=true&useSSL=false&autoReconnect=true
             - name: spring.datasource.username
