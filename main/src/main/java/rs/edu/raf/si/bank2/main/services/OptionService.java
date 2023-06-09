@@ -16,6 +16,7 @@ import java.util.Optional;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rs.edu.raf.si.bank2.main.exceptions.*;
@@ -87,8 +88,11 @@ public class OptionService implements OptionServiceInterface {
     }
 
     @Override
+    @Cacheable(value = "optionsStock")
     public List<Option> findByStock(String stockSymbol) {
         //        List<Option> requestedOptions = optionRepository.findAllByStockSymbol(stockSymbol);
+        System.out.println("Getting options by stock - fist time (caching into redis)");
+
         List<Option> requestedOptions = optionRepository.findAllByStockSymbol(stockSymbol.toUpperCase());
         if (requestedOptions.isEmpty()) {
             optionRepository.saveAll(getFromExternalApi(stockSymbol, ""));
@@ -97,7 +101,9 @@ public class OptionService implements OptionServiceInterface {
     }
 
     @Override
+    @Cacheable(value = "optionsStockDate")
     public List<Option> findByStockAndDate(String stockSymbol, String regularDate) {
+        System.out.println("Getting options for stock and date - fist time (caching into redis)");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         LocalDate date = LocalDate.parse(regularDate, formatter);
         formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
