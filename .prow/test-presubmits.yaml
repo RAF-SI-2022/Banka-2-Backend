@@ -22,9 +22,6 @@ presubmits:
               export SIDE="backend"
               export NAMESPACE="banka-2-$ENV"
               
-              kubectl config get-contexts
-              kubectl config set-context --current --namespace=${NAMESPACE}
-              
               ##########################
               # Delete existing config #
               ##########################
