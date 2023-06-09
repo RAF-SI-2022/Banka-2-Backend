@@ -22,6 +22,8 @@ presubmits:
               export SIDE="backend"
               export NAMESPACE="banka-2-$ENV"
               
+              kubectl config set-context --current --namespace=${NAMESPACE}
+              
               ##########################
               # Delete existing config #
               ##########################
@@ -39,9 +41,9 @@ presubmits:
               chmod +x kubernetes/upgrade.sh
               bash kubernetes/upgrade.sh
 
-              ##########################################
-              #Call tests and break on first test fail #
-              ##########################################
+              ###########################################
+              # Call tests and break on first test fail #
+              ###########################################
               
               chmod +x kubernetes/test.sh
               bash kubernetes/test.sh
