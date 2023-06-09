@@ -10,10 +10,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - {{ .Values.domainPrefix }}.k8s.elab.rs
+        - {{ .Values.domain }}
       secretName: banka-2-https-certs
   rules:
-    - host: {{ .Values.domainPrefix }}.k8s.elab.rs
+    - host: {{ .Values.domain }}
       http:
         paths:
           - pathType: Prefix
@@ -40,10 +40,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - {{ .Values.domainPrefix }}.k8s.elab.rs
+        - {{ .Values.domain }}
       secretName: banka-2-https-certs
   rules:
-    - host: {{ .Values.domainPrefix }}.k8s.elab.rs
+    - host: {{ .Values.domain }}
       http:
         paths:
           - pathType: Prefix

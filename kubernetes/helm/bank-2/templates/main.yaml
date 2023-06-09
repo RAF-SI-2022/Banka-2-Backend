@@ -17,7 +17,7 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-        - image: harbor.k8s.elab.rs/banka-2/main:{{ .Values.backend.imageVer }}
+        - image: "harbor.k8s.elab.rs/banka-2/main:{{ .Values.backend.imageVer }}"
           imagePullPolicy: Always
           name: main
           env:
@@ -27,14 +27,14 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: relational-creds
-                  key: rootUser
+                  key: username
             - name: spring.datasource.password
               valueFrom:
                 secretKeyRef:
                   name: relational-creds
-                  key: rootPassword
+                  key: password
             - name: spring.data.mongodb.uri
-              value: mongodb://root:raf-si@mongo-service:27017/backend?authSource=admin
+              value: mongodb://{{ .Values.mongodb.username }}:{{ .Values.mongodb.password }}@{{ .Values.mongodb.service }}:27017/backend?authSource=admin
             - name: spring.cache.type
               value: redis
             - name: spring.data.redis.host
@@ -54,23 +54,23 @@ spec:
         - name: assert-mysql
           image: alpine
           command: ["/bin/sh", "-c"]
-          args: ["apk add --no-cache netcat-openbsd; until nc -z -v relational 3306; do echo Waiting for MySQL database; sleep 30; done"]
+          args: ["apk add --no-cache netcat-openbsd; until nc -z -v relational 3306; do echo Waiting for MySQL database; sleep 60; done"]
 
         # Check that MongoDB is running
         - name: assert-mongo
           image: mongo
           command: ["/bin/sh", "-c"]
-          args: ["until mongosh \"mongodb://root:raf-si@mongo-service:27017/backend?authSource=admin\" --eval \"db.stats()\" > /dev/null 2>&1; do echo Waiting for MongoDB database; sleep 30; done"]
+          args: ["until mongosh \"mongodb://{{ .Values.mongodb.username }}:{{ .Values.mongodb.password }}@{{ .Values.mongodb.service }}:27017/backend?authSource=admin\" --eval \"db.stats()\" > /dev/null 2>&1; do echo Waiting for MongoDB database; sleep 60; done"]
 
         # Check that MongoDB is running
         - name: assert-redis
           image: redis:7.0.11-alpine
           command: ["/bin/sh", "-c"]
-          args: ["until echo PING | redis-cli -h redis -p 6379 > /dev/null 2>&1; do echo Waiting for Redis cache; sleep 30; done"]
+          args: ["until echo PING | redis-cli -h redis -p 6379 > /dev/null 2>&1; do echo Waiting for Redis cache; sleep 60; done"]
 
-        # Migrate schema to {{ .Values.backend.imageVer }} version
+        # Migrate schema to "{{ .Values.backend.imageVer }}" version
         - name: flyway
-          image: harbor.k8s.elab.rs/banka-2/flyway:{{ .Values.backend.imageVer }}
+          image: "harbor.k8s.elab.rs/banka-2/flyway:{{ .Values.backend.imageVer }}"
           env:
             - name: url
               value: jdbc:mysql://relational:3306/backend?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true
@@ -78,16 +78,16 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: relational-creds
-                  key: rootUser
+                  key: username
             - name: password
               valueFrom:
                 secretKeyRef:
                   name: relational-creds
-                  key: rootPassword
+                  key: password
             - name: schemas
               value: backend
           command: ["/bin/sh", "-c"]
-          args: ["flyway migrate -url=$url -user=$user -password=$password"]
+          args: ["until flyway migrate -url=$url -user=$user -password=$password; do echo Waiting for Flyway migration; sleep 60; done"]
 
 ---
 

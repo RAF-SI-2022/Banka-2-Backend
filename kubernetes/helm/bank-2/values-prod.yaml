@@ -1,0 +1,10 @@
+namespace: banka-2-prod
+domain: banka-2.k8s.elab.rs
+mongodb:
+  service: mongodb-mongodb-sharded
+  username: admin
+  password: raf-si
+backend:
+  imageVer: latest
+frontend:
+  imageVer: latest

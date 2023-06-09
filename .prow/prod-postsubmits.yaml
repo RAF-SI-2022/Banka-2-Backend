@@ -15,68 +15,24 @@ postsubmits:
             - -c
             - |
               set -euo pipefail
-
-              ################################
-              # Build and push Docker images #
-              ################################
-
+              
+              #####################################
+              # Define environment/namespace vars #
+              #####################################
+              
+              export ENV="prod"
+              export SIDE="backend"
+              export NAMESPACE="banka-2-$ENV"
+              
+              ##############
+              # Call setup #
+              ##############
+  
               start-docker.sh
               docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD harbor.k8s.elab.rs
-
-              commit_hash=$(git rev-parse HEAD)
-              tag_name=$(git tag --points-at HEAD)
               
-              services="flyway"
-              services+=" users"
-              services+=" main"
-              services+=" otc"
-              services=$(echo $services | xargs)
-
-              image_tags="latest"
-              image_tags+=" ${commit_hash}"
-              image_tags+=" ${tag_name}"
-              image_tags=$(echo $image_tags | xargs)
-
-              docker build -t harbor.k8s.elab.rs/banka-2/users:builder -f ./docker/users.Dockerfile .
-              docker build -t harbor.k8s.elab.rs/banka-2/otc:builder -f ./docker/otc.Dockerfile .
-              docker build -t harbor.k8s.elab.rs/banka-2/main:builder -f ./docker/main.Dockerfile .
-
-              for service in $services
-              do
-                  for tag in $image_tags
-                  do
-                      docker build -t harbor.k8s.elab.rs/banka-2/$service:builder -f ./docker/$service.Dockerfile .
-                      docker tag harbor.k8s.elab.rs/banka-2/$service:builder harbor.k8s.elab.rs/banka-2/$service:$tag
-                      docker push harbor.k8s.elab.rs/banka-2/$service:$tag
-                  done
-              done
-              
-              ########################
-              # Deploy to production #
-              ########################
-              
-              namespace="banka-2-prod"
-              domainPrefix="banka-2"
-              imageVer="$commit_hash"
-              
-              apt-get -y install grep
-              installed=$(helm list --no-headers 2>/dev/null | grep "banka-2-prod")
-              
-              cd kubernetes
-              
-              if [[ -n "${installed}" ]]; then
-                  helm upgrade banka-2-prod . --reuse-values \
-                      --set namespace=$namespace \
-                      --set domainPrefix=$domainPrefix \
-                      --set backend.imageVer=$imageVer \
-                      -n banka-2-prod
-              else
-                  helm install banka-2-prod . --reuse-values \
-                      --set namespace=$namespace \
-                      --set domainPrefix=$domainPrefix \
-                      --set backend.imageVer=$imageVer \
-                      -n banka-2-prod
-              fi
+              chmod +x kubernetes/upgrade.sh
+              bash kubernetes/upgrade.sh --update
 
           securityContext:
             privileged: true
