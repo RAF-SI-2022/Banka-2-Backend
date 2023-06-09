@@ -58,6 +58,9 @@ public class StockBuyWorker extends Thread {
                     return;
                 }
                 StockOrder stockOrder = stockBuyRequestsQueue.take();
+
+
+
                 // These are checks for limit and stop. If they are set and order doesn't meet the requirements we skip that order and try again later.
                 if(!this.stockService.checkLimitAndStopForBuy(stockOrder)) {
                     stockBuyRequestsQueue.put(stockOrder); // Put order back at the end of the queue.

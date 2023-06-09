@@ -44,5 +44,7 @@ public class BootstrapData implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         initializeMarginAccount();
+
+        System.out.println("Everything started");
     }
 }
