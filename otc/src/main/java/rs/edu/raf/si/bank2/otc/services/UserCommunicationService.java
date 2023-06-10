@@ -110,7 +110,7 @@ public class UserCommunicationService implements UserCommunicationInterface {
             throw new RuntimeException(e);
         }
     }
-    public CommunicationDto sendGet(String senderEmail, String urlExtension,String service){
+    public CommunicationDto sendGet(String senderEmail, String urlExtension, String service){
 //        String senderEmail = args[0];
 //        String urlExtension = args[1];
 //        String service = null;

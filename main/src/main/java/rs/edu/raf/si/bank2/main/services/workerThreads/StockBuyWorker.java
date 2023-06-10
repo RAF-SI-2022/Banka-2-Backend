@@ -6,6 +6,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.ResponseEntity;
+import rs.edu.raf.si.bank2.main.dto.AccountType;
+import rs.edu.raf.si.bank2.main.dto.CommunicationDto;
+import rs.edu.raf.si.bank2.main.dto.MarginTransactionDto;
+import rs.edu.raf.si.bank2.main.dto.TransactionType;
 import rs.edu.raf.si.bank2.main.exceptions.OrderNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.*;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.Order;
@@ -13,6 +21,7 @@ import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderStatus;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.StockOrder;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.OrderRepository;
 import rs.edu.raf.si.bank2.main.services.*;
+import rs.edu.raf.si.bank2.main.services.interfaces.UserCommunicationInterface;
 
 public class StockBuyWorker extends Thread {
 
@@ -25,6 +34,8 @@ public class StockBuyWorker extends Thread {
     TransactionService transactionService;
     UserService userService;
     OrderRepository orderRepository;
+    ObjectMapper mapper = new ObjectMapper();
+    UserCommunicationService userCommunicationService;
 
     public StockBuyWorker(
             BlockingQueue<StockOrder> blockingQueue,
@@ -34,7 +45,9 @@ public class StockBuyWorker extends Thread {
             CurrencyService currencyService,
             TransactionService transactionService,
             OrderRepository orderRepository,
-            UserService userService) {
+            UserService userService,
+            UserCommunicationService userCommunicationService
+    ) {
         this.stockBuyRequestsQueue = blockingQueue;
         this.stockService = stockService;
         this.userStockService = userStockService;
@@ -43,6 +56,7 @@ public class StockBuyWorker extends Thread {
         this.transactionService = transactionService;
         this.orderRepository = orderRepository;
         this.userService = userService;
+        this.userCommunicationService = userCommunicationService;
     }
 
     @Override
@@ -75,9 +89,15 @@ public class StockBuyWorker extends Thread {
                     userStockService.save(userStock);
                     usersStockToChange = userStockService.findUserStockByUserIdAndStockSymbol(stockOrder.getUser().getId(), stockOrder.getSymbol());
                 }
+
+                CommunicationDto communicationDto;
                 Balance balance = this.balanceService.findBalanceByUserIdAndCurrency(stockOrder.getUser().getId(), stockOrder.getCurrencyCode());
                 Stock stock = this.stockService.findStockBySymbolInDb(stockOrder.getSymbol());
-                this.balanceService.reserveAmount(stock.getPriceValue().floatValue()*stockOrder.getAmount(), stockOrder.getUser().getEmail(), stockOrder.getCurrencyCode(), true);
+
+                //todo if not margin
+                if (!stockOrder.isMargin()) {
+                    this.balanceService.reserveAmount(stock.getPriceValue().floatValue() * stockOrder.getAmount(), stockOrder.getUser().getEmail(), stockOrder.getCurrencyCode(), true);
+                }
 
                 User user = stockOrder.getUser();
                 user.setDailyLimit(user.getDailyLimit() - stock.getPriceValue().floatValue() * stockOrder.getAmount());
@@ -85,24 +105,48 @@ public class StockBuyWorker extends Thread {
 
                 if (stockOrder.isAllOrNone()) {
                     usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + stockOrder.getAmount());
-                    Transaction transaction = this.transactionService.createTransaction(stockOrder, balance, stock.getPriceValue().floatValue()*stockOrder.getAmount(), stock.getPriceValue().floatValue()*stockOrder.getAmount());
-                    this.transactionService.save(transaction);
-                } else {
+
+                    //ako je margin saljemo otc servisu
+                    if (stockOrder.isMargin()){
+                        sendMarginTransaction(stockOrder, user, stockOrder.getPrice());
+                    }
+                    else {
+                        Transaction transaction = this.transactionService.createTransaction(stockOrder, balance, stock.getPriceValue().floatValue()*stockOrder.getAmount(), stock.getPriceValue().floatValue()*stockOrder.getAmount());
+                        this.transactionService.save(transaction);
+                    }
+                }
+                else {
                     int stockAmountSum = 0;
                     List<Transaction> transactionList = new ArrayList<>();
                     while (stockAmountSum < stockOrder.getAmount()) {
                         int amountBought = random.nextInt(stockOrder.getAmount() - stockAmountSum) + 1;
                         stockAmountSum += amountBought;
                         usersStockToChange.get().setAmount(usersStockToChange.get().getAmount() + amountBought);
-                        Transaction transaction = this.transactionService.createTransaction(stockOrder, balance, stock.getPriceValue().floatValue() * amountBought, stock.getPriceValue().floatValue()*stockOrder.getAmount());
-                        transactionList.add(transaction);
+
+                        //todo ovde pozovi margin send
+                        if (stockOrder.isMargin()) {
+                            sendMarginTransaction(stockOrder, user, stock.getPriceValue().doubleValue() * amountBought);
+                        }
+                        else {
+                            Transaction transaction = this.transactionService.createTransaction(stockOrder, balance, stock.getPriceValue().floatValue() * amountBought, stock.getPriceValue().floatValue()*stockOrder.getAmount());
+                            transactionList.add(transaction);
+                        }
                     }
-                    this.transactionService.saveAll(transactionList);
+                    if (!stockOrder.isMargin())
+                        this.transactionService.saveAll(transactionList);
                 }
                 userStockService.save(usersStockToChange.get());
+
+                if (stockOrder.isMargin()){
+                    this.updateOrderStatus(stockOrder.getId(), OrderStatus.COMPLETE);
+                    continue;
+                }
+
+                //todo ako je margin preskoco ovo isamo markiraj da je order complete
                 this.balanceService.updateBalance(stockOrder, stockOrder.getUser().getEmail(), stockOrder.getCurrencyCode(), true);
                 this.updateOrderStatus(stockOrder.getId(), OrderStatus.COMPLETE);
                 this.transactionService.updateTransactionsStatusesOfOrder(stockOrder.getId(), TransactionStatus.COMPLETE);
+
             } catch (Exception e) {
                 // If unexpected error occurs, we want to print it and to continue.
                 // Exception must not crash this worker thread.
@@ -119,4 +163,26 @@ public class StockBuyWorker extends Thread {
             this.orderRepository.save(order.get());
         } else throw new OrderNotFoundException(id);
     }
+
+    private CommunicationDto sendMarginTransaction(StockOrder stockOrder, User user, Double price) {
+        //ako je MARGIN order posalji ga na drugi service umesto da ga ovde obradjujes
+        CommunicationDto communicationDto;
+        MarginTransactionDto marginTransactionDto = new MarginTransactionDto();
+        marginTransactionDto.setAccountType(AccountType.MARGIN);
+        marginTransactionDto.setOrderId(stockOrder.getId());
+        marginTransactionDto.setTransactionComment("Prodaja akcija");
+        marginTransactionDto.setCurrencyCode(stockOrder.getCurrencyCode());
+        marginTransactionDto.setTransactionType(TransactionType.BUY);
+        marginTransactionDto.setInitialMargin(price);
+        marginTransactionDto.setMaintenanceMargin(price * 0.4); //za odrzavanje je 40% full cene
+        try {
+            String marginDtoJson = mapper.writeValueAsString(marginTransactionDto);
+            communicationDto = userCommunicationService.sendMarginTransaction("/makeTransaction", marginDtoJson, user.getEmail());
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        return communicationDto;
+    }
+
 }
