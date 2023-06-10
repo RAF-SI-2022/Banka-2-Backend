@@ -29,12 +29,12 @@ public class MarginTransactionService {
 
     public void updateBalance(MarginBalance marginBalance, MarginTransaction marginTransaction) {
         if (marginTransaction.getTransactionType().equals(TransactionType.BUY)) {
-            marginBalance.setInvestedResources(marginBalance.getInvestedResources() + marginTransaction.getInitialMargin());
+            marginBalance.setInvestedResources(marginBalance.getInvestedResources() - marginTransaction.getInitialMargin());
             marginBalance.setLoanedResources(marginBalance.getLoanedResources() + marginTransaction.getLoanValue());
             marginBalance.setMaintenanceMargin(marginBalance.getMaintenanceMargin() + marginTransaction.getMaintenanceMargin());
         }
         else {
-            marginBalance.setInvestedResources(marginBalance.getInvestedResources() - marginTransaction.getInitialMargin());
+            marginBalance.setInvestedResources(marginBalance.getInvestedResources() + marginTransaction.getInitialMargin());
             marginBalance.setMaintenanceMargin(marginBalance.getMaintenanceMargin() - marginTransaction.getMaintenanceMargin());
             if (marginBalance.getInvestedResources() < 0) {
                 marginBalance.setInvestedResources(0.0);
