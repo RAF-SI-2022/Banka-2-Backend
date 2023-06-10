@@ -101,8 +101,8 @@ public class MarginTransactionService {
         return null;
     }
 
-    public List<MarginTransaction> findByGroup(String currencyCode, String orderType){
-        return marginTransactionRepository.findMarginTransactionByCurrencyCodeAndOrderType(currencyCode, orderType);
+    public List<MarginTransaction> findByGroup(String orderType){
+        return marginTransactionRepository.findMarginTransactionByOrderType(orderType);
     }
 
     public List<MarginTransaction> findAll() {

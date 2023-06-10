@@ -31,7 +31,7 @@ public class MarginTransactionController {
 
     @GetMapping("/byGroup/{group}")
     public ResponseEntity<?> getTransactionsByGroup(@PathVariable String group){
-        return ResponseEntity.ok(marginTransactionService.findByGroup("USD", group));
+        return ResponseEntity.ok(marginTransactionService.findByGroup(group));
     }
 
     @GetMapping("/{id}")
