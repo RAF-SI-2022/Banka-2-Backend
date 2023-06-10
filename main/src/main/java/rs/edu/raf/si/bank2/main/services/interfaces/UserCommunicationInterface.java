@@ -37,6 +37,8 @@ public interface UserCommunicationInterface {
 
     public CommunicationDto sendPostLike(String urlExtension, String postObjectBody, String senderEmail, String method);
 
+    public CommunicationDto sendMarginTransaction(String urlExtension, String postObjectBody, String senderEmail);
+
     public CommunicationDto sendDelete(String urlExtension);
 
 
