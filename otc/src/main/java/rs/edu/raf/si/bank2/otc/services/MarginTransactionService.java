@@ -46,6 +46,7 @@ public class MarginTransactionService {
         marginBalanceRepository.save(marginBalance);
     }
 
+
     public String trim(String input) {
         String[] parts = input.split("\"responseMsg\":\"");
         String lastNumber = parts[1].split("\"")[0];
@@ -76,6 +77,7 @@ public class MarginTransactionService {
                 .loanValue(loanVal)
                 .maintenanceMargin(marginTransactionDto.getMaintenanceMargin())
                 .interest(orderType.equals("FOREX") ? loanVal * 0.05 : 0.0)
+                .orderType(orderType)
                 .build();
         Optional<MarginBalance> marginBalanceFromDb = marginBalanceRepository.findMarginBalanceByListingGroup(ListingGroup.valueOf(orderType));
 //        if(tradeType != marginTransactionDto.getTransactionType().toString()){
@@ -99,25 +101,14 @@ public class MarginTransactionService {
         return null;
     }
 
+    public List<MarginTransaction> findByGroup(String currencyCode, String orderType){
+        return marginTransactionRepository.findMarginTransactionByCurrencyCodeAndOrderType(currencyCode, orderType);
+    }
+
     public List<MarginTransaction> findAll() {
         return marginTransactionRepository.findAll();
     }
-//    public MarginTransaction updateMarginTransaction(String id,MarginTransaction marginTransaction){
-//        if(marginTransactionRepository.findById(id).isPresent()){
-//            return marginTransactionRepository.save(marginTransaction);
-//        }
-//        return null;
-//    }
-//
-//    public MarginTransaction deleteMarginTransaction(String id){
-//        Optional<MarginTransaction> marginTransaction = marginTransactionRepository.findById(id);
-//        if(marginTransaction.isEmpty()){
-//            marginTransactionRepository.delete(marginTransaction.get());
-//            return marginTransaction.get();
-//        }else{
-//            return null;
-//        }
-//    }
+
 
     public List<MarginTransaction> findMarginsByEmail(String email) {
         return marginTransactionRepository.findMarginTransactionsByUserEmail(email);

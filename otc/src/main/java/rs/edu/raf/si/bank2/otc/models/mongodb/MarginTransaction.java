@@ -23,9 +23,6 @@ public class MarginTransaction {
     String id;
     AccountType accountType;
     LocalDateTime dateTime;
-//    ListingGroup listingGroup;//Long orderId;// ovo smo se dogovorili da fejkujemo?
-    // jer nam je pretesko da namestimo komunikaciju i sve do prekosutra
-
     Long orderId;
     String userEmail;
     String transactionComment;
@@ -35,4 +32,5 @@ public class MarginTransaction {
     Double loanValue;
     Double maintenanceMargin;
     Double interest;
+    String orderType;
 }

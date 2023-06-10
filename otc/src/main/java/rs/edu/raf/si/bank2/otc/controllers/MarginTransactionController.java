@@ -29,6 +29,11 @@ public class MarginTransactionController {
         return ResponseEntity.ok(transactions);
     }
 
+    @GetMapping("/byGroup/{group}")
+    public ResponseEntity<?> getTransactionsByGroup(@PathVariable String group){
+        return ResponseEntity.ok(marginTransactionService.findByGroup("USD", group));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getTransactionById(@PathVariable String id) {
         MarginTransaction transaction = marginTransactionService.findById(id);
@@ -41,8 +46,7 @@ public class MarginTransactionController {
 
     @PostMapping(value = "/makeTransaction")
     public ResponseEntity<?> createMarginTransaction(@RequestBody MarginTransactionDto marginTransactionDto) {
-
-        System.err.println(marginTransactionDto);
+//        System.err.println(marginTransactionDto);
         return ResponseEntity.ok().body(marginTransactionService.makeTransaction(marginTransactionDto, getContext().getAuthentication().getName()));
     }
 
