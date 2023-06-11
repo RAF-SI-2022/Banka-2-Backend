@@ -157,7 +157,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
         user.setDailyLimit(user.getDailyLimit() + limitChange);
 //        userRepository.save(user);
 
-        try {//todo proveri da li ovo radi pravilno
+        try {
             String userJsonBody = mapper.writeValueAsString(user);
             userCommunicationInterface.sendPostLike("/save", userJsonBody, null, "POST");
         } catch (JsonProcessingException e) { throw new RuntimeException(e); }

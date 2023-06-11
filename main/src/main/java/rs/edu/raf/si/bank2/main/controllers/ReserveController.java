@@ -64,7 +64,7 @@ public class ReserveController {
 
     @PostMapping("/reserveStock")
     public ResponseEntity<?> reserveUserStock(@RequestBody ReserveDto reserveDto) {
-        Optional<UserStock> userStock = userStocksRepository.findByIdAndStockId(reserveDto.getHartijaId(), reserveDto.getUserId());
+        Optional<UserStock> userStock = userStocksRepository.findUserStockByUserIdAndStockId(reserveDto.getUserId(), reserveDto.getHartijaId());
 
         if (userStock.isEmpty()) return ResponseEntity.status(404).body("Stock nije pronadjen");
         if (userStock.get().getAmount() < reserveDto.getAmount())

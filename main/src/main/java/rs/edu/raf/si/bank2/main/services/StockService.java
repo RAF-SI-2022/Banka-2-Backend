@@ -14,6 +14,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,20 +25,22 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import rs.edu.raf.si.bank2.main.dto.AccountType;
+import rs.edu.raf.si.bank2.main.dto.CommunicationDto;
+import rs.edu.raf.si.bank2.main.dto.MarginTransactionDto;
+import rs.edu.raf.si.bank2.main.dto.TransactionType;
 import rs.edu.raf.si.bank2.main.exceptions.ExchangeNotFoundException;
 import rs.edu.raf.si.bank2.main.exceptions.ExternalAPILimitReachedException;
-import rs.edu.raf.si.bank2.main.exceptions.NotEnoughMoneyException;
+import rs.edu.raf.si.bank2.main.exceptions.OrderNotFoundException;
 import rs.edu.raf.si.bank2.main.exceptions.StockNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.*;
-import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderStatus;
-import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderTradeType;
-import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderType;
-import rs.edu.raf.si.bank2.main.models.mariadb.orders.StockOrder;
+import rs.edu.raf.si.bank2.main.models.mariadb.orders.*;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.ExchangeRepository;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.OrderRepository;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.StockHistoryRepository;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.StockRepository;
 import rs.edu.raf.si.bank2.main.requests.StockRequest;
+import rs.edu.raf.si.bank2.main.services.interfaces.UserCommunicationInterface;
 import rs.edu.raf.si.bank2.main.services.workerThreads.StockBuyWorker;
 import rs.edu.raf.si.bank2.main.services.workerThreads.StockSellWorker;
 import rs.edu.raf.si.bank2.main.services.workerThreads.StocksRetrieverFromApiWorker;
@@ -81,7 +86,7 @@ public class StockService {
             TransactionService transactionService,
             ExchangeRepository exchangeRepository,
             BalanceService balanceService,
-            OrderRepository orderRepository) {
+            OrderRepository orderRepository, UserCommunicationService userCommunicationService) {
         this.stockRepository = stockRepository;
         this.exchangeRepository = exchangeRepository;
         this.stockHistoryRepository = stockHistoryRepository;
@@ -97,9 +102,18 @@ public class StockService {
                 currencyService,
                 transactionService,
                 orderRepository,
-                userService);
+                userService,
+                userCommunicationService
+        );
         this.stockSellWorker = new StockSellWorker(
-                stockSellRequestsQueue, userStockService, this, transactionService, orderRepository, balanceService);
+                stockSellRequestsQueue,
+                userStockService,
+                this,
+                transactionService,
+                orderRepository,
+                balanceService,
+                userCommunicationService
+        );
         stockBuyWorker.start();
         stockSellWorker.start();
         this.stocksRetrieverFromApiWorker = new StocksRetrieverFromApiWorker(this);
@@ -446,6 +460,7 @@ public class StockService {
             return ResponseEntity.internalServerError().body("Doslo je do neocekivane greske.");
         }
 
+        //napravimo order is stavimo na cekanje ako ne moze da prodje
         if (!approved && price.doubleValue() > user.getDailyLimit()) {
             order = stockOrder == null
                     ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.WAITING, OrderTradeType.BUY)
@@ -453,8 +468,31 @@ public class StockService {
             this.orderRepository.save(order);
             return ResponseEntity.status(400).body("Dnevni limit je prekoracen, porudzbina je na cekanju (WAITING).");
         }
+
         order = stockOrder == null ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.IN_PROGRESS, OrderTradeType.BUY) : stockOrder;
         order = this.orderRepository.save(order);
+
+        //ako je MARGIN order posalji ga na drugi service umesto da ga ovde obradjujes
+//        if (order.isMargin()){
+//            CommunicationDto communicationDto;
+//            MarginTransactionDto marginTransactionDto = new MarginTransactionDto();
+//            marginTransactionDto.setAccountType(AccountType.MARGIN);
+//            marginTransactionDto.setOrderId(order.getId());
+//            marginTransactionDto.setTransactionComment("Kupovina akcija");
+//            marginTransactionDto.setCurrencyCode(order.getCurrencyCode());
+//            marginTransactionDto.setTransactionType(TransactionType.BUY);
+//            marginTransactionDto.setInitialMargin(price.doubleValue());
+//            marginTransactionDto.setMaintenanceMargin(price.doubleValue() * 0.4); //za odrzavanje je 40% full cene
+//            try {
+//                String marginDtoJson = mapper.writeValueAsString(marginTransactionDto);
+//                communicationDto = userCommunicationInterface.sendMarginTransaction("/makeTransaction", marginDtoJson, user.getEmail());
+//            } catch (JsonProcessingException e) { throw new RuntimeException(e); }
+//
+//            if (communicationDto.getResponseCode() == 200)
+//                this.updateOrderStatus(order.getId(), OrderStatus.COMPLETE);
+//            return ResponseEntity.status(communicationDto.getResponseCode()).body(communicationDto.getResponseMsg());
+//        }
+
         try {
             stockBuyRequestsQueue.put(order);
         } catch (InterruptedException e) {
@@ -468,6 +506,15 @@ public class StockService {
         Map<String, String> response = new HashMap<>();
         response.put("message", "Kupovina akcije je uspesna.");
         return ResponseEntity.ok().body(response);
+    }
+
+    private void updateOrderStatus(Long id, OrderStatus orderStatus) {
+        Optional<Order> order = this.orderRepository.findById(id);
+
+        if (order.isPresent()) {
+            order.get().setStatus(orderStatus);
+            this.orderRepository.save(order.get());
+        } else throw new OrderNotFoundException(id);
     }
 
     private StockOrder createOrder(
@@ -516,6 +563,28 @@ public class StockService {
                             OrderTradeType.SELL)
                     : stockOrder;
             order = this.orderRepository.save(order);
+
+//            //ako je MARGIN order posalji ga na drugi service umesto da ga ovde obradjujes
+//            if (order.isMargin()){//todo proveri dal radi
+//                CommunicationDto communicationDto;
+//                MarginTransactionDto marginTransactionDto = new MarginTransactionDto();
+//                marginTransactionDto.setAccountType(AccountType.MARGIN);
+//                marginTransactionDto.setOrderId(order.getId());
+//                marginTransactionDto.setTransactionComment("Prodaja akcija");
+//                marginTransactionDto.setCurrencyCode(order.getCurrencyCode());
+//                marginTransactionDto.setTransactionType(TransactionType.SELL);
+//                marginTransactionDto.setInitialMargin(price.doubleValue());
+//                marginTransactionDto.setMaintenanceMargin(price.doubleValue() * 0.4); //za odrzavanje je 40% full cene
+//                try {
+//                    String marginDtoJson = mapper.writeValueAsString(marginTransactionDto);
+//                    communicationDto = userCommunicationInterface.sendMarginTransaction("/makeTransaction", marginDtoJson, userStock.get().getUser().getEmail());
+//                } catch (JsonProcessingException e) { throw new RuntimeException(e); }
+//
+//                if (communicationDto.getResponseCode() == 200)
+//                    this.updateOrderStatus(order.getId(), OrderStatus.COMPLETE);
+//                return ResponseEntity.status(communicationDto.getResponseCode()).body(communicationDto.getResponseMsg());
+//            }
+
             stockSellRequestsQueue.put(order);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

@@ -1,20 +1,17 @@
-package rs.edu.raf.si.bank2.otc.dto;
+package rs.edu.raf.si.bank2.main.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import rs.edu.raf.si.bank2.otc.models.mongodb.AccountType;
-import rs.edu.raf.si.bank2.otc.models.mongodb.ListingGroup;
-import rs.edu.raf.si.bank2.otc.models.mongodb.TransactionType;
 
-import java.time.LocalDateTime;
 @Data
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class MarginTransactionDto {
     AccountType accountType;//ENUM - CASH,MARGIN
+
     Long orderId;
     String transactionComment;//Uplaćivanje sredstava na račun - Initial Margin, Uplaćivanjesredstava na račun -Margin Call, Isplata kamate
     String currencyCode;

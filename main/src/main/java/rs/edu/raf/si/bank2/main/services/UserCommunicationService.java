@@ -31,6 +31,9 @@ public class UserCommunicationService implements UserCommunicationInterface {
     @Value("${services.users.host}")
     private String usersServiceHost;
 
+    @Value("${services.otc.host}")
+    private String otcServiceHost;
+
     @Autowired
     public UserCommunicationService(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
@@ -148,6 +151,56 @@ public class UserCommunicationService implements UserCommunicationInterface {
             URL url = new URL("http", hostPort[0], Integer.parseInt(hostPort[1]), "/api/userService" + urlExtension);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod(method);
+            connection.setRequestProperty("Authorization", "Bearer " + token);
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            OutputStream outputStream = connection.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+            writer.write(postObjectBody);
+            writer.flush();
+            writer.close();
+
+            int responseCode = connection.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK){
+                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+            }
+            else {
+                reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+            }
+            System.out.println("Response Code: " + responseCode);
+            System.out.println("Response: " + response.toString());
+            connection.disconnect();
+            reader.close();
+            return new CommunicationDto(responseCode, response.toString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public CommunicationDto sendMarginTransaction(String urlExtension, String postObjectBody, String senderEmail){
+        System.err.println("POSALI SMO MARGIN TRANS");
+
+        if (senderEmail == null) senderEmail = "anesic3119rn+banka2backend+admin@raf.rs";
+
+        String token = jwtUtil.generateToken(senderEmail);
+        String []hostPort = otcServiceHost.split(":");
+        BufferedReader reader;
+        StringBuilder response = new StringBuilder();
+        String line;
+
+        try {
+            URL url = new URL("http", hostPort[0], Integer.parseInt(hostPort[1]), "/api/marginTransaction" + urlExtension);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setDoOutput(true);
