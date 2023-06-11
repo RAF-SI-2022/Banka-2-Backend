@@ -6,6 +6,7 @@ SERVICES="flyway"
 SERVICES+=" users"
 SERVICES+=" main"
 SERVICES+=" otc"
+SERVICES+=" client"
 export SERVICES="${SERVICES}"
 
 #######################################################################
