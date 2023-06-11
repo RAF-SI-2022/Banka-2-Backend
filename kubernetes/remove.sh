@@ -17,10 +17,10 @@ set -euo pipefail
 
 echo "Deleting chart"
 
-helm uninstall ${NAMESPACE} || true
-kubectl delete pvc storage-relational-0 || true
-kubectl delete pvc storage-relational-1 || true
-kubectl delete pvc storage-relational-2 || true
+helm uninstall ${NAMESPACE} -n ${NAMESPACE} || true
+kubectl delete pvc storage-relational-0 -n ${NAMESPACE} || true
+kubectl delete pvc storage-relational-1 -n ${NAMESPACE} || true
+kubectl delete pvc storage-relational-2 -n ${NAMESPACE} || true
 
 ###################
 # Remove services #

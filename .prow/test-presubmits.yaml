@@ -22,6 +22,13 @@ presubmits:
               export SIDE="backend"
               export NAMESPACE="banka-2-$ENV"
               
+              ##########################
+              # Delete existing config #
+              ##########################
+              
+              chmod +x kubernetes/remove.sh
+              bash kubernetes/remove.sh
+              
               ##############
               # Call setup #
               ##############
@@ -30,68 +37,14 @@ presubmits:
               docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD harbor.k8s.elab.rs
               
               chmod +x kubernetes/upgrade.sh
-              bash kubernetes/upgrade.sh --update
+              bash kubernetes/upgrade.sh
 
-              ##########################################
-              # Run tests and break on first test fail #
-              ##########################################
+              ###########################################
+              # Call tests and break on first test fail #
+              ###########################################
               
-              # Load services
-              chmod +x kubernetes/scripts/vars.sh
-              . kubernetes/scripts/vars.sh
-              
-              # Number of attempts
-              max_attempts=10
-              
-              # Interval between attempts (in seconds)
-              interval=30
-              
-              # Current attempt
-              attempt=1
-              
-              all_ready=true
-              while [ $attempt -le $max_attempts ]
-              do
-                echo "Checking if services pods are running #$attempt"
-                all_ready=true
-                
-                services=$(echo ${SERVICES} | xargs)
-                for service in $services
-                do
-                
-                  # Regex of the pod
-                  regex="$service-.*"
-                  
-                  # Fetch the status of the pod
-                  pod_status=$(kubectl get pods -n <NAMESPACE> | grep -E $regex | awk '{print $3}')
-                  
-                  # Check if the pod is running
-                  if [ "$pod_status" != "Running" ]
-                  then
-                    all_ready=false
-                    break
-                  fi
-                done
-              
-                if [ "$all_ready" = true ]
-                then
-                  break
-                fi
-                
-                # Wait for the specified interval
-                sleep $interval
-                
-                # Increase the attempt counter
-                ((attempt++))
-              done
-              
-              if [ "$all_ready" != true]
-              then
-                echo "Service pods did not reach the 'Running' status after $max_attempts attempts."
-                exit 1
-              fi
-              
-              echo "Service pods ready for testing"
+              chmod +x kubernetes/test.sh
+              bash kubernetes/test.sh
 
           securityContext:
             privileged: true

@@ -21,6 +21,10 @@ spec:
           imagePullPolicy: Always
           name: main
           env:
+            - name: server.address
+              value: main
+            - name: server.port
+              value: "8081"
             - name: spring.datasource.url
               value: jdbc:mysql://relational:3306/backend?allowPublicKeyRetrieval=true&useSSL=false&autoReconnect=true
             - name: spring.datasource.username
@@ -45,8 +49,12 @@ spec:
               value: "900000"
             - name: service.users.host
               value: users:8080
+            - name: service.users.otc
+              value: users:8082
+            - name: service.users.client
+              value: users:8083
           ports:
-            - containerPort: 8080
+            - containerPort: 8081
           command: ["java", "-jar", "app.jar"]
 
       initContainers:

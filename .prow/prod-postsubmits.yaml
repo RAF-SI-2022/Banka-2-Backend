@@ -24,6 +24,8 @@ postsubmits:
               export SIDE="backend"
               export NAMESPACE="banka-2-$ENV"
               
+              kubectl config set-context --current --namespace=${NAMESPACE}
+              
               ##############
               # Call setup #
               ##############

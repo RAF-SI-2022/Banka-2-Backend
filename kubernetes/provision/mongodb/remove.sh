@@ -2,7 +2,12 @@
 
 set -euo pipefail
 
-helm uninstall mongodb || true
-kubectl delete pvc datadir-mongodb-mongodb-sharded-configsvr-0 || true
-kubectl delete pvc datadir-mongodb-mongodb-sharded-shard0-data-0 || true
-kubectl delete pvc datadir-mongodb-mongodb-sharded-shard1-data-0 || true
+if [[ -z "${NAMESPACE}" ]]; then
+  echo "NAMESPACE not declared"
+  exit 1
+fi
+
+helm uninstall mongodb -n ${NAMESPACE} || true
+kubectl delete pvc datadir-mongodb-mongodb-sharded-configsvr-0 -n ${NAMESPACE} || true
+kubectl delete pvc datadir-mongodb-mongodb-sharded-shard0-data-0 -n ${NAMESPACE} || true
+kubectl delete pvc datadir-mongodb-mongodb-sharded-shard1-data-0 -n ${NAMESPACE} || true
