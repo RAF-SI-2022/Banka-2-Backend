@@ -8,7 +8,6 @@ import rs.edu.raf.si.bank2.client.models.mariadb.PasswordResetToken;
 import rs.edu.raf.si.bank2.client.models.mariadb.Permission;
 import rs.edu.raf.si.bank2.client.models.mariadb.User;
 import rs.edu.raf.si.bank2.client.services.interfaces.UserServiceInterface;
-import rs.edu.raf.si.bank2.client.exceptions.PasswordResetTokenNotFoundException;
 import rs.edu.raf.si.bank2.client.exceptions.UserNotFoundException;
 import rs.edu.raf.si.bank2.client.repositories.mariadb.PasswordResetTokenRepository;
 import rs.edu.raf.si.bank2.client.repositories.mariadb.UserRepository;
@@ -84,6 +83,7 @@ public class UserService implements UserServiceInterface {
         //      throw new UserNotFoundException(id);
         //    }
     }
+
 
     @Override
     public User changeUsersDailyLimit(String userEmail, Double limitChange) {
