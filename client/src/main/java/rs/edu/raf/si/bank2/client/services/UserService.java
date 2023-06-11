@@ -8,7 +8,6 @@ import rs.edu.raf.si.bank2.client.models.mariadb.PasswordResetToken;
 import rs.edu.raf.si.bank2.client.models.mariadb.Permission;
 import rs.edu.raf.si.bank2.client.models.mariadb.User;
 import rs.edu.raf.si.bank2.client.services.interfaces.UserServiceInterface;
-import rs.edu.raf.si.bank2.client.exceptions.PasswordResetTokenNotFoundException;
 import rs.edu.raf.si.bank2.client.exceptions.UserNotFoundException;
 import rs.edu.raf.si.bank2.client.repositories.mariadb.PasswordResetTokenRepository;
 import rs.edu.raf.si.bank2.client.repositories.mariadb.UserRepository;
@@ -85,40 +84,6 @@ public class UserService implements UserServiceInterface {
         //    }
     }
 
-    @Override
-    public Optional<User> getUserByPasswordResetToken(String token) {
-        Optional<PasswordResetToken> passwordResetToken =
-                passwordResetTokenRepository.findPasswordResetTokenByToken(token);
-
-        if (passwordResetToken.isPresent())
-            return userRepository.findById(passwordResetToken.get().getUser().getId());
-        else throw new PasswordResetTokenNotFoundException(token);
-    }
-
-    @Override
-    public void changePassword(User user, String newPassword, String passwordResetToken) {
-        user.setPassword(newPassword);
-
-        Optional<PasswordResetToken> passwordResetTokenFromDB =
-                passwordResetTokenRepository.findPasswordResetTokenByToken(passwordResetToken);
-
-        if (passwordResetTokenFromDB.isPresent()) {
-            Optional<User> userFromDB = userRepository.findById(user.getId());
-
-            if (userFromDB.isPresent()) {
-                User userToChangePasswordTo = userFromDB.get();
-                userToChangePasswordTo.setPassword(newPassword);
-
-                userRepository.save(user);
-            } else {
-                throw new UserNotFoundException(user.getId());
-            }
-
-            passwordResetTokenRepository.deleteByToken(passwordResetToken);
-        } else {
-            throw new PasswordResetTokenNotFoundException(passwordResetToken);
-        }
-    }
 
     @Override
     public User changeUsersDailyLimit(String userEmail, Double limitChange) {
