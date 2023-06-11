@@ -22,7 +22,7 @@ spec:
           name: otc
           env:
             - name: server.address
-              value: otc
+              value: 127.0.0.1
             - name: server.port
               value: "8082"
             - name: spring.datasource.url

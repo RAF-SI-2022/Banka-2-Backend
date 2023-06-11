@@ -22,7 +22,7 @@ spec:
           name: main
           env:
             - name: server.address
-              value: main
+              value: 127.0.0.1
             - name: server.port
               value: "8081"
             - name: spring.datasource.url

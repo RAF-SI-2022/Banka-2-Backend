@@ -22,7 +22,7 @@ spec:
           name: client
           env:
             - name: server.address
-              value: client
+              value: 127.0.0.1
             - name: server.port
               value: "8083"
             - name: spring.datasource.url
