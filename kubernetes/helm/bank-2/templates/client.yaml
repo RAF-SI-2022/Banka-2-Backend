@@ -22,7 +22,7 @@ spec:
           name: client
           env:
             - name: server.address
-              value: client
+              value: 0.0.0.0
             - name: server.port
               value: "8083"
             - name: spring.datasource.url
@@ -108,9 +108,9 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   ports:
-    - port: 8081
+    - port: 8083
       protocol: TCP
-      targetPort: 8081
+      targetPort: 8083
   selector:
     app: client
   type: ClusterIP
