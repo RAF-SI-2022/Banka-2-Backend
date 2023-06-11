@@ -33,5 +33,6 @@ public class PoslovniRacun extends Racun{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
     private BussinessAccountType bussinessAccountType;
+//    private String companyId; //todo ovo stavi kasnije (treba da se gettuje iz otc servisa ili sa fronta)
 
 }
