@@ -51,8 +51,10 @@ spec:
               value: users:8080
             - name: service.main.host
               value: main:8081
+            - name: service.main.client
+              value: main:8083
           ports:
-            - containerPort: 8080
+            - containerPort: 8082
           command: ["java", "-jar", "app.jar"]
 
       initContainers:

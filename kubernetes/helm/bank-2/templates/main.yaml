@@ -49,8 +49,12 @@ spec:
               value: "900000"
             - name: service.users.host
               value: users:8080
+            - name: service.users.otc
+              value: users:8082
+            - name: service.users.client
+              value: users:8083
           ports:
-            - containerPort: 8080
+            - containerPort: 8081
           command: ["java", "-jar", "app.jar"]
 
       initContainers:

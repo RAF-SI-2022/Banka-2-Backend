@@ -67,3 +67,10 @@ spec:
                 name: otc
                 port:
                   number: 8082
+          - pathType: Prefix
+            path: "/backend/client(/|$)(.*)"
+            backend:
+              service:
+                name: otc
+                port:
+                  number: 8083
