@@ -30,29 +30,5 @@ public class Company {
     private String taxNumber;
     private String activityCode;
     private String address;
-    @DBRef(lazy = true)
-    private Collection<ContactPerson> contactPersons;
-    @DBRef(lazy = true)
-    private Collection<CompanyBankAccount> bankAccounts;
 
-    public Company(String name, String registrationNumber, String taxNumber, String activityCode, String address) {
-        this.name = name;
-        this.registrationNumber = registrationNumber;
-        this.taxNumber = taxNumber;
-        this.activityCode = activityCode;
-        this.address = address;
-        this.contactPersons = new ArrayList<>();
-        this.bankAccounts = new ArrayList<>();
-    }
-
-    public Company(String name, String registrationNumber, String taxNumber, String activityCode, String address, Collection<ContactPerson> contactPersons, Collection<CompanyBankAccount> bankAccounts) {
-        this.name = name;
-        this.registrationNumber = registrationNumber;
-        this.taxNumber = taxNumber;
-        this.activityCode = activityCode;
-        this.address = address;
-        this.contactPersons = new ArrayList<>(contactPersons);
-        this.bankAccounts = new ArrayList<>(bankAccounts);
-
-    }
 }
