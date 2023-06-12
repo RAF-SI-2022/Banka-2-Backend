@@ -18,7 +18,7 @@ public class StocksRetrieverFromApiWorker extends Thread {
             } catch (Exception e) {
                 // If any unexpected error occurs, we want to print it and to continue.
                 // Exception must not crash this thread worker.
-                // e.printStackTrace();
+                 e.printStackTrace();
             }
         }
     }

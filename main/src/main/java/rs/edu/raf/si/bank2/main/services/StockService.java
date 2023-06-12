@@ -117,7 +117,7 @@ public class StockService {
         stockBuyWorker.start();
         stockSellWorker.start();
         this.stocksRetrieverFromApiWorker = new StocksRetrieverFromApiWorker(this);
-        this.stocksRetrieverFromApiWorker.start();
+//        this.stocksRetrieverFromApiWorker.start(); TODO VRATI UPDATER
     }
 
     @Cacheable(value = "stockALL")
@@ -183,9 +183,10 @@ public class StockService {
                 JSONArray result = quoteSummary.getJSONArray("result");
                 JSONObject assetProfile = result.getJSONObject(0).getJSONObject("assetProfile");
                 String website = assetProfile.getString("website");
-
-                Optional<Exchange> exchangeOptional =
-                        exchangeRepository.findExchangeByAcronym(companyOverview.getString("Exchange"));
+//
+//                Optional<Exchange> exchangeOptional =//todo vrati kad proradi
+//                        exchangeRepository.findExchangeByAcronym(companyOverview.getString("Exchange"));
+                Optional<Exchange> exchangeOptional = exchangeRepository.findExchangeByAcronym("NYSE");
 
                 if (exchangeOptional.isPresent()) {
                     // This method is called from separate thread.
@@ -193,9 +194,9 @@ public class StockService {
                     // rs.edu.raf.si.bank2.main.models.mariadb.Exchange"
                     // To avoid that we check if exchange entity is in detached state. If it is, merge it.
                     Exchange exchange = exchangeOptional.get();
-                    if (!entityManager.contains(exchange)) {
-                        exchange = this.entityManager.merge(exchange);
-                    }
+//                    if (!entityManager.contains(exchange)) { todo vrati
+//                        exchange = this.entityManager.merge(exchange);
+//                    }
                     stock = Stock.builder()
                             .exchange(exchange)
                             .symbol(symbol)
