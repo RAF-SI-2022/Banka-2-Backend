@@ -120,7 +120,7 @@ public class BootstrapData implements CommandLineRunner {
         if (listOfBalances.size() == 0) runTestSetup = true;
 
 
-        boolean temporaryLoad = false;//TODO OVO TREBA DA SE UNAPREDI I DA BUDE NA FALSE NA LOKALU
+        boolean temporaryLoad = true;//TODO OVO TREBA DA SE UNAPREDI I DA BUDE NA FALSE NA LOKALU
 
 
         if (!temporaryLoad){
