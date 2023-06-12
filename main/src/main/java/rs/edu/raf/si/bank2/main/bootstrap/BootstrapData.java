@@ -63,16 +63,13 @@ public class BootstrapData implements CommandLineRunner {
     private final FutureRepository futureRepository;
     private final BalanceRepository balanceRepository;
     private final UserStocksRepository userStocksRepository;
-
     private final ForexService forexService;
     private final StockRepository stockRepository;
     private final StockHistoryRepository stockHistoryRepository;
     private final StockService stockService;
     private final OptionService optionService;
     private final OptionRepository optionRepository;
-
     private final EntityManagerFactory entityManagerFactory;
-
     private final RedisConnectionFactory redisConnectionFactory;
 
     private boolean runTestSetup = false;
@@ -118,56 +115,48 @@ public class BootstrapData implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        //todo nameti da ovo radi samo za testiranje
-
+        // todo nameti da ovo radi samo za testiranje
         List<Balance> listOfBalances = balanceRepository.findAll();
         if (listOfBalances.size() == 0) runTestSetup = true;
 
-        // If empty, add futures in db from csv
-        long numberOfRowsFutures = this.futureRepository.count();
-        if (numberOfRowsFutures == 0) {
-            logger.info("Added futures");
-            this.loadFutureTable();
+        boolean temporaryLoad = false; // TODO OVO TREBA DA SE UNAPREDI I DA BUDE NA FALSE NA LOKALU
+
+        if (!temporaryLoad) {
+            // If empty, add futures in db from csv
+            if (this.futureRepository.count() == 0) {
+                logger.info("Added futures");
+                this.loadFutureTable();
+            }
+            // If empty, add currencies in db from csv
+            if (this.currencyRepository.count() == 0) {
+                logger.info("Added currencies");
+                this.loadCurrenciesAndInflationTable();
+            }
+            // If empty, add exchange markets in db from csv
+            if (this.exchangeRepository.count() == 0) {
+                logger.info("Added exchange markets");
+                this.loadExchangeMarkets();
+            }
+            // If empty, add stocks in db from csv
+            if (stockRepository.count() == 0) {
+                logger.info("Adding stocks");
+                loadStocksTable();
+            }
+        } else {
+            this.temporaryLoad();
         }
 
-        // If empty, add currencies in db from csv
-        long numberOfRowsCurrency = this.currencyRepository.count();
-        if (numberOfRowsCurrency == 0) {
-            logger.info("Added currencies");
-            this.loadCurrenciesAndInflationTable();
-        }
-
-        // If empty, add exchange markets in db from csv
-        long numberOfExchanges = this.exchangeRepository.count();
-        if (numberOfExchanges == 0) {
-            logger.info("Added exchange markets");
-            this.loadExchangeMarkets();
-        }
-
-        long numberOfStocks = stockRepository.count();
-        if (numberOfStocks == 0) {
-            logger.info("Adding stocks");
-            loadStocksTable();
-        }
-
-
-        logger.info("Added exchange markets");
-        this.loadExchangeMarkets();
-        // Includes both initial admin run and permissions run.
-
-        if (runTestSetup){
+        if (runTestSetup) {
             addAdminForTest();
             addBalancesToAdmin();
             runTestSetup = false;
         }
 
-
         logger.info("Started!");
         System.out.println("Everything started");
-
     }
 
-    private void addBalancesToAdmin(){
+    private void addBalancesToAdmin() {
         // Add initial 100_000 RSD to admin
         Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
         User admin = adminUser.get();
@@ -517,4 +506,38 @@ public class BootstrapData implements CommandLineRunner {
         logger.info("Root admin added");
     }
 
+    /*
+    future
+    currency
+    exchange
+    stocks
+     */
+    private void temporaryLoad() {
+
+        // corn,5000,bushel,1600,AGRICULTURE
+        // soybean,5000,bushel,2700,AGRICULTURE
+
+        futureRepository.save(new Future(1L, "corn", 5000, "bushel", 1600, "AGRICULTURE", "01.05.2025", true, null));
+        futureRepository.save(new Future(2L, "corn", 5000, "bushel", 1500, "AGRICULTURE", "01.03.2025", true, null));
+        futureRepository.save(new Future(3L, "soybean", 5000, "bushel", 1700, "AGRICULTURE", "01.05.2025", true, null));
+        futureRepository.save(new Future(4L, "soybean", 5000, "bushel", 1750, "AGRICULTURE", "01.04.2025", true, null));
+
+        currencyRepository.save(
+                new Currency(1L, "United States Dollar", "USD", "$", "United States", new ArrayList<>()));
+        currencyRepository.save(new Currency(2L, "Danish Krone", "DKK", "DKK", "Denmark", new ArrayList<>()));
+        currencyRepository.save(new Currency(3L, "Serbian Dinar", "RSD", "RSD", "Serbia", new ArrayList<>()));
+
+        exchangeRepository.save(
+                new Exchange(1L, "New York Stock Exchange", "NYSE", "XNYS", "USA", null, "USA", " 09:30", " 16:00"));
+        exchangeRepository.save(
+                new Exchange(2L, "Nasdaq", "NASDAQ", "XNAS", "USA", null, "America/New_York", " 09:30", " 16:00"));
+
+        // dodajemo 5 opcija
+        //        optionService.getFiveMostImportantOptionsFromApi();
+
+        // dodajemo 5 stockova
+        stockService.updateAllStocksInDb();
+
+        // todo stock history
+    }
 }

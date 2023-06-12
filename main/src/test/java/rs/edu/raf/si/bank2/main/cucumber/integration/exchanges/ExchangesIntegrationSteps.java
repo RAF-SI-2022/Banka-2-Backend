@@ -55,7 +55,8 @@ public class ExchangesIntegrationSteps extends ExchangesIntegrationTestConfig {
 
     @Given("there is an exchange record in database")
     public void there_is_an_exchange_record_in_database() {
-        testExchange = new Exchange(2L, "Nasdaq", "NASDAQ", "XNAS", "USA", "America/New_York", " 09:30", " 16:00");
+        testExchange =
+                new Exchange(50L, "testName", "Nasdaq", "NASDAQ", "XNAS", null, "America/New_York", " 09:30", " 16:00");
     }
 
     @When("user is logged in")

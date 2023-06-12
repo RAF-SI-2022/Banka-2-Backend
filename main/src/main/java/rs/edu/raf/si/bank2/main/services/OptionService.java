@@ -292,8 +292,8 @@ public class OptionService implements OptionServiceInterface {
 
                 // TODO Smanjiti user balance
                 this.orderService.updateOrderStatus(optionOrder.getId(), OrderStatus.COMPLETE);
-                Transaction transaction =
-                        this.transactionService.createTransaction(optionOrder, balance, (float) premium, (float)optionOrder.getPrice());
+                Transaction transaction = this.transactionService.createTransaction(
+                        optionOrder, balance, (float) premium, (float) optionOrder.getPrice());
                 this.transactionService.save(transaction);
                 this.balanceService.updateBalance(optionOrder, userFromDB.getEmail(), "USD", false);
                 return userOptionRepository.save(userOption);
@@ -362,9 +362,9 @@ public class OptionService implements OptionServiceInterface {
                 Object o = callsArray.get(i);
 
                 JSONObject json = (JSONObject) o;
-//                System.out.println(json);
+                //                System.out.println(json);
                 //                System.out.println(json.length() + " ovo je velicina");
-//                System.out.println(json.getDouble("change") + " bidovi ");
+                //                System.out.println(json.getDouble("change") + " bidovi ");
 
                 Integer contractSize = 100;
                 Double price = json.getDouble("lastPrice");

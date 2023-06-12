@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.edu.raf.si.bank2.main.services.AuthorisationService;
-import rs.edu.raf.si.bank2.main.services.UserCommunicationService;
 import rs.edu.raf.si.bank2.main.services.ExchangeService;
+import rs.edu.raf.si.bank2.main.services.UserCommunicationService;
 import rs.edu.raf.si.bank2.main.services.UserService;
 import rs.edu.raf.si.bank2.main.services.interfaces.UserCommunicationInterface;
 
@@ -21,7 +21,9 @@ public class ExchangeController {
 
     @Autowired
     public ExchangeController(
-            AuthorisationService authorisationService, ExchangeService exchangeService, UserService userService,
+            AuthorisationService authorisationService,
+            ExchangeService exchangeService,
+            UserService userService,
             UserCommunicationService communicationService) {
         this.userCommunicationInterface = communicationService;
         this.authorisationService = authorisationService;

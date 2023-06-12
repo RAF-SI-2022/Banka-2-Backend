@@ -1,16 +1,14 @@
 package rs.edu.raf.si.bank2.users.controllers;
 
+import static org.springframework.security.core.context.SecurityContextHolder.getContext;
+
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.edu.raf.si.bank2.users.dto.ChangePassDto;
 import rs.edu.raf.si.bank2.users.models.mariadb.User;
 import rs.edu.raf.si.bank2.users.services.UserService;
-
-import java.util.Optional;
-
-import static org.springframework.security.core.context.SecurityContextHolder.getContext;
-
 
 @RestController
 @CrossOrigin
@@ -19,13 +17,10 @@ public class UserServiceController {
 
     private final UserService userService;
 
-
     @Autowired
     public UserServiceController(UserService userService) {
         this.userService = userService;
     }
-
-
 
     @GetMapping(value = "/loadUserByUsername/{username}")
     public ResponseEntity<?> loadUserByUsername(@PathVariable(name = "username") String username) {
@@ -38,7 +33,7 @@ public class UserServiceController {
 
         Optional<User> user = userService.findByEmail(userEmail);
         if (user.isPresent()) return ResponseEntity.ok().body(user);
-        else  return ResponseEntity.status(404).body("Korisnik nije pronadjen.");
+        else return ResponseEntity.status(404).body("Korisnik nije pronadjen.");
     }
 
     @GetMapping(value = "/findAll")
@@ -48,22 +43,22 @@ public class UserServiceController {
 
     @PostMapping(value = "/save")
     public ResponseEntity<?> save(@RequestBody User user) {
-        return  ResponseEntity.ok().body(userService.save(user));
+        return ResponseEntity.ok().body(userService.save(user));
     }
 
     @GetMapping(value = "/getUserPermissions")
     public ResponseEntity<?> getUserPermissions() {
         String userEmail = getContext().getAuthentication().getName();
-        return  ResponseEntity.ok().body(userService.getUserPermissions(userEmail));
+        return ResponseEntity.ok().body(userService.getUserPermissions(userEmail));
     }
 
     @GetMapping(value = "/findById/{id}")
     public ResponseEntity<?> findById(@PathVariable(name = "id") Long id) {
-//        return ResponseEntity.ok().body(userService.findById(id));
+        //        return ResponseEntity.ok().body(userService.findById(id));
 
         Optional<User> user = userService.findById(id);
         if (user.isPresent()) return ResponseEntity.ok().body(user);
-        else  return ResponseEntity.status(404).body("Korisnik sa email-om: asdf@raf.rs nije pronadjen.");
+        else return ResponseEntity.status(404).body("Korisnik sa email-om: asdf@raf.rs nije pronadjen.");
     }
 
     @DeleteMapping(value = "/deleteById/{id}")
@@ -74,13 +69,13 @@ public class UserServiceController {
 
     @GetMapping(value = "/getUserByPasswordResetToken/{token}")
     public ResponseEntity<?> getUserByPasswordResetToken(@PathVariable(name = "token") String token) {
-        return  ResponseEntity.ok().body(userService.getUserByPasswordResetToken(token));
+        return ResponseEntity.ok().body(userService.getUserByPasswordResetToken(token));
     }
 
     @PatchMapping(value = "/changePassword")
     public ResponseEntity<?> changePassword(@RequestBody ChangePassDto dto) {
         userService.changePassword(dto.getUser(), dto.getNewPass(), dto.getPassResetToken());
-        return  ResponseEntity.ok().body("Password changed");
+        return ResponseEntity.ok().body("Password changed");
     }
 
     @PatchMapping(value = "/changeUsersDailyLimit/{limit}")
@@ -94,7 +89,4 @@ public class UserServiceController {
         String userEmail = getContext().getAuthentication().getName();
         return ResponseEntity.ok().body(userService.getUsersDailyLimit(userEmail));
     }
-
-
-
 }

@@ -1,13 +1,8 @@
 package rs.edu.raf.si.bank2.main.services.interfaces;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-
 import rs.edu.raf.si.bank2.main.dto.CommunicationDto;
-import rs.edu.raf.si.bank2.main.models.mariadb.Permission;
 import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
-import rs.edu.raf.si.bank2.main.models.mariadb.User;
 
 public interface UserCommunicationInterface {
 
@@ -40,6 +35,4 @@ public interface UserCommunicationInterface {
     public CommunicationDto sendMarginTransaction(String urlExtension, String postObjectBody, String senderEmail);
 
     public CommunicationDto sendDelete(String urlExtension);
-
-
 }

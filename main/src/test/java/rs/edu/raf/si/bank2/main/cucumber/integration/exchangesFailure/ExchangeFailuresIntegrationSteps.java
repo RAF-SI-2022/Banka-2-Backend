@@ -25,8 +25,8 @@ public class ExchangeFailuresIntegrationSteps extends ExchangeFailuresIntegratio
     @Autowired
     protected MockMvc mockMvc;
 
-    protected static Exchange testExchange =
-            new Exchange(-1L, "Fail Stock Xchange", "FAIL", "LLLL", "Germany", "Europe/Berlin", " 08:00", " 20:00");
+    protected static Exchange testExchange = testExchange =
+            new Exchange(-1L, "testName", "Nasdaq", "NASDAQ", "XNAS", null, "America/New_York", " 09:30", " 16:00");
     ;
 
     protected static String token;

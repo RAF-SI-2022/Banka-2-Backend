@@ -8,7 +8,6 @@ import com.jayway.jsonpath.JsonPath;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -473,74 +472,74 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
         }
     }
 
-//    @Then("user updates his profile")
-//    public void user_updates_his_profile() {
-//        try {
-//            mockMvc.perform(put("/api/users/edit-profile/" + testUser.get().getId())
-//                            .contentType("application/json")
-//                            .content(
-//                                    """
-//                                              {
-//                                                "email": "testUser@gmail.com",
-//                                                "firstName": "UserEditedName",
-//                                                "lastName": "UserEditedLName",
-//                                                "phone": "666666666"
-//                                              }
-//                                            """)
-//                            .header("Content-Type", "application/json")
-//                            .header("Access-Control-Allow-Origin", "*")
-//                            .header("Authorization", "Bearer " + token))
-//                    .andExpect(status().isOk())
-//                    .andReturn();
-//            String editedName =
-//                    userService.findById(testUser.get().getId()).get().getFirstName();
-//            System.out.println(editedName);
-//            assertEquals(editedName, "UserEditedName");
-//        } catch (Exception e) {
-//            fail(e.getMessage());
-//        }
-//    }
+    //    @Then("user updates his profile")
+    //    public void user_updates_his_profile() {
+    //        try {
+    //            mockMvc.perform(put("/api/users/edit-profile/" + testUser.get().getId())
+    //                            .contentType("application/json")
+    //                            .content(
+    //                                    """
+    //                                              {
+    //                                                "email": "testUser@gmail.com",
+    //                                                "firstName": "UserEditedName",
+    //                                                "lastName": "UserEditedLName",
+    //                                                "phone": "666666666"
+    //                                              }
+    //                                            """)
+    //                            .header("Content-Type", "application/json")
+    //                            .header("Access-Control-Allow-Origin", "*")
+    //                            .header("Authorization", "Bearer " + token))
+    //                    .andExpect(status().isOk())
+    //                    .andReturn();
+    //            String editedName =
+    //                    userService.findById(testUser.get().getId()).get().getFirstName();
+    //            System.out.println(editedName);
+    //            assertEquals(editedName, "UserEditedName");
+    //        } catch (Exception e) {
+    //            fail(e.getMessage());
+    //        }
+    //    }
 
     // Test findUserByEmail
-//    @Then("get user by his email")
-//    public void get_user_by_his_email() {
-//        try {
-//            mockMvc.perform(get("/api/users/email")
-//                            .contentType("application/json")
-//                            .header("Content-Type", "application/json")
-//                            .header("Access-Control-Allow-Origin", "*")
-//                            .header("Authorization", "Bearer " + token))
-//                    .andExpect(status().isOk())
-//                    .andReturn();
-//        } catch (Exception e) {
-//            fail(e.getMessage());
-//        }
-//    }
+    //    @Then("get user by his email")
+    //    public void get_user_by_his_email() {
+    //        try {
+    //            mockMvc.perform(get("/api/users/email")
+    //                            .contentType("application/json")
+    //                            .header("Content-Type", "application/json")
+    //                            .header("Access-Control-Allow-Origin", "*")
+    //                            .header("Authorization", "Bearer " + token))
+    //                    .andExpect(status().isOk())
+    //                    .andReturn();
+    //        } catch (Exception e) {
+    //            fail(e.getMessage());
+    //        }
+    //    }
 
     // Test user changes his password
-//    @Then("user changes his password")
-//    public void user_changes_his_password() {
-//        try {
-//            mockMvc.perform(put("/api/users/password/" + testUser.get().getId())
-//                            .contentType("application/json")
-//                            .content(
-//                                    """
-//                                              {
-//                                                  "password": "testPass"
-//                                              }
-//                                            """)
-//                            .header("Content-Type", "application/json")
-//                            .header("Access-Control-Allow-Origin", "*")
-//                            .header("Authorization", "Bearer " + token))
-//                    .andExpect(status().isOk())
-//                    .andReturn();
-//            String oldPass = testUser.get().getPassword();
-//            String newPass = userService.findById(testUser.get().getId()).get().getPassword();
-//            assertNotEquals(oldPass, newPass);
-//        } catch (Exception e) {
-//            fail(e.getMessage());
-//        }
-//    }
+    //    @Then("user changes his password")
+    //    public void user_changes_his_password() {
+    //        try {
+    //            mockMvc.perform(put("/api/users/password/" + testUser.get().getId())
+    //                            .contentType("application/json")
+    //                            .content(
+    //                                    """
+    //                                              {
+    //                                                  "password": "testPass"
+    //                                              }
+    //                                            """)
+    //                            .header("Content-Type", "application/json")
+    //                            .header("Access-Control-Allow-Origin", "*")
+    //                            .header("Authorization", "Bearer " + token))
+    //                    .andExpect(status().isOk())
+    //                    .andReturn();
+    //            String oldPass = testUser.get().getPassword();
+    //            String newPass = userService.findById(testUser.get().getId()).get().getPassword();
+    //            assertNotEquals(oldPass, newPass);
+    //        } catch (Exception e) {
+    //            fail(e.getMessage());
+    //        }
+    //    }
 
     // Testing deleting user
     @Given("privileged user logged in")
