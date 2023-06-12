@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import java.util.List;
 
 @Data
 @Builder
@@ -28,7 +29,7 @@ public class Client {
     private String telephone;
     private String address;
     private String Password;
-    private DevizniRacun[] balances;
+    private List<Racun> balances;
 
 
 }

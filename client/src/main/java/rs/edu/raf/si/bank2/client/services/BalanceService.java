@@ -22,15 +22,6 @@ public class BalanceService {
     private final TekuciRacunRepository tekuciRacunRepository;
     private final DevizniRacunRepository devizniRacunRepository;
     private final PoslovniRacunRepository poslovniRacunRepository;
-    //private final TransactionElementRepository transactionElementRepository;
-
-//    @Autowired
-//    public BalanceService(ContactRepository contactRepository, CompanyRepository companyRepository, ReservedService reservedService, TransactionElementRepository transactionElementRepository) {
-//        this.contactRepository = contactRepository;
-//        this.companyRepository = companyRepository;
-//        this.reservedService = reservedService;
-//        this.transactionElementRepository = transactionElementRepository;
-//    }
 
     @Autowired
     public BalanceService(TekuciRacunRepository tekuciRacunRepository, DevizniRacunRepository devizniRacunRepository, PoslovniRacunRepository poslovniRacunRepository) {
@@ -51,9 +42,6 @@ public class BalanceService {
         return poslovniRacunRepository.findById(id);
     }
 
-
-
-
     public List<TekuciRacun> getAllTekuciRacuni() {
         return tekuciRacunRepository.findAll();
     }
@@ -64,11 +52,11 @@ public class BalanceService {
         return poslovniRacunRepository.findAll();}
 
 
-    public BalanceDto openDevizniRacun(Long userId, DevizniRacunDto devizniRacunDto) {
+    public BalanceDto openDevizniRacun(String ownerId, DevizniRacunDto devizniRacunDto) {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         LocalDate now = LocalDate.now();
-        DevizniRacun newDevizniRacun = new DevizniRacun(devizniRacunDto.getRegistrationNumber(), devizniRacunDto.getOwnerId(),
+        DevizniRacun newDevizniRacun = new DevizniRacun(devizniRacunDto.getRegistrationNumber(), ownerId,
                 devizniRacunDto.getBalance(), devizniRacunDto.getAvailableBalance(), devizniRacunDto.getAssignedAgentId(),
                 dtf.format(now), null, devizniRacunDto.getCurrency(), devizniRacunDto.getBalanceStatus(),
                 devizniRacunDto.getBalanceType(), devizniRacunDto.getInterestRatePercentage(), devizniRacunDto.getAccountMaintenance(),
@@ -77,11 +65,11 @@ public class BalanceService {
 
         return new BalanceDto(200, "Devizni racun uspeno napravljen.");
     }
-    public BalanceDto openTekuciRacun(Long userId, TekuciRacunDto tekuciRacunDto) {
+    public BalanceDto openTekuciRacun(String ownerId, TekuciRacunDto tekuciRacunDto) {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         LocalDate now = LocalDate.now();
-        TekuciRacun newTekuciRacun = new TekuciRacun(tekuciRacunDto.getRegistrationNumber(), tekuciRacunDto.getOwnerId(),
+        TekuciRacun newTekuciRacun = new TekuciRacun(tekuciRacunDto.getRegistrationNumber(), ownerId,
                 tekuciRacunDto.getBalance(), tekuciRacunDto.getAvailableBalance(), tekuciRacunDto.getAssignedAgentId(),
                 dtf.format(now), null, tekuciRacunDto.getCurrency(), tekuciRacunDto.getBalanceStatus(),
                 tekuciRacunDto.getBalanceType(), tekuciRacunDto.getInterestRatePercentage(), tekuciRacunDto.getAccountMaintenance());
@@ -89,11 +77,11 @@ public class BalanceService {
 
         return new BalanceDto(200, "Tekuci racun uspeno napravljen.");
     }
-    public BalanceDto openPoslovniRacun(Long userId, PoslovniRacunDto poslovniRacunDto) {
+    public BalanceDto openPoslovniRacun(String ownerId, PoslovniRacunDto poslovniRacunDto) {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         LocalDate now = LocalDate.now();
-        PoslovniRacun newPoslovniRacun = new PoslovniRacun(poslovniRacunDto.getRegistrationNumber(), poslovniRacunDto.getOwnerId(),
+        PoslovniRacun newPoslovniRacun = new PoslovniRacun(poslovniRacunDto.getRegistrationNumber(), ownerId,
                 poslovniRacunDto.getBalance(), poslovniRacunDto.getAvailableBalance(), poslovniRacunDto.getAssignedAgentId(),
                 dtf.format(now), null, poslovniRacunDto.getCurrency(), poslovniRacunDto.getBalanceStatus(),
                 poslovniRacunDto.getBussinessAccountType());
