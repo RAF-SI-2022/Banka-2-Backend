@@ -37,7 +37,6 @@ public class BalanceController {
 
     //    @GetMapping
 //    public void test(){
-//        System.err.println("kurac");
 //
 ////        TekuciRacun tekuciRacun = new TekuciRacun(
 ////                "regNum", "ownerId", 5000.0, 5000.0, 1L, "creationDate",
@@ -55,7 +54,7 @@ public class BalanceController {
 //        poslovniRacunRepository.save(poslovniRacun);
 //    }
 
-    @GetMapping
+    @GetMapping("/tekuci")
     public ResponseEntity<?> getAllTekuciRacuni() {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
@@ -64,7 +63,7 @@ public class BalanceController {
         return ResponseEntity.ok(balanceService.getAllTekuciRacuni());
     }
 
-    @GetMapping
+    @GetMapping("/poslovni")
     public ResponseEntity<?> getAllPoslovniRacuni() {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
@@ -73,7 +72,7 @@ public class BalanceController {
         return ResponseEntity.ok(balanceService.getAllPoslovniRacuni());
     }
 
-    @GetMapping
+    @GetMapping("/devizni")
     public ResponseEntity<?> getAllDevizniRacuni() {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
@@ -82,7 +81,7 @@ public class BalanceController {
         return ResponseEntity.ok().body(balanceService.getAllDevizniRacuni());
     }
 
-    @GetMapping("/{devizniRacunId}")
+    @GetMapping("/devizni/{devizniRacunId}")
     public ResponseEntity<?> getDevizniRacun(@PathVariable(name = "devizniRacunId") String id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
@@ -94,7 +93,7 @@ public class BalanceController {
         return ResponseEntity.ok(devizniRacun.get());
     }
 
-    @GetMapping("/{tekuciRacunId}")
+    @GetMapping("/tekuci/{tekuciRacunId}")
     public ResponseEntity<?> getTekuciRacun(@PathVariable(name = "tekuciRacunId") String id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
@@ -106,7 +105,7 @@ public class BalanceController {
         return ResponseEntity.ok(tekuciRacun.get());
     }
 
-    @GetMapping("/{poslovniRacunId}")
+    @GetMapping("/poslovni/{poslovniRacunId}")
     public ResponseEntity<?> getPoslovniRacun(@PathVariable(name = "poslovniRacunId") String id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
