@@ -30,4 +30,5 @@ public class Client {
     private String Password;
     private DevizniRacun[] balances;
 
+
 }
