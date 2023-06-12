@@ -14,9 +14,9 @@ import rs.edu.raf.si.bank2.client.models.mongodb.enums.BalanceType;
 public class DevizniRacunDto {
 
       private String registrationNumber;
-      private String ownerId;
+//      private String ownerId;
       private Double balance;
-      private Double availableBalance; //ovo je toliko glupo .i.
+      private Double availableBalance;
       private Long assignedAgentId;
       private String currency;
       private BalanceStatus balanceStatus; //enum active / not active

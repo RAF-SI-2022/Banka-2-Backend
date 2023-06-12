@@ -23,6 +23,5 @@ public class ClientDto {
       private String telephone;
       private String address;
       private String Password;
-      private DevizniRacun[] balances;
 
 }

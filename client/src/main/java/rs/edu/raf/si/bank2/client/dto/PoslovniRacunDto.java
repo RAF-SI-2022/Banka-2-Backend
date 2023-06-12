@@ -15,7 +15,7 @@ import rs.edu.raf.si.bank2.client.models.mongodb.enums.BussinessAccountType;
 public class PoslovniRacunDto {
 
       private String registrationNumber;
-      private String ownerId;
+//      private String ownerId;
       private Double balance;
       private Double availableBalance; //ovo je toliko glupo .i.
       private Long assignedAgentId;

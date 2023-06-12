@@ -15,6 +15,7 @@ import rs.edu.raf.si.bank2.client.repositories.mongodb.TekuciRacunRepository;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,24 +23,27 @@ import java.util.Optional;
 public class ClientService {
 
     private final ClientRepository clientRepository;
+
     @Autowired
     public ClientService(ClientRepository clientRepository) {
         this.clientRepository = clientRepository;
     }
+
     public Optional<Client> getClient(String id) {
         return clientRepository.findById(id);
     }
+
     public List<Client> getAllClients() {
         return clientRepository.findAll();
     }
-    public CommunicationDto createClient(Long userId, ClientDto clientDto) {
 
-        Client newClient = new Client(clientDto.getId(),clientDto.getName(),clientDto.getLastname(),clientDto.getDateOfBirth(),
-                clientDto.getGender(),clientDto.getEmail(),clientDto.getTelephone(),clientDto.getAddress(),clientDto.getPassword(),
-                clientDto.getBalances());
-        clientRepository.save(newClient);
-
-        return new CommunicationDto(200, "Devizni racun uspeno napravljen.");
+    //todo dodaj hesiranje passowrda
+    public Client createClient(ClientDto clientDto) {
+        Client newClient = new Client(clientDto.getId(),clientDto.getName(),clientDto.getLastname(),
+                clientDto.getDateOfBirth(), clientDto.getGender(),clientDto.getEmail(),clientDto.getTelephone(),
+                clientDto.getAddress(),clientDto.getPassword(), new ArrayList<>());
+        return clientRepository.save(newClient);
     }
+
     //TODO ubaciti edit i delete opcije
 }

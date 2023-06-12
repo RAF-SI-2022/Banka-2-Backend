@@ -27,7 +27,6 @@ public class ClientController {
 
     private final UserCommunicationInterface userCommunicationInterface;
     private final ClientService clientService;
-    ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     public ClientController(UserCommunicationInterface userCommunicationInterface, ClientService clientService) {
@@ -41,21 +40,7 @@ public class ClientController {
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
-
-        User user = null;
-        CommunicationDto response = userCommunicationInterface.sendGet(signedInUserEmail, "/findByEmail");
-
-        if (response.getResponseCode() == 200) {
-            try {
-                user = mapper.readValue(response.getResponseMsg(), User.class);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        } else return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
-
-//        System.err.println(user);
-
-        return ResponseEntity.ok().body(clientService.getAllClients());
+        return ResponseEntity.ok(clientService.getAllClients());
     }
 
     @GetMapping("/{id}")
@@ -67,7 +52,7 @@ public class ClientController {
 
         Optional<Client> client = clientService.getClient(id);
         if (client.isEmpty()) return ResponseEntity.status(404).body("Trazeni klijent ne postoji");
-        return ResponseEntity.ok().body(client.get());
+        return ResponseEntity.ok(client.get());
     }
 
     @PostMapping("/createClient")
@@ -76,19 +61,7 @@ public class ClientController {
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
-
-        User user = null;
-        CommunicationDto userResponse = userCommunicationInterface.sendGet(signedInUserEmail, "/findByEmail");
-
-        if (userResponse.getResponseCode() == 200) {
-            try {
-                user = mapper.readValue(userResponse.getResponseMsg(), User.class);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        } else return ResponseEntity.status(userResponse.getResponseCode()).body(userResponse.getResponseMsg());
-
-        CommunicationDto response = clientService.createClient(user.getId(), clientDto);
-        return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
+        return ResponseEntity.ok(clientService.createClient(clientDto));
     }
+
 }
