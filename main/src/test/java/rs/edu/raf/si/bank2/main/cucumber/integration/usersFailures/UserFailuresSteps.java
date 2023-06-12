@@ -184,8 +184,8 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
 
             String expectedMessage =
                     "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException: User with id <-1> not found.";
-//            String actualMessage = exception.getMessage();
-//            assertEquals(expectedMessage, actualMessage);
+            //            String actualMessage = exception.getMessage();
+            //            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -204,10 +204,12 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
                         .andReturn();
             });
 
-//            String expectedMessage = "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException: User with id <-1> not found.";
-            String expectedMessage = "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException: User with id <-1> not found.";
+            //            String expectedMessage = "Request processing failed; nested exception is
+            // rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException: User with id <-1> not found.";
+            String expectedMessage =
+                    "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException: User with id <-1> not found.";
             String actualMessage = exception.getMessage();
-//            assertEquals(expectedMessage, actualMessage);
+            //            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -230,7 +232,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
             String expectedMessage =
                     "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException: User with id <-1> not found.";
             String actualMessage = exception.getMessage();
-//            assertEquals(expectedMessage, actualMessage);
+            //            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -253,7 +255,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
             String expectedMessage =
                     "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException: User with id <-1> not found.";
             String actualMessage = exception.getMessage();
-//            assertEquals(expectedMessage, actualMessage);
+            //            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -276,7 +278,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
             String expectedMessage =
                     "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.UserNotFoundException: User with id <-1> not found.";
             String actualMessage = exception.getMessage();
-//            assertEquals(expectedMessage, actualMessage);
+            //            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -338,7 +340,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
                     "Request processing failed; nested exception is org.springframework.dao.EmptyResultDataAccessException: "
                             + "No class rs.edu.raf.si.bank2.main.models.mariadb.User entity with id -1 exists!";
             String actualMessage = exception.getMessage();
-//            assertEquals(expectedMessage, actualMessage);
+            //            assertEquals(expectedMessage, actualMessage);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -659,7 +661,7 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
         }
     }
 
-    //TODO Matejin test
+    // TODO Matejin test
     @Then("unauthorised user resets his daily limit")
     public void unauthorised_user_resets_his_daily_limit() {
         try {
@@ -679,7 +681,6 @@ public class UserFailuresSteps extends UsersFailureIntegrationTestConfig {
     @Given("delete test user")
     public void delete_test_user() {
         Optional<User> user = userService.findByEmail("nonpriv@gmail.com");
-        if (user.isPresent())
-            userService.deleteById(user.get().getId());
+        if (user.isPresent()) userService.deleteById(user.get().getId());
     }
 }

@@ -90,12 +90,12 @@ public class ExchangeService implements ExchangeServiceInterface {
         if (exchangeEntry.isEmpty()) {
             throw new ExchangeNotFoundException();
         }
-        Exchange exchange = exchangeEntry.get();//todo nisu radile vikendom pa je sklonjeno vrati posle
+        Exchange exchange = exchangeEntry.get(); // todo nisu radile vikendom pa je sklonjeno vrati posle
         LocalTime openTime = LocalTime.parse(exchange.getOpenTime().substring(1));
         LocalTime closeTime = LocalTime.parse(exchange.getCloseTime().substring(1));
         ZoneId zone = ZoneId.of(exchange.getTimeZone());
         LocalTime currTime = LocalTime.now(zone);
         return !currTime.isBefore(openTime) && !currTime.isAfter(closeTime);
-//        return true;
+        //        return true;
     }
 }

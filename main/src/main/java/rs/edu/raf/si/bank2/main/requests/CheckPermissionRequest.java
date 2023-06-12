@@ -1,7 +1,6 @@
 package rs.edu.raf.si.bank2.main.requests;
 
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
 
 @Data

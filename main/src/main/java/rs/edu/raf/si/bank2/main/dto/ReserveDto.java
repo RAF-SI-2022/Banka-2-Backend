@@ -12,7 +12,7 @@ public class ReserveDto {
     }
 
     Long userId;
-    Long hartijaId; //:)
+    Long hartijaId; // :)
     Integer amount;
     String futureStorage;
 }

@@ -14,9 +14,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,10 +22,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import rs.edu.raf.si.bank2.main.dto.AccountType;
-import rs.edu.raf.si.bank2.main.dto.CommunicationDto;
-import rs.edu.raf.si.bank2.main.dto.MarginTransactionDto;
-import rs.edu.raf.si.bank2.main.dto.TransactionType;
 import rs.edu.raf.si.bank2.main.exceptions.ExchangeNotFoundException;
 import rs.edu.raf.si.bank2.main.exceptions.ExternalAPILimitReachedException;
 import rs.edu.raf.si.bank2.main.exceptions.OrderNotFoundException;
@@ -40,7 +33,6 @@ import rs.edu.raf.si.bank2.main.repositories.mariadb.OrderRepository;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.StockHistoryRepository;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.StockRepository;
 import rs.edu.raf.si.bank2.main.requests.StockRequest;
-import rs.edu.raf.si.bank2.main.services.interfaces.UserCommunicationInterface;
 import rs.edu.raf.si.bank2.main.services.workerThreads.StockBuyWorker;
 import rs.edu.raf.si.bank2.main.services.workerThreads.StockSellWorker;
 import rs.edu.raf.si.bank2.main.services.workerThreads.StocksRetrieverFromApiWorker;
@@ -86,7 +78,8 @@ public class StockService {
             TransactionService transactionService,
             ExchangeRepository exchangeRepository,
             BalanceService balanceService,
-            OrderRepository orderRepository, UserCommunicationService userCommunicationService) {
+            OrderRepository orderRepository,
+            UserCommunicationService userCommunicationService) {
         this.stockRepository = stockRepository;
         this.exchangeRepository = exchangeRepository;
         this.stockHistoryRepository = stockHistoryRepository;
@@ -103,8 +96,7 @@ public class StockService {
                 transactionService,
                 orderRepository,
                 userService,
-                userCommunicationService
-        );
+                userCommunicationService);
         this.stockSellWorker = new StockSellWorker(
                 stockSellRequestsQueue,
                 userStockService,
@@ -112,12 +104,11 @@ public class StockService {
                 transactionService,
                 orderRepository,
                 balanceService,
-                userCommunicationService
-        );
+                userCommunicationService);
         stockBuyWorker.start();
         stockSellWorker.start();
         this.stocksRetrieverFromApiWorker = new StocksRetrieverFromApiWorker(this);
-//        this.stocksRetrieverFromApiWorker.start(); TODO VRATI UPDATER
+        //        this.stocksRetrieverFromApiWorker.start(); TODO VRATI UPDATER
     }
 
     @Cacheable(value = "stockALL")
@@ -135,7 +126,9 @@ public class StockService {
     }
 
     public Stock findStockBySymbolInDb(String symbol) {
-        return this.stockRepository.findStockBySymbol(symbol).orElse(null); // if found return Stock, if not, return null
+        return this.stockRepository
+                .findStockBySymbol(symbol)
+                .orElse(null); // if found return Stock, if not, return null
     }
 
     @Cacheable(value = "exchangesSymbol", key = "#symbol")
@@ -183,9 +176,10 @@ public class StockService {
                 JSONArray result = quoteSummary.getJSONArray("result");
                 JSONObject assetProfile = result.getJSONObject(0).getJSONObject("assetProfile");
                 String website = assetProfile.getString("website");
-//
-//                Optional<Exchange> exchangeOptional =//todo vrati kad proradi
-//                        exchangeRepository.findExchangeByAcronym(companyOverview.getString("Exchange"));
+                //
+                //                Optional<Exchange> exchangeOptional =//todo vrati kad proradi
+                //
+                // exchangeRepository.findExchangeByAcronym(companyOverview.getString("Exchange"));
                 Optional<Exchange> exchangeOptional = exchangeRepository.findExchangeByAcronym("NYSE");
 
                 if (exchangeOptional.isPresent()) {
@@ -194,9 +188,9 @@ public class StockService {
                     // rs.edu.raf.si.bank2.main.models.mariadb.Exchange"
                     // To avoid that we check if exchange entity is in detached state. If it is, merge it.
                     Exchange exchange = exchangeOptional.get();
-//                    if (!entityManager.contains(exchange)) { todo vrati
-//                        exchange = this.entityManager.merge(exchange);
-//                    }
+                    //                    if (!entityManager.contains(exchange)) { todo vrati
+                    //                        exchange = this.entityManager.merge(exchange);
+                    //                    }
                     stock = Stock.builder()
                             .exchange(exchange)
                             .symbol(symbol)
@@ -457,11 +451,11 @@ public class StockService {
         BigDecimal price = stock.getPriceValue().multiply(BigDecimal.valueOf(stockRequest.getAmount()));
 
         StockOrder order;
-        if (user.getDailyLimit() == null) { //|| user.getDailyLimit() <= 0
+        if (user.getDailyLimit() == null) { // || user.getDailyLimit() <= 0
             return ResponseEntity.internalServerError().body("Doslo je do neocekivane greske.");
         }
 
-        //napravimo order is stavimo na cekanje ako ne moze da prodje
+        // napravimo order is stavimo na cekanje ako ne moze da prodje
         if (!approved && price.doubleValue() > user.getDailyLimit()) {
             order = stockOrder == null
                     ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.WAITING, OrderTradeType.BUY)
@@ -470,29 +464,34 @@ public class StockService {
             return ResponseEntity.status(400).body("Dnevni limit je prekoracen, porudzbina je na cekanju (WAITING).");
         }
 
-        order = stockOrder == null ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.IN_PROGRESS, OrderTradeType.BUY) : stockOrder;
+        order = stockOrder == null
+                ? this.createOrder(stockRequest, price.doubleValue(), user, OrderStatus.IN_PROGRESS, OrderTradeType.BUY)
+                : stockOrder;
         order = this.orderRepository.save(order);
 
-        //ako je MARGIN order posalji ga na drugi service umesto da ga ovde obradjujes
-//        if (order.isMargin()){
-//            CommunicationDto communicationDto;
-//            MarginTransactionDto marginTransactionDto = new MarginTransactionDto();
-//            marginTransactionDto.setAccountType(AccountType.MARGIN);
-//            marginTransactionDto.setOrderId(order.getId());
-//            marginTransactionDto.setTransactionComment("Kupovina akcija");
-//            marginTransactionDto.setCurrencyCode(order.getCurrencyCode());
-//            marginTransactionDto.setTransactionType(TransactionType.BUY);
-//            marginTransactionDto.setInitialMargin(price.doubleValue());
-//            marginTransactionDto.setMaintenanceMargin(price.doubleValue() * 0.4); //za odrzavanje je 40% full cene
-//            try {
-//                String marginDtoJson = mapper.writeValueAsString(marginTransactionDto);
-//                communicationDto = userCommunicationInterface.sendMarginTransaction("/makeTransaction", marginDtoJson, user.getEmail());
-//            } catch (JsonProcessingException e) { throw new RuntimeException(e); }
-//
-//            if (communicationDto.getResponseCode() == 200)
-//                this.updateOrderStatus(order.getId(), OrderStatus.COMPLETE);
-//            return ResponseEntity.status(communicationDto.getResponseCode()).body(communicationDto.getResponseMsg());
-//        }
+        // ako je MARGIN order posalji ga na drugi service umesto da ga ovde obradjujes
+        //        if (order.isMargin()){
+        //            CommunicationDto communicationDto;
+        //            MarginTransactionDto marginTransactionDto = new MarginTransactionDto();
+        //            marginTransactionDto.setAccountType(AccountType.MARGIN);
+        //            marginTransactionDto.setOrderId(order.getId());
+        //            marginTransactionDto.setTransactionComment("Kupovina akcija");
+        //            marginTransactionDto.setCurrencyCode(order.getCurrencyCode());
+        //            marginTransactionDto.setTransactionType(TransactionType.BUY);
+        //            marginTransactionDto.setInitialMargin(price.doubleValue());
+        //            marginTransactionDto.setMaintenanceMargin(price.doubleValue() * 0.4); //za odrzavanje je 40% full
+        // cene
+        //            try {
+        //                String marginDtoJson = mapper.writeValueAsString(marginTransactionDto);
+        //                communicationDto = userCommunicationInterface.sendMarginTransaction("/makeTransaction",
+        // marginDtoJson, user.getEmail());
+        //            } catch (JsonProcessingException e) { throw new RuntimeException(e); }
+        //
+        //            if (communicationDto.getResponseCode() == 200)
+        //                this.updateOrderStatus(order.getId(), OrderStatus.COMPLETE);
+        //            return
+        // ResponseEntity.status(communicationDto.getResponseCode()).body(communicationDto.getResponseMsg());
+        //        }
 
         try {
             stockBuyRequestsQueue.put(order);
@@ -565,26 +564,30 @@ public class StockService {
                     : stockOrder;
             order = this.orderRepository.save(order);
 
-//            //ako je MARGIN order posalji ga na drugi service umesto da ga ovde obradjujes
-//            if (order.isMargin()){//todo proveri dal radi
-//                CommunicationDto communicationDto;
-//                MarginTransactionDto marginTransactionDto = new MarginTransactionDto();
-//                marginTransactionDto.setAccountType(AccountType.MARGIN);
-//                marginTransactionDto.setOrderId(order.getId());
-//                marginTransactionDto.setTransactionComment("Prodaja akcija");
-//                marginTransactionDto.setCurrencyCode(order.getCurrencyCode());
-//                marginTransactionDto.setTransactionType(TransactionType.SELL);
-//                marginTransactionDto.setInitialMargin(price.doubleValue());
-//                marginTransactionDto.setMaintenanceMargin(price.doubleValue() * 0.4); //za odrzavanje je 40% full cene
-//                try {
-//                    String marginDtoJson = mapper.writeValueAsString(marginTransactionDto);
-//                    communicationDto = userCommunicationInterface.sendMarginTransaction("/makeTransaction", marginDtoJson, userStock.get().getUser().getEmail());
-//                } catch (JsonProcessingException e) { throw new RuntimeException(e); }
-//
-//                if (communicationDto.getResponseCode() == 200)
-//                    this.updateOrderStatus(order.getId(), OrderStatus.COMPLETE);
-//                return ResponseEntity.status(communicationDto.getResponseCode()).body(communicationDto.getResponseMsg());
-//            }
+            //            //ako je MARGIN order posalji ga na drugi service umesto da ga ovde obradjujes
+            //            if (order.isMargin()){//todo proveri dal radi
+            //                CommunicationDto communicationDto;
+            //                MarginTransactionDto marginTransactionDto = new MarginTransactionDto();
+            //                marginTransactionDto.setAccountType(AccountType.MARGIN);
+            //                marginTransactionDto.setOrderId(order.getId());
+            //                marginTransactionDto.setTransactionComment("Prodaja akcija");
+            //                marginTransactionDto.setCurrencyCode(order.getCurrencyCode());
+            //                marginTransactionDto.setTransactionType(TransactionType.SELL);
+            //                marginTransactionDto.setInitialMargin(price.doubleValue());
+            //                marginTransactionDto.setMaintenanceMargin(price.doubleValue() * 0.4); //za odrzavanje je
+            // 40% full cene
+            //                try {
+            //                    String marginDtoJson = mapper.writeValueAsString(marginTransactionDto);
+            //                    communicationDto =
+            // userCommunicationInterface.sendMarginTransaction("/makeTransaction", marginDtoJson,
+            // userStock.get().getUser().getEmail());
+            //                } catch (JsonProcessingException e) { throw new RuntimeException(e); }
+            //
+            //                if (communicationDto.getResponseCode() == 200)
+            //                    this.updateOrderStatus(order.getId(), OrderStatus.COMPLETE);
+            //                return
+            // ResponseEntity.status(communicationDto.getResponseCode()).body(communicationDto.getResponseMsg());
+            //            }
 
             stockSellRequestsQueue.put(order);
         } catch (InterruptedException e) {
@@ -601,20 +604,27 @@ public class StockService {
     }
 
     public boolean checkLimitAndStopForBuy(StockOrder stockOrder) {
-        // Here we have to find price of the stock referenced in stockOrder and to compare it with order's limit and stop
-        BigDecimal stockPrice = this.findStockBySymbolInDb(stockOrder.getSymbol()).getPriceValue();
-        if(stockOrder.getStockLimit() != null && stockPrice.doubleValue() <= stockOrder.getStockLimit().doubleValue()) {
+        // Here we have to find price of the stock referenced in stockOrder and to compare it with order's limit and
+        // stop
+        BigDecimal stockPrice =
+                this.findStockBySymbolInDb(stockOrder.getSymbol()).getPriceValue();
+        if (stockOrder.getStockLimit() != null
+                && stockPrice.doubleValue() <= stockOrder.getStockLimit().doubleValue()) {
             return true;
         }
-        return stockOrder.getStop() != null && stockPrice.doubleValue() >= stockOrder.getStop().doubleValue();
+        return stockOrder.getStop() != null
+                && stockPrice.doubleValue() >= stockOrder.getStop().doubleValue();
     }
 
     public boolean checkLimitAndStopForSell(StockOrder stockOrder) {
-        BigDecimal stockPrice = this.findStockBySymbolInDb(stockOrder.getSymbol()).getPriceValue();
-        if(stockOrder.getStockLimit() != null && stockPrice.doubleValue() >= stockOrder.getStockLimit().doubleValue()) {
+        BigDecimal stockPrice =
+                this.findStockBySymbolInDb(stockOrder.getSymbol()).getPriceValue();
+        if (stockOrder.getStockLimit() != null
+                && stockPrice.doubleValue() >= stockOrder.getStockLimit().doubleValue()) {
             return true;
         }
-        return stockOrder.getStop() != null && stockPrice.doubleValue() <= stockOrder.getStop().doubleValue();
+        return stockOrder.getStop() != null
+                && stockPrice.doubleValue() <= stockOrder.getStop().doubleValue();
     }
 
     @Transactional
