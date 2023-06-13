@@ -28,7 +28,7 @@ public class Client {
     private String email;
     private String telephone;
     private String address;
-    private String Password;
+    private String password;
     private List<Racun> balances;
 
 

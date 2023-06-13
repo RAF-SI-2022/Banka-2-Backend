@@ -14,14 +14,14 @@ import rs.edu.raf.si.bank2.client.models.mongodb.enums.BussinessAccountType;
 @RequiredArgsConstructor
 public class PoslovniRacunDto {
 
-      private String registrationNumber;
-//      private String ownerId;
-      private Double balance;
-      private Double availableBalance; //ovo je toliko glupo .i.
+//      private String id;
+//      private String registrationNumber;
+      private String ownerId;
+//      private Double balance;
+//      private Double availableBalance;
       private Long assignedAgentId;
       private String currency;
-      private BalanceStatus balanceStatus;
-      private String id;
+//      private BalanceStatus balanceStatus;
       private BussinessAccountType bussinessAccountType;
 
 }

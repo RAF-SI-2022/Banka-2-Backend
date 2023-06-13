@@ -35,25 +35,6 @@ public class BalanceController {
         this.clientRepository = clientRepository;
     }
 
-    //    @GetMapping
-//    public void test(){
-//
-////        TekuciRacun tekuciRacun = new TekuciRacun(
-////                "regNum", "ownerId", 5000.0, 5000.0, 1L, "creationDate",
-////                "expDate", "USD", BalanceStatus.ACTIVE, BalanceType.STEDNI, 1, 20.0);
-////        tekuciRacunRepository.save(tekuciRacun);
-//
-//        DevizniRacun devizniRacun =
-//                new DevizniRacun("regNum", "ownerId", 5000.0, 5000.0, 1L,
-//                        "creationDate", "expDate", "USD", BalanceStatus.ACTIVE, BalanceType.STEDNI,
-//                        1, 20.0, true, 4);
-//        devizniRacunRepository.save(devizniRacun);
-//
-//        PoslovniRacun poslovniRacun = new PoslovniRacun("regNum", "ownerId", 5000.0, 5000.0, 1L,
-//                "creationDate", "expDate", "USD", BalanceStatus.ACTIVE, BussinessAccountType.KUPOVNI);
-//        poslovniRacunRepository.save(poslovniRacun);
-//    }
-
     @GetMapping("/tekuci")
     public ResponseEntity<?> getAllTekuciRacuni() {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -124,10 +105,8 @@ public class BalanceController {
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
-        Optional<Client> client = clientRepository.findClientByEmail(signedInUserEmail);
-        if (client.isEmpty()) return ResponseEntity.status(404).body("Ulogovani user ne postoji u bazi");
 
-        BalanceDto response = balanceService.openDevizniRacun(client.get().getId(), devizniRacunDto);
+        BalanceDto response = balanceService.openDevizniRacun(devizniRacunDto);
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
@@ -137,10 +116,7 @@ public class BalanceController {
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
-        Optional<Client> client = clientRepository.findClientByEmail(signedInUserEmail);
-        if (client.isEmpty()) return ResponseEntity.status(404).body("Ulogovani user ne postoji u bazi");
-
-        BalanceDto response = balanceService.openTekuciRacun(client.get().getId(), tekuciRacunDto);
+        BalanceDto response = balanceService.openTekuciRacun(tekuciRacunDto);
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
@@ -150,10 +126,8 @@ public class BalanceController {
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
-        Optional<Client> client = clientRepository.findClientByEmail(signedInUserEmail);
-        if (client.isEmpty()) return ResponseEntity.status(404).body("Ulogovani user ne postoji u bazi");
 
-        BalanceDto response = balanceService.openPoslovniRacun(client.get().getId(), poslovniRacunDto);
+        BalanceDto response = balanceService.openPoslovniRacun(poslovniRacunDto);
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 }
