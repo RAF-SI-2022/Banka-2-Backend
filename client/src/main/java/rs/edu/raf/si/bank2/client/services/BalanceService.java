@@ -7,6 +7,7 @@ import rs.edu.raf.si.bank2.client.dto.*;
 import rs.edu.raf.si.bank2.client.models.mongodb.DevizniRacun;
 import rs.edu.raf.si.bank2.client.models.mongodb.PoslovniRacun;
 import rs.edu.raf.si.bank2.client.models.mongodb.TekuciRacun;
+import rs.edu.raf.si.bank2.client.models.mongodb.enums.BalanceStatus;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.DevizniRacunRepository;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.PoslovniRacunRepository;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.TekuciRacunRepository;
@@ -52,38 +53,38 @@ public class BalanceService {
         return poslovniRacunRepository.findAll();}
 
 
-    public BalanceDto openDevizniRacun(String ownerId, DevizniRacunDto devizniRacunDto) {
+    public BalanceDto openDevizniRacun(DevizniRacunDto devizniRacunDto) {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         LocalDate now = LocalDate.now();
-        DevizniRacun newDevizniRacun = new DevizniRacun(devizniRacunDto.getRegistrationNumber(), ownerId,
-                devizniRacunDto.getBalance(), devizniRacunDto.getAvailableBalance(), devizniRacunDto.getAssignedAgentId(),
-                dtf.format(now), null, devizniRacunDto.getCurrency(), devizniRacunDto.getBalanceStatus(),
+        DevizniRacun newDevizniRacun = new DevizniRacun("69696969", devizniRacunDto.getOwnerId(),
+                5000.0, 5000.0, devizniRacunDto.getAssignedAgentId(),
+                dtf.format(now), null, devizniRacunDto.getCurrency(), BalanceStatus.ACTIVE,
                 devizniRacunDto.getBalanceType(), devizniRacunDto.getInterestRatePercentage(), devizniRacunDto.getAccountMaintenance(),
                 devizniRacunDto.getDefaultCurrency(), devizniRacunDto.getAllowedNumOfCurrencies());
         devizniRacunRepository.save(newDevizniRacun);
 
         return new BalanceDto(200, "Devizni racun uspeno napravljen.");
     }
-    public BalanceDto openTekuciRacun(String ownerId, TekuciRacunDto tekuciRacunDto) {
+    public BalanceDto openTekuciRacun(TekuciRacunDto tekuciRacunDto) {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         LocalDate now = LocalDate.now();
-        TekuciRacun newTekuciRacun = new TekuciRacun(tekuciRacunDto.getRegistrationNumber(), ownerId,
-                tekuciRacunDto.getBalance(), tekuciRacunDto.getAvailableBalance(), tekuciRacunDto.getAssignedAgentId(),
-                dtf.format(now), null, tekuciRacunDto.getCurrency(), tekuciRacunDto.getBalanceStatus(),
+        TekuciRacun newTekuciRacun = new TekuciRacun("69696969", tekuciRacunDto.getOwnerId(),
+                5000.0, 5000.0, tekuciRacunDto.getAssignedAgentId(),
+                dtf.format(now), null, tekuciRacunDto.getCurrency(), BalanceStatus.ACTIVE,
                 tekuciRacunDto.getBalanceType(), tekuciRacunDto.getInterestRatePercentage(), tekuciRacunDto.getAccountMaintenance());
         tekuciRacunRepository.save(newTekuciRacun);
 
         return new BalanceDto(200, "Tekuci racun uspeno napravljen.");
     }
-    public BalanceDto openPoslovniRacun(String ownerId, PoslovniRacunDto poslovniRacunDto) {
+    public BalanceDto openPoslovniRacun(PoslovniRacunDto poslovniRacunDto) {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         LocalDate now = LocalDate.now();
-        PoslovniRacun newPoslovniRacun = new PoslovniRacun(poslovniRacunDto.getRegistrationNumber(), ownerId,
-                poslovniRacunDto.getBalance(), poslovniRacunDto.getAvailableBalance(), poslovniRacunDto.getAssignedAgentId(),
-                dtf.format(now), null, poslovniRacunDto.getCurrency(), poslovniRacunDto.getBalanceStatus(),
+        PoslovniRacun newPoslovniRacun = new PoslovniRacun("69696969", poslovniRacunDto.getOwnerId(),
+                5000.0, 5000.0, poslovniRacunDto.getAssignedAgentId(),
+                dtf.format(now), null, poslovniRacunDto.getCurrency(),BalanceStatus.ACTIVE,
                 poslovniRacunDto.getBussinessAccountType());
         poslovniRacunRepository.save(newPoslovniRacun);
 

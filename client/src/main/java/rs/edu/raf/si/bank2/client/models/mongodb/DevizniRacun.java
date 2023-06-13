@@ -11,6 +11,7 @@ import rs.edu.raf.si.bank2.client.models.mongodb.enums.BalanceType;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import java.util.List;
 
 @Data
 @Builder
@@ -24,7 +25,7 @@ public class DevizniRacun extends Racun{
 
     public DevizniRacun(String registrationNumber, String ownerId, Double balance, Double availableBalance, Long assignedAgentId,
                         String creationDate, String expirationDate, String currency, BalanceStatus balanceStatus, BalanceType balanceType,
-                        Integer interestRatePercentage, Double accountMaintenance, Boolean defaultCurrency, Integer allowedNumOfCurrencies) {
+                        Integer interestRatePercentage, Double accountMaintenance, Boolean defaultCurrency, List<String> allowedNumOfCurrencies) {
         super(registrationNumber, ownerId, balance, availableBalance, assignedAgentId, creationDate, expirationDate, currency,
                 balanceStatus, balanceType, interestRatePercentage, accountMaintenance);
         this.defaultCurrency = defaultCurrency;
@@ -35,8 +36,6 @@ public class DevizniRacun extends Racun{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
     private Boolean defaultCurrency;
-    private Integer allowedNumOfCurrencies;
-
-
+    private List<String> allowedNumOfCurrencies;
 
 }

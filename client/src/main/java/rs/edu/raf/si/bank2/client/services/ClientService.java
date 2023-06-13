@@ -5,16 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.client.dto.*;
 import rs.edu.raf.si.bank2.client.models.mongodb.Client;
-import rs.edu.raf.si.bank2.client.models.mongodb.DevizniRacun;
-import rs.edu.raf.si.bank2.client.models.mongodb.PoslovniRacun;
-import rs.edu.raf.si.bank2.client.models.mongodb.TekuciRacun;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.ClientRepository;
-import rs.edu.raf.si.bank2.client.repositories.mongodb.DevizniRacunRepository;
-import rs.edu.raf.si.bank2.client.repositories.mongodb.PoslovniRacunRepository;
-import rs.edu.raf.si.bank2.client.repositories.mongodb.TekuciRacunRepository;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

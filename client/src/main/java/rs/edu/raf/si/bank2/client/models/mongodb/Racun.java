@@ -1,11 +1,8 @@
 package rs.edu.raf.si.bank2.client.models.mongodb;
 
-import org.springframework.data.annotation.Id;
 import rs.edu.raf.si.bank2.client.models.mongodb.enums.BalanceStatus;
 import rs.edu.raf.si.bank2.client.models.mongodb.enums.BalanceType;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 
 public class Racun {
 
@@ -27,7 +24,6 @@ public class Racun {
 
     public Racun() {
     }
-
 
     private String registrationNumber;
     private String ownerId;
