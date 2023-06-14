@@ -53,10 +53,9 @@ public class BalanceService {
     }
 
     public List<PoslovniRacun> getAllPoslovniRacuni() {
-        return poslovniRacunRepository.findAll();}
+        return poslovniRacunRepository.findAll();
+    }
 
-
-    //todo KADA SE PRIV NAPRAVI STAVI BASE NA TRUE A OSTALO NA FALSE
     public BalanceDto openDevizniRacun(DevizniRacunDto devizniRacunDto) {
         Optional<Client> clientToAddBalanceTo = clientService.getClient(devizniRacunDto.getOwnerId());
         if (clientToAddBalanceTo.isEmpty()){
@@ -80,7 +79,6 @@ public class BalanceService {
                 dtf.format(now), null, devizniRacunDto.getCurrency(), BalanceStatus.ACTIVE,
                 devizniRacunDto.getBalanceType(), devizniRacunDto.getInterestRatePercentage(), devizniRacunDto.getAccountMaintenance(),
                 defaultCurrency, devizniRacunDto.getAllowedCurrencies());
-
         devizniRacunRepository.save(newDevizniRacun);
         clientToAddBalanceTo.get().getBalances().add(newDevizniRacun);
         clientService.save(clientToAddBalanceTo.get());
@@ -107,6 +105,7 @@ public class BalanceService {
 
         return new BalanceDto(200, "Tekuci racun uspeno napravljen.");
     }
+
     public BalanceDto openPoslovniRacun(PoslovniRacunDto poslovniRacunDto) {
         Optional<Client> clientToAddBalanceTo = clientService.getClient(poslovniRacunDto.getOwnerId());
         if (clientToAddBalanceTo.isEmpty()){
