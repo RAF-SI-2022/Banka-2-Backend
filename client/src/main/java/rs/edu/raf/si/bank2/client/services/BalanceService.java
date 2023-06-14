@@ -5,9 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.client.dto.*;
 import rs.edu.raf.si.bank2.client.models.mongodb.*;
+import rs.edu.raf.si.bank2.client.models.mongodb.enums.Balance;
 import rs.edu.raf.si.bank2.client.models.mongodb.enums.BalanceStatus;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.DevizniRacunRepository;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.PoslovniRacunRepository;
+import rs.edu.raf.si.bank2.client.repositories.mongodb.RacunStorageRepository;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.TekuciRacunRepository;
 
 import java.time.LocalDate;
@@ -22,13 +24,15 @@ public class BalanceService {
     private final TekuciRacunRepository tekuciRacunRepository;
     private final DevizniRacunRepository devizniRacunRepository;
     private final PoslovniRacunRepository poslovniRacunRepository;
+    private final RacunStorageRepository racunStorageRepository;
     private final ClientService clientService;
 
     @Autowired
-    public BalanceService(TekuciRacunRepository tekuciRacunRepository, DevizniRacunRepository devizniRacunRepository, PoslovniRacunRepository poslovniRacunRepository, ClientService clientService) {
+    public BalanceService(TekuciRacunRepository tekuciRacunRepository, DevizniRacunRepository devizniRacunRepository, PoslovniRacunRepository poslovniRacunRepository, RacunStorageRepository racunStorageRepository, ClientService clientService) {
         this.tekuciRacunRepository = tekuciRacunRepository;
         this.devizniRacunRepository = devizniRacunRepository;
         this.poslovniRacunRepository = poslovniRacunRepository;
+        this.racunStorageRepository = racunStorageRepository;
         this.clientService = clientService;
     }
 
@@ -74,12 +78,17 @@ public class BalanceService {
             }
         }
 
-        DevizniRacun newDevizniRacun = new DevizniRacun(generateRandomNumber(10), devizniRacunDto.getOwnerId(),
+        String registrationNumber = generateRandomNumber(10);//todo proveri dal ok
+        if (racunStorageRepository.findRacunStorageByBalanceRegistrationNumberAndType(registrationNumber, Balance.DEVIZNI).isPresent())
+            registrationNumber = generateRandomNumber(10); //za slucaj da se nekim sudom ponovi broj 1/1 000 000
+
+        DevizniRacun newDevizniRacun = new DevizniRacun(registrationNumber, devizniRacunDto.getOwnerId(),
                 5000.0, 5000.0, devizniRacunDto.getAssignedAgentId(),
                 dtf.format(now), null, devizniRacunDto.getCurrency(), BalanceStatus.ACTIVE,
                 devizniRacunDto.getBalanceType(), devizniRacunDto.getInterestRatePercentage(), devizniRacunDto.getAccountMaintenance(),
                 defaultCurrency, devizniRacunDto.getAllowedCurrencies());
         devizniRacunRepository.save(newDevizniRacun);
+        racunStorageRepository.save(new RacunStorage(newDevizniRacun.getRegistrationNumber(), newDevizniRacun.getType()));
         clientToAddBalanceTo.get().getBalances().add(newDevizniRacun);
         clientService.save(clientToAddBalanceTo.get());
 
@@ -95,11 +104,17 @@ public class BalanceService {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         LocalDate now = LocalDate.now();
-        TekuciRacun newTekuciRacun = new TekuciRacun(generateRandomNumber(10), tekuciRacunDto.getOwnerId(),
+
+        String registrationNumber = generateRandomNumber(10);//todo proveri dal ok
+        if (racunStorageRepository.findRacunStorageByBalanceRegistrationNumberAndType(registrationNumber, Balance.DEVIZNI).isPresent())
+            registrationNumber = generateRandomNumber(10); //za slucaj da se nekim sudom ponovi broj 1/1 000 000
+
+        TekuciRacun newTekuciRacun = new TekuciRacun(registrationNumber, tekuciRacunDto.getOwnerId(),
                 5000.0, 5000.0, tekuciRacunDto.getAssignedAgentId(),
                 dtf.format(now), null, tekuciRacunDto.getCurrency(), BalanceStatus.ACTIVE,
                 tekuciRacunDto.getBalanceType(), tekuciRacunDto.getInterestRatePercentage(), tekuciRacunDto.getAccountMaintenance());
         tekuciRacunRepository.save(newTekuciRacun);
+        racunStorageRepository.save(new RacunStorage(newTekuciRacun.getRegistrationNumber(), newTekuciRacun.getType()));
         clientToAddBalanceTo.get().getBalances().add(newTekuciRacun);
         clientService.save(clientToAddBalanceTo.get());
 
@@ -115,11 +130,17 @@ public class BalanceService {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         LocalDate now = LocalDate.now();
-        PoslovniRacun newPoslovniRacun = new PoslovniRacun(generateRandomNumber(10), poslovniRacunDto.getOwnerId(),
+
+        String registrationNumber = generateRandomNumber(10);//todo proveri dal ok
+        if (racunStorageRepository.findRacunStorageByBalanceRegistrationNumberAndType(registrationNumber, Balance.DEVIZNI).isPresent())
+            registrationNumber = generateRandomNumber(10); //za slucaj da se nekim sudom ponovi broj 1/1 000 000
+
+        PoslovniRacun newPoslovniRacun = new PoslovniRacun(registrationNumber, poslovniRacunDto.getOwnerId(),
                 5000.0, 5000.0, poslovniRacunDto.getAssignedAgentId(),
                 dtf.format(now), null, poslovniRacunDto.getCurrency(),BalanceStatus.ACTIVE,
                 poslovniRacunDto.getBussinessAccountType());
         poslovniRacunRepository.save(newPoslovniRacun);
+        racunStorageRepository.save(new RacunStorage(newPoslovniRacun.getRegistrationNumber(), newPoslovniRacun.getType()));
         clientToAddBalanceTo.get().getBalances().add(newPoslovniRacun);
         clientService.save(clientToAddBalanceTo.get());
 

@@ -16,6 +16,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -48,18 +50,19 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (username != null) {
 
-            UserDetails userDetails = this.userService.loadUserByUsername(username);
-
-            if (jwtUtil.validateToken(jwt, userDetails)) {
-
+            //todo vrati
+//            UserDetails userDetails = this.userService.loadUserByUsername(username);
+//            if (jwtUtil.validateToken(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                usernamePasswordAuthenticationToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
+                        new UsernamePasswordAuthenticationToken(username, null, new ArrayList<>());
+                usernamePasswordAuthenticationToken.setDetails( new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            }
+                System.err.println(usernamePasswordAuthenticationToken);
+//            }
+
         }
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
+
 }

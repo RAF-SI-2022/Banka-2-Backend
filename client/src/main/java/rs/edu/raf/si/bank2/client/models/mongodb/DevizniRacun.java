@@ -21,6 +21,26 @@ import java.util.List;
 @Document("devizniRacun")
 public class DevizniRacun extends Racun{
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private String id;
+    private String registrationNumber;
+    private String ownerId;
+    private Balance type; //koji je balans zapravo
+    private Double balance;
+    private Double availableBalance; //ovo je toliko glupo .i.
+    private Long assignedAgentId;
+    private String creationDate;
+    private String expirationDate;
+    private String currency;
+    private BalanceStatus balanceStatus; //enum active / not active
+    private BalanceType balanceType; //enum //licni, stedni ...
+    private Integer interestRatePercentage; //1% - kamatna stopa
+    private Double accountMaintenance;
+    private Boolean defaultCurrency;
+    private List<String> allowedCurrencies;
+
+
     public DevizniRacun() {
     }
 
@@ -43,24 +63,4 @@ public class DevizniRacun extends Racun{
         this.defaultCurrency = defaultCurrency;
         this.allowedCurrencies = allowedCurrencies;
     }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
-    private String registrationNumber;
-    private String ownerId;
-    private Balance type; //koji je balans zapravo
-    private Double balance;
-    private Double availableBalance; //ovo je toliko glupo .i.
-    private Long assignedAgentId;
-    private String creationDate;
-    private String expirationDate;
-    private String currency;
-    private BalanceStatus balanceStatus; //enum active / not active
-    private BalanceType balanceType; //enum //licni, stedni ...
-    private Integer interestRatePercentage; //1% - kamatna stopa
-    private Double accountMaintenance;
-    private Boolean defaultCurrency;
-    private List<String> allowedCurrencies;
-
 }
