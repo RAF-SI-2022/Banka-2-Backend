@@ -39,6 +39,7 @@ presubmits:
               docker compose up -d redis
               docker compose up -d users
               docker compose up -d otc
+              docker compose up -d client
               
               cd main
 
