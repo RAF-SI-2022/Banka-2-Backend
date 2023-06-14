@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import rs.edu.raf.si.bank2.client.models.mongodb.enums.Balance;
 import rs.edu.raf.si.bank2.client.models.mongodb.enums.BalanceStatus;
 import rs.edu.raf.si.bank2.client.models.mongodb.enums.BalanceType;
 
@@ -26,7 +27,7 @@ public class DevizniRacun extends Racun{
     public DevizniRacun(String registrationNumber, String ownerId, Double balance, Double availableBalance, Long assignedAgentId,
                         String creationDate, String expirationDate, String currency, BalanceStatus balanceStatus, BalanceType balanceType,
                         Integer interestRatePercentage, Double accountMaintenance, Boolean defaultCurrency, List<String> allowedCurrencies) {
-        super(registrationNumber, ownerId, balance, availableBalance, assignedAgentId, creationDate, expirationDate, currency,
+        super(registrationNumber, ownerId, balance, availableBalance, assignedAgentId, creationDate, Balance.DEVIZNI ,expirationDate, currency,
                 balanceStatus, balanceType, interestRatePercentage, accountMaintenance);
         this.defaultCurrency = defaultCurrency;
         this.allowedCurrencies = allowedCurrencies;

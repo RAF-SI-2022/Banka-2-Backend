@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import rs.edu.raf.si.bank2.client.models.mongodb.enums.Balance;
 import rs.edu.raf.si.bank2.client.models.mongodb.enums.BalanceStatus;
 import rs.edu.raf.si.bank2.client.models.mongodb.enums.BalanceType;
 import rs.edu.raf.si.bank2.client.models.mongodb.enums.BussinessAccountType;
@@ -24,7 +25,7 @@ public class PoslovniRacun extends Racun{
 
     public PoslovniRacun(String registrationNumber, String ownerId, Double balance, Double availableBalance, Long assignedAgentId,
                          String creationDate, String expirationDate, String currency, BalanceStatus balanceStatus, BussinessAccountType bussinessAccountType) {
-        super(registrationNumber, ownerId, balance, availableBalance, assignedAgentId, creationDate, expirationDate, currency,
+        super(registrationNumber, ownerId, balance, availableBalance, assignedAgentId, creationDate, Balance.POSLOVNI ,expirationDate, currency,
                 balanceStatus, null, null, null);
         this.bussinessAccountType = bussinessAccountType;
     }
