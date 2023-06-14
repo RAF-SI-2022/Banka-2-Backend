@@ -6,19 +6,16 @@ import rs.edu.raf.si.bank2.client.models.mongodb.enums.Balance;
 @Data
 public class PaymentDto {
 
-    private String senderId;
     private String receiverName;
     private String fromBalanceRegNum;
     private String toBalanceRegNum;
-    private Balance type;
     private Double amount;
     private String referenceNumber;
     private String paymentNumber;
     private String paymentDescription;
 
-    public PaymentDto(String senderId, String receiverName, String fromBalanceRegNum,
-                      String toBalanceRegNum, Double amount, String referenceNumber, String paymentNumber, String paymentDescription) {
-        this.senderId = senderId;
+    public PaymentDto(String receiverName, String fromBalanceRegNum, String toBalanceRegNum,
+                      Double amount, String referenceNumber, String paymentNumber, String paymentDescription) {
         this.receiverName = receiverName;
         this.fromBalanceRegNum = fromBalanceRegNum;
         this.toBalanceRegNum = toBalanceRegNum;
