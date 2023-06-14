@@ -1,22 +1,16 @@
 package rs.edu.raf.si.bank2.client.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.edu.raf.si.bank2.client.dto.*;
 import rs.edu.raf.si.bank2.client.models.mariadb.PermissionName;
-import rs.edu.raf.si.bank2.client.models.mariadb.User;
 import rs.edu.raf.si.bank2.client.models.mongodb.Client;
-import rs.edu.raf.si.bank2.client.models.mongodb.DevizniRacun;
-import rs.edu.raf.si.bank2.client.models.mongodb.PoslovniRacun;
-import rs.edu.raf.si.bank2.client.models.mongodb.TekuciRacun;
 import rs.edu.raf.si.bank2.client.requests.LoginRequest;
 import rs.edu.raf.si.bank2.client.responses.ClientLoginResponse;
-import rs.edu.raf.si.bank2.client.services.BalanceService;
 import rs.edu.raf.si.bank2.client.services.ClientService;
 import rs.edu.raf.si.bank2.client.services.interfaces.UserCommunicationInterface;
+import rs.edu.raf.si.bank2.client.utils.JwtUtil;
 
 import java.util.Optional;
 
@@ -29,11 +23,13 @@ public class ClientController {
 
     private final UserCommunicationInterface userCommunicationInterface;
     private final ClientService clientService;
+    private final JwtUtil jwtUtil;
 
     @Autowired
-    public ClientController(UserCommunicationInterface userCommunicationInterface, ClientService clientService) {
+    public ClientController(UserCommunicationInterface userCommunicationInterface, ClientService clientService, JwtUtil jwtUtil) {
         this.userCommunicationInterface = userCommunicationInterface;
         this.clientService = clientService;
+        this.jwtUtil = jwtUtil;
     }
 
     @GetMapping
@@ -43,6 +39,12 @@ public class ClientController {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
         return ResponseEntity.ok(clientService.getAllClients());
+    }
+
+    @GetMapping("/mailFromToken")
+    public ResponseEntity<?> getClientMailFromToken(){
+        String signedInUserEmail = getContext().getAuthentication().getName();
+        return ResponseEntity.ok(signedInUserEmail);
     }
 
     @GetMapping("/{id}")

@@ -1,6 +1,7 @@
 package rs.edu.raf.si.bank2.client.dto;
 
 import lombok.Data;
+import rs.edu.raf.si.bank2.client.models.mongodb.enums.Balance;
 
 @Data
 public class PaymentDto {
@@ -9,10 +10,12 @@ public class PaymentDto {
     private String receiverName;
     private String fromBalanceRegNum;
     private String toBalanceRegNum;
+    private Balance type;
     private Double amount;
     private String referenceNumber;
     private String paymentNumber;
     private String paymentDescription;
+
 
 
     public PaymentDto(String senderId, String receiverName, String fromBalanceRegNum,
