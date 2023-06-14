@@ -51,22 +51,7 @@ public class MailingService implements MailingServiceInterface {
         //  transport?
     }
 
-    @Override
-    public void sendResetPasswordEmail(String email, String link) {
-        String template =
-                """
-                Hello,
 
-                A password reset was requested for your account. To reset your password, please visit the following link:
 
-                %s
 
-                If you did not request a password reset, please ignore this email.
-                """;
-        try {
-            sendMail(email, "Password Reset", String.format(template, link));
-        } catch (MessagingException e) {
-            logger.error("Failed to send password reset email", e);
-        }
-    }
 }

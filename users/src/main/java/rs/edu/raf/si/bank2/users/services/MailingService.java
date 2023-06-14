@@ -1,6 +1,9 @@
 package rs.edu.raf.si.bank2.users.services;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.util.Random;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -16,9 +19,12 @@ public class MailingService implements MailingServiceInterface {
     private static final Logger logger = LoggerFactory.getLogger(MailingService.class);
     private static final String from = "banka2backend@gmail.com";
     private static final String password = "idxegskltunedxog";
+    private final List<String> registrationCodes;
 
     @Autowired
-    public MailingService() {}
+    public MailingService() {
+        this.registrationCodes = new ArrayList<>();
+    }
 
     private void sendMail(String recipient, String subject, String content) throws MessagingException {
         // Setting up STMP server
@@ -51,6 +57,31 @@ public class MailingService implements MailingServiceInterface {
     }
 
     @Override
+    public void sendRegistrationToken(String email) {
+        String template =
+                """
+                Hello,
+
+                This is your registration token which is used for setting up your password for the first time.
+
+                TOKEN: %s
+
+                If you did not request a password reset, please ignore this email.
+                """;
+        try {
+            int randomCodePlace = new Random().nextInt(registrationCodes.size()) + 1;
+            sendMail(email, "Registration token", String.format(template, registrationCodes.get(randomCodePlace)));
+        } catch (MessagingException e) {
+            logger.error("Failed to send password reset email", e);
+        }
+    }
+
+    @Override
+    public boolean checkIfTokenGood(String token) {
+        return registrationCodes.contains(token);
+    }
+
+    @Override
     public void sendResetPasswordEmail(String email, String link) {
         String template =
                 """
@@ -67,5 +98,9 @@ public class MailingService implements MailingServiceInterface {
         } catch (MessagingException e) {
             logger.error("Failed to send password reset email", e);
         }
+    }
+
+    public List<String> getRegistrationCodes() {
+        return registrationCodes;
     }
 }

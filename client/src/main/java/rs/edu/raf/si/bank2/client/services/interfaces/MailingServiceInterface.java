@@ -11,7 +11,6 @@ public interface MailingServiceInterface {
      * contain a password reset token.
      *
      * @param email the user's email address (recipient)
-     * @param link  the password reset link
+     * @param token 4 digit number
      */
-    void sendResetPasswordEmail(String email, String link);
 }

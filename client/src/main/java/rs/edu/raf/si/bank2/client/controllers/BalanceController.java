@@ -99,6 +99,7 @@ public class BalanceController {
     }
 
 
+    //todo trenutno je na frontu hard code interest rade i acc maintenance
     @PostMapping("/openDevizniRacun")
     public ResponseEntity<?> openDevizniRacun(@RequestBody DevizniRacunDto devizniRacunDto) {
         String signedInUserEmail = getContext().getAuthentication().getName();

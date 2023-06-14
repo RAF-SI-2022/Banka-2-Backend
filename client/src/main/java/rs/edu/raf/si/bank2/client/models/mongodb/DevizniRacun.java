@@ -25,17 +25,17 @@ public class DevizniRacun extends Racun{
 
     public DevizniRacun(String registrationNumber, String ownerId, Double balance, Double availableBalance, Long assignedAgentId,
                         String creationDate, String expirationDate, String currency, BalanceStatus balanceStatus, BalanceType balanceType,
-                        Integer interestRatePercentage, Double accountMaintenance, Boolean defaultCurrency, List<String> allowedNumOfCurrencies) {
+                        Integer interestRatePercentage, Double accountMaintenance, Boolean defaultCurrency, List<String> allowedCurrencies) {
         super(registrationNumber, ownerId, balance, availableBalance, assignedAgentId, creationDate, expirationDate, currency,
                 balanceStatus, balanceType, interestRatePercentage, accountMaintenance);
         this.defaultCurrency = defaultCurrency;
-        this.allowedNumOfCurrencies = allowedNumOfCurrencies;
+        this.allowedCurrencies = allowedCurrencies;
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
     private Boolean defaultCurrency;
-    private List<String> allowedNumOfCurrencies;
+    private List<String> allowedCurrencies;
 
 }

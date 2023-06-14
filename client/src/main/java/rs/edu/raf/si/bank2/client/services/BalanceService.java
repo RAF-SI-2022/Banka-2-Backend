@@ -46,13 +46,16 @@ public class BalanceService {
     public List<TekuciRacun> getAllTekuciRacuni() {
         return tekuciRacunRepository.findAll();
     }
+
     public List<DevizniRacun> getAllDevizniRacuni() {
         return devizniRacunRepository.findAll();
     }
+
     public List<PoslovniRacun> getAllPoslovniRacuni() {
         return poslovniRacunRepository.findAll();}
 
 
+    //todo KADA SE PRIV NAPRAVI STAVI BASE NA TRUE A OSTALO NA FALSE
     public BalanceDto openDevizniRacun(DevizniRacunDto devizniRacunDto) {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
@@ -61,11 +64,12 @@ public class BalanceService {
                 5000.0, 5000.0, devizniRacunDto.getAssignedAgentId(),
                 dtf.format(now), null, devizniRacunDto.getCurrency(), BalanceStatus.ACTIVE,
                 devizniRacunDto.getBalanceType(), devizniRacunDto.getInterestRatePercentage(), devizniRacunDto.getAccountMaintenance(),
-                devizniRacunDto.getDefaultCurrency(), devizniRacunDto.getAllowedNumOfCurrencies());
+                devizniRacunDto.getDefaultCurrency(), devizniRacunDto.getAllowedCurrencies());
         devizniRacunRepository.save(newDevizniRacun);
 
         return new BalanceDto(200, "Devizni racun uspeno napravljen.");
     }
+
     public BalanceDto openTekuciRacun(TekuciRacunDto tekuciRacunDto) {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");

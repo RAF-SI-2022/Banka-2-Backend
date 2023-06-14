@@ -29,6 +29,8 @@ public class ClientService {
         return clientRepository.findAll();
     }
 
+
+
     //todo dodaj hesiranje passowrda
     public Client createClient(ClientDto clientDto) {
         Client newClient = new Client(clientDto.getId(),clientDto.getName(),clientDto.getLastname(),
@@ -38,4 +40,6 @@ public class ClientService {
     }
 
     //TODO ubaciti edit i delete opcije
+
+
 }
