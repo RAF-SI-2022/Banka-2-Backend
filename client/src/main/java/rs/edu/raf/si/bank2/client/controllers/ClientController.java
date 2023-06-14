@@ -12,6 +12,8 @@ import rs.edu.raf.si.bank2.client.models.mongodb.Client;
 import rs.edu.raf.si.bank2.client.models.mongodb.DevizniRacun;
 import rs.edu.raf.si.bank2.client.models.mongodb.PoslovniRacun;
 import rs.edu.raf.si.bank2.client.models.mongodb.TekuciRacun;
+import rs.edu.raf.si.bank2.client.requests.LoginRequest;
+import rs.edu.raf.si.bank2.client.responses.ClientLoginResponse;
 import rs.edu.raf.si.bank2.client.services.BalanceService;
 import rs.edu.raf.si.bank2.client.services.ClientService;
 import rs.edu.raf.si.bank2.client.services.interfaces.UserCommunicationInterface;
@@ -58,6 +60,13 @@ public class ClientController {
     @PostMapping("/createClient")
     public ResponseEntity<?> createClient(@RequestBody ClientDto clientDto) {
         return ResponseEntity.ok(clientService.createClient(clientDto));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginClient(@RequestBody LoginRequest loginRequest){
+        String token = clientService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
+        if (token == null) return ResponseEntity.status(403).body("Bad credentials");
+        return ResponseEntity.ok(new ClientLoginResponse(token));
     }
 
 }
