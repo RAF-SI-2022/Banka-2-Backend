@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.client.dto.*;
 import rs.edu.raf.si.bank2.client.models.mongodb.Client;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.ClientRepository;
+import rs.edu.raf.si.bank2.client.utils.JwtUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +16,12 @@ import java.util.Optional;
 public class ClientService {
 
     private final ClientRepository clientRepository;
+    private final JwtUtil jwtUtil;
 
     @Autowired
-    public ClientService(ClientRepository clientRepository) {
+    public ClientService(ClientRepository clientRepository, JwtUtil jwtUtil) {
         this.clientRepository = clientRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     public Optional<Client> getClient(String id) {
@@ -27,6 +30,12 @@ public class ClientService {
 
     public List<Client> getAllClients() {
         return clientRepository.findAll();
+    }
+
+    public String loginUser(String email, String password){
+        Optional<Client> client = clientRepository.findClientByEmailAndPassword(email, password);
+        if (client.isEmpty()) return null;
+        return jwtUtil.generateToken(email);
     }
 
     public Client save(Client client){
