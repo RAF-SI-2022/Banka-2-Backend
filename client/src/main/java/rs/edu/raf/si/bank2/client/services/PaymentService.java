@@ -36,10 +36,6 @@ public class PaymentService {
         Optional<RacunStorage> fromRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(paymentDto.getToBalanceRegNum());
         Optional<RacunStorage> toRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(paymentDto.getFromBalanceRegNum());
 
-        System.err.println(fromRacunInfo);
-        System.err.println(toRacunInfo);
-
-
         //todo mozda da se skloni provera za tudji racun
         if (fromRacunInfo.isEmpty()) return new CommunicationDto(404, "Klijentski racun nije pronadjen");
         if (toRacunInfo.isEmpty()) return new CommunicationDto(404, "Razun na koji saljete nije pronadjen");
@@ -58,7 +54,6 @@ public class PaymentService {
 
     //todo U OVIM PLACANJIMA TREBA DA SE STAVI NA NEKI WAIT ILI NESTO ZA AVAILABLE
     //todo uradi verifikaciju da li imamo dovoljno para
-
 
     private void pay(Balance type, String regNum, double amountToReduce) {
         switch (type) {
@@ -86,7 +81,6 @@ public class PaymentService {
         }
     }
 
-
     private void add(Balance type, String regNum, double amountToIncrease) {
         switch (type) {
             case TEKUCI -> {
@@ -113,12 +107,14 @@ public class PaymentService {
         }
     }
 
+    //todo uradi transfer
+    public CommunicationDto transferMoney(TransferDto transferDto) {
+        Optional<RacunStorage> fromRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(transferDto.getToBalanceRegNum());
+        Optional<RacunStorage> toRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(transferDto.getFromBalanceRegNum());
 
-    public String transferMoney(TransferDto transferDto) {
-
-
-        return null;
+        return new CommunicationDto(200, "Placanje uspesno izvrseno");
     }
+
 
     public void exchangeMoney() {
 

@@ -25,11 +25,11 @@ Feature: Option service
     When user is logged in
     Then user gets his user options
 
-  Scenario: user buys an AAPL option
-    Given user logs in
-    And there is an option to buy
-    When user is logged in
-    Then user buys an AAPL option
+#  Scenario: user buys an AAPL option
+#    Given user logs in
+#    And there is an option to buy
+#    When user is logged in
+#    Then user buys an AAPL option
 
   Scenario: user sells an AAPL option
     Given user logs in

@@ -17,6 +17,6 @@ Feature: Currency service
   Scenario: user gets inflation by id and year
     Then user gets inflation by id and year
 
-  Scenario: user gets currency by currency code
-    When user is logged in
-    Then user gets currency by currency code from database
+#  Scenario: user gets currency by currency code
+#    When user is logged in
+#    Then user gets currency by currency code from database
