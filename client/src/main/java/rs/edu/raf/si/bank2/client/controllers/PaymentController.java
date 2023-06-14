@@ -3,10 +3,7 @@ package rs.edu.raf.si.bank2.client.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import rs.edu.raf.si.bank2.client.dto.ExchangeDto;
-import rs.edu.raf.si.bank2.client.dto.PaymentDto;
-import rs.edu.raf.si.bank2.client.dto.PaymentReceiverDto;
-import rs.edu.raf.si.bank2.client.dto.TransferDto;
+import rs.edu.raf.si.bank2.client.dto.*;
 import rs.edu.raf.si.bank2.client.models.mongodb.PaymentReceiver;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.PaymentReceiverRepository;
 import rs.edu.raf.si.bank2.client.services.PaymentService;
@@ -29,20 +26,20 @@ public class PaymentController {
 
     @PostMapping("/makePayment")
     public ResponseEntity<?> makePayment(@RequestBody PaymentDto paymentDto) {
-        //todo va
-        return ResponseEntity.ok(paymentService.makePayment(paymentDto));
+        //todo validacija
+        CommunicationDto communicationDto = paymentService.makePayment(paymentDto);
+        return ResponseEntity.status(communicationDto.getResponseCode()).body(communicationDto.getResponseMsg());
     }
 
     @PostMapping("/transferMoney")
     public ResponseEntity<?> transferMoney(@RequestBody TransferDto transferDto) {
-        //todo va
+        //todo validacija
         return ResponseEntity.ok(paymentService.transferMoney(transferDto));
     }
 
-
     @PostMapping("/exchangeMoney")
     public ResponseEntity<?> exchangeMoney(@RequestBody ExchangeDto exchangeDto) {
-        //todo va
+        //todo validacija
         return null;
     }
 

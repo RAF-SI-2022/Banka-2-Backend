@@ -13,10 +13,9 @@ public interface MailingServiceInterface {
      * @param email the user's email address (recipient)
      * @param link  the password reset link
      */
+
     void sendResetPasswordEmail(String email, String link);
 
-    void sendRegistrationToken(String email);
 
-    boolean checkIfTokenGood(String token);
 
 }

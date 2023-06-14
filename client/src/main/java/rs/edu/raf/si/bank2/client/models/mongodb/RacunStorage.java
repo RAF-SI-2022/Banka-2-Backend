@@ -28,4 +28,6 @@ public class RacunStorage {
         this.type = type;
     }
 
+    public RacunStorage() {
+    }
 }

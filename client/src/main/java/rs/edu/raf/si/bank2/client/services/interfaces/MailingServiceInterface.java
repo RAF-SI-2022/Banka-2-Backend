@@ -5,12 +5,8 @@ package rs.edu.raf.si.bank2.client.services.interfaces;
  */
 public interface MailingServiceInterface {
 
-    /**
-     * Sends the password reset link to the specified email address. Should be
-     * used after resetting a user's password. Typically, the link will
-     * contain a password reset token.
-     *
-     * @param email the user's email address (recipient)
-     * @param token 4 digit number
-     */
+
+    void sendRegistrationToken(String email);
+
+    boolean checkIfTokenGood(String token);
 }

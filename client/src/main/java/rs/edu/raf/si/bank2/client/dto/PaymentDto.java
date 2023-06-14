@@ -16,8 +16,6 @@ public class PaymentDto {
     private String paymentNumber;
     private String paymentDescription;
 
-
-
     public PaymentDto(String senderId, String receiverName, String fromBalanceRegNum,
                       String toBalanceRegNum, Double amount, String referenceNumber, String paymentNumber, String paymentDescription) {
         this.senderId = senderId;
