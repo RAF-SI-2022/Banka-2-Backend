@@ -110,17 +110,4 @@ public class AuthenticationController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/sendToken/{email}")
-    public ResponseEntity<?> sendTokenToMail(@PathVariable String email){
-        mailingService.sendRegistrationToken(email);//todo dodaj email
-        return ResponseEntity.ok("Token sent");
-    }
-
-    @GetMapping("/checkToken/{token}")
-    public ResponseEntity<?> checkToken(@PathVariable String token){
-        if (mailingService.checkIfTokenGood(token))
-            return ResponseEntity.ok("Valid");
-        return ResponseEntity.status(404).body("Not valid");
-    }
-
 }

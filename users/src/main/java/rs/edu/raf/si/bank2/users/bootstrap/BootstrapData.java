@@ -75,16 +75,6 @@ public class BootstrapData implements CommandLineRunner {
             logger.info("Permission " + pn + "added");
         }
 
-        mailingService.getRegistrationCodes().add("1934");
-        mailingService.getRegistrationCodes().add("1358");
-        mailingService.getRegistrationCodes().add("5743");
-        mailingService.getRegistrationCodes().add("4325");
-        mailingService.getRegistrationCodes().add("2368");
-        mailingService.getRegistrationCodes().add("2342");
-        mailingService.getRegistrationCodes().add("2357");
-        mailingService.getRegistrationCodes().add("3341");
-        mailingService.getRegistrationCodes().add("1231");
-
         // Set up admin user
         Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
         if (adminUser.isPresent()) {

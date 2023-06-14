@@ -50,14 +50,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (username != null) {
 
-            //todo vrati
+            //todo vrati ovaj kurac
 //            UserDetails userDetails = this.userService.loadUserByUsername(username);
 //            if (jwtUtil.validateToken(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                         new UsernamePasswordAuthenticationToken(username, null, new ArrayList<>());
                 usernamePasswordAuthenticationToken.setDetails( new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-                System.err.println(usernamePasswordAuthenticationToken);
 //            }
 
         }
