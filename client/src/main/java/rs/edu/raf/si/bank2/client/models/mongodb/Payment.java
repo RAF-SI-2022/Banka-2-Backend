@@ -17,13 +17,12 @@ import javax.persistence.GenerationType;
 @Document("payments")
 public class Payment {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
-    private String senderId;//klijent koji je posalo
     private String receiverName;
-    private String fromBalanceRegNum;
-    private String toBalanceRegNum;
+    private String balanceRegistrationNumber;//reg broj racuna
     private Double amount;
     private String referenceNumber;//poziv na broj
     private String paymentNumber;
@@ -32,16 +31,13 @@ public class Payment {
     public Payment() {
     }
 
-    public Payment(String senderId, String receiverName, String fromBalanceRegNum, String toBalanceRegNum,
+    public Payment(String receiverName, String balanceRegistrationNumber,
                    Double amount, String referenceNumber, String paymentNumber, String paymentDescription) {
-        this.senderId = senderId;
         this.receiverName = receiverName;
-        this.fromBalanceRegNum = fromBalanceRegNum;
-        this.toBalanceRegNum = toBalanceRegNum;
+        this.balanceRegistrationNumber = balanceRegistrationNumber;
         this.amount = amount;
         this.referenceNumber = referenceNumber;
         this.paymentNumber = paymentNumber;
         this.paymentDescription = paymentDescription;
     }
-
 }

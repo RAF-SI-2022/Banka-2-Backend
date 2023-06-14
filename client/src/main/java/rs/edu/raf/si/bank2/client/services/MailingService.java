@@ -71,7 +71,7 @@ public class MailingService implements MailingServiceInterface {
                 If you did not request a password reset, please ignore this email.
                 """;
         try {
-            int randomCodePlace = new Random().nextInt(registrationCodes.size()) + 1;
+            int randomCodePlace = new Random().nextInt(registrationCodes.size());
             sendMail(email, "Registration token", String.format(template, registrationCodes.get(randomCodePlace)));
         } catch (MessagingException e) {
             logger.error("Failed to send password reset email", e);

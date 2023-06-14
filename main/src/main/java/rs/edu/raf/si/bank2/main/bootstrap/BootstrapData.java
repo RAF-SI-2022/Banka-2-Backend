@@ -72,7 +72,7 @@ public class BootstrapData implements CommandLineRunner {
     private final EntityManagerFactory entityManagerFactory;
     private final RedisConnectionFactory redisConnectionFactory;
 
-    private boolean runTestSetup = false;
+    private boolean runTestSetup = true;
 
     @Autowired
     public BootstrapData(
@@ -119,7 +119,7 @@ public class BootstrapData implements CommandLineRunner {
         List<Balance> listOfBalances = balanceRepository.findAll();
         if (listOfBalances.size() == 0) runTestSetup = true;
 
-        boolean temporaryLoad = false; // TODO OVO TREBA DA SE UNAPREDI I DA BUDE NA FALSE NA LOKALU
+        boolean temporaryLoad = true; // TODO OVO TREBA DA SE UNAPREDI I DA BUDE NA FALSE NA LOKALU
 
         if (!temporaryLoad) {
             // If empty, add futures in db from csv
