@@ -1,5 +1,5 @@
 presubmits:
-  - name: post-banka-2-backend-test-presubmits
+  - name: post-banka-2-backend-dev-presubmits
     labels:
       preset-harbor-robot-push: "true"
     decorate: true
@@ -47,13 +47,6 @@ presubmits:
               
               chmod +x kubernetes/upgrade.sh
               bash kubernetes/upgrade.sh
-
-              ###########################################
-              # Call tests and break on first test fail #
-              ###########################################
-              
-              chmod +x kubernetes/test.sh
-              bash kubernetes/test.sh
 
           securityContext:
             privileged: true
