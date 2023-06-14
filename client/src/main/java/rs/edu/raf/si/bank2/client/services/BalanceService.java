@@ -79,7 +79,7 @@ public class BalanceService {
         }
 
         String registrationNumber = generateRandomNumber(10);//todo proveri dal ok
-        if (racunStorageRepository.findRacunStorageByBalanceRegistrationNumberAndType(registrationNumber, Balance.DEVIZNI).isPresent())
+        if (racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(registrationNumber).isPresent())
             registrationNumber = generateRandomNumber(10); //za slucaj da se nekim sudom ponovi broj 1/1 000 000
 
         DevizniRacun newDevizniRacun = new DevizniRacun(registrationNumber, devizniRacunDto.getOwnerId(),
@@ -106,7 +106,7 @@ public class BalanceService {
         LocalDate now = LocalDate.now();
 
         String registrationNumber = generateRandomNumber(10);//todo proveri dal ok
-        if (racunStorageRepository.findRacunStorageByBalanceRegistrationNumberAndType(registrationNumber, Balance.DEVIZNI).isPresent())
+        if (racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(registrationNumber).isPresent())
             registrationNumber = generateRandomNumber(10); //za slucaj da se nekim sudom ponovi broj 1/1 000 000
 
         TekuciRacun newTekuciRacun = new TekuciRacun(registrationNumber, tekuciRacunDto.getOwnerId(),
@@ -132,7 +132,7 @@ public class BalanceService {
         LocalDate now = LocalDate.now();
 
         String registrationNumber = generateRandomNumber(10);//todo proveri dal ok
-        if (racunStorageRepository.findRacunStorageByBalanceRegistrationNumberAndType(registrationNumber, Balance.DEVIZNI).isPresent())
+        if (racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(registrationNumber).isPresent())
             registrationNumber = generateRandomNumber(10); //za slucaj da se nekim sudom ponovi broj 1/1 000 000
 
         PoslovniRacun newPoslovniRacun = new PoslovniRacun(registrationNumber, poslovniRacunDto.getOwnerId(),

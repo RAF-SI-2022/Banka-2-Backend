@@ -10,6 +10,6 @@ import java.util.Optional;
 @Repository
 public interface RacunStorageRepository extends MongoRepository<RacunStorage, String> {
 
-    Optional<RacunStorage> findRacunStorageByBalanceRegistrationNumberAndType(String regNumber, Balance balance);
+    Optional<RacunStorage> findRacunStorageByBalanceRegistrationNumber(String regNumber);
 
 }
