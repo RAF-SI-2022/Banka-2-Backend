@@ -73,15 +73,10 @@ public class BalanceController {
         Optional<Client> client = clientRepository.findClientByEmail(email);
         if (client.isEmpty()) return ResponseEntity.status(404).body("Client not found");
 
-        List<TekuciRacun> tekuciRacuni = tekuciRacunRepository.findTekuciRacunByOwnerId(client.get().getId());
-        List<PoslovniRacun> poslovniRacuni = poslovniRacunRepository.findPoslovniRacunByOwnerId(client.get().getId());
-        List<DevizniRacun> devizniRacuni = devizniRacunRepository.findDevizniRacunByOwnerId(client.get().getId());
-
         List<Racun> allRacuni = new ArrayList<>();
-        allRacuni.addAll(tekuciRacuni);
-        allRacuni.addAll(poslovniRacuni);
-        allRacuni.addAll(devizniRacuni);
-
+        allRacuni.addAll(tekuciRacunRepository.findTekuciRacunByOwnerId(client.get().getId()));
+        allRacuni.addAll(poslovniRacunRepository.findPoslovniRacunByOwnerId(client.get().getId()));
+        allRacuni.addAll(devizniRacunRepository.findDevizniRacunByOwnerId(client.get().getId()));
         return ResponseEntity.ok(allRacuni);
     }
 
@@ -154,4 +149,5 @@ public class BalanceController {
         BalanceDto response = balanceService.openPoslovniRacun(poslovniRacunDto);
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
+
 }

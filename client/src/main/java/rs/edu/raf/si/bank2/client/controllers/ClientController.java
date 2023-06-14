@@ -57,10 +57,6 @@ public class ClientController {
 
     @PostMapping("/createClient")
     public ResponseEntity<?> createClient(@RequestBody ClientDto clientDto) {
-        String signedInUserEmail = getContext().getAuthentication().getName();
-        if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
-        }
         return ResponseEntity.ok(clientService.createClient(clientDto));
     }
 
