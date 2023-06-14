@@ -4,10 +4,7 @@ package rs.edu.raf.si.bank2.client.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.client.dto.*;
-import rs.edu.raf.si.bank2.client.models.mongodb.Client;
-import rs.edu.raf.si.bank2.client.models.mongodb.DevizniRacun;
-import rs.edu.raf.si.bank2.client.models.mongodb.PoslovniRacun;
-import rs.edu.raf.si.bank2.client.models.mongodb.TekuciRacun;
+import rs.edu.raf.si.bank2.client.models.mongodb.*;
 import rs.edu.raf.si.bank2.client.models.mongodb.enums.BalanceStatus;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.DevizniRacunRepository;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.PoslovniRacunRepository;
@@ -61,12 +58,22 @@ public class BalanceService {
 
     //todo KADA SE PRIV NAPRAVI STAVI BASE NA TRUE A OSTALO NA FALSE
     public BalanceDto openDevizniRacun(DevizniRacunDto devizniRacunDto) {
+        Optional<Client> clientToAddBalanceTo = clientService.getClient(devizniRacunDto.getOwnerId());
+        if (clientToAddBalanceTo.isEmpty()){
+            System.err.println("Client not found");
+            return null;
+        }
+
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         LocalDate now = LocalDate.now();
-        Optional<Client> clientToAddBalanceTo = clientService.getClient(devizniRacunDto.getOwnerId());
         boolean defaultCurrency = false;
-        if (clientToAddBalanceTo.get().getBalances().size() != 0)
-            defaultCurrency = true;
+
+        for (Racun racun : clientToAddBalanceTo.get().getBalances()){
+            if (racun instanceof DevizniRacun) {
+                defaultCurrency = true;
+                break;
+            }
+        }
 
         DevizniRacun newDevizniRacun = new DevizniRacun(generateRandomNumber(10), devizniRacunDto.getOwnerId(),
                 5000.0, 5000.0, devizniRacunDto.getAssignedAgentId(),
@@ -74,17 +81,20 @@ public class BalanceService {
                 devizniRacunDto.getBalanceType(), devizniRacunDto.getInterestRatePercentage(), devizniRacunDto.getAccountMaintenance(),
                 defaultCurrency, devizniRacunDto.getAllowedCurrencies());
 
-
         devizniRacunRepository.save(newDevizniRacun);
-        if (clientToAddBalanceTo.isPresent()){
-            clientToAddBalanceTo.get().getBalances().add(newDevizniRacun);
-            clientService.save(clientToAddBalanceTo.get());
-        }
+        clientToAddBalanceTo.get().getBalances().add(newDevizniRacun);
+        clientService.save(clientToAddBalanceTo.get());
 
         return new BalanceDto(200, "Devizni racun uspeno napravljen.");
     }
 
     public BalanceDto openTekuciRacun(TekuciRacunDto tekuciRacunDto) {
+        Optional<Client> clientToAddBalanceTo = clientService.getClient(tekuciRacunDto.getOwnerId());
+        if (clientToAddBalanceTo.isEmpty()){
+            System.err.println("Client not found");
+            return null;
+        }
+
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         LocalDate now = LocalDate.now();
         TekuciRacun newTekuciRacun = new TekuciRacun(generateRandomNumber(10), tekuciRacunDto.getOwnerId(),
@@ -92,16 +102,18 @@ public class BalanceService {
                 dtf.format(now), null, tekuciRacunDto.getCurrency(), BalanceStatus.ACTIVE,
                 tekuciRacunDto.getBalanceType(), tekuciRacunDto.getInterestRatePercentage(), tekuciRacunDto.getAccountMaintenance());
         tekuciRacunRepository.save(newTekuciRacun);
-
-        Optional<Client> clientToAddBalanceTo = clientService.getClient(tekuciRacunDto.getOwnerId());
-        if (clientToAddBalanceTo.isPresent()){
-            clientToAddBalanceTo.get().getBalances().add(newTekuciRacun);
-            clientService.save(clientToAddBalanceTo.get());
-        }
+        clientToAddBalanceTo.get().getBalances().add(newTekuciRacun);
+        clientService.save(clientToAddBalanceTo.get());
 
         return new BalanceDto(200, "Tekuci racun uspeno napravljen.");
     }
     public BalanceDto openPoslovniRacun(PoslovniRacunDto poslovniRacunDto) {
+        Optional<Client> clientToAddBalanceTo = clientService.getClient(poslovniRacunDto.getOwnerId());
+        if (clientToAddBalanceTo.isEmpty()){
+            System.err.println("Client not found");
+            return null;
+        }
+
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         LocalDate now = LocalDate.now();
         PoslovniRacun newPoslovniRacun = new PoslovniRacun(generateRandomNumber(10), poslovniRacunDto.getOwnerId(),
@@ -109,12 +121,8 @@ public class BalanceService {
                 dtf.format(now), null, poslovniRacunDto.getCurrency(),BalanceStatus.ACTIVE,
                 poslovniRacunDto.getBussinessAccountType());
         poslovniRacunRepository.save(newPoslovniRacun);
-
-        Optional<Client> clientToAddBalanceTo = clientService.getClient(poslovniRacunDto.getOwnerId());
-        if (clientToAddBalanceTo.isPresent()){
-            clientToAddBalanceTo.get().getBalances().add(newPoslovniRacun);
-            clientService.save(clientToAddBalanceTo.get());
-        }
+        clientToAddBalanceTo.get().getBalances().add(newPoslovniRacun);
+        clientService.save(clientToAddBalanceTo.get());
 
         return new BalanceDto(200, "Poslovni racun uspeno napravljen.");
     }
