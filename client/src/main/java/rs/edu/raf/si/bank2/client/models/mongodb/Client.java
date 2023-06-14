@@ -18,6 +18,19 @@ import java.util.List;
 @Document("client")
 public class Client {
 
+    public Client(String name, String lastname, String dateOfBirth, String gender, String email,
+                  String telephone, String address, String password, List<Racun> balances) {
+        this.name = name;
+        this.lastname = lastname;
+        this.dateOfBirth = dateOfBirth;
+        this.gender = gender;
+        this.email = email;
+        this.telephone = telephone;
+        this.address = address;
+        this.password = password;
+        this.balances = balances;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
@@ -30,6 +43,5 @@ public class Client {
     private String address;
     private String password;
     private List<Racun> balances;
-
 
 }

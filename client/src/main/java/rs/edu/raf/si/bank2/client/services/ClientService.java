@@ -33,13 +33,11 @@ public class ClientService {
 
     //todo dodaj hesiranje passowrda
     public Client createClient(ClientDto clientDto) {
-        Client newClient = new Client(clientDto.getId(),clientDto.getName(),clientDto.getLastname(),
+        Client newClient = new Client(clientDto.getName(),clientDto.getLastname(),
                 clientDto.getDateOfBirth(), clientDto.getGender(),clientDto.getEmail(),clientDto.getTelephone(),
                 clientDto.getAddress(),clientDto.getPassword(), new ArrayList<>());
         return clientRepository.save(newClient);
     }
 
     //TODO ubaciti edit i delete opcije
-
-
 }

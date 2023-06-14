@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class ClientDto {
-      private String id;
       private String name;
       private String lastname;
       private String dateOfBirth;
