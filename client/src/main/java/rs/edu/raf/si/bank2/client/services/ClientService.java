@@ -29,6 +29,10 @@ public class ClientService {
         return clientRepository.findAll();
     }
 
+    public Client save(Client client){
+        return clientRepository.save(client);
+    }
+
 
 
     //todo dodaj hesiranje passowrda

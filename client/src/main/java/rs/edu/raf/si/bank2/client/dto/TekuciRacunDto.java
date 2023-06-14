@@ -13,16 +13,10 @@ import rs.edu.raf.si.bank2.client.models.mongodb.enums.BalanceType;
 @RequiredArgsConstructor
 public class TekuciRacunDto {
 
-//      private String id;
-//      private String registrationNumber;
       private String ownerId;
-//      private Double balance;
-//      private Double availableBalance;
       private Long assignedAgentId;
       private String currency;
-//      private BalanceStatus balanceStatus; //enum active / not active
-      private BalanceType balanceType; //enum //licni, stedni ...
-      private Integer interestRatePercentage; //1% - kamatna stopa
+      private BalanceType balanceType;
+      private Integer interestRatePercentage;
       private Double accountMaintenance;
-
 }

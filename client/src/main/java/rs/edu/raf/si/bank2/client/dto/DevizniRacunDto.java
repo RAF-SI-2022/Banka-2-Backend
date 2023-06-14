@@ -14,18 +14,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DevizniRacunDto {
 
-//      private String id;
-//      private String registrationNumber;
       private String ownerId;
-//      private Double balance;
-//      private Double availableBalance;
       private Long assignedAgentId;
       private String currency;
-//      private BalanceStatus balanceStatus; //enum active / not active
-      private BalanceType balanceType; //enum //licni, stedni ...
-      private Integer interestRatePercentage; //1% - kamatna stopa
+      private BalanceType balanceType;
+      private Integer interestRatePercentage;
       private Double accountMaintenance;
-      private Boolean defaultCurrency;
+//      private Boolean defaultCurrency;
       private List<String> allowedCurrencies;
-
 }
