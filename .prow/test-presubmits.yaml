@@ -4,6 +4,11 @@ presubmits:
       preset-harbor-robot-push: "true"
     decorate: true
     always_run: true
+    extra_refs:
+      - org: RAF-SI-2022
+        repo: Banka-2-Infrastructure
+        base_ref: main
+        path_alias: "infra"
     spec:
       serviceAccountName: prow-admin
       containers:
