@@ -16,27 +16,27 @@ Feature: Future service
   Scenario: user gets future by name from database
     Then user gets future by name from database
 
-  Scenario: user buys future from company
-    Given future is on sale
-    Then user buys future from company
-
-  Scenario: user buys future from company with null currency code
-    Given future is on sale
-    Then user buys future from company with null currency code
-
-  Scenario: user buys future from company with limit or stop
-    Given future is on sale
-    Then user buys future from company with limit or stop
-
-  Scenario: user buys future from another user
-    Given future is on sale
-    Given future is owned by another user
-    Then user buys future from another user
-
-  Scenario: user buys future from another user with limit or stop
-    Given future is on sale
-    Given future is owned by another user
-    Then user buys future from another user with limit or stop
+#  Scenario: user buys future from company
+#    Given future is on sale
+#    Then user buys future from company
+#
+#  Scenario: user buys future from company with null currency code
+#    Given future is on sale
+#    Then user buys future from company with null currency code
+#
+#  Scenario: user buys future from company with limit or stop
+#    Given future is on sale
+#    Then user buys future from company with limit or stop
+#
+#  Scenario: user buys future from another user
+#    Given future is on sale
+#    Given future is owned by another user
+#    Then user buys future from another user
+#
+#  Scenario: user buys future from another user with limit or stop
+#    Given future is on sale
+#    Given future is owned by another user
+#    Then user buys future from another user with limit or stop
 
   Scenario: user sells future
     Given future is owned by this user

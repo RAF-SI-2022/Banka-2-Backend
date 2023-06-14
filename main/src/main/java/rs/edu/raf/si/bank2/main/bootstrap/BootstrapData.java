@@ -72,7 +72,7 @@ public class BootstrapData implements CommandLineRunner {
     private final EntityManagerFactory entityManagerFactory;
     private final RedisConnectionFactory redisConnectionFactory;
 
-    private boolean runTestSetup = false;
+    private boolean runTestSetup = true;
 
     @Autowired
     public BootstrapData(
