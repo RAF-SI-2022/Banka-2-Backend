@@ -7,6 +7,8 @@ import rs.edu.raf.si.bank2.client.dto.TransferDto;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.ClientRepository;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.PaymentRepository;
 
+import java.util.Optional;
+
 @Service
 public class PaymentService {
 
@@ -21,7 +23,7 @@ public class PaymentService {
 
 
     public String makePayment(PaymentDto paymentDto){
-
+//        Optional<>
 
 
         return null;
