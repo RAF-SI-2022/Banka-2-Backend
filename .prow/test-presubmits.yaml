@@ -21,10 +21,17 @@ presubmits:
               export ENV="dev"
               export SIDE="backend"
               export NAMESPACE="banka-2-$ENV"
+              export SERVICES="flyway users main otc client"
               
               ##########################
               # Delete existing config #
               ##########################
+              
+              start-docker.sh
+              docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD harbor.k8s.elab.rs
+              
+              INFRA_SRC=/home/prow/go/src/infra/kubernetes
+              rsync -av --exclude='.git' ${INFRA_SRC} .
               
               chmod +x kubernetes/remove.sh
               bash kubernetes/remove.sh
@@ -32,9 +39,6 @@ presubmits:
               ##############
               # Call setup #
               ##############
-              
-              start-docker.sh
-              docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD harbor.k8s.elab.rs
               
               chmod +x kubernetes/upgrade.sh
               bash kubernetes/upgrade.sh

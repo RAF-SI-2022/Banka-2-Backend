@@ -1,11 +1,16 @@
 postsubmits:
-  - name: post-banka-2-backend-users-prod-postsubmits
+  - name: post-banka-2-backend-prod-postsubmits
     labels:
       preset-harbor-robot-push: "true"
     decorate: true
     always_run: true
     branches:
       - ^main$
+    extra_refs:
+      - org: RAF-SI-2022
+        repo: Banka-2-Infrastructure
+        base_ref: main
+        path_alias: "infra"
     spec:
       serviceAccountName: prow-admin
       containers:
@@ -23,8 +28,7 @@ postsubmits:
               export ENV="prod"
               export SIDE="backend"
               export NAMESPACE="banka-2-$ENV"
-              
-              kubectl config set-context --current --namespace=${NAMESPACE}
+              export SERVICES="flyway users main otc client"
               
               ##############
               # Call setup #
@@ -32,6 +36,9 @@ postsubmits:
   
               start-docker.sh
               docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD harbor.k8s.elab.rs
+              
+              INFRA_SRC=/home/prow/go/src/infra/kubernetes
+              rsync -av --exclude='.git' ${INFRA_SRC} .
               
               chmod +x kubernetes/upgrade.sh
               bash kubernetes/upgrade.sh --update
