@@ -21,7 +21,7 @@ public class Racun {
         this.balanceType = balanceType;
         this.interestRatePercentage = interestRatePercentage;
         this.accountMaintenance = accountMaintenance;
-        this.balance = balance;
+        this.type = type;
     }
 
     public Racun() {
