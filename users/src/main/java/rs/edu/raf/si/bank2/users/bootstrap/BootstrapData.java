@@ -1,12 +1,11 @@
 package rs.edu.raf.si.bank2.users.bootstrap;
 
 import java.util.*;
-import javax.persistence.EntityManagerFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import rs.edu.raf.si.bank2.users.models.mariadb.Permission;
@@ -14,6 +13,7 @@ import rs.edu.raf.si.bank2.users.models.mariadb.PermissionName;
 import rs.edu.raf.si.bank2.users.models.mariadb.User;
 import rs.edu.raf.si.bank2.users.repositories.mariadb.PermissionRepository;
 import rs.edu.raf.si.bank2.users.repositories.mariadb.UserRepository;
+import rs.edu.raf.si.bank2.users.services.MailingService;
 
 @Component
 public class BootstrapData implements CommandLineRunner {
@@ -41,23 +41,18 @@ public class BootstrapData implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PermissionRepository permissionRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MailingService mailingService;
 
-    private final EntityManagerFactory entityManagerFactory;
-
-    private final RedisConnectionFactory redisConnectionFactory;
 
     @Autowired
     public BootstrapData(
             UserRepository userRepository,
             PermissionRepository permissionRepository,
-            PasswordEncoder passwordEncoder,
-            EntityManagerFactory entityManagerFactory,
-            RedisConnectionFactory redisConnectionFactory) {
+            PasswordEncoder passwordEncoder, MailingService mailingService) {
         this.userRepository = userRepository;
         this.permissionRepository = permissionRepository;
         this.passwordEncoder = passwordEncoder;
-        this.entityManagerFactory = entityManagerFactory;
-        this.redisConnectionFactory = redisConnectionFactory;
+        this.mailingService = mailingService;
     }
 
     @Override
@@ -79,6 +74,16 @@ public class BootstrapData implements CommandLineRunner {
             this.permissionRepository.save(addPerm);
             logger.info("Permission " + pn + "added");
         }
+
+        mailingService.getRegistrationCodes().add("1934");
+        mailingService.getRegistrationCodes().add("1358");
+        mailingService.getRegistrationCodes().add("5743");
+        mailingService.getRegistrationCodes().add("4325");
+        mailingService.getRegistrationCodes().add("2368");
+        mailingService.getRegistrationCodes().add("2342");
+        mailingService.getRegistrationCodes().add("2357");
+        mailingService.getRegistrationCodes().add("3341");
+        mailingService.getRegistrationCodes().add("1231");
 
         // Set up admin user
         Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
@@ -112,5 +117,7 @@ public class BootstrapData implements CommandLineRunner {
         // Save admin
         this.userRepository.save(admin);
         logger.info("Root admin added");
+
+
     }
 }

@@ -61,45 +61,6 @@ public class AuthorisationService implements AuthorisationServiceInterface {
         return false;
     }
 
-    @Override
-    public Optional<String> login(String email, String password) {
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-        } catch (Exception e) {
-            return Optional.empty();
-        }
 
-        String token = jwtUtil.generateToken(email);
-        return Optional.of(token);
-    }
 
-    @Override
-    public boolean requestPasswordResetToken(String email) {
-        Optional<User> user = userRepository.findUserByEmail(email);
-        if (user.isEmpty()) {
-            return false;
-        }
-
-        User client = user.get();
-        // TODO random enough?
-        String token = UUID.randomUUID().toString();
-        passwordResetTokenRepository.save(new PasswordResetToken(client, token));
-        mailingService.sendResetPasswordEmail(email, token);
-        return true;
-    }
-
-    @Override
-    public String validatePasswordResetToken(String token) {
-        Optional<PasswordResetToken> passwordResetToken =
-                passwordResetTokenRepository.findPasswordResetTokenByToken(token);
-        if (passwordResetToken.isEmpty()) return "Token not found";
-
-        Calendar cal = Calendar.getInstance();
-        if (passwordResetToken.get().getExpirationDate().before(cal.getTime())) {
-            this.passwordResetTokenRepository.delete(passwordResetToken.get());
-            return "Token expired";
-        }
-
-        return "";
-    }
 }

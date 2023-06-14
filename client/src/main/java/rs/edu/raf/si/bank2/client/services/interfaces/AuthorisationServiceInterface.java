@@ -10,25 +10,7 @@ import java.util.Optional;
  */
 public interface AuthorisationServiceInterface {
 
-    /**
-     * Logs in the user with the specified email and password. If successful,
-     * returns a JWT token for further requests; otherwise, returns empty.
-     *
-     * @param email    user email
-     * @param password user password
-     * @return JWT token or empty
-     */
-    Optional<String> login(String email, String password);
-
-    /**
-     * Requests a password reset for the user with the given email.
-     *
-     * @param email user email
-     * @return true if successful, false otherwise
-     */
-    boolean requestPasswordResetToken(String email);
 
     boolean isAuthorised(PermissionName permissionRequired, String userEmail);
 
-    String validatePasswordResetToken(String token);
 }

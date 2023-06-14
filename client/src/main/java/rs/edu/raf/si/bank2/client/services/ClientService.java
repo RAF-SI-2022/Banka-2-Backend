@@ -29,9 +29,15 @@ public class ClientService {
         return clientRepository.findAll();
     }
 
+    public Client save(Client client){
+        return clientRepository.save(client);
+    }
+
+
+
     //todo dodaj hesiranje passowrda
     public Client createClient(ClientDto clientDto) {
-        Client newClient = new Client(clientDto.getId(),clientDto.getName(),clientDto.getLastname(),
+        Client newClient = new Client(clientDto.getName(),clientDto.getLastname(),
                 clientDto.getDateOfBirth(), clientDto.getGender(),clientDto.getEmail(),clientDto.getTelephone(),
                 clientDto.getAddress(),clientDto.getPassword(), new ArrayList<>());
         return clientRepository.save(newClient);
