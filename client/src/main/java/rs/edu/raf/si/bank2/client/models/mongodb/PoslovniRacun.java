@@ -20,6 +20,23 @@ import javax.persistence.GenerationType;
 @Document("poslovniRacun")
 public class PoslovniRacun extends Racun{
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private String id;
+    private String registrationNumber;
+    private String ownerId;
+    private Balance type; //koji je balans zapravo
+    private Double balance;
+    private Double availableBalance; //ovo je toliko glupo .i.
+    private Long assignedAgentId;
+    private String creationDate;
+    private String expirationDate;
+    private String currency;
+    private BalanceStatus balanceStatus; //enum active / not active
+    private BussinessAccountType bussinessAccountType;
+//    private String companyId; //todo ovo stavi kasnije (treba da se gettuje iz otc servisa ili sa fronta)
+
+
     public PoslovniRacun() {
     }
 
@@ -37,21 +54,5 @@ public class PoslovniRacun extends Racun{
         this.type = Balance.POSLOVNI;
         this.bussinessAccountType = bussinessAccountType;
     }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
-    private String registrationNumber;
-    private String ownerId;
-    private Balance type; //koji je balans zapravo
-    private Double balance;
-    private Double availableBalance; //ovo je toliko glupo .i.
-    private Long assignedAgentId;
-    private String creationDate;
-    private String expirationDate;
-    private String currency;
-    private BalanceStatus balanceStatus; //enum active / not active
-    private BussinessAccountType bussinessAccountType;
-//    private String companyId; //todo ovo stavi kasnije (treba da se gettuje iz otc servisa ili sa fronta)
 
 }

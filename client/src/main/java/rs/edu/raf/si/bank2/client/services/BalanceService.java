@@ -74,7 +74,11 @@ public class BalanceService {
             }
         }
 
-        DevizniRacun newDevizniRacun = new DevizniRacun(generateRandomNumber(10), devizniRacunDto.getOwnerId(),
+        String registrationNumber = generateRandomNumber(10);
+        if (devizniRacunRepository.findDevizniRacunByRegistrationNumber(registrationNumber).isPresent())
+            registrationNumber = generateRandomNumber(10); //za slucaj da se nekim sudom ponovi broj 1/1 000 000
+
+        DevizniRacun newDevizniRacun = new DevizniRacun(registrationNumber, devizniRacunDto.getOwnerId(),
                 5000.0, 5000.0, devizniRacunDto.getAssignedAgentId(),
                 dtf.format(now), null, devizniRacunDto.getCurrency(), BalanceStatus.ACTIVE,
                 devizniRacunDto.getBalanceType(), devizniRacunDto.getInterestRatePercentage(), devizniRacunDto.getAccountMaintenance(),
@@ -95,7 +99,12 @@ public class BalanceService {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         LocalDate now = LocalDate.now();
-        TekuciRacun newTekuciRacun = new TekuciRacun(generateRandomNumber(10), tekuciRacunDto.getOwnerId(),
+
+        String registrationNumber = generateRandomNumber(10);
+        if (devizniRacunRepository.findDevizniRacunByRegistrationNumber(registrationNumber).isPresent())
+            registrationNumber = generateRandomNumber(10); //za slucaj da se nekim sudom ponovi broj 1/1 000 000
+
+        TekuciRacun newTekuciRacun = new TekuciRacun(registrationNumber, tekuciRacunDto.getOwnerId(),
                 5000.0, 5000.0, tekuciRacunDto.getAssignedAgentId(),
                 dtf.format(now), null, tekuciRacunDto.getCurrency(), BalanceStatus.ACTIVE,
                 tekuciRacunDto.getBalanceType(), tekuciRacunDto.getInterestRatePercentage(), tekuciRacunDto.getAccountMaintenance());
@@ -115,7 +124,12 @@ public class BalanceService {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         LocalDate now = LocalDate.now();
-        PoslovniRacun newPoslovniRacun = new PoslovniRacun(generateRandomNumber(10), poslovniRacunDto.getOwnerId(),
+
+        String registrationNumber = generateRandomNumber(10);
+        if (devizniRacunRepository.findDevizniRacunByRegistrationNumber(registrationNumber).isPresent())
+            registrationNumber = generateRandomNumber(10); //za slucaj da se nekim sudom ponovi broj 1/1 000 000
+
+        PoslovniRacun newPoslovniRacun = new PoslovniRacun(registrationNumber, poslovniRacunDto.getOwnerId(),
                 5000.0, 5000.0, poslovniRacunDto.getAssignedAgentId(),
                 dtf.format(now), null, poslovniRacunDto.getCurrency(),BalanceStatus.ACTIVE,
                 poslovniRacunDto.getBussinessAccountType());

@@ -20,6 +20,24 @@ import javax.persistence.GenerationType;
 @Document("tekuciRacun")
 public class TekuciRacun extends Racun{
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private String id;
+    private String registrationNumber;
+    private String ownerId;
+    private Balance type; //koji je balans zapravo
+    private Double balance;
+    private Double availableBalance; //ovo je toliko glupo .i.
+    private Long assignedAgentId;
+    private String creationDate;
+    private String expirationDate;
+    private String currency;
+    private BalanceStatus balanceStatus; //enum active / not active
+    private BalanceType balanceType; //enum //licni, stedni ...
+    private Integer interestRatePercentage; //1% - kamatna stopa
+    private Double accountMaintenance;
+
+
     public TekuciRacun(String registrationNumber, String ownerId, Double balance, Double availableBalance,
                        Long assignedAgentId, String creationDate, String expirationDate, String currency, BalanceStatus balanceStatus,
                        BalanceType balanceType, Integer interestRatePercentage, Double accountMaintenance) {
@@ -43,21 +61,5 @@ public class TekuciRacun extends Racun{
         super();
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
-    private String registrationNumber;
-    private String ownerId;
-    private Balance type; //koji je balans zapravo
-    private Double balance;
-    private Double availableBalance; //ovo je toliko glupo .i.
-    private Long assignedAgentId;
-    private String creationDate;
-    private String expirationDate;
-    private String currency;
-    private BalanceStatus balanceStatus; //enum active / not active
-    private BalanceType balanceType; //enum //licni, stedni ...
-    private Integer interestRatePercentage; //1% - kamatna stopa
-    private Double accountMaintenance;
 
 }
