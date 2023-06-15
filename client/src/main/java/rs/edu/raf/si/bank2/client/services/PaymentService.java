@@ -32,6 +32,7 @@ public class PaymentService {
     }
 
 
+    //todo flipovani su from i to
     public CommunicationDto makePayment(PaymentDto paymentDto) {
         Optional<RacunStorage> fromRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(paymentDto.getToBalanceRegNum());
         Optional<RacunStorage> toRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(paymentDto.getFromBalanceRegNum());

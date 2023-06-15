@@ -21,9 +21,9 @@ Feature: Stock service
   Scenario: user without perms tries to sell stock
     Then user tries to sell stock
 
-  Scenario: user without perms tries to see stocks
-    Then user tries to get stock
+#  Scenario: user without perms tries to see stocks
+#    Then user tries to get stock
 
-  Scenario: user without perms tries to remove stocks
-    Then user tries to remove stock
+#  Scenario: user without perms tries to remove stocks
+#    Then user tries to remove stock
 

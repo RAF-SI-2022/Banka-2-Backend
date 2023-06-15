@@ -30,14 +30,14 @@ public class ForexService implements ForexServiceInterface {
     }
 
     @Override
-    @Cacheable(value = "forexALL")
+//    @Cacheable(value = "forexALL")
     public List<Forex> findAll() {
         System.out.println("Getting all forexes first time (caching into redis)");
         return forexRepository.findAll();
     }
 
     @Override
-    @Cacheable(value = "forexFromTo", key = "{#fromCurrency, #toCurrency}")
+//    @Cacheable(value = "forexFromTo", key = "{#fromCurrency, #toCurrency}")
     public Forex getForexForCurrencies(String fromCurrency, String toCurrency) {
         Optional<Forex> forex = forexRepository.findForexByFromCurrencyCodeAndToCurrencyCode(fromCurrency, toCurrency);
 
