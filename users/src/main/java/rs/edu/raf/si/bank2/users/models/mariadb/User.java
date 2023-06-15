@@ -1,6 +1,5 @@
 package rs.edu.raf.si.bank2.users.models.mariadb;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;

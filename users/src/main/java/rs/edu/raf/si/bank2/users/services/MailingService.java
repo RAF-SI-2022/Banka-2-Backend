@@ -1,9 +1,6 @@
 package rs.edu.raf.si.bank2.users.services;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
-import java.util.Random;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -21,8 +18,7 @@ public class MailingService implements MailingServiceInterface {
     private static final String password = "idxegskltunedxog";
 
     @Autowired
-    public MailingService() {
-    }
+    public MailingService() {}
 
     private void sendMail(String recipient, String subject, String content) throws MessagingException {
         // Setting up STMP server
@@ -54,8 +50,6 @@ public class MailingService implements MailingServiceInterface {
         //  transport?
     }
 
-
-
     @Override
     public void sendResetPasswordEmail(String email, String link) {
         String template =
@@ -74,6 +68,4 @@ public class MailingService implements MailingServiceInterface {
             logger.error("Failed to send password reset email", e);
         }
     }
-
-
 }

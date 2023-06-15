@@ -1,7 +1,6 @@
 package rs.edu.raf.si.bank2.users.bootstrap;
 
 import java.util.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import rs.edu.raf.si.bank2.users.models.mariadb.PermissionName;
 import rs.edu.raf.si.bank2.users.models.mariadb.User;
 import rs.edu.raf.si.bank2.users.repositories.mariadb.PermissionRepository;
 import rs.edu.raf.si.bank2.users.repositories.mariadb.UserRepository;
-import rs.edu.raf.si.bank2.users.services.MailingService;
 
 @Component
 public class BootstrapData implements CommandLineRunner {
@@ -24,7 +22,7 @@ public class BootstrapData implements CommandLineRunner {
      * zapravo imali pristup. Mogu
      * da podesim forwardovanje ako je potrebno nekom drugom jos pristup.
      */
-    private static final String ADMIN_EMAIL = "anesic3119rn+banka2backend" + "+admin@raf.rs";
+    private static final String ADMIN_EMAIL = "anesic3119rn+banka2backend+admin@raf.rs";
     /**
      * TODO promeniti password ovde da bude jaci! Eventualno TODO napraviti
      * da se auto-generise novi
@@ -41,18 +39,13 @@ public class BootstrapData implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PermissionRepository permissionRepository;
     private final PasswordEncoder passwordEncoder;
-    private final MailingService mailingService;
-
 
     @Autowired
     public BootstrapData(
-            UserRepository userRepository,
-            PermissionRepository permissionRepository,
-            PasswordEncoder passwordEncoder, MailingService mailingService) {
+            UserRepository userRepository, PermissionRepository permissionRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.permissionRepository = permissionRepository;
         this.passwordEncoder = passwordEncoder;
-        this.mailingService = mailingService;
     }
 
     @Override
@@ -60,7 +53,6 @@ public class BootstrapData implements CommandLineRunner {
 
         // Set up all permissions
         Set<PermissionName> allPermissions = EnumSet.allOf(PermissionName.class);
-        System.out.println(allPermissions);
 
         for (PermissionName pn : allPermissions) {
             List<Permission> findPerm = permissionRepository.findByPermissionNames(Collections.singletonList(pn));
@@ -107,7 +99,5 @@ public class BootstrapData implements CommandLineRunner {
         // Save admin
         this.userRepository.save(admin);
         logger.info("Root admin added");
-
-
     }
 }
