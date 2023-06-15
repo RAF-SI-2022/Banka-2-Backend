@@ -59,7 +59,7 @@ public class FutureService implements FutureServiceInterface {
     CacheManager cacheManager;
 
     @Override
-    @Cacheable(value = "futureALL")
+    // @Cacheable(value = "futureALL")
     public List<Future> findAll() {
 
         System.out.println("Getting all futures first time (caching into redis)");
@@ -67,7 +67,7 @@ public class FutureService implements FutureServiceInterface {
     }
 
     @Override
-    @Cacheable(value = "futureID", key = "#id")
+    // @Cacheable(value = "futureID", key = "#id")
     public Optional<Future> findById(Long id) {
         System.out.println("Getting future by id first time (caching into redis)");
         if (cacheManager != null) this.clearFindAllCache();
@@ -84,7 +84,7 @@ public class FutureService implements FutureServiceInterface {
     }
 
     @Override
-    @Cacheable(value = "futureByName", key = "#futureName")
+    // @Cacheable(value = "futureByName", key = "#futureName")
     public Optional<List<Future>> findFuturesByFutureName(String futureName) {
         System.out.println("Getting future by name first time (caching into redis)");
 
