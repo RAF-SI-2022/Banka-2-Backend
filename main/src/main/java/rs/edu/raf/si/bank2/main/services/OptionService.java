@@ -88,7 +88,7 @@ public class OptionService implements OptionServiceInterface {
     }
 
     @Override
-    @Cacheable(value = "optionsStock")
+//    @Cacheable(value = "optionsStock")
     public List<Option> findByStock(String stockSymbol) {
         //        List<Option> requestedOptions = optionRepository.findAllByStockSymbol(stockSymbol);
         System.out.println("Getting options by stock - fist time (caching into redis)");
@@ -101,7 +101,7 @@ public class OptionService implements OptionServiceInterface {
     }
 
     @Override
-    @Cacheable(value = "optionsStockDate")
+//    @Cacheable(value = "optionsStockDate")
     public List<Option> findByStockAndDate(String stockSymbol, String regularDate) {
         System.out.println("Getting options for stock and date - fist time (caching into redis)");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");

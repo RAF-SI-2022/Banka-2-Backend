@@ -115,13 +115,12 @@ public class BootstrapData implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        // todo nameti da ovo radi samo za testiranje
-        List<Balance> listOfBalances = balanceRepository.findAll();
-        if (listOfBalances.size() == 0) runTestSetup = true;
-
         boolean temporaryLoad = true; // TODO OVO TREBA DA SE UNAPREDI I DA BUDE NA FALSE NA LOKALU
 
         if (!temporaryLoad) {
+            // todo nameti da ovo radi samo za testiranje
+            List<Balance> listOfBalances = balanceRepository.findAll();
+            if (listOfBalances.size() == 0) runTestSetup = true;
             // If empty, add futures in db from csv
             if (this.futureRepository.count() == 0) {
                 logger.info("Added futures");
@@ -142,15 +141,16 @@ public class BootstrapData implements CommandLineRunner {
                 logger.info("Adding stocks");
                 loadStocksTable();
             }
+//            if (runTestSetup) {
+//            addAdminForTest();//
+//            addBalancesToAdmin();
+//            runTestSetup = false;
+//            }
         } else {
             this.temporaryLoad();
         }
 
-        if (runTestSetup) {
-            addAdminForTest();
-            addBalancesToAdmin();
-            runTestSetup = false;
-        }
+
 
         logger.info("Started!");
         System.out.println("Everything started");
@@ -532,11 +532,17 @@ public class BootstrapData implements CommandLineRunner {
         exchangeRepository.save(
                 new Exchange(2L, "Nasdaq", "NASDAQ", "XNAS", "USA", null, "America/New_York", " 09:30", " 16:00"));
 
+//        giveAdminStocks();
+
         // dodajemo 5 opcija
         //        optionService.getFiveMostImportantOptionsFromApi();
 
         // dodajemo 5 stockova
         stockService.updateAllStocksInDb();
+
+        if (balanceRepository.findAllByUser_Id(1L).size() == 0)
+            addBalancesToAdmin();
+
 
         // todo stock history
     }

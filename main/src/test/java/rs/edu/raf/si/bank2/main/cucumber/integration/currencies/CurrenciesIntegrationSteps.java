@@ -136,7 +136,7 @@ public class CurrenciesIntegrationSteps extends CurrenciesIntegrationTestConfig 
     @Then("user gets currency by currency code from database")
     public void user_gets_currency_by_code() {
         try {
-            mockMvc.perform(get("/api/currencies/code/" + testCurrency.getCurrencyCode())
+            mockMvc.perform(get("/api/currencies/code/USD")
                             .contentType("application/json")
                             .content(
                                     """

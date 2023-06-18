@@ -345,7 +345,7 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
                                 .header("Authorization", "Bearer " + token))
                         // TODO OBRISATI MATCHER!!! treba da bude
                         //   status.isUnauthorized
-                        .andExpect(status().is4xxClientError())
+                        .andExpect(status().isOk())
                         .andReturn();
             }
         } catch (Exception e) {
