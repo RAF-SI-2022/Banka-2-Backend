@@ -109,7 +109,7 @@ services:
         condition: service_healthy
       flyway:
         condition: service_completed_successfully
-    entrypoint: [ "java", "-jar", "app.jar" ]
+    entrypoint: [ "java", "-Dspring.profiles.active=container,test", "-jar", "app.jar" ]
     networks:
       - bank2_net
 
@@ -139,7 +139,7 @@ services:
         condition: service_completed_successfully
       users:
         condition: service_healthy
-    entrypoint: [ "java", "-jar", "app.jar" ]
+    entrypoint: [ "java", "-Dspring.profiles.active=container,test", "-jar", "app.jar" ]
     networks:
       - bank2_net
 
@@ -169,7 +169,7 @@ services:
         condition: service_completed_successfully
       users:
         condition: service_healthy
-    entrypoint: [ "java", "-jar", "app.jar" ]
+    entrypoint: [ "java", "-Dspring.profiles.active=container,test", "-jar", "app.jar" ]
     networks:
       - bank2_net
 
@@ -199,7 +199,7 @@ services:
         condition: service_completed_successfully
       users:
         condition: service_healthy
-    entrypoint: [ "java", "-jar", "app.jar" ]
+    entrypoint: [ "java", "-Dspring.profiles.active=container,test", "-jar", "app.jar" ]
     networks:
       - bank2_net
 
