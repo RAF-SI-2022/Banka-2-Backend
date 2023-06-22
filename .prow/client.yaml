@@ -45,7 +45,7 @@ presubmits:
               services=$(echo ${SERVICES_NAMES} | xargs)
               for service in $services
               do
-                docker compose up -d --build --no-recreate ${service} 
+                docker compose up -d --build --no-recreate ${service} || sleep 3600
               done
               
               # Check all microservices available
@@ -54,6 +54,7 @@ presubmits:
               for port in $ports
               do
                 counter=0
+                set +e
                 until curl 127.0.0.1:${port}
                 do
                   ((counter++))
@@ -62,11 +63,12 @@ presubmits:
                     echo "Failed to ping 127.0.0.1:${port} after ${max_attempts}, exiting."
                     exit 1
                   fi
-                sleep 15
+                  sleep 15
                 done
+                set -e
               done
               
-              # Environment ready, start test      
+              # Environment ready, start test
               cd ${THIS_SERVICE}
 
               mvn clean verify sonar:sonar -Pcoverage \
@@ -117,7 +119,7 @@ postsubmits:
               services=$(echo ${SERVICES_NAMES} | xargs)
               for service in $services
               do
-                docker compose up -d --build --no-recreate ${service} 
+                docker compose up -d --build --no-recreate ${service}
               done
               
               # Check all microservices available
@@ -134,13 +136,13 @@ postsubmits:
                     echo "Failed to ping 127.0.0.1:${port} after ${max_attempts}, exiting."
                     exit 1
                   fi
-                sleep 15
+                  sleep 15
                 done
               done
               
               ref=$(git rev-parse --abbrev-ref HEAD)
               
-              # Environment ready, start test      
+              # Environment ready, start test
               cd ${THIS_SERVICE}
 
               mvn clean verify sonar:sonar -Pcoverage \

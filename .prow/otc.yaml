@@ -66,7 +66,7 @@ presubmits:
                 done
               done
               
-              # Environment ready, start test      
+              # Environment ready, start test
               cd ${THIS_SERVICE}
 
               mvn clean verify sonar:sonar -Pcoverage \
@@ -140,7 +140,7 @@ postsubmits:
               
               ref=$(git rev-parse --abbrev-ref HEAD)
               
-              # Environment ready, start test      
+              # Environment ready, start test
               cd ${THIS_SERVICE}
 
               mvn clean verify sonar:sonar -Pcoverage \
