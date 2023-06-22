@@ -199,22 +199,21 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
         }
     }
 
-        @Then("user gets stock history")
-        public void user_gets_stock_history() {
-            try {
-                MvcResult mvcResult = mockMvc.perform(get("/api/stock/1/history/ONE_DAY")
-                                .contentType("application/json")
-                                .header("Content-Type", "application/json")
-                                .header("Access-Control-Allow-Origin", "*")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
-                        .andReturn();
-                assertNotNull(mvcResult);
-            } catch (Exception e) {
-                fail(e.getMessage());
-            }
+    @Then("user gets stock history")
+    public void user_gets_stock_history() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(get("/api/stock/1/history/ONE_DAY")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+            assertNotNull(mvcResult);
+        } catch (Exception e) {
+            fail(e.getMessage());
         }
-
+    }
 
     @Then("user sells stock")
     public void user_sells_stock() {
@@ -266,7 +265,7 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
         }
     }
 
-    //TODO Matejin test 2
+    // TODO Matejin test 2
     @Then("user gets stock history by id and time")
     public void user_gets_stock_history_by_id_and_time() {
         try {

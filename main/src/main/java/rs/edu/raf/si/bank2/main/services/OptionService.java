@@ -16,6 +16,7 @@ import java.util.Optional;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rs.edu.raf.si.bank2.main.exceptions.*;
@@ -87,8 +88,11 @@ public class OptionService implements OptionServiceInterface {
     }
 
     @Override
+    // @Cacheable(value = "optionsStock")
     public List<Option> findByStock(String stockSymbol) {
         //        List<Option> requestedOptions = optionRepository.findAllByStockSymbol(stockSymbol);
+        System.out.println("Getting options by stock - fist time (caching into redis)");
+
         List<Option> requestedOptions = optionRepository.findAllByStockSymbol(stockSymbol.toUpperCase());
         if (requestedOptions.isEmpty()) {
             optionRepository.saveAll(getFromExternalApi(stockSymbol, ""));
@@ -97,7 +101,9 @@ public class OptionService implements OptionServiceInterface {
     }
 
     @Override
+    // @Cacheable(value = "optionsStockDate")
     public List<Option> findByStockAndDate(String stockSymbol, String regularDate) {
+        System.out.println("Getting options for stock and date - fist time (caching into redis)");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         LocalDate date = LocalDate.parse(regularDate, formatter);
         formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
@@ -286,8 +292,8 @@ public class OptionService implements OptionServiceInterface {
 
                 // TODO Smanjiti user balance
                 this.orderService.updateOrderStatus(optionOrder.getId(), OrderStatus.COMPLETE);
-                Transaction transaction =
-                        this.transactionService.createTransaction(optionOrder, balance, (float) premium, (float)optionOrder.getPrice());
+                Transaction transaction = this.transactionService.createTransaction(
+                        optionOrder, balance, (float) premium, (float) optionOrder.getPrice());
                 this.transactionService.save(transaction);
                 this.balanceService.updateBalance(optionOrder, userFromDB.getEmail(), "USD", false);
                 return userOptionRepository.save(userOption);
@@ -356,9 +362,9 @@ public class OptionService implements OptionServiceInterface {
                 Object o = callsArray.get(i);
 
                 JSONObject json = (JSONObject) o;
-                System.out.println(json);
+                //                System.out.println(json);
                 //                System.out.println(json.length() + " ovo je velicina");
-                System.out.println(json.getDouble("change") + " bidovi ");
+                //                System.out.println(json.getDouble("change") + " bidovi ");
 
                 Integer contractSize = 100;
                 Double price = json.getDouble("lastPrice");
@@ -374,7 +380,7 @@ public class OptionService implements OptionServiceInterface {
                         .expirationDate(Instant.ofEpochMilli(json.getInt("expiration") * 1000L)
                                 .atZone(ZoneId.systemDefault())
                                 .toLocalDate())
-                        .openInterest(json.getInt("openInterest"))
+                        .openInterest(json.has("openInterest") ? json.getInt("openInterest") : 0)
                         .contractSize(contractSize)
                         .price(price)
                         .maintenanceMargin(maintenanceMargin)
@@ -410,7 +416,7 @@ public class OptionService implements OptionServiceInterface {
                         .expirationDate(Instant.ofEpochMilli(json.getInt("expiration") * 1000L)
                                 .atZone(ZoneId.systemDefault())
                                 .toLocalDate())
-                        .openInterest(json.getInt("openInterest"))
+                        .openInterest(json.has("openInterest") ? json.getInt("openInterest") : 0)
                         .contractSize(contractSize)
                         .price(price)
                         .maintenanceMargin(maintenanceMargin)
@@ -430,7 +436,7 @@ public class OptionService implements OptionServiceInterface {
             throw new RuntimeException(e);
         }
 
-        System.err.println(optionList.size());
+//        System.err.println(optionList.size());
 
         return optionList;
     }

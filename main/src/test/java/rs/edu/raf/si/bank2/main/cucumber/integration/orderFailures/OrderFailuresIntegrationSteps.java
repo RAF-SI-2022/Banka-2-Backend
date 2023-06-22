@@ -123,8 +123,7 @@ public class OrderFailuresIntegrationSteps extends OrderIntegrationFailuresTestC
                 "usd"));
     }
 
-
-    //TODO Matejin test
+    // TODO Matejin test
     @Given("there is order in waiting status in db")
     public void there_is_order_in_waiting_status_in_db() {
         testOrder = this.orderService.save(new StockOrder(
@@ -201,7 +200,7 @@ public class OrderFailuresIntegrationSteps extends OrderIntegrationFailuresTestC
         }
     }
 
-    //TODO Matejin test
+    // TODO Matejin test
     @Then("order denied")
     public void order_denied() {
         try {

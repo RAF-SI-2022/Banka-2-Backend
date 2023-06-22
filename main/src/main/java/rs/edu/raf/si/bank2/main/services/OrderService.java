@@ -72,7 +72,8 @@ public class OrderService implements OrderServiceInterface {
                         return this.stockService.buyStock(
                                 this.orderToStockRequest((StockOrder) o.get()),
                                 o.get().getUser(),
-                                (StockOrder) o.get(), approved);
+                                (StockOrder) o.get(),
+                                approved);
                     } else {
                         return this.stockService.sellStock(
                                 this.orderToStockRequest((StockOrder) o.get()), (StockOrder) o.get());

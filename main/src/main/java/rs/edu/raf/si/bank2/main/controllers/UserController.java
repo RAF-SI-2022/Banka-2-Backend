@@ -5,9 +5,6 @@ import static org.springframework.security.core.context.SecurityContextHolder.ge
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -96,7 +93,8 @@ public class UserController {
         return ResponseEntity.ok().body(userService.findById(id));
     }
 
-    @PostMapping(value = "/register",
+    @PostMapping(
+            value = "/register",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createUser(@RequestBody RegisterRequest user) {
@@ -367,7 +365,7 @@ public class UserController {
         }
     }
 
-    @PatchMapping(value = "change-limit/{id}/{limit}")//todo ovo ne radi
+    @PatchMapping(value = "change-limit/{id}/{limit}") // todo ovo ne radi
     public ResponseEntity<?> changeUserDefaultDailyLimit(
             @PathVariable(name = "id") Long id, @PathVariable(name = "limit") Double limit) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -390,6 +388,4 @@ public class UserController {
             return ResponseEntity.status(400).body("Korisnik ne postoji");
         }
     }
-
-
 }

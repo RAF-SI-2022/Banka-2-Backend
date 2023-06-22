@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface MarginTransactionRepository extends MongoRepository<MarginTransaction,String> {
     List<MarginTransaction> findMarginTransactionsByUserEmail(String email);
+
+    List<MarginTransaction> findMarginTransactionByOrderType(String orderType);
 }

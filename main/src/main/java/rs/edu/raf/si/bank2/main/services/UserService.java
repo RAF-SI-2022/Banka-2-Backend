@@ -1,11 +1,10 @@
 package rs.edu.raf.si.bank2.main.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -30,8 +29,10 @@ public class UserService implements UserDetailsService, UserServiceInterface {
     ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository,
-                       UserCommunicationService communicationService) {
+    public UserService(
+            UserRepository userRepository,
+            PasswordResetTokenRepository passwordResetTokenRepository,
+            UserCommunicationService communicationService) {
         this.userRepository = userRepository;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.userCommunicationInterface = communicationService;
@@ -43,32 +44,33 @@ public class UserService implements UserDetailsService, UserServiceInterface {
         if (myUser.isEmpty()) {
             throw new UsernameNotFoundException("Korisnik sa email-om: " + username + " nije pronadjen.");
         }
-        return new org.springframework.security.core.userdetails.
-                User(myUser.get().getEmail(), myUser.get().getPassword(), new ArrayList<>());
+        return new org.springframework.security.core.userdetails.User(
+                myUser.get().getEmail(), myUser.get().getPassword(), new ArrayList<>());
     }
 
     @Override
     public Optional<User> findByEmail(String email) {
         User user = null;
-        CommunicationDto response = userCommunicationInterface.sendGet( email, "/findByEmail");
+        CommunicationDto response = userCommunicationInterface.sendGet(email, "/findByEmail");
 
         if (response.getResponseCode() == 200) {
             try {
                 user = mapper.readValue(response.getResponseMsg(), User.class);
-            } catch (JsonProcessingException e) { throw new RuntimeException(e); }
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
             return Optional.of(user);
 
-        }
-        else{
+        } else {
             return Optional.empty();
-//            throw new UserNotFoundException(email);
+            //            throw new UserNotFoundException(email);
         }
     }
 
     @Override
     public List<User> findAll() {
         List<User> user = null;
-        CommunicationDto response = userCommunicationInterface.sendGet( null,"/findAll");
+        CommunicationDto response = userCommunicationInterface.sendGet(null, "/findAll");
         try {
             user = mapper.readValue(response.getResponseMsg(), List.class);
         } catch (JsonProcessingException e) {
@@ -77,17 +79,16 @@ public class UserService implements UserDetailsService, UserServiceInterface {
         return user;
     }
 
-
-
     @Override
     public List<Permission> getUserPermissions(String email) {
-        List<Permission> permissions = new ArrayList<>(this.findByEmail(email).get().getPermissions());
+        List<Permission> permissions =
+                new ArrayList<>(this.findByEmail(email).get().getPermissions());
         return permissions;
     }
 
     @Override
     public Optional<User> findById(Long id) throws UserNotFoundException {
-        CommunicationDto response = userCommunicationInterface.sendGet( null,"/findById/" + id);
+        CommunicationDto response = userCommunicationInterface.sendGet(null, "/findById/" + id);
 
         User user = null;
 
@@ -106,7 +107,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 
     @Override
     public void deleteById(Long id) throws UserNotFoundException {
-//        userCommunicationInterface.sendDelete("/deleteById/" + id);
+        //        userCommunicationInterface.sendDelete("/deleteById/" + id);
         userRepository.deleteById(id);
     }
 
@@ -134,12 +135,14 @@ public class UserService implements UserDetailsService, UserServiceInterface {
                 User userToChangePasswordTo = userFromDB.get();
                 userToChangePasswordTo.setPassword(newPassword);
 
-//                userRepository.save(user);
+                //                userRepository.save(user);
 
-                try {//todo proveri da li ovo radi pravilno
+                try { // todo proveri da li ovo radi pravilno
                     String userJsonBody = mapper.writeValueAsString(user);
                     userCommunicationInterface.sendPostLike("/save", userJsonBody, null, "POST");
-                } catch (JsonProcessingException e) { throw new RuntimeException(e); }
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
 
             } else {
                 throw new UserNotFoundException(user.getId());
@@ -155,13 +158,14 @@ public class UserService implements UserDetailsService, UserServiceInterface {
     public User changeUsersDailyLimit(String userEmail, Double limitChange) {
         User user = findByEmail(userEmail).get();
         user.setDailyLimit(user.getDailyLimit() + limitChange);
-//        userRepository.save(user);
+        //        userRepository.save(user);
 
-        try {//todo proveri da li ovo radi pravilno
+        try {
             String userJsonBody = mapper.writeValueAsString(user);
             userCommunicationInterface.sendPostLike("/save", userJsonBody, null, "POST");
-        } catch (JsonProcessingException e) { throw new RuntimeException(e); }
-
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
         return user;
     }

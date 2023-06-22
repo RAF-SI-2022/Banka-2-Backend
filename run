@@ -8,11 +8,6 @@ init() {
 	git config core.autocrlf false
 	echo "Done"
 
-	# Copy git hooks
-	echo "Copying git hooks..."
-	cp -a ./git/hooks/. ./.git/hooks
-	echo "Done"
-
   echo "Cleaning old $jdk folder..."
   rm -rf $jdk >/dev/null 2>&1
   rm -f lib/sha_comp_0.txt >/dev/null 2>&1

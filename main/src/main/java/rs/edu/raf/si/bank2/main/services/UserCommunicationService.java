@@ -1,12 +1,10 @@
 package rs.edu.raf.si.bank2.main.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Optional;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,12 +22,15 @@ public class UserCommunicationService implements UserCommunicationInterface {
     private final JwtUtil jwtUtil;
     ObjectMapper mapper = new ObjectMapper();
 
-//
-//    @Autowired
-//    private UserServiceInterface userServiceInterface;
+    //
+    //    @Autowired
+    //    private UserServiceInterface userServiceInterface;
 
     @Value("${services.users.host}")
     private String usersServiceHost;
+
+    @Value("${services.otc.host}")
+    private String otcServiceHost;
 
     @Autowired
     public UserCommunicationService(JwtUtil jwtUtil) {
@@ -70,14 +71,13 @@ public class UserCommunicationService implements UserCommunicationInterface {
 
         CommunicationDto response = sendGet(userEmail, "/findByEmail");
 
-        if (response.getResponseCode() == 200){
+        if (response.getResponseCode() == 200) {
             try {
                 user = mapper.readValue(response.getResponseMsg(), User.class);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
-        }
-        else return false;
+        } else return false;
 
         // TODO los kod, ovde treba da se vrati verovatno set, pa da se odmah
         //  proveri da li postoji permission. To zahteva da permission equals
@@ -86,19 +86,20 @@ public class UserCommunicationService implements UserCommunicationInterface {
         //  specificni permission ali znamo njegov naziv. ID polje u
         //  permissionu ne radi nista (mozda cak i smeta)
         for (Permission p : user.getPermissions()) {
-            if (p.getPermissionName().equals(permissionName) || p.getPermissionName().equals(PermissionName.ADMIN_USER)) return true;
+            if (p.getPermissionName().equals(permissionName)
+                    || p.getPermissionName().equals(PermissionName.ADMIN_USER)) return true;
         }
         return false;
     }
 
     @Override
-    public CommunicationDto sendGet(String senderEmail, String urlExtension){
-//        System.err.println("POSALI SMO SEND GET");
+    public CommunicationDto sendGet(String senderEmail, String urlExtension) {
+        //        System.err.println("POSALI SMO SEND GET");
 
         if (senderEmail == null) senderEmail = "anesic3119rn+banka2backend+admin@raf.rs";
 
         String token = jwtUtil.generateToken(senderEmail);
-        String []hostPort = usersServiceHost.split(":");
+        String[] hostPort = usersServiceHost.split(":");
         BufferedReader reader = null;
         StringBuilder response = new StringBuilder();
         String line;
@@ -110,20 +111,19 @@ public class UserCommunicationService implements UserCommunicationInterface {
             connection.setRequestProperty("Authorization", "Bearer " + token);
             int responseCode = connection.getResponseCode();
 
-            if (responseCode == HttpURLConnection.HTTP_OK && connection.getInputStream() != null){
+            if (responseCode == HttpURLConnection.HTTP_OK && connection.getInputStream() != null) {
                 reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 while ((line = reader.readLine()) != null) {
                     response.append(line);
                 }
-            }
-            else if (connection.getErrorStream() != null){
+            } else if (connection.getErrorStream() != null) {
                 reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
                 while ((line = reader.readLine()) != null) {
                     response.append(line);
                 }
             }
-//            System.out.println("Response Code: " + responseCode);
-//            System.out.println("Response: " + response.toString());
+            //            System.out.println("Response Code: " + responseCode);
+            //            System.out.println("Response: " + response.toString());
             connection.disconnect();
             if (reader != null) reader.close();
             return new CommunicationDto(responseCode, response.toString());
@@ -133,13 +133,14 @@ public class UserCommunicationService implements UserCommunicationInterface {
     }
 
     @Override
-    public CommunicationDto sendPostLike(String urlExtension, String postObjectBody, String senderEmail, String method){
+    public CommunicationDto sendPostLike(
+            String urlExtension, String postObjectBody, String senderEmail, String method) {
         System.err.println("POSALI SMO SEND POST");
 
         if (senderEmail == null) senderEmail = "anesic3119rn+banka2backend+admin@raf.rs";
 
         String token = jwtUtil.generateToken(senderEmail);
-        String []hostPort = usersServiceHost.split(":");
+        String[] hostPort = usersServiceHost.split(":");
         BufferedReader reader;
         StringBuilder response = new StringBuilder();
         String line;
@@ -160,13 +161,12 @@ public class UserCommunicationService implements UserCommunicationInterface {
 
             int responseCode = connection.getResponseCode();
 
-            if (responseCode == HttpURLConnection.HTTP_OK){
+            if (responseCode == HttpURLConnection.HTTP_OK) {
                 reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 while ((line = reader.readLine()) != null) {
                     response.append(line);
                 }
-            }
-            else {
+            } else {
                 reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
                 while ((line = reader.readLine()) != null) {
                     response.append(line);
@@ -182,46 +182,94 @@ public class UserCommunicationService implements UserCommunicationInterface {
         }
     }
 
-
     @Override
-    public CommunicationDto sendDelete(String urlExtension){
-//        System.err.println("POSALI SMO SEND DELETE");
-//
-//        String token = jwtUtil.generateToken("anesic3119rn+banka2backend+admin@raf.rs");
-//        String []hostPort = usersServiceHost.split(":");
-//        BufferedReader reader;
-//        StringBuilder response = new StringBuilder();
-//        String line;
-//
-//        try {
-//            URL url = new URL("http", hostPort[0], Integer.parseInt(hostPort[1]), "/api/userService" + urlExtension);
-//            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//            connection.setRequestMethod("DELETE");
-//            connection.setRequestProperty("Authorization", "Bearer " + token);
-//            int responseCode = connection.getResponseCode();
-//
-//            if (responseCode == HttpURLConnection.HTTP_OK){
-//                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-//                while ((line = reader.readLine()) != null) {
-//                    response.append(line);
-//                }
-//            }
-//            else {
-//                reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-//                while ((line = reader.readLine()) != null) {
-//                    response.append(line);
-//                }
-//            }
-//            System.out.println("Response Code: " + responseCode);
-//            System.out.println("Response: " + response.toString());
-//            connection.disconnect();
-//            reader.close();
-//            return new CommunicationDto(responseCode, response.toString());
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-        return null;
+    public CommunicationDto sendMarginTransaction(String urlExtension, String postObjectBody, String senderEmail) {
+        System.err.println("POSALI SMO MARGIN TRANS");
+
+        if (senderEmail == null) senderEmail = "anesic3119rn+banka2backend+admin@raf.rs";
+
+        String token = jwtUtil.generateToken(senderEmail);
+        String[] hostPort = otcServiceHost.split(":");
+        BufferedReader reader;
+        StringBuilder response = new StringBuilder();
+        String line;
+
+        try {
+            URL url = new URL(
+                    "http", hostPort[0], Integer.parseInt(hostPort[1]), "/api/marginTransaction" + urlExtension);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Authorization", "Bearer " + token);
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            OutputStream outputStream = connection.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+            writer.write(postObjectBody);
+            writer.flush();
+            writer.close();
+
+            int responseCode = connection.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+            } else {
+                reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+            }
+            System.out.println("Response Code: " + responseCode);
+            System.out.println("Response: " + response.toString());
+            connection.disconnect();
+            reader.close();
+            return new CommunicationDto(responseCode, response.toString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-
+    @Override
+    public CommunicationDto sendDelete(String urlExtension) {
+        //        System.err.println("POSALI SMO SEND DELETE");
+        //
+        //        String token = jwtUtil.generateToken("anesic3119rn+banka2backend+admin@raf.rs");
+        //        String []hostPort = usersServiceHost.split(":");
+        //        BufferedReader reader;
+        //        StringBuilder response = new StringBuilder();
+        //        String line;
+        //
+        //        try {
+        //            URL url = new URL("http", hostPort[0], Integer.parseInt(hostPort[1]), "/api/userService" +
+        // urlExtension);
+        //            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        //            connection.setRequestMethod("DELETE");
+        //            connection.setRequestProperty("Authorization", "Bearer " + token);
+        //            int responseCode = connection.getResponseCode();
+        //
+        //            if (responseCode == HttpURLConnection.HTTP_OK){
+        //                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        //                while ((line = reader.readLine()) != null) {
+        //                    response.append(line);
+        //                }
+        //            }
+        //            else {
+        //                reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+        //                while ((line = reader.readLine()) != null) {
+        //                    response.append(line);
+        //                }
+        //            }
+        //            System.out.println("Response Code: " + responseCode);
+        //            System.out.println("Response: " + response.toString());
+        //            connection.disconnect();
+        //            reader.close();
+        //            return new CommunicationDto(responseCode, response.toString());
+        //        } catch (IOException e) {
+        //            throw new RuntimeException(e);
+        //        }
+        return null;
+    }
 }

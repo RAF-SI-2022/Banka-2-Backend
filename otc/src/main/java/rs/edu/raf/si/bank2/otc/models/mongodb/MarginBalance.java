@@ -27,5 +27,4 @@ public class MarginBalance {
     Double loanedResources;
     Double maintenanceMargin;
     boolean marginCall;
-
 }

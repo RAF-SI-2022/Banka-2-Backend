@@ -1,15 +1,13 @@
 package rs.edu.raf.si.bank2.main.controllers;
 
-
+import java.time.LocalDate;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.edu.raf.si.bank2.main.dto.ReserveDto;
 import rs.edu.raf.si.bank2.main.models.mariadb.*;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
-
-import java.time.LocalDate;
-import java.util.Optional;
 
 @RestController
 @CrossOrigin
@@ -25,9 +23,14 @@ public class ReserveController {
     private final OptionRepository optionRepository;
 
     @Autowired
-    public ReserveController(UserOptionRepository userOptionRepository, UserStocksRepository userStocksRepository,
-                             FutureRepository futureRepository, BalanceRepository balanceRepository, UserRepository
-                                         userRepository, StockRepository stockRepository, OptionRepository optionRepository) {
+    public ReserveController(
+            UserOptionRepository userOptionRepository,
+            UserStocksRepository userStocksRepository,
+            FutureRepository futureRepository,
+            BalanceRepository balanceRepository,
+            UserRepository userRepository,
+            StockRepository stockRepository,
+            OptionRepository optionRepository) {
         this.userOptionRepository = userOptionRepository;
         this.userStocksRepository = userStocksRepository;
         this.futureRepository = futureRepository;
@@ -39,7 +42,8 @@ public class ReserveController {
 
     @PostMapping("/reserveOption")
     public ResponseEntity<?> reserveUserOption(@RequestBody ReserveDto reserveDto) {
-        Optional<UserOption> userOption = userOptionRepository.findByIdAndUserId(reserveDto.getHartijaId(), reserveDto.getUserId());
+        Optional<UserOption> userOption =
+                userOptionRepository.findByIdAndUserId(reserveDto.getHartijaId(), reserveDto.getUserId());
 
         if (userOption.isEmpty()) return ResponseEntity.status(404).body("User opcija nije pronadjena");
         if (userOption.get().getAmount() < reserveDto.getAmount())
@@ -53,7 +57,8 @@ public class ReserveController {
 
     @PostMapping("/undoReserveOption")
     public ResponseEntity<?> undoReserveUserOption(@RequestBody ReserveDto reserveDto) {
-        Optional<UserOption> userOption = userOptionRepository.findByIdAndUserId(reserveDto.getHartijaId(), reserveDto.getUserId());
+        Optional<UserOption> userOption =
+                userOptionRepository.findByIdAndUserId(reserveDto.getHartijaId(), reserveDto.getUserId());
         if (userOption.isEmpty()) return ResponseEntity.status(404).body("User opcija nije pronadjena");
 
         userOption.get().setAmount(userOption.get().getAmount() + reserveDto.getAmount());
@@ -64,7 +69,8 @@ public class ReserveController {
 
     @PostMapping("/reserveStock")
     public ResponseEntity<?> reserveUserStock(@RequestBody ReserveDto reserveDto) {
-        Optional<UserStock> userStock = userStocksRepository.findByIdAndStockId(reserveDto.getHartijaId(), reserveDto.getUserId());
+        Optional<UserStock> userStock =
+                userStocksRepository.findUserStockByUserIdAndStockId(reserveDto.getUserId(), reserveDto.getHartijaId());
 
         if (userStock.isEmpty()) return ResponseEntity.status(404).body("Stock nije pronadjen");
         if (userStock.get().getAmount() < reserveDto.getAmount())
@@ -78,7 +84,8 @@ public class ReserveController {
 
     @PostMapping("/undoReserveStock")
     public ResponseEntity<?> undoReserveUserStock(@RequestBody ReserveDto reserveDto) {
-        Optional<UserStock> userStock = userStocksRepository.findByIdAndStockId(reserveDto.getHartijaId(), reserveDto.getUserId());
+        Optional<UserStock> userStock =
+                userStocksRepository.findByIdAndStockId(reserveDto.getHartijaId(), reserveDto.getUserId());
         if (userStock.isEmpty()) return ResponseEntity.status(404).body("Stock nije pronadjen");
 
         userStock.get().setAmount(userStock.get().getAmount() + reserveDto.getAmount());
@@ -89,7 +96,8 @@ public class ReserveController {
 
     @PostMapping("/reserveFuture")
     public ResponseEntity<?> reserveFutureStock(@RequestBody ReserveDto reserveDto) {
-        Optional<Future> userFuture = futureRepository.findByIdAndUserId(reserveDto.getHartijaId(), reserveDto.getUserId());
+        Optional<Future> userFuture =
+                futureRepository.findByIdAndUserId(reserveDto.getHartijaId(), reserveDto.getUserId());
         if (userFuture.isEmpty()) return ResponseEntity.status(404).body("Future nije pronadjen");
 
         String saveString = userFuture.get().toString();
@@ -119,11 +127,11 @@ public class ReserveController {
 
     @PostMapping("/reserveMoney")
     public ResponseEntity<?> reserveMoney(@RequestBody ReserveDto reserveDto) {
-        //todo trenutno hard code na USD
-        Optional<Balance> userBalance = balanceRepository.findBalanceByUserIdAndCurrencyId(reserveDto.getUserId(), 138L);
-        //!!! NIJE HARTIJA NEGO CURRENCY ID !!!
+        // todo trenutno hard code na USD
+        Optional<Balance> userBalance =
+                balanceRepository.findBalanceByUserIdAndCurrencyId(reserveDto.getUserId(), 138L);
+        // !!! NIJE HARTIJA NEGO CURRENCY ID !!!
         if (userBalance.isEmpty()) return ResponseEntity.status(404).body("Balans nije pronadjen");
-
 
         Float priceChange = Float.parseFloat(reserveDto.getFutureStorage());
         if (userBalance.get().getFree() < priceChange)
@@ -138,9 +146,10 @@ public class ReserveController {
 
     @PostMapping("/undoReserveMoney")
     public ResponseEntity<?> undoReserveMoney(@RequestBody ReserveDto reserveDto) {
-        //todo trenutno hard code na USD
-        Optional<Balance> userBalance = balanceRepository.findBalanceByUserIdAndCurrencyId(reserveDto.getUserId(), 138L);
-        //!!! NIJE HARTIJA NEGO CURRENCY ID !!!
+        // todo trenutno hard code na USD
+        Optional<Balance> userBalance =
+                balanceRepository.findBalanceByUserIdAndCurrencyId(reserveDto.getUserId(), 138L);
+        // !!! NIJE HARTIJA NEGO CURRENCY ID !!!
         if (userBalance.isEmpty()) return ResponseEntity.status(404).body("Balans nije pronadjen");
 
         Float priceChange = Float.parseFloat(reserveDto.getFutureStorage());
@@ -151,10 +160,10 @@ public class ReserveController {
         return ResponseEntity.ok("Novac uspesno dodat");
     }
 
-
     @PostMapping("finalizeStock")
     public ResponseEntity<?> finalizeStockBuy(@RequestBody ReserveDto reserveDto) {
-        Optional<UserStock> userStock = userStocksRepository.findUserStockByUserIdAndStockId(reserveDto.getUserId(), reserveDto.getHartijaId());
+        Optional<UserStock> userStock =
+                userStocksRepository.findUserStockByUserIdAndStockId(reserveDto.getUserId(), reserveDto.getHartijaId());
 
         if (userStock.isEmpty()) {
             Optional<User> user = userRepository.findById(reserveDto.getUserId());
@@ -176,7 +185,6 @@ public class ReserveController {
         return ResponseEntity.ok("Stockovi su dodati");
     }
 
-
     @PostMapping("finalizeOption")
     public ResponseEntity<?> finalizeOptionBuy(@RequestBody ReserveDto reserveDto) {
 
@@ -185,9 +193,9 @@ public class ReserveController {
         if (user.isEmpty()) return ResponseEntity.status(404).body("Korisnik nije pronadjen");
         Optional<Option> option = optionRepository.findById(Long.parseLong(cut[0]));
 
-        //1,20,CALL,2023-06-09,85,AAPL, cena
-        //option ffield
-        //- option id - premium - type (CALL ...) - expiriation date - strke - stock_symbol - price
+        // 1,20,CALL,2023-06-09,85,AAPL, cena
+        // option ffield
+        // - option id - premium - type (CALL ...) - expiriation date - strke - stock_symbol - price
 
         UserOption newUserOption = new UserOption();
         newUserOption.setUser(user.get());
@@ -223,5 +231,4 @@ public class ReserveController {
                 user.get());
         return ResponseEntity.ok(futureRepository.save(future));
     }
-
 }

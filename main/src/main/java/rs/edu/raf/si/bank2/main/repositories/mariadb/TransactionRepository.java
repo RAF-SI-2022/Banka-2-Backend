@@ -11,10 +11,11 @@ import rs.edu.raf.si.bank2.main.models.mariadb.TransactionStatus;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     List<Transaction> findAllByUserEmailAndCurrencyCurrencyCode(String userEmail, String currencyCode);
+
     List<Transaction> findAllByOrderId(Long id);
+
     @Modifying
     @Transactional
     @Query("UPDATE Transaction t SET t.status = :status WHERE t.order.id = :orderId")
     void updateTransactionStatusesByOrderId(@Param("orderId") Long orderId, @Param("status") TransactionStatus status);
-
 }

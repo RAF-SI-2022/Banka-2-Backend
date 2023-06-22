@@ -10,6 +10,7 @@ import rs.edu.raf.si.bank2.users.models.mariadb.User;
 import rs.edu.raf.si.bank2.users.requests.LoginRequest;
 import rs.edu.raf.si.bank2.users.requests.PasswordResetRequest;
 import rs.edu.raf.si.bank2.users.responses.LoginResponse;
+import rs.edu.raf.si.bank2.users.services.MailingService;
 import rs.edu.raf.si.bank2.users.services.UserService;
 import rs.edu.raf.si.bank2.users.services.interfaces.AuthorisationServiceInterface;
 import rs.edu.raf.si.bank2.users.utils.JwtUtil;
@@ -27,17 +28,20 @@ public class AuthenticationController {
     private final AuthorisationServiceInterface authorisationService;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final MailingService mailingService;
 
     @Autowired
     public AuthenticationController(
             JwtUtil jwtUtil,
             AuthorisationServiceInterface authorisationService,
             UserService userService,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            MailingService mailingService) {
         this.jwtUtil = jwtUtil;
         this.authorisationService = authorisationService;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+        this.mailingService = mailingService;
     }
 
     /**

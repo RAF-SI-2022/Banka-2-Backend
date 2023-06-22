@@ -59,7 +59,7 @@ public class OtcController {
             }
         } else return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
 
-        System.err.println(user);
+//        System.err.println(user);
 
         Permission permission = user.getPermissions().get(0);
         if (permission.getPermissionName() == PermissionName.ADMIN_USER){
@@ -89,7 +89,7 @@ public class OtcController {
             }
         } else return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
 
-        System.err.println(user);
+//        System.err.println(user);
 
         Permission permission = user.getPermissions().get(0);
         if (permission.getPermissionName() == PermissionName.ADMIN_USER){
