@@ -16,6 +16,7 @@ presubmits:
 
               SONAR_PROJECT_KEY="Banka-2-Backend-Users"
               SONAR_PROJECT_NAME="Banka-2-Backend-Users"
+              THIS_SERVICE="users"
 
               start-docker.sh
 
@@ -31,14 +32,15 @@ presubmits:
               git reset --hard HEAD~1
               git checkout $branch
 
-              # Start all microservices
+              # Start all helper services
               docker network create --driver bridge bank2_net || true
               docker compose up -d mariadb
               docker compose up -d flyway
               docker compose up -d mongodb
               docker compose up -d redis
               
-              cd users
+              # Environment ready, start test      
+              cd ${THIS_SERVICE}
 
               mvn clean verify sonar:sonar -Pcoverage \
                 -Dsonar.host.url=https://sonar.k8s.elab.rs \
@@ -71,10 +73,9 @@ postsubmits:
 
               SONAR_PROJECT_KEY="Banka-2-Backend-Users"
               SONAR_PROJECT_NAME="Banka-2-Backend-Users"
+              THIS_SERVICE="users"
 
-              start-docker.sh
-
-              # Start all microservices
+              # Start all helper services
               docker network create --driver bridge bank2_net || true
               docker compose up -d mariadb
               docker compose up -d flyway
@@ -83,7 +84,8 @@ postsubmits:
               
               ref=$(git rev-parse --abbrev-ref HEAD)
               
-              cd users
+              # Environment ready, start test      
+              cd ${THIS_SERVICE}
 
               mvn clean verify sonar:sonar -Pcoverage \
                 -Dsonar.host.url=https://sonar.k8s.elab.rs \
