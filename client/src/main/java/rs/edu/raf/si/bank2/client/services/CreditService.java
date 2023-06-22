@@ -70,7 +70,9 @@ public class CreditService {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         Optional<CreditRequest> creditRequest = creditRequestRepository.findById(creditId);
         if (creditRequest.isEmpty()) return new CommunicationDto(404, "Request requested not found");
+        if (creditRequest.get().getCreditApproval() != CreditApproval.WAITING) return new CommunicationDto(500, "Zahtev nije na cekanju");
         creditRequest.get().setCreditApproval(CreditApproval.APPROVED);
+        creditRequestRepository.save(creditRequest.get());
 
         double monthlyRate = (dto.getRatePercentage() / 100.0) * dto.getAmount();
 
@@ -94,21 +96,21 @@ public class CreditService {
         switch (racunInfo.get().getType()){
             case TEKUCI -> {
                 Optional<TekuciRacun> tekuciRacun = tekuciRacunRepository.findTekuciRacunByRegistrationNumber(racunRegNum);
-                double newValue = tekuciRacun.get().getBalance() + amount;
+                double newValue = tekuciRacun.get().getBalance() + amountToChange;
                 tekuciRacun.get().setBalance(newValue);
                 tekuciRacun.get().setAvailableBalance(newValue);
                 tekuciRacunRepository.save(tekuciRacun.get());
             }
             case DEVIZNI -> {
                 Optional<DevizniRacun> devizniRacun = devizniRacunRepository.findDevizniRacunByRegistrationNumber(racunRegNum);
-                double newValue = devizniRacun.get().getBalance() + amount;
+                double newValue = devizniRacun.get().getBalance() + amountToChange;
                 devizniRacun.get().setBalance(newValue);
                 devizniRacun.get().setAvailableBalance(newValue);
                 devizniRacunRepository.save(devizniRacun.get());
             }
             case POSLOVNI -> {
                 Optional<PoslovniRacun> poslovniRacun = poslovniRacunRepository.findPoslovniRacunByRegistrationNumber(racunRegNum);
-                double newValue = poslovniRacun.get().getBalance() + amount;
+                double newValue = poslovniRacun.get().getBalance() + amountToChange;
                 poslovniRacun.get().setBalance(newValue);
                 poslovniRacun.get().setAvailableBalance(newValue);
                 poslovniRacunRepository.save(poslovniRacun.get());
@@ -119,7 +121,9 @@ public class CreditService {
     public CommunicationDto denyCredit(String creditId) {
         Optional<CreditRequest> creditRequest = creditRequestRepository.findById(creditId);
         if (creditRequest.isEmpty()) return new CommunicationDto(404, "Request requested not found");
+        if (creditRequest.get().getCreditApproval() != CreditApproval.WAITING) return new CommunicationDto(500, "Zahtev nije na cekanju");
         creditRequest.get().setCreditApproval(CreditApproval.DENIED);
+        creditRequestRepository.save(creditRequest.get());
         return new CommunicationDto(200, "Kredit je odbijen");
     }
 

@@ -1,12 +1,9 @@
 package rs.edu.raf.si.bank2.client.controllers;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import rs.edu.raf.si.bank2.client.dto.CommunicationDto;
-import rs.edu.raf.si.bank2.client.dto.CreditDto;
-import rs.edu.raf.si.bank2.client.dto.CreditRequestDto;
+import rs.edu.raf.si.bank2.client.dto.*;
 import rs.edu.raf.si.bank2.client.models.mongodb.enums.CreditApproval;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.CreditRequestRepository;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.PayedInterestRepository;
@@ -47,7 +44,7 @@ public class CreditController {
 
 
     //requests
-    @GetMapping("/request")
+    @PostMapping("/request")
     public ResponseEntity<?> requestCredit(@RequestBody CreditRequestDto dto) {
         return ResponseEntity.ok(creditService.saveRequest(dto));
     }

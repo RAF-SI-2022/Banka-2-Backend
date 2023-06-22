@@ -7,7 +7,6 @@ import rs.edu.raf.si.bank2.client.models.mongodb.enums.CreditApproval;
 public class CreditRequestDto {
 
     private String clientEmail;
-    private CreditApproval creditApproval; //approved / denied / waiting
     private Double amount;
     private String usedFor;
     private Double monthlyRate;//mesecno placanje
@@ -18,10 +17,9 @@ public class CreditRequestDto {
     private String phoneNumber;
 
 
-    public CreditRequestDto(String clientEmail, CreditApproval creditApproval, Double amount, String usedFor, Double monthlyRate,
-                            Boolean clientHasJob, String jobLocation, String currentJobDuration, Integer dueDateInMonths, String phoneNumber) {
+    public CreditRequestDto(String clientEmail, Double amount, String usedFor, Double monthlyRate, Boolean clientHasJob,
+                            String jobLocation, String currentJobDuration, Integer dueDateInMonths, String phoneNumber) {
         this.clientEmail = clientEmail;
-        this.creditApproval = creditApproval;
         this.amount = amount;
         this.usedFor = usedFor;
         this.monthlyRate = monthlyRate;
