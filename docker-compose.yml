@@ -109,6 +109,7 @@ services:
         condition: service_healthy
       flyway:
         condition: service_completed_successfully
+    entrypoint: [ "java", "-jar", "app.jar" ]
     networks:
       - bank2_net
 
@@ -138,6 +139,7 @@ services:
         condition: service_completed_successfully
       users:
         condition: service_healthy
+    entrypoint: [ "java", "-jar", "app.jar" ]
     networks:
       - bank2_net
 
@@ -167,6 +169,7 @@ services:
         condition: service_completed_successfully
       users:
         condition: service_healthy
+    entrypoint: [ "java", "-jar", "app.jar" ]
     networks:
       - bank2_net
 
@@ -196,6 +199,7 @@ services:
         condition: service_completed_successfully
       users:
         condition: service_healthy
+    entrypoint: [ "java", "-jar", "app.jar" ]
     networks:
       - bank2_net
 
