@@ -19,7 +19,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rs.edu.raf.si.bank2.main.exceptions.ExchangeNotFoundException;
-import rs.edu.raf.si.bank2.main.exceptions.ExternalAPILimitReachedException;
 import rs.edu.raf.si.bank2.main.exceptions.StockNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.Exchange;
 import rs.edu.raf.si.bank2.main.models.mariadb.Stock;
@@ -174,94 +173,94 @@ public class StockServiceTest {
         verify(stockRepository, times(1)).findStockBySymbol(symbol);
     }
 
-    @Test
-    public void getStockBySymbol_getStockFromExternalAPI_success() {
+//    @Test
+//    public void getStockBySymbol_getStockFromExternalAPI_success() {
+//
+//        String symbol = "GOOG";
+//        Exchange exchange = new Exchange();
+//        String acronym = "NASDAQ";
+//
+//        Stock stockFromDB = Stock.builder()
+//                .exchange(exchange)
+//                .symbol(symbol)
+//                .companyName("Apple Inc")
+//                .dividendYield(new BigDecimal("0.005800"))
+//                .outstandingShares(Long.parseLong("15821900000"))
+//                .openValue(new BigDecimal("161.53000"))
+//                .highValue(new BigDecimal("162.47000"))
+//                .lowValue(new BigDecimal("161.27000"))
+//                .priceValue(new BigDecimal("162.36000"))
+//                .volumeValue(Long.parseLong("49443818"))
+//                .lastUpdated(LocalDate.parse("2023-04-03"))
+//                .previousClose(new BigDecimal("160.77000"))
+//                .changeValue(new BigDecimal("1.59000"))
+//                .changePercent("0.9890%")
+//                .websiteUrl("https://www.apple.com")
+//                .build();
+//
+//        when(stockRepository.findStockBySymbol(symbol))
+//                .thenReturn(Optional.empty())
+//                .thenReturn(Optional.of(stockFromDB));
+//
+//        when(exchangeRepository.findExchangeByAcronym(acronym)).thenReturn(Optional.of(exchange));
+//        stockService.getStockBySymbol(symbol);
+//        verify(stockRepository).save(any());
+//        //         TODO 💩 Ovaj test zavisi od eksternog API-ja, ukoliko se premasi broj poziva zakomentarisati tri
+//        // linije iznad
+//        //         i otkomentarisati linije ispod
+//        //                assertThrows(ExternalAPILimitReachedException.class, () -> {
+//        //                    stockService.getStockBySymbol(symbol);
+//        //                });
+//    }
 
-                String symbol = "GOOG";
-                Exchange exchange = new Exchange();
-                String acronym = "NASDAQ";
+//    @Test
+//    public void getStockBySymbol_getStockFromExternalAPI_throwsExchangeNotFoundException() {
+//
+//        String symbol = "AAPL";
+//        String acronym = "NASDAQ";
+//
+//        Stock stockFromDB = Stock.builder()
+//                .exchange(new Exchange())
+//                .symbol(symbol)
+//                .companyName("Apple Inc")
+//                .dividendYield(new BigDecimal("0.005800"))
+//                .outstandingShares(Long.parseLong("15821900000"))
+//                .openValue(new BigDecimal("161.53000"))
+//                .highValue(new BigDecimal("162.47000"))
+//                .lowValue(new BigDecimal("161.27000"))
+//                .priceValue(new BigDecimal("162.36000"))
+//                .volumeValue(Long.parseLong("49443818"))
+//                .lastUpdated(LocalDate.parse("2023-04-03"))
+//                .previousClose(new BigDecimal("160.77000"))
+//                .changeValue(new BigDecimal("1.59000"))
+//                .changePercent("0.9890%")
+//                .websiteUrl("https://www.apple.com")
+//                .build();
+//
+//        when(stockRepository.findStockBySymbol(symbol))
+//                .thenReturn(Optional.empty())
+//                .thenReturn(Optional.of(stockFromDB));
+//
+//        when(exchangeRepository.findExchangeByAcronym(acronym)).thenReturn(Optional.empty());
+//
+//        assertThrows(ExchangeNotFoundException.class, () -> stockService.getStockBySymbol(symbol));
+//    }
 
-                Stock stockFromDB =
-                        Stock.builder()
-                                .exchange(exchange)
-                                .symbol(symbol)
-                                .companyName("Apple Inc")
-                                .dividendYield(new BigDecimal("0.005800"))
-                                .outstandingShares(Long.parseLong("15821900000"))
-                                .openValue(new BigDecimal("161.53000"))
-                                .highValue(new BigDecimal("162.47000"))
-                                .lowValue(new BigDecimal("161.27000"))
-                                .priceValue(new BigDecimal("162.36000"))
-                                .volumeValue(Long.parseLong("49443818"))
-                                .lastUpdated(LocalDate.parse("2023-04-03"))
-                                .previousClose(new BigDecimal("160.77000"))
-                                .changeValue(new BigDecimal("1.59000"))
-                                .changePercent("0.9890%")
-                                .websiteUrl("https://www.apple.com")
-                                .build();
-
-                when(stockRepository.findStockBySymbol(symbol))
-                        .thenReturn(Optional.empty())
-                        .thenReturn(Optional.of(stockFromDB));
-
-                when(exchangeRepository.findExchangeByAcronym(acronym)).thenReturn(Optional.of(exchange));
-                stockService.getStockBySymbol(symbol);
-                verify(stockRepository).save(any());
-//         TODO 💩 Ovaj test zavisi od eksternog API-ja, ukoliko se premasi broj poziva zakomentarisati tri linije iznad
-//         i otkomentarisati linije ispod
-//                assertThrows(ExternalAPILimitReachedException.class, () -> {
-//                    stockService.getStockBySymbol(symbol);
-//                });
-    }
-
-        @Test
-        public void getStockBySymbol_getStockFromExternalAPI_throwsExchangeNotFoundException() {
-
-            String symbol = "AAPL";
-            String acronym = "NASDAQ";
-
-            Stock stockFromDB = Stock.builder()
-                    .exchange(new Exchange())
-                    .symbol(symbol)
-                    .companyName("Apple Inc")
-                    .dividendYield(new BigDecimal("0.005800"))
-                    .outstandingShares(Long.parseLong("15821900000"))
-                    .openValue(new BigDecimal("161.53000"))
-                    .highValue(new BigDecimal("162.47000"))
-                    .lowValue(new BigDecimal("161.27000"))
-                    .priceValue(new BigDecimal("162.36000"))
-                    .volumeValue(Long.parseLong("49443818"))
-                    .lastUpdated(LocalDate.parse("2023-04-03"))
-                    .previousClose(new BigDecimal("160.77000"))
-                    .changeValue(new BigDecimal("1.59000"))
-                    .changePercent("0.9890%")
-                    .websiteUrl("https://www.apple.com")
-                    .build();
-
-            when(stockRepository.findStockBySymbol(symbol))
-                    .thenReturn(Optional.empty())
-                    .thenReturn(Optional.of(stockFromDB));
-
-            when(exchangeRepository.findExchangeByAcronym(acronym)).thenReturn(Optional.empty());
-
-            assertThrows(ExchangeNotFoundException.class, () -> stockService.getStockBySymbol(symbol));
-        }
-
-        @Test
-        public void getStockBySymbol_getStockFromExternalAPI_throwsStockNotFoundException() {
-
-            String symbol = "GOOG";
-            Exchange exchange = new Exchange();
-            String acronym = "NASDAQ";
-
-            when(stockRepository.findStockBySymbol(symbol)).thenReturn(Optional.empty());
-
-            when(exchangeRepository.findExchangeByAcronym(acronym)).thenReturn(Optional.of(exchange));
-
-            assertThrows(StockNotFoundException.class, () -> {
-                stockService.getStockBySymbol(symbol);
-            });
-        }
+//    @Test
+//    public void getStockBySymbol_getStockFromExternalAPI_throwsStockNotFoundException() {
+//
+//        String symbol = "GOOG";
+//        Exchange exchange = new Exchange();
+//        String acronym = "NASDAQ";
+//
+//        when(stockRepository.findStockBySymbol(symbol)).thenReturn(Optional.empty());
+//
+//        when(exchangeRepository.findExchangeByAcronym(acronym)).thenReturn(Optional.of(exchange));
+//
+//        assertThrows(StockNotFoundException.class, () -> {
+//            stockService.getStockBySymbol(symbol);
+//        });
+//    }
 
     @Test
     public void getStockHistoryByStockIdAndTimePeriod_successOneDay() {

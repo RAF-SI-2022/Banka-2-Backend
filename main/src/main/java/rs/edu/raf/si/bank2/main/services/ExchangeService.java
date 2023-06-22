@@ -30,7 +30,7 @@ public class ExchangeService implements ExchangeServiceInterface {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
-    @Cacheable(value = "exchangesALL")
+    // @Cacheable(value = "exchangesALL")
     @Override
     public List<Exchange> findAll() {
         //        System.out.println(redisTemplate.keys("*"));
@@ -40,7 +40,7 @@ public class ExchangeService implements ExchangeServiceInterface {
     }
 
     @Override
-    @Cacheable(value = "exchangesID", key = "#id")
+    // @Cacheable(value = "exchangesID", key = "#id")
     public Exchange findById(Long id) {
         //        System.out.println(redisTemplate.keys("*"));
         //      za test ovo moze da se otkomentarise i tacno se vidi da kesira kljuceve redis :)
@@ -56,7 +56,7 @@ public class ExchangeService implements ExchangeServiceInterface {
     }
 
     @Override
-    @Cacheable(value = "exchangesMIC", key = "#micCode")
+    // @Cacheable(value = "exchangesMIC", key = "#micCode")
     public Exchange findByMicCode(String micCode) {
         //        System.out.println(redisTemplate.keys("*"));
         //      za test ovo moze da se otkomentarise i tacno se vidi da kesira kljuceve redis :)
@@ -71,7 +71,7 @@ public class ExchangeService implements ExchangeServiceInterface {
     }
 
     @Override
-    @Cacheable(value = "exchangesAcronym", key = "#acronym")
+    // @Cacheable(value = "exchangesAcronym", key = "#acronym")
     public Exchange findByAcronym(String acronym) {
         //        System.out.println(redisTemplate.keys("*"));
         //      za test ovo moze da se otkomentarise i tacno se vidi da kesira kljuceve redis :)
@@ -90,12 +90,12 @@ public class ExchangeService implements ExchangeServiceInterface {
         if (exchangeEntry.isEmpty()) {
             throw new ExchangeNotFoundException();
         }
-        Exchange exchange = exchangeEntry.get();//todo nisu radile vikendom pa je sklonjeno vrati posle
+        Exchange exchange = exchangeEntry.get(); // todo nisu radile vikendom pa je sklonjeno vrati posle
         LocalTime openTime = LocalTime.parse(exchange.getOpenTime().substring(1));
         LocalTime closeTime = LocalTime.parse(exchange.getCloseTime().substring(1));
         ZoneId zone = ZoneId.of(exchange.getTimeZone());
         LocalTime currTime = LocalTime.now(zone);
         return !currTime.isBefore(openTime) && !currTime.isAfter(closeTime);
-//        return true;
+        //        return true;
     }
 }

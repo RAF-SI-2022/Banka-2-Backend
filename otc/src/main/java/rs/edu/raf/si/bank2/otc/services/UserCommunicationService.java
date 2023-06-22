@@ -110,7 +110,7 @@ public class UserCommunicationService implements UserCommunicationInterface {
             throw new RuntimeException(e);
         }
     }
-    public CommunicationDto sendGet(String senderEmail, String urlExtension,String service){
+    public CommunicationDto sendGet(String senderEmail, String urlExtension, String service){
 //        String senderEmail = args[0];
 //        String urlExtension = args[1];
 //        String service = null;
@@ -159,7 +159,7 @@ public class UserCommunicationService implements UserCommunicationInterface {
 
     @Override
     public CommunicationDto sendPostLike(String urlExtension, String postObjectBody, String senderEmail, String method){
-        System.err.println("POSALI SMO SEND POST");
+//        System.err.println("POSALI SMO SEND POST");
 
         if (senderEmail == null) senderEmail = "anesic3119rn+banka2backend+admin@raf.rs";
 

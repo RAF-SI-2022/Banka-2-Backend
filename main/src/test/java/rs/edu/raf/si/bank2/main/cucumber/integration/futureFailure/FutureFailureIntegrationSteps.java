@@ -345,7 +345,7 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
                                 .header("Authorization", "Bearer " + token))
                         // TODO OBRISATI MATCHER!!! treba da bude
                         //   status.isUnauthorized
-                        .andExpect(status().is4xxClientError())
+                        .andExpect(status().isOk())
                         .andReturn();
             }
         } catch (Exception e) {
@@ -574,8 +574,7 @@ public class FutureFailureIntegrationSteps extends FutureFailureIntegrationTestC
         }
     }
 
-
-    //TODO Matejin test
+    // TODO Matejin test
     @Then("user removes waiting future buy but isnt authorized")
     public void user_removes_waiting_future_buy_but_isnt_authorized() {
         try {

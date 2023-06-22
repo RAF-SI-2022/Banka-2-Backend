@@ -3,12 +3,11 @@ package rs.edu.raf.si.bank2.main.models.mariadb;
 import java.io.Serializable;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 // @Builder
-@AllArgsConstructor
+// @AllArgsConstructor
 // @RequiredArgsConstructor
 // @NoArgsConstructor
 @Entity
@@ -24,6 +23,26 @@ public class Exchange implements Serializable {
     private Long id;
 
     public Exchange() {}
+
+    public Exchange(
+            Long id,
+            String exchangeName,
+            String acronym,
+            String micCode,
+            String polity,
+            Currency currency,
+            String timeZone,
+            String openTime,
+            String closeTime) {
+        this.id = id;
+        this.exchangeName = exchangeName;
+        this.acronym = acronym;
+        this.micCode = micCode;
+        this.polity = polity;
+        this.timeZone = timeZone;
+        this.openTime = openTime;
+        this.closeTime = closeTime;
+    }
 
     public Exchange(
             String exchangeName,

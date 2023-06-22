@@ -11,7 +11,7 @@ import lombok.*;
 import org.apache.commons.lang3.builder.ToStringExclude;
 
 @Data
-//@ToString(exclude = "balances")
+// @ToString(exclude = "balances")
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor

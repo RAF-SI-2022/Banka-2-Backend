@@ -93,7 +93,7 @@ public class ForexFailureIntegrationSteps extends ForexFailureIntegrationTestCon
         }
     }
 
-    //TODO Matejin test
+    // TODO Matejin test
     @Given("there is a forex record in database")
     public void there_is_a_forex_record_in_database() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -186,7 +186,7 @@ public class ForexFailureIntegrationSteps extends ForexFailureIntegrationTestCon
                 errorMsg);
     }
 
-    //TODO Matejin test
+    // TODO Matejin test
     @Then("user converts from one currency to another with db without enough money")
     public void user_converts_from_one_currency_to_another_with_db_without_enough_money()
             throws JsonProcessingException, UnsupportedEncodingException {
@@ -208,5 +208,4 @@ public class ForexFailureIntegrationSteps extends ForexFailureIntegrationTestCon
             fail(e.getMessage());
         }
     }
-
 }

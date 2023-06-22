@@ -141,6 +141,24 @@ services:
     networks:
       - bank2_net
 
+  # TODO add health check for Client
+  client:
+    container_name: otc
+    image: harbor.k8s.elab.rs/banka-2/client
+    expose:
+      - "8083"
+    ports:
+      - "8083:8083"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
+    networks:
+      - bank2_net
+
 volumes:
   mariadb:
   mongodb:

@@ -15,7 +15,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.web.util.NestedServletException;
 import rs.edu.raf.si.bank2.main.models.mariadb.PermissionName;
 import rs.edu.raf.si.bank2.main.models.mariadb.Stock;
 import rs.edu.raf.si.bank2.main.models.mariadb.User;
@@ -39,7 +38,7 @@ public class StockFailureIntegrationSteps extends StockFailureIntegrationTestCon
     private static Stock testStock;
     private static String token;
 
-    //TODO Matejin test
+    // TODO Matejin test
     @When("user is logged in")
     public void user_is_logged_in() {
         try {
@@ -77,8 +76,7 @@ public class StockFailureIntegrationSteps extends StockFailureIntegrationTestCon
         }
     }
 
-
-    //TODO Matejin test
+    // TODO Matejin test
     @Given("user logs in")
     public void user_logs_in() {
         try {
@@ -140,7 +138,7 @@ public class StockFailureIntegrationSteps extends StockFailureIntegrationTestCon
             });
             String expectedMessage = "Stock with symbol <ASDF> not found.";
             String actualMessage = exception.getMessage();
-//            assertEquals(expectedMessage, actualMessage);
+            //            assertEquals(expectedMessage, actualMessage);
 
         } catch (Exception e) {
             fail(e.getMessage());

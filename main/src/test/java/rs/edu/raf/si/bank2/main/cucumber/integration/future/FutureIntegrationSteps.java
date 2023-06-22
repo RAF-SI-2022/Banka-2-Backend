@@ -213,7 +213,8 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
         }
         balance = this.balanceService.findBalanceByUserEmailAndCurrencyCode(
                 "anesic3119rn+banka2backend+admin@raf.rs", "USD");
-        assertEquals(Math.round(oldFree - testFuture.getMaintenanceMargin().floatValue()), Math.round(balance.getFree()));
+        assertEquals(
+                Math.round(oldFree - testFuture.getMaintenanceMargin().floatValue()), Math.round(balance.getFree()));
     }
 
     @Then("user buys future from company with limit or stop")
@@ -445,7 +446,7 @@ public class FutureIntegrationSteps extends FutureIntegrationTestConfig {
         }
     }
 
-    //TODO Matejin test
+    // TODO Matejin test
     @Then("user gets waiting buy future")
     public void user_gets_waiting_buy_future() {
         try {

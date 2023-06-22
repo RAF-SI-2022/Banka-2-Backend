@@ -14,11 +14,6 @@ rem environemnt.
         call git config core.autocrlf false
         echo Done
 
-        rem Copy git hooks
-        echo Copying git hooks...
-        call xcopy "git\hooks" ".git\hooks" /E /C /H /R /K /Y
-        echo Done
-
         echo Cleaning old !jdk! folder...
         call rmdir %jdk% /s /q >NUL 2>&1
         call del lib\sha_comp_0.txt >NUL 2>&1

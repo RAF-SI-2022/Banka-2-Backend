@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class MarginTransactionDto {
     AccountType accountType;//ENUM - CASH,MARGIN
-
     Long orderId;
     String transactionComment;//Uplaćivanje sredstava na račun - Initial Margin, Uplaćivanjesredstava na račun -Margin Call, Isplata kamate
     String currencyCode;

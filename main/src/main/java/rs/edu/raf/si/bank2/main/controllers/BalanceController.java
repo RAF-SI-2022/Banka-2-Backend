@@ -19,8 +19,7 @@ public class BalanceController {
     private final UserCommunicationInterface userCommunicationInterface;
 
     @Autowired
-    public BalanceController(BalanceService balanceService,
-                UserCommunicationService communicationService) {
+    public BalanceController(BalanceService balanceService, UserCommunicationService communicationService) {
         this.userCommunicationInterface = communicationService;
         this.balanceService = balanceService;
     }
@@ -47,8 +46,8 @@ public class BalanceController {
     @PostMapping(value = "/decrease")
     public ResponseEntity<?> decreaseBalance(@RequestBody @Valid BalanceDto dto) {
         try {
-            return ResponseEntity.ok(
-                    this.balanceService.decreaseBalance(dto.getUserEmail(), dto.getCurrencyCode(), dto.getAmount(), false));
+            return ResponseEntity.ok(this.balanceService.decreaseBalance(
+                    dto.getUserEmail(), dto.getCurrencyCode(), dto.getAmount(), false));
         } catch (BalanceNotFoundException e1) {
             return ResponseEntity.badRequest()
                     .body("Balans za korisnika sa email-om "
