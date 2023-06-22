@@ -1,11 +1,25 @@
-package rs.edu.raf.si.bank2.client.dto;
+package rs.edu.raf.si.bank2.client.models.mongodb;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import rs.edu.raf.si.bank2.client.models.mongodb.enums.CreditApproval;
 
-@Data
-public class CreditRequestDto {
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 
+@Data
+@Builder
+@AllArgsConstructor
+//@RequiredArgsConstructor
+@Document("creditRequest")
+public class CreditRequest {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private String id;
     private String clientEmail;
     private CreditApproval creditApproval; //approved / denied / waiting
     private Double amount;
@@ -17,9 +31,11 @@ public class CreditRequestDto {
     private Integer dueDateInMonths;
     private String phoneNumber;
 
+    public CreditRequest() {
+    }
 
-    public CreditRequestDto(String clientEmail, CreditApproval creditApproval, Double amount, String usedFor, Double monthlyRate,
-                            Boolean clientHasJob, String jobLocation, String currentJobDuration, Integer dueDateInMonths, String phoneNumber) {
+    public CreditRequest(String clientEmail, CreditApproval creditApproval, Double amount, String usedFor, Double monthlyRate,
+                         Boolean clientHasJob, String jobLocation, String currentJobDuration, Integer dueDateInMonths, String phoneNumber) {
         this.clientEmail = clientEmail;
         this.creditApproval = creditApproval;
         this.amount = amount;

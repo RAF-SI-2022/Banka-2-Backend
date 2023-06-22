@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import rs.edu.raf.si.bank2.client.dto.*;
 import rs.edu.raf.si.bank2.client.models.mongodb.PaymentReceiver;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.PaymentReceiverRepository;
+import rs.edu.raf.si.bank2.client.repositories.mongodb.PaymentRepository;
 import rs.edu.raf.si.bank2.client.services.PaymentService;
 
 import java.util.Optional;
@@ -16,11 +17,13 @@ import java.util.Optional;
 public class PaymentController {
     private final PaymentReceiverRepository paymentReceiverRepository;
     private final PaymentService paymentService;
+    private final PaymentRepository paymentRepository;
 
     @Autowired
-    public PaymentController(PaymentReceiverRepository paymentReceiverRepository, PaymentService paymentService) {
+    public PaymentController(PaymentReceiverRepository paymentReceiverRepository, PaymentService paymentService, PaymentRepository paymentRepository) {
         this.paymentReceiverRepository = paymentReceiverRepository;
         this.paymentService = paymentService;
+        this.paymentRepository = paymentRepository;
     }
 
 
@@ -44,6 +47,11 @@ public class PaymentController {
     public ResponseEntity<?> exchangeMoney(@RequestBody ExchangeDto exchangeDto) {
         //todo validacija
         return null;
+    }
+
+    @GetMapping("/payments/{email}")
+    public ResponseEntity<?> getPaymentsForClient(@PathVariable String email){
+        return ResponseEntity.ok(paymentRepository.findAllBySenderEmail(email));
     }
 
 
