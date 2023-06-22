@@ -35,7 +35,8 @@ public class AuthenticationController {
             JwtUtil jwtUtil,
             AuthorisationServiceInterface authorisationService,
             UserService userService,
-            PasswordEncoder passwordEncoder, MailingService mailingService) {
+            PasswordEncoder passwordEncoder,
+            MailingService mailingService) {
         this.jwtUtil = jwtUtil;
         this.authorisationService = authorisationService;
         this.userService = userService;
@@ -109,5 +110,4 @@ public class AuthenticationController {
 
         return ResponseEntity.ok().build();
     }
-
 }

@@ -38,6 +38,8 @@ presubmits:
               docker compose up -d mongodb
               docker compose up -d redis
               docker compose up -d users
+              docker compose up -d main
+              docker compose up -d client
               
               cd otc
 
@@ -82,6 +84,8 @@ postsubmits:
               docker compose up -d mongodb
               docker compose up -d redis
               docker compose up -d users
+              docker compose up -d main
+              docker compose up -d client
               
               ref=$(git rev-parse --abbrev-ref HEAD)
               
