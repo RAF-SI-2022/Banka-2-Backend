@@ -34,10 +34,10 @@ presubmits:
 
               # Start all helper services
               docker network create --driver bridge bank2_net || true
-              docker compose up -d mariadb
-              docker compose up -d flyway
-              docker compose up -d mongodb
-              docker compose up -d redis
+              docker compose up -d --no-recreate mariadb
+              docker compose up -d --no-recreate flyway
+              docker compose up -d --no-recreate mongodb
+              docker compose up -d --no-recreate redis
               
               # Environment ready, start test      
               cd ${THIS_SERVICE}
@@ -77,10 +77,10 @@ postsubmits:
 
               # Start all helper services
               docker network create --driver bridge bank2_net || true
-              docker compose up -d mariadb
-              docker compose up -d flyway
-              docker compose up -d mongodb
-              docker compose up -d redis
+              docker compose up -d --no-recreate mariadb
+              docker compose up -d --no-recreate flyway
+              docker compose up -d --no-recreate mongodb
+              docker compose up -d --no-recreate redis
               
               ref=$(git rev-parse --abbrev-ref HEAD)
               
