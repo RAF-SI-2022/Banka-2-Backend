@@ -47,20 +47,18 @@ public class PaymentController {
     //Payment receivers
 
     @PostMapping("/addReceiver")
-    public ResponseEntity<?> addPaymentReceiver(@RequestBody PaymentReceiverDto paymentReceiverDto) {
+    public ResponseEntity<?> addPaymentReceiver(@RequestBody PaymentReceiverDto dto) {
         //todo verifikaija
-
-        return ResponseEntity.ok(paymentReceiverRepository.save(new PaymentReceiver(
-                paymentReceiverDto.getName(),
-                paymentReceiverDto.getBalanceRegistrationNumber(),
-                paymentReceiverDto.getSavedByClientId()))
-        );
+        PaymentReceiver paymentReceiver = new PaymentReceiver(
+                dto.getSavedByClientEmail(), dto.getReceiverName(), dto.getBalanceRegistrationNumber(),
+                dto.getReferenceNumber(), dto.getPaymentNumber(), dto.getPaymentDescription());
+        return ResponseEntity.ok(paymentReceiverRepository.save(paymentReceiver));
     }
 
-    @GetMapping("/getReceivers/{clientId}")
-    public ResponseEntity<?> getAllSavedReceiversForClient(@PathVariable String clientId) {
+    @GetMapping("/getReceivers/{clientEmail}")
+    public ResponseEntity<?> getAllSavedReceiversForClient(@PathVariable String clientEmail) {
         //todo verifikacija
-        return ResponseEntity.ok(paymentReceiverRepository.findPaymentReceiversBySavedByClientId(clientId));
+        return ResponseEntity.ok(paymentReceiverRepository.findPaymentReceiversBySavedByClientEmail(clientEmail));
     }
 
 }

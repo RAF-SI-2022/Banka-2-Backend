@@ -6,6 +6,7 @@ import rs.edu.raf.si.bank2.client.models.mongodb.enums.Balance;
 @Data
 public class PaymentDto {
 
+    private String senderEmail;
     private String receiverName;
     private String fromBalanceRegNum;
     private String toBalanceRegNum;
