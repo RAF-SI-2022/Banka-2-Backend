@@ -60,7 +60,7 @@ public class BalanceService {
         return poslovniRacunRepository.findAll();
     }
 
-    public BalanceDto openDevizniRacun(DevizniRacunDto devizniRacunDto) {
+    public CommunicationDto openDevizniRacun(DevizniRacunDto devizniRacunDto) {
         Optional<Client> clientToAddBalanceTo = clientService.getClient(devizniRacunDto.getOwnerId());
         if (clientToAddBalanceTo.isEmpty()){
             System.err.println("Client not found");
@@ -92,10 +92,10 @@ public class BalanceService {
         clientToAddBalanceTo.get().getBalances().add(newDevizniRacun);
         clientService.save(clientToAddBalanceTo.get());
 
-        return new BalanceDto(200, "Devizni racun uspeno napravljen.");
+        return new CommunicationDto(200, "Devizni racun uspeno napravljen.");
     }
 
-    public BalanceDto openTekuciRacun(TekuciRacunDto tekuciRacunDto) {
+    public CommunicationDto openTekuciRacun(TekuciRacunDto tekuciRacunDto) {
         Optional<Client> clientToAddBalanceTo = clientService.getClient(tekuciRacunDto.getOwnerId());
         if (clientToAddBalanceTo.isEmpty()){
             System.err.println("Client not found");
@@ -118,10 +118,10 @@ public class BalanceService {
         clientToAddBalanceTo.get().getBalances().add(newTekuciRacun);
         clientService.save(clientToAddBalanceTo.get());
 
-        return new BalanceDto(200, "Tekuci racun uspeno napravljen.");
+        return new CommunicationDto(200, "Tekuci racun uspeno napravljen.");
     }
 
-    public BalanceDto openPoslovniRacun(PoslovniRacunDto poslovniRacunDto) {
+    public CommunicationDto openPoslovniRacun(PoslovniRacunDto poslovniRacunDto) {
         Optional<Client> clientToAddBalanceTo = clientService.getClient(poslovniRacunDto.getOwnerId());
         if (clientToAddBalanceTo.isEmpty()){
             System.err.println("Client not found");
@@ -144,7 +144,7 @@ public class BalanceService {
         clientToAddBalanceTo.get().getBalances().add(newPoslovniRacun);
         clientService.save(clientToAddBalanceTo.get());
 
-        return new BalanceDto(200, "Poslovni racun uspeno napravljen.");
+        return new CommunicationDto(200, "Poslovni racun uspeno napravljen.");
     }
 
     //TODO ubaciti edit i delete opcije

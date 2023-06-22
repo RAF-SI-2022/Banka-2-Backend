@@ -121,7 +121,7 @@ public class ExchangeFailuresIntegrationSteps extends ExchangeFailuresIntegratio
     public void user_gets_exchange_by_nonexistent_acronym_from_database() { // todo fix
         try {
             Exception exception = assertThrows(Exception.class, () -> {
-                mockMvc.perform(get("/api/exchange/acronym/" + testExchange.getAcronym())
+                mockMvc.perform(get("/api/exchange/acronym/KRUAC")
                                 .contentType("application/json")
                                 .header("Content-Type", "application/json")
                                 .header("Access-Control-Allow-Origin", "*")
