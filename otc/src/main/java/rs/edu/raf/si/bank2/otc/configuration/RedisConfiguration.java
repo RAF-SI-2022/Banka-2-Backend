@@ -11,7 +11,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  * TODO why *Test* configuration? rename or remove class if unnecessary
  */
 @Configuration
-public class RedisTestConfiguration {
+public class RedisConfiguration {
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
