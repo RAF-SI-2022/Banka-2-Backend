@@ -44,13 +44,14 @@ public class CreditService {
         return creditRepository.findAllByClientEmail(clientEmail);
     }
 
-    public CommunicationDto payOfMonthsInterest(String creditId){
+    public CommunicationDto payOffOneMonthsInterest(String creditId){
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         Optional<Credit> credit = creditRepository.findById(creditId);
         double monthlyRate = credit.get().getMonthlyRate();
 
         increaseOrDecreaseUserBalance(monthlyRate, credit.get().getAccountRegNumber(), true);
         credit.get().setRemainingAmount(credit.get().getRemainingAmount() - monthlyRate);
+        creditRepository.save(credit.get());
         payedInterestRepository.save(new PayedInterest("Kamanta", creditId, dtf.format(LocalDate.now()), monthlyRate));
 
         return new CommunicationDto(200, "Mesecna kamata je placena");

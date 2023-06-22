@@ -34,12 +34,13 @@ public class CreditController {
 
     @PostMapping("/pay/{creditId}")
     public ResponseEntity<?> payThisMonthsInterest(@PathVariable String creditId){
-        return ResponseEntity.ok(creditService.payOfMonthsInterest(creditId));
+        CommunicationDto communicationDto = creditService.payOffOneMonthsInterest(creditId);
+        return ResponseEntity.status(communicationDto.getResponseCode()).body(communicationDto.getResponseMsg());
     }
 
     @GetMapping("/interests/{creditId}")
     public ResponseEntity<?> getAllPayedInterests(@PathVariable String creditId){
-        return ResponseEntity.ok(payedInterestRepository.findAllByCreditId(creditId));
+        return ResponseEntity.ok(payedInterestRepository.findAll());
     }
 
 

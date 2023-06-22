@@ -31,6 +31,7 @@ public class Client {
         this.balances = balances;
     }
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;

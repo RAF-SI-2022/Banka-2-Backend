@@ -3,6 +3,7 @@ package rs.edu.raf.si.bank2.client.models.mongodb;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -23,6 +24,9 @@ public class PayedInterest {
     private String creditId;
     private String date;
     private Double amount;
+
+    public PayedInterest() {
+    }
 
     public PayedInterest(String name, String creditId, String date, Double amount) {
         this.name = name;
