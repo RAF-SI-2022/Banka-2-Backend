@@ -31,11 +31,12 @@ public class PaymentController {
         return ResponseEntity.status(communicationDto.getResponseCode()).body(communicationDto.getResponseMsg());
     }
 
-    @PostMapping("/transferMoney")
-    public ResponseEntity<?> transferMoney(@RequestBody TransferDto transferDto) {
-        //todo validacija
-        return ResponseEntity.ok(paymentService.transferMoney(transferDto));
-    }
+//    @Deprecated
+//    @PostMapping("/transferMoney")
+//    public ResponseEntity<?> transferMoney(@RequestBody TransferDto transferDto) {
+//        //todo validacija
+//        return ResponseEntity.ok(paymentService.transferMoney(transferDto));
+//    }
 
     @PostMapping("/exchangeMoney")
     public ResponseEntity<?> exchangeMoney(@RequestBody ExchangeDto exchangeDto) {

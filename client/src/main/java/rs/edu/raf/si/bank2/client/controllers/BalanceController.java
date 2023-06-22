@@ -125,7 +125,7 @@ public class BalanceController {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
 
-        BalanceDto response = balanceService.openDevizniRacun(devizniRacunDto);
+        CommunicationDto response = balanceService.openDevizniRacun(devizniRacunDto);
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
@@ -135,7 +135,7 @@ public class BalanceController {
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
-        BalanceDto response = balanceService.openTekuciRacun(tekuciRacunDto);
+        CommunicationDto response = balanceService.openTekuciRacun(tekuciRacunDto);
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
@@ -146,7 +146,7 @@ public class BalanceController {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
         }
 
-        BalanceDto response = balanceService.openPoslovniRacun(poslovniRacunDto);
+        CommunicationDto response = balanceService.openPoslovniRacun(poslovniRacunDto);
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 

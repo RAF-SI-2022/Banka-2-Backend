@@ -106,13 +106,15 @@ public class PaymentService {
         }
     }
 
-    //todo uradi transfer
-    public CommunicationDto transferMoney(TransferDto transferDto) {
-        Optional<RacunStorage> fromRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(transferDto.getToBalanceRegNum());
-        Optional<RacunStorage> toRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(transferDto.getFromBalanceRegNum());
-
-        return new CommunicationDto(200, "Placanje uspesno izvrseno");
-    }
+//    @Deprecated
+//    public CommunicationDto transferMoney(TransferDto transferDto) {
+//        Optional<RacunStorage> fromRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(transferDto.getToBalanceRegNum());
+//        Optional<RacunStorage> toRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(transferDto.getFromBalanceRegNum());
+//        if (fromRacunInfo.isEmpty()) return new CommunicationDto(404, "Klijentski racun nije pronadjen");
+//        if (toRacunInfo.isEmpty()) return new CommunicationDto(404, "Razun na koji saljete nije pronadjen");
+//
+//        return new CommunicationDto(200, "Placanje uspesno izvrseno");
+//    }
 
 
     public void exchangeMoney() {
