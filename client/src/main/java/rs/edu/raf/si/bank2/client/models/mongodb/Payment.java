@@ -21,6 +21,7 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
+    private String senderEmail;
     private String receiverName;
     private String balanceRegistrationNumber;//reg broj racuna
     private Double amount;
@@ -31,9 +32,10 @@ public class Payment {
     public Payment() {
     }
 
-    public Payment(String receiverName, String balanceRegistrationNumber,
+    public Payment(String senderEmail, String receiverName, String balanceRegistrationNumber,
                    Double amount, String referenceNumber, String paymentNumber, String paymentDescription) {
         this.receiverName = receiverName;
+        this.senderEmail = senderEmail;
         this.balanceRegistrationNumber = balanceRegistrationNumber;
         this.amount = amount;
         this.referenceNumber = referenceNumber;

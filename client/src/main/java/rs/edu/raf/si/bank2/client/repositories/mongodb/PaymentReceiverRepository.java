@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface PaymentReceiverRepository extends MongoRepository<PaymentReceiver, String> {
 
-    List<PaymentReceiver> findPaymentReceiversBySavedByClientId(String SavedByClientId);
+    List<PaymentReceiver> findPaymentReceiversBySavedByClientEmail(String SavedByClientEmail);
 }

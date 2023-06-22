@@ -8,7 +8,7 @@ import rs.edu.raf.si.bank2.client.dto.TransferDto;
 import rs.edu.raf.si.bank2.client.models.mongodb.*;
 import rs.edu.raf.si.bank2.client.models.mongodb.enums.Balance;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.*;
-
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -32,10 +32,9 @@ public class PaymentService {
     }
 
 
-    //todo flipovani su from i to
     public CommunicationDto makePayment(PaymentDto paymentDto) {
-        Optional<RacunStorage> fromRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(paymentDto.getToBalanceRegNum());
-        Optional<RacunStorage> toRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(paymentDto.getFromBalanceRegNum());
+        Optional<RacunStorage> fromRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(paymentDto.getFromBalanceRegNum());
+        Optional<RacunStorage> toRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(paymentDto.getToBalanceRegNum());
 
         //todo mozda da se skloni provera za tudji racun
         if (fromRacunInfo.isEmpty()) return new CommunicationDto(404, "Klijentski racun nije pronadjen");
@@ -44,14 +43,13 @@ public class PaymentService {
         pay(fromRacunInfo.get().getType(), fromRacunInfo.get().getBalanceRegistrationNumber(), paymentDto.getAmount());
         add(toRacunInfo.get().getType(), toRacunInfo.get().getBalanceRegistrationNumber(), paymentDto.getAmount());
 
-        paymentRepository.save(new Payment(
-                paymentDto.getReceiverName(), paymentDto.getFromBalanceRegNum(),
+        paymentRepository.save(new Payment(paymentDto.getSenderEmail(), paymentDto.getReceiverName(),
                 paymentDto.getToBalanceRegNum(), paymentDto.getAmount(), paymentDto.getReferenceNumber(),
-                paymentDto.getPaymentNumber(), paymentDto.getPaymentDescription()
-        ));
+                paymentDto.getPaymentNumber(), paymentDto.getPaymentDescription()));
 
         return new CommunicationDto(200, "Placanje uspesno izvrseno");
     }
+
 
     //todo U OVIM PLACANJIMA TREBA DA SE STAVI NA NEKI WAIT ILI NESTO ZA AVAILABLE
     //todo uradi verifikaciju da li imamo dovoljno para
@@ -108,13 +106,15 @@ public class PaymentService {
         }
     }
 
-    //todo uradi transfer
-    public CommunicationDto transferMoney(TransferDto transferDto) {
-        Optional<RacunStorage> fromRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(transferDto.getToBalanceRegNum());
-        Optional<RacunStorage> toRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(transferDto.getFromBalanceRegNum());
-
-        return new CommunicationDto(200, "Placanje uspesno izvrseno");
-    }
+//    @Deprecated
+//    public CommunicationDto transferMoney(TransferDto transferDto) {
+//        Optional<RacunStorage> fromRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(transferDto.getToBalanceRegNum());
+//        Optional<RacunStorage> toRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(transferDto.getFromBalanceRegNum());
+//        if (fromRacunInfo.isEmpty()) return new CommunicationDto(404, "Klijentski racun nije pronadjen");
+//        if (toRacunInfo.isEmpty()) return new CommunicationDto(404, "Razun na koji saljete nije pronadjen");
+//
+//        return new CommunicationDto(200, "Placanje uspesno izvrseno");
+//    }
 
 
     public void exchangeMoney() {
