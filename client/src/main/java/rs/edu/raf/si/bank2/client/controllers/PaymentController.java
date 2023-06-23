@@ -31,9 +31,13 @@ public class PaymentController {
 
     @PostMapping("/makePayment")
     public ResponseEntity<?> makePayment(@RequestBody PaymentDto paymentDto) {
-        //todo validacija
         CommunicationDto communicationDto = paymentService.makePayment(paymentDto);
         return ResponseEntity.status(communicationDto.getResponseCode()).body(communicationDto.getResponseMsg());
+    }
+
+    @PostMapping("/removeMoney")
+    public ResponseEntity<?> removeMoney(@RequestBody RemoveMoneyDto removeMoneyDto){
+        return ResponseEntity.ok( paymentService.removeMoney(removeMoneyDto));
     }
 
     @PostMapping("/transferMoney")
