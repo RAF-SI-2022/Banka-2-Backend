@@ -54,6 +54,7 @@ presubmits:
               for port in $ports
               do
                 counter=0
+                set +e
                 until curl 127.0.0.1:${port}
                 do
                   ((counter++))
@@ -62,8 +63,9 @@ presubmits:
                     echo "Failed to ping 127.0.0.1:${port} after ${max_attempts}, exiting."
                     exit 1
                   fi
-                sleep 15
+                  sleep 15
                 done
+                set -e
               done
               
               # Environment ready, start test
@@ -126,6 +128,7 @@ postsubmits:
               for port in $ports
               do
                 counter=0
+                set +e
                 until curl 127.0.0.1:${port}
                 do
                   ((counter++))
@@ -134,8 +137,9 @@ postsubmits:
                     echo "Failed to ping 127.0.0.1:${port} after ${max_attempts}, exiting."
                     exit 1
                   fi
-                sleep 15
+                  sleep 15
                 done
+                set -e
               done
               
               ref=$(git rev-parse --abbrev-ref HEAD)

@@ -128,6 +128,7 @@ postsubmits:
               for port in $ports
               do
                 counter=0
+                set +e
                 until curl 127.0.0.1:${port}
                 do
                   ((counter++))
@@ -138,6 +139,7 @@ postsubmits:
                   fi
                   sleep 15
                 done
+                set -e
               done
               
               ref=$(git rev-parse --abbrev-ref HEAD)
