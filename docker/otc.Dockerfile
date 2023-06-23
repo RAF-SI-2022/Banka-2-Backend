@@ -13,8 +13,9 @@ RUN --mount=type=cache,target=/root/.m2 mvn -DfinalName=app -Dmaven.test.skip -f
 # Expose
 FROM openjdk:17-alpine
 
+WORKDIR /
 ENV HOME=/usr/app
-COPY --from=builder $HOME/target/app-*.jar /app.jar
+COPY --from=builder $HOME/target/*.jar /app.jar
 
 # Configure for microservice
 EXPOSE 8082
