@@ -107,4 +107,8 @@ public class CompanyService {
         }
         return companyRet.get();
     }
+
+    public Company save(Company company) {
+        return this.companyRepository.save(company);
+    }
 }

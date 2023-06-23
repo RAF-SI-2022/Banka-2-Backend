@@ -42,7 +42,6 @@ public class CompanyBankAccountService {
         if(companyOptional.isEmpty()) {
             throw new CompanyNotFoundException("There is no company with this ID.");
         }
-
         return new ArrayList<>(companyOptional.get().getBankAccounts());
     }
 
@@ -89,5 +88,8 @@ public class CompanyBankAccountService {
         else {
             throw new BankAccountNotFoundException("Bank account not found with id: " + id);
         }
+    }
+    public CompanyBankAccount save(CompanyBankAccount account) {
+        return this.bankAccountRepository.save(account);
     }
 }
