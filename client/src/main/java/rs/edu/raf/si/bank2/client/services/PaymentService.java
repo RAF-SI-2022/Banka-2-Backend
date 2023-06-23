@@ -113,8 +113,8 @@ public class PaymentService {
 
     //todo mozda postaviti check a mozda ne
     public CommunicationDto transferMoney(TransferDto transferDto) {
-        Optional<RacunStorage> fromRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(transferDto.getToBalanceRegNum());
-        Optional<RacunStorage> toRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(transferDto.getFromBalanceRegNum());
+        Optional<RacunStorage> fromRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(transferDto.getFromBalanceRegNum());
+        Optional<RacunStorage> toRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(transferDto.getToBalanceRegNum());
         if (fromRacunInfo.isEmpty()) return new CommunicationDto(404, "Klijentski racun nije pronadjen");
         if (toRacunInfo.isEmpty()) return new CommunicationDto(404, "Razun na koji saljete nije pronadjen");
 
@@ -126,8 +126,8 @@ public class PaymentService {
 
 
     public CommunicationDto exchangeMoney(ExchangeDto exchangeDto) {
-        Optional<RacunStorage> fromRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(exchangeDto.getToBalanceRegNum());
-        Optional<RacunStorage> toRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(exchangeDto.getFromBalanceRegNum());
+        Optional<RacunStorage> fromRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(exchangeDto.getFromBalanceRegNum());
+        Optional<RacunStorage> toRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(exchangeDto.getToBalanceRegNum());
         if (fromRacunInfo.isEmpty()) return new CommunicationDto(404, "Klijentski racun nije pronadjen");
         if (toRacunInfo.isEmpty()) return new CommunicationDto(404, "Razun na koji saljete nije pronadjen");
 
