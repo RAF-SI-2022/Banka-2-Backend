@@ -17,6 +17,9 @@ WORKDIR /
 ENV HOME=/usr/app
 COPY --from=builder $HOME/target/*.jar /app.jar
 
+# Add curl for health check
+RUN apk --no-cache --update add curl
+
 # Configure for microservice
 EXPOSE 8083
 ENTRYPOINT ["echo", "Image entrypoint not defined!", "&&", "exit", "1"]
