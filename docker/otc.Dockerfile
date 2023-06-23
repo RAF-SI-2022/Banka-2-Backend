@@ -1,22 +1,25 @@
-FROM maven:3.8.5-openjdk-17-slim as base
+FROM maven:3.9.1 as builder
 
-# Caching
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
-ADD ./otc/pom.xml /usr/src/app
-RUN mvn verify clean --fail-never
+# Configure for microservice
+ENV SERVICE=otc
 
-# Build
-FROM base AS stage1
-ADD ./otc /usr/src/app
-RUN mvn package -DskipTests
+# Build & Cache
+ENV HOME=/usr/app
+RUN mkdir -p $HOME
+WORKDIR $HOME
+ADD ./$SERVICE $HOME
+RUN --mount=type=cache,target=/root/.m2 mvn -DfinalName=app -Dmaven.test.skip -f $HOME/pom.xml clean package
 
-# Prepare JAR
-FROM stage1 AS stage2
-RUN cp /usr/src/app/target/*.jar /usr/src/app/app.jar
+# Expose
+FROM openjdk:17-alpine
 
-# Entrypoint
-FROM stage2 AS stage3
-WORKDIR /usr/src/app
+WORKDIR /
+ENV HOME=/usr/app
+COPY --from=builder $HOME/target/*.jar /app.jar
+
+# Add curl for health check
+RUN apk --no-cache --update add curl
+
+# Configure for microservice
 EXPOSE 8082
-ENTRYPOINT ["bash"]
+ENTRYPOINT ["echo", "Image entrypoint not defined!", "&&", "exit", "1"]

@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
-import rs.edu.raf.si.bank2.main.configuration.RedisTestConfiguration;
+import rs.edu.raf.si.bank2.main.configuration.RedisConfiguration;
 import rs.edu.raf.si.bank2.main.exceptions.ExchangeNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.Exchange;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.ExchangeRepository;
@@ -25,7 +25,7 @@ import rs.edu.raf.si.bank2.main.repositories.mariadb.ExchangeRepository;
 @SpringBootTest
 @RunWith(SpringRunner.class)
 @ExtendWith(MockitoExtension.class)
-@Import(RedisTestConfiguration.class)
+@Import(RedisConfiguration.class)
 class ExchangeServiceTest {
 
     //    @Autowired
