@@ -76,6 +76,8 @@ postsubmits:
               SONAR_PROJECT_NAME="Banka-2-Backend-Users"
               THIS_SERVICE="users"
 
+              start-docker.sh
+
               # Start all helper services
               docker network create --driver bridge bank2_net || true
               docker compose up -d --no-recreate mariadb
