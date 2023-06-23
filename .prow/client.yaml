@@ -45,7 +45,7 @@ presubmits:
               services=$(echo ${SERVICES_NAMES} | xargs)
               for service in $services
               do
-                docker compose up -d --build --no-recreate ${service} || sleep 3600
+                docker compose up -d --build --no-recreate ${service}
               done
               
               # Check all microservices available
