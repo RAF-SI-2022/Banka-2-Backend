@@ -20,4 +20,5 @@ public class PaymentReceiverDto {
         this.paymentNumber = paymentNumber;
         this.paymentDescription = paymentDescription;
     }
+
 }
