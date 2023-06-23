@@ -2,10 +2,7 @@ package rs.edu.raf.si.bank2.client.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import rs.edu.raf.si.bank2.client.dto.CommunicationDto;
-import rs.edu.raf.si.bank2.client.dto.ExchangeDto;
-import rs.edu.raf.si.bank2.client.dto.PaymentDto;
-import rs.edu.raf.si.bank2.client.dto.TransferDto;
+import rs.edu.raf.si.bank2.client.dto.*;
 import rs.edu.raf.si.bank2.client.models.mongodb.*;
 import rs.edu.raf.si.bank2.client.models.mongodb.enums.Balance;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.*;
@@ -55,9 +52,12 @@ public class PaymentService {
         return new CommunicationDto(200, "Placanje uspesno izvrseno");
     }
 
+    public String removeMoney (RemoveMoneyDto removeMoneyDto){
+        Optional<RacunStorage> racunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(removeMoneyDto.getBalanceRegNum());
+        subtract(racunInfo.get().getType(), racunInfo.get().getBalanceRegistrationNumber(), removeMoneyDto.getAmount());
+        return "Uklonjen novac";
+    }
 
-    //todo U OVIM PLACANJIMA TREBA DA SE STAVI NA NEKI WAIT ILI NESTO ZA AVAILABLE
-    //todo uradi verifikaciju da li imamo dovoljno para
 
     private void subtract(Balance type, String regNum, double amountToReduce) {
         switch (type) {
