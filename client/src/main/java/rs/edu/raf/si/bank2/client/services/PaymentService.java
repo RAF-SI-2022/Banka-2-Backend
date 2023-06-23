@@ -3,12 +3,15 @@ package rs.edu.raf.si.bank2.client.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.client.dto.CommunicationDto;
+import rs.edu.raf.si.bank2.client.dto.ExchangeDto;
 import rs.edu.raf.si.bank2.client.dto.PaymentDto;
 import rs.edu.raf.si.bank2.client.dto.TransferDto;
 import rs.edu.raf.si.bank2.client.models.mongodb.*;
 import rs.edu.raf.si.bank2.client.models.mongodb.enums.Balance;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.*;
-import java.util.List;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -20,6 +23,7 @@ public class PaymentService {
     private final DevizniRacunRepository devizniRacunRepository;
     private final PoslovniRacunRepository poslovniRacunRepository;
     private final RacunStorageRepository racunStorageRepository;
+    private final Map<String, Double> exchangeRates;
 
     @Autowired
     public PaymentService(PaymentRepository paymentRepository, ClientRepository clientRepository, TekuciRacunRepository tekuciRacunRepository, DevizniRacunRepository devizniRacunRepository, PoslovniRacunRepository poslovniRacunRepository, RacunStorageRepository racunStorageRepository) {
@@ -29,6 +33,7 @@ public class PaymentService {
         this.devizniRacunRepository = devizniRacunRepository;
         this.poslovniRacunRepository = poslovniRacunRepository;
         this.racunStorageRepository = racunStorageRepository;
+        this.exchangeRates = new HashMap<>();
     }
 
 
@@ -40,11 +45,11 @@ public class PaymentService {
         if (fromRacunInfo.isEmpty()) return new CommunicationDto(404, "Klijentski racun nije pronadjen");
         if (toRacunInfo.isEmpty()) return new CommunicationDto(404, "Razun na koji saljete nije pronadjen");
 
-        pay(fromRacunInfo.get().getType(), fromRacunInfo.get().getBalanceRegistrationNumber(), paymentDto.getAmount());
+        subtract(fromRacunInfo.get().getType(), fromRacunInfo.get().getBalanceRegistrationNumber(), paymentDto.getAmount());
         add(toRacunInfo.get().getType(), toRacunInfo.get().getBalanceRegistrationNumber(), paymentDto.getAmount());
 
         paymentRepository.save(new Payment(paymentDto.getSenderEmail(), paymentDto.getReceiverName(),
-                paymentDto.getToBalanceRegNum(), paymentDto.getAmount(), paymentDto.getReferenceNumber(),
+                fromRacunInfo.get().getBalanceRegistrationNumber(), toRacunInfo.get().getBalanceRegistrationNumber(), paymentDto.getAmount(), paymentDto.getReferenceNumber(),
                 paymentDto.getPaymentNumber(), paymentDto.getPaymentDescription()));
 
         return new CommunicationDto(200, "Placanje uspesno izvrseno");
@@ -54,7 +59,7 @@ public class PaymentService {
     //todo U OVIM PLACANJIMA TREBA DA SE STAVI NA NEKI WAIT ILI NESTO ZA AVAILABLE
     //todo uradi verifikaciju da li imamo dovoljno para
 
-    private void pay(Balance type, String regNum, double amountToReduce) {
+    private void subtract(Balance type, String regNum, double amountToReduce) {
         switch (type) {
             case TEKUCI -> {
                 Optional<TekuciRacun> tekuciRacun = tekuciRacunRepository.findTekuciRacunByRegistrationNumber(regNum);
@@ -106,20 +111,36 @@ public class PaymentService {
         }
     }
 
-//    @Deprecated
-//    public CommunicationDto transferMoney(TransferDto transferDto) {
-//        Optional<RacunStorage> fromRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(transferDto.getToBalanceRegNum());
-//        Optional<RacunStorage> toRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(transferDto.getFromBalanceRegNum());
-//        if (fromRacunInfo.isEmpty()) return new CommunicationDto(404, "Klijentski racun nije pronadjen");
-//        if (toRacunInfo.isEmpty()) return new CommunicationDto(404, "Razun na koji saljete nije pronadjen");
-//
-//        return new CommunicationDto(200, "Placanje uspesno izvrseno");
-//    }
+    //todo mozda postaviti check a mozda ne
+    public CommunicationDto transferMoney(TransferDto transferDto) {
+        Optional<RacunStorage> fromRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(transferDto.getToBalanceRegNum());
+        Optional<RacunStorage> toRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(transferDto.getFromBalanceRegNum());
+        if (fromRacunInfo.isEmpty()) return new CommunicationDto(404, "Klijentski racun nije pronadjen");
+        if (toRacunInfo.isEmpty()) return new CommunicationDto(404, "Razun na koji saljete nije pronadjen");
 
+        subtract(fromRacunInfo.get().getType(), fromRacunInfo.get().getBalanceRegistrationNumber(), transferDto.getAmount());
+        add(toRacunInfo.get().getType(), toRacunInfo.get().getBalanceRegistrationNumber(), transferDto.getAmount());
 
-    public void exchangeMoney() {
-
+        return new CommunicationDto(200, "Placanje uspesno izvrseno");
     }
 
 
+    public CommunicationDto exchangeMoney(ExchangeDto exchangeDto) {
+        Optional<RacunStorage> fromRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(exchangeDto.getToBalanceRegNum());
+        Optional<RacunStorage> toRacunInfo = racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(exchangeDto.getFromBalanceRegNum());
+        if (fromRacunInfo.isEmpty()) return new CommunicationDto(404, "Klijentski racun nije pronadjen");
+        if (toRacunInfo.isEmpty()) return new CommunicationDto(404, "Razun na koji saljete nije pronadjen");
+
+        double rate = exchangeRates.get(exchangeDto.getExchange());
+        double newAmount = exchangeDto.getAmount() * rate;
+
+        subtract(fromRacunInfo.get().getType(), fromRacunInfo.get().getBalanceRegistrationNumber(), exchangeDto.getAmount());
+        add(toRacunInfo.get().getType(), toRacunInfo.get().getBalanceRegistrationNumber(), newAmount);
+
+        return new CommunicationDto(200, "Placanje uspesno izvrseno");
+    }
+
+    public Map<String, Double> getExchangeRates() {
+        return exchangeRates;
+    }
 }

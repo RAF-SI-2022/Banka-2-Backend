@@ -36,17 +36,14 @@ public class PaymentController {
         return ResponseEntity.status(communicationDto.getResponseCode()).body(communicationDto.getResponseMsg());
     }
 
-//    @Deprecated
-//    @PostMapping("/transferMoney")
-//    public ResponseEntity<?> transferMoney(@RequestBody TransferDto transferDto) {
-//        //todo validacija
-//        return ResponseEntity.ok(paymentService.transferMoney(transferDto));
-//    }
+    @PostMapping("/transferMoney")
+    public ResponseEntity<?> transferMoney(@RequestBody TransferDto transferDto) {
+        return ResponseEntity.ok(paymentService.transferMoney(transferDto));
+    }
 
     @PostMapping("/exchangeMoney")
     public ResponseEntity<?> exchangeMoney(@RequestBody ExchangeDto exchangeDto) {
-        //todo validacija
-        return null;
+        return ResponseEntity.ok(paymentService.exchangeMoney(exchangeDto));
     }
 
     @GetMapping("/payments/{email}")

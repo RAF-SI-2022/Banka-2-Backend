@@ -24,6 +24,7 @@ public class Payment {
     private String senderEmail;
     private String receiverName;
     private String balanceRegistrationNumber;//reg broj racuna
+    private String toBalanceRegistrationNumber;//reg broj racuna
     private Double amount;
     private String referenceNumber;//poziv na broj
     private String paymentNumber;
@@ -32,11 +33,12 @@ public class Payment {
     public Payment() {
     }
 
-    public Payment(String senderEmail, String receiverName, String balanceRegistrationNumber,
+    public Payment(String senderEmail, String receiverName, String balanceRegistrationNumber, String toBalanceRegistrationNumber,
                    Double amount, String referenceNumber, String paymentNumber, String paymentDescription) {
         this.receiverName = receiverName;
         this.senderEmail = senderEmail;
         this.balanceRegistrationNumber = balanceRegistrationNumber;
+        this.toBalanceRegistrationNumber = toBalanceRegistrationNumber;
         this.amount = amount;
         this.referenceNumber = referenceNumber;
         this.paymentNumber = paymentNumber;
