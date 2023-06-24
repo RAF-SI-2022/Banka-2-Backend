@@ -54,3 +54,16 @@ Feature: Company service
     And company exists in db
     Then user edits company
 
+  Scenario: user cannot get company by id because it does not exist
+    Given user logs in
+    When user is logged in
+    And company does not exist in db
+    Then user cannot get company by id because it does not exist
+
+  Scenario: user cannot get bank accounts for company because it does not exist
+    Given user logs in
+    When user is logged in
+    And company does not exist in db
+    Then user cannot get bank accounts for company because it does not exist
+
+

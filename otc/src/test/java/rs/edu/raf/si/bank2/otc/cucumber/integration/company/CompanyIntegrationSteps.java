@@ -1,6 +1,7 @@
 package rs.edu.raf.si.bank2.otc.cucumber.integration.company;
 
 import com.jayway.jsonpath.JsonPath;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -56,6 +57,7 @@ public class CompanyIntegrationSteps extends CompanyIntegrationTestConfig {
     AtomicLong registrationNumber = new AtomicLong(System.currentTimeMillis());
     AtomicLong taxNumber = new AtomicLong(System.currentTimeMillis());
 
+    String testId = "155333555333L";
 
     @Given("user logs in")
     public void user_logs_in() {
@@ -271,6 +273,42 @@ public class CompanyIntegrationSteps extends CompanyIntegrationTestConfig {
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + this.token))
                     .andExpect(status().isOk())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Given("company does not exist in db")
+    public void companyDoesNotExistInDb() {
+        Optional<Company> companyOptional = this.companyService.getCompanyById(testId);
+        companyOptional.ifPresent(value -> this.companyService.delete(value));
+    }
+
+    @Then("user cannot get company by id because it does not exist")
+    public void userCannotGetCompanyByIdBecauseItDoesNotExist() {
+        try {
+            mockMvc.perform(get("/api/company/" + testId)
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + this.token))
+                    .andExpect(status().isNotFound())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Then("user cannot get bank accounts for company because it does not exist")
+    public void userCannotGetBankAccountsForCompanyBecauseItDoesNotExist() {
+        try {
+            mockMvc.perform(get("/api/company/accounts/" + testId)
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + this.token))
+                    .andExpect(status().isNotFound())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
