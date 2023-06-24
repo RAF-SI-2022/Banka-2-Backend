@@ -10,16 +10,13 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @ExtendWith(MockitoExtension.class)
 class MailingServiceTest {
 
+    @Autowired
     private MailingService mailingServiceUnderTest;
-
-    @BeforeEach
-    void setUp() {
-        mailingServiceUnderTest = new MailingService();
-    }
 
     @Test
     void testSendResetPasswordMail() {

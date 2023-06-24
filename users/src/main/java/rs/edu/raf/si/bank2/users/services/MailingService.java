@@ -1,15 +1,24 @@
 package rs.edu.raf.si.bank2.users.services;
 
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.DistributionSummary;
+import io.micrometer.core.instrument.LongTaskTimer;
+import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.users.services.interfaces.MailingServiceInterface;
 
+@Timed
 @Service
 public class MailingService implements MailingServiceInterface {
 
@@ -17,9 +26,19 @@ public class MailingService implements MailingServiceInterface {
     private static final String from = "banka2backend@gmail.com";
     private static final String password = "idxegskltunedxog";
 
-    @Autowired
-    public MailingService() {}
+    /**
+     * Monitoring. Keeps track of the number of emails sent.
+     */
+    private Counter sent;
 
+    @Autowired
+    public MailingService(
+            CompositeMeterRegistry meterRegistry
+    ) {
+        sent = meterRegistry.counter("services.mailing.sent");
+    }
+
+    @Timed("services.mailing.sendMail")
     private void sendMail(String recipient, String subject, String content) throws MessagingException {
         // Setting up STMP server
         Properties props = new Properties();
@@ -45,6 +64,7 @@ public class MailingService implements MailingServiceInterface {
         email.setText(content);
 
         Transport.send(email);
+        sent.increment();
 
         // TODO: da li ovde treba nesto da se zatvori? npr session ili
         //  transport?

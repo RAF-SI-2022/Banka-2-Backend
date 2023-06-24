@@ -2,6 +2,8 @@ package rs.edu.raf.si.bank2.main.controllers;
 
 import java.time.LocalDate;
 import java.util.Optional;
+
+import io.micrometer.core.annotation.Timed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,7 @@ import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/reserve")
+@Timed
 public class ReserveController {
 
     private final UserOptionRepository userOptionRepository;
@@ -40,6 +43,7 @@ public class ReserveController {
         this.optionRepository = optionRepository;
     }
 
+    @Timed("controllers.reserve.reserveUserOption")
     @PostMapping("/reserveOption")
     public ResponseEntity<?> reserveUserOption(@RequestBody ReserveDto reserveDto) {
         Optional<UserOption> userOption =
@@ -55,6 +59,7 @@ public class ReserveController {
         return ResponseEntity.ok("Opcije su rezervisane");
     }
 
+    @Timed("controllers.reserve.undoReserveUserOption")
     @PostMapping("/undoReserveOption")
     public ResponseEntity<?> undoReserveUserOption(@RequestBody ReserveDto reserveDto) {
         Optional<UserOption> userOption =
@@ -67,6 +72,7 @@ public class ReserveController {
         return ResponseEntity.ok("Opcije su dodate");
     }
 
+    @Timed("controllers.reserve.reserveUserStock")
     @PostMapping("/reserveStock")
     public ResponseEntity<?> reserveUserStock(@RequestBody ReserveDto reserveDto) {
         Optional<UserStock> userStock =
@@ -82,6 +88,7 @@ public class ReserveController {
         return ResponseEntity.ok("Stockovi su rezervisani");
     }
 
+    @Timed("controllers.reserve.undoReserveUserStock")
     @PostMapping("/undoReserveStock")
     public ResponseEntity<?> undoReserveUserStock(@RequestBody ReserveDto reserveDto) {
         Optional<UserStock> userStock =
@@ -94,6 +101,7 @@ public class ReserveController {
         return ResponseEntity.ok("Stockovi su dodati");
     }
 
+    @Timed("controllers.reserve.reserveFutureStock")
     @PostMapping("/reserveFuture")
     public ResponseEntity<?> reserveFutureStock(@RequestBody ReserveDto reserveDto) {
         Optional<Future> userFuture =
@@ -105,6 +113,7 @@ public class ReserveController {
         return ResponseEntity.ok(saveString);
     }
 
+    @Timed("controllers.reserve.undoReserveFutureStock")
     @PostMapping("/undoReserveFuture")
     public ResponseEntity<?> undoReserveFutureStock(@RequestBody ReserveDto reserveDto) {
         String[] data = reserveDto.getFutureStorage().split(",");
@@ -125,6 +134,7 @@ public class ReserveController {
         return ResponseEntity.ok(futureRepository.save(future));
     }
 
+    @Timed("controllers.reserve.reserveMoney")
     @PostMapping("/reserveMoney")
     public ResponseEntity<?> reserveMoney(@RequestBody ReserveDto reserveDto) {
         // todo trenutno hard code na USD
@@ -144,6 +154,7 @@ public class ReserveController {
         return ResponseEntity.ok("Novac uspesno rezervisan");
     }
 
+    @Timed("controllers.reserve.undoReserveMoney")
     @PostMapping("/undoReserveMoney")
     public ResponseEntity<?> undoReserveMoney(@RequestBody ReserveDto reserveDto) {
         // todo trenutno hard code na USD
@@ -160,6 +171,7 @@ public class ReserveController {
         return ResponseEntity.ok("Novac uspesno dodat");
     }
 
+    @Timed("controllers.reserve.finalizeStockBuy")
     @PostMapping("finalizeStock")
     public ResponseEntity<?> finalizeStockBuy(@RequestBody ReserveDto reserveDto) {
         Optional<UserStock> userStock =
@@ -185,6 +197,7 @@ public class ReserveController {
         return ResponseEntity.ok("Stockovi su dodati");
     }
 
+    @Timed("controllers.reserve.finalizeOptionBuy")
     @PostMapping("finalizeOption")
     public ResponseEntity<?> finalizeOptionBuy(@RequestBody ReserveDto reserveDto) {
 
@@ -212,6 +225,7 @@ public class ReserveController {
         return ResponseEntity.ok("Stockovi su dodati");
     }
 
+    @Timed("controllers.reserve.finalizeFutureStock")
     @PostMapping("/finalizeFuture")
     public ResponseEntity<?> finalizeFutureStock(@RequestBody ReserveDto reserveDto) {
         String[] data = reserveDto.getFutureStorage().split(",");

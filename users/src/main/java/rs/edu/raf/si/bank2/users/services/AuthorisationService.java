@@ -1,8 +1,7 @@
 package rs.edu.raf.si.bank2.users.services;
 
-import java.util.Calendar;
-import java.util.Optional;
-import java.util.UUID;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +17,11 @@ import rs.edu.raf.si.bank2.users.services.interfaces.AuthorisationServiceInterfa
 import rs.edu.raf.si.bank2.users.services.interfaces.MailingServiceInterface;
 import rs.edu.raf.si.bank2.users.utils.JwtUtil;
 
+import java.util.Calendar;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Service
 public class AuthorisationService implements AuthorisationServiceInterface {
 
@@ -28,6 +32,27 @@ public class AuthorisationService implements AuthorisationServiceInterface {
     private final JwtUtil jwtUtil;
     private final MailingServiceInterface mailingService;
 
+    /**
+     * Monitoring. Counts the number of JWT tokens generated.
+     */
+    private Counter tokensCount;
+
+    /**
+     * Monitoring. Counts the number of reset password tokens generated.
+     */
+    private Counter resetPasswordCount;
+
+    /**
+     * Default constructor.
+     *
+     * @param authenticationManager
+     * @param permissionRepository
+     * @param userRepository
+     * @param passwordResetTokenRepository
+     * @param jwtUtil
+     * @param mailingService
+     * @param meterRegistry
+     */
     @Autowired
     public AuthorisationService(
             AuthenticationManager authenticationManager,
@@ -35,13 +60,17 @@ public class AuthorisationService implements AuthorisationServiceInterface {
             UserRepository userRepository,
             PasswordResetTokenRepository passwordResetTokenRepository,
             JwtUtil jwtUtil,
-            MailingServiceInterface mailingService) {
+            MailingServiceInterface mailingService,
+            CompositeMeterRegistry meterRegistry
+    ) {
         this.authenticationManager = authenticationManager;
         this.permissionRepository = permissionRepository;
         this.userRepository = userRepository;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.jwtUtil = jwtUtil;
         this.mailingService = mailingService;
+        tokensCount = meterRegistry.counter("services.authorisation.tokens");
+        resetPasswordCount = meterRegistry.counter("services.authorisation.resetPassword");
     }
 
     @Override
@@ -69,6 +98,7 @@ public class AuthorisationService implements AuthorisationServiceInterface {
         }
 
         String token = jwtUtil.generateToken(email);
+        tokensCount.increment();
         return Optional.of(token);
     }
 
@@ -83,6 +113,7 @@ public class AuthorisationService implements AuthorisationServiceInterface {
         // TODO random enough?
         String token = UUID.randomUUID().toString();
         passwordResetTokenRepository.save(new PasswordResetToken(client, token));
+        resetPasswordCount.increment();
         mailingService.sendResetPasswordEmail(email, token);
         return true;
     }

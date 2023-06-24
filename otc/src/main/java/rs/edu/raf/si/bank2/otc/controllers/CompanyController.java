@@ -1,6 +1,7 @@
 package rs.edu.raf.si.bank2.otc.controllers;
 
 
+import io.micrometer.core.annotation.Timed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -25,6 +26,7 @@ import java.util.Optional;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/company")
+@Timed
 public class CompanyController {
 
 //    private JmsTemplate jmsTemplate;
@@ -44,11 +46,13 @@ public class CompanyController {
 //        this.createCompanyDestination = createCompanyDestination;
     }
 
+    @Timed("controllers.company.getCompanies")
     @GetMapping(value = "")
     public ResponseEntity<?> getCompanies(@RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(companyService.getCompanies());
     }
 
+    @Timed("controllers.company.getBankAccountsForCompany")
     @GetMapping(value = "/accounts/{companyId}")
     public ResponseEntity<?> getBankAccountsForCompany(@PathVariable(name = "companyId") String companyId) {
         Optional<Company> company = companyService.getCompanyById(companyId);
@@ -58,6 +62,8 @@ public class CompanyController {
 
         return ResponseEntity.ok(company.get().getBankAccounts());
     }
+
+    @Timed("controllers.company.getCompanyById")
     @GetMapping(value = "/{id}")
     public ResponseEntity<?> getCompanyById(@PathVariable String id) {
         Optional<Company> company = companyService.getCompanyById(id);
@@ -67,21 +73,25 @@ public class CompanyController {
         return ResponseEntity.ok(company.get());
     }
 
+    @Timed("controllers.company.getCompanyByNaziv")
     @GetMapping(value = "/name/{name}")
     public ResponseEntity<?> getCompanyByNaziv(@PathVariable String name) {
         return ResponseEntity.ok(companyService.getCompanyByName(name));
     }
 
+    @Timed("controllers.company.getCompanyByMaticniBroj")
     @GetMapping(value = "/registrationNumber/{registrationNumber}")
     public ResponseEntity<?> getCompanyByMaticniBroj(@PathVariable String registrationNumber) {
         return ResponseEntity.ok(companyService.getCompanyByRegistrationNumber(registrationNumber));
     }
 
+    @Timed("controllers.company.getCompanyByPib")
     @GetMapping(value = "/taxNumber/{taxNumber}")
     public ResponseEntity<?> getCompanyByPib(@PathVariable String taxNumber) {
         return ResponseEntity.ok(companyService.getCompanyByTaxNumber(taxNumber));
     }
 
+    @Timed("controllers.company.createCompany")
     @PostMapping(value = "/create")
     public ResponseEntity<?> createCompany(@RequestBody CreateCompanyDto companyDto) {
 
@@ -96,11 +106,14 @@ public class CompanyController {
 //        }
         return ResponseEntity.ok().build();
     }
+
+    @Timed("controllers.company.addContactsAndBankAccounts")
     @PostMapping(value = "/add")
     public ResponseEntity<?> addContactsAndBankAccounts(@RequestBody ContactsBankAccountsDto contactsBankAccountsDto ){
         return ResponseEntity.ok(companyService.addContactsAndBankAccounts(contactsBankAccountsDto));
     }
 
+    @Timed("controllers.company.editCompany")
     @PostMapping(value = "/edit")
     public ResponseEntity<?> editCompany(@RequestHeader("Authorization") String token, @RequestBody EditCompanyDto editCompanyDto) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
