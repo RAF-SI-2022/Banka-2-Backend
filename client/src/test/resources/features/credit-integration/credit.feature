@@ -19,5 +19,14 @@ Feature: Credit service
     When test client is logged in
     Then get all waiting
 
+#  Scenario: pay this months interest
+#    Given  pay this months interest
+#
+#  Scenario: approve request
+#    Given approve request
+#
+#  Scenario: deny request
+#    Given deny request
+
   Scenario: delete useless
     Given deleteTestUsers

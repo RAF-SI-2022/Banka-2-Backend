@@ -42,6 +42,7 @@
             **/ClientApplication.java,
             **/SpringSecurityConfig.java,
             **/RedisTestConfiguration.java,
+            **/ServiceAuthController.java,
             **/MessageBroker.java,
             **/JwtFilter.java,
             **/AppConfig.java,
