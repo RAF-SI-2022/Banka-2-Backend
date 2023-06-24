@@ -175,7 +175,7 @@ public class UserCommunicationService implements UserCommunicationInterface {
         String line;
 
         try {
-            URL url = new URL("http", hostPort[0], Integer.parseInt(hostPort[1]), "/api/userService" + urlExtension);
+            URL url = new URL("http", hostPort[0], Integer.parseInt(hostPort[1]), "/api" + urlExtension);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod(method);
             connection.setRequestProperty("Authorization", "Bearer " + token);
