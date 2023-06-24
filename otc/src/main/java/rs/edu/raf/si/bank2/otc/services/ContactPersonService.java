@@ -1,12 +1,11 @@
 package rs.edu.raf.si.bank2.otc.services;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.otc.dto.ContactPersonDto;
 import rs.edu.raf.si.bank2.otc.exceptions.ContactPersonNotFoundException;
 import rs.edu.raf.si.bank2.otc.models.mongodb.ContactPerson;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.ContactPersonRepository;
-
-import java.util.List;
 
 @Service
 public class ContactPersonService {
@@ -22,7 +21,9 @@ public class ContactPersonService {
     }
 
     public ContactPerson getContactPersonById(String id) {
-        return contactPersonRepository.findById(id).orElseThrow(() -> new ContactPersonNotFoundException("ContactPerson not found."));
+        return contactPersonRepository
+                .findById(id)
+                .orElseThrow(() -> new ContactPersonNotFoundException("ContactPerson not found."));
     }
 
     public ContactPerson addContactPerson(ContactPerson contactPerson) {

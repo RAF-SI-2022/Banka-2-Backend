@@ -1,20 +1,20 @@
-//package rs.edu.raf.si.bank2.otc.listener;
+// package rs.edu.raf.si.bank2.otc.listener;
 //
-//import com.fasterxml.jackson.core.JsonProcessingException;
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import org.springframework.stereotype.Component;
+// import com.fasterxml.jackson.core.JsonProcessingException;
+// import com.fasterxml.jackson.databind.ObjectMapper;
+// import org.springframework.stereotype.Component;
 //
-////import javax.jms.JMSException;
-////import javax.jms.Message;
-////import javax.jms.TextMessage;
-//import javax.validation.ConstraintViolation;
-//import javax.validation.Validator;
-//import java.io.IOException;
-//import java.util.Set;
-//import java.util.stream.Collectors;
+//// import javax.jms.JMSException;
+//// import javax.jms.Message;
+//// import javax.jms.TextMessage;
+// import javax.validation.ConstraintViolation;
+// import javax.validation.Validator;
+// import java.io.IOException;
+// import java.util.Set;
+// import java.util.stream.Collectors;
 //
-//@Component
-//public class MessageHelper {
+// @Component
+// public class MessageHelper {
 //
 //
 //    private Validator validator;
@@ -57,5 +57,5 @@
 //                .collect(Collectors.joining(", "));
 //        throw new RuntimeException(concatenatedViolations);
 //    }
-//}
+// }
 //

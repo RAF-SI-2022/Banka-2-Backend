@@ -1,5 +1,8 @@
 package rs.edu.raf.si.bank2.otc.services;
 
+import java.util.Calendar;
+import java.util.Optional;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,10 +17,6 @@ import rs.edu.raf.si.bank2.otc.repositories.mariadb.UserRepository;
 import rs.edu.raf.si.bank2.otc.services.interfaces.AuthorisationServiceInterface;
 import rs.edu.raf.si.bank2.otc.services.interfaces.MailingServiceInterface;
 import rs.edu.raf.si.bank2.otc.utils.JwtUtil;
-
-import java.util.Calendar;
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class AuthorisationService implements AuthorisationServiceInterface {

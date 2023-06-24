@@ -2,27 +2,25 @@ package rs.edu.raf.si.bank2.otc.bootstrap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import rs.edu.raf.si.bank2.otc.models.mongodb.AccountType;
 import rs.edu.raf.si.bank2.otc.models.mongodb.ListingGroup;
 import rs.edu.raf.si.bank2.otc.models.mongodb.MarginBalance;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.MarginBalanceRepository;
-import rs.edu.raf.si.bank2.otc.repositories.mongodb.MarginTransactionRepository;
-
-import javax.persistence.EntityManagerFactory;
 
 @Component
 public class BootstrapData implements CommandLineRunner {
 
     MarginBalanceRepository marginBalanceRepository;
-    public void initializeMarginAccount(){
+
+    public void initializeMarginAccount() {
         for (ListingGroup listingGroup : ListingGroup.values()) {
-            if(marginBalanceRepository.findMarginBalanceByListingGroup(listingGroup).isPresent()){
+            if (marginBalanceRepository
+                    .findMarginBalanceByListingGroup(listingGroup)
+                    .isPresent()) {
                 continue;
             }
-            MarginBalance oneBalance= MarginBalance.builder()
+            MarginBalance oneBalance = MarginBalance.builder()
                     .accountType(AccountType.MARGIN)
                     .maintenanceMargin(2000.00)
                     .marginCall(false)
