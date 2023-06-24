@@ -8,3 +8,21 @@ scrape_configs:
       - targets: [
         "users:8080"
       ]
+  - job_name: "main"
+    metrics_path: "/actuator/prometheus"
+    static_configs:
+      - targets: [
+        "main:8081"
+      ]
+  - job_name: "otc"
+    metrics_path: "/actuator/prometheus"
+    static_configs:
+      - targets: [
+        "main:8082"
+      ]
+  - job_name: "client"
+    metrics_path: "/actuator/prometheus"
+    static_configs:
+      - targets: [
+        "main:8083"
+      ]
