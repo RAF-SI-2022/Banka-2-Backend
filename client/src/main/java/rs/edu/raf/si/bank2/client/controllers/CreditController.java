@@ -21,13 +21,16 @@ public class CreditController {
     private final PayedInterestRepository payedInterestRepository;
 
     @Autowired
-    public CreditController(CreditService creditService, CreditRequestRepository creditRequestRepository, PayedInterestRepository payedInterestRepository) {
+    public CreditController(
+            CreditService creditService,
+            CreditRequestRepository creditRequestRepository,
+            PayedInterestRepository payedInterestRepository) {
         this.creditService = creditService;
         this.creditRequestRepository = creditRequestRepository;
         this.payedInterestRepository = payedInterestRepository;
     }
 
-    //credit
+    // credit
 
     @Timed("controllers.credit.getCreditsForClient")
     @GetMapping("/{email}")
@@ -37,19 +40,18 @@ public class CreditController {
 
     @Timed("controllers.credit.payThisMonthsInterest")
     @PostMapping("/pay/{creditId}")
-    public ResponseEntity<?> payThisMonthsInterest(@PathVariable String creditId){
+    public ResponseEntity<?> payThisMonthsInterest(@PathVariable String creditId) {
         CommunicationDto communicationDto = creditService.payOffOneMonthsInterest(creditId);
         return ResponseEntity.status(communicationDto.getResponseCode()).body(communicationDto.getResponseMsg());
     }
 
     @Timed("controllers.credit.getAllPayedInterests")
     @GetMapping("/interests/{creditId}")
-    public ResponseEntity<?> getAllPayedInterests(@PathVariable String creditId){
+    public ResponseEntity<?> getAllPayedInterests(@PathVariable String creditId) {
         return ResponseEntity.ok(payedInterestRepository.findAll());
     }
 
-
-    //requests
+    // requests
     @Timed("controllers.credit.requestCredit")
     @PostMapping("/request")
     public ResponseEntity<?> requestCredit(@RequestBody CreditRequestDto dto) {
@@ -75,6 +77,4 @@ public class CreditController {
         CommunicationDto communicationDto = creditService.denyCredit(id);
         return ResponseEntity.status(communicationDto.getResponseCode()).body(communicationDto.getResponseMsg());
     }
-
-
 }
