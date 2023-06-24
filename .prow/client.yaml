@@ -22,6 +22,8 @@ presubmits:
             privileged: true
           imagePullPolicy: Always
   - name: pull-banka-2-backend-client-snyk
+    labels:
+      preset-banka-2-snyk: "true"
     always_run: true
     decorate: true
     spec:
