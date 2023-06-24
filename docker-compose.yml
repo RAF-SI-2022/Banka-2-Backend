@@ -81,7 +81,28 @@ services:
       - redis:/bitnami/redis/data
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
-    profiles: [ "all", "core" ]
+    networks:
+      - bank2_net
+
+  prometheus:
+    container_name: prometheus
+    image: quay.io/prometheus/prometheus:v2.44.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+    networks:
+      - bank2_net
+
+  # Default username/password: admin/admin
+  grafana:
+    container_name: grafana
+    image: docker.io/grafana/grafana-oss:9.5.2
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana:/var/lib/grafana
+    user: 'root'
     networks:
       - bank2_net
 
@@ -207,6 +228,7 @@ volumes:
   mariadb:
   mongodb:
   redis:
+  grafana:
 
 networks:
   bank2_net:
