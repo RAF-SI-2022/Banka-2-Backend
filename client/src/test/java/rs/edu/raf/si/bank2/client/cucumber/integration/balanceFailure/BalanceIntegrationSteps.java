@@ -1,4 +1,4 @@
-package rs.edu.raf.si.bank2.client.cucumber.integration.balance;
+package rs.edu.raf.si.bank2.client.cucumber.integration.balanceFailure;
 
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -10,8 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -19,10 +17,6 @@ import rs.edu.raf.si.bank2.client.dto.CommunicationDto;
 import rs.edu.raf.si.bank2.client.dto.DevizniRacunDto;
 import rs.edu.raf.si.bank2.client.dto.PoslovniRacunDto;
 import rs.edu.raf.si.bank2.client.dto.TekuciRacunDto;
-import rs.edu.raf.si.bank2.client.models.mongodb.Client;
-import rs.edu.raf.si.bank2.client.models.mongodb.DevizniRacun;
-import rs.edu.raf.si.bank2.client.models.mongodb.PoslovniRacun;
-import rs.edu.raf.si.bank2.client.models.mongodb.TekuciRacun;
 import rs.edu.raf.si.bank2.client.models.mongodb.enums.BalanceType;
 import rs.edu.raf.si.bank2.client.models.mongodb.enums.BussinessAccountType;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.ClientRepository;
@@ -42,6 +36,9 @@ public class BalanceIntegrationSteps extends BalanceIntegrationTestConfig {
     ClientRepository clientRepository;
 
     @Autowired
+    UserCommunicationService userCommunicationService;
+
+    @Autowired
     protected MockMvc mockMvc;
 
     @Autowired
@@ -53,9 +50,6 @@ public class BalanceIntegrationSteps extends BalanceIntegrationTestConfig {
     @Autowired
     PoslovniRacunRepository poslovniRacunRepository;
 
-    @Autowired
-    UserCommunicationService userCommunicationService;
-
     protected static String token;
 
     protected static String testClientId;
@@ -64,26 +58,9 @@ public class BalanceIntegrationSteps extends BalanceIntegrationTestConfig {
 
     @Given("test client is logged in")
     public void test_client_is_logged_in() throws JsonProcessingException {
-        Optional<Client> testClient = clientRepository.findClientByEmail("test@gmail.com");
-        if (testClient.isEmpty()) {
-            Client newClient = new Client(
-                    "Test",
-                    "Testic",
-                    "b-day",
-                    "nonb",
-                    "test@gmail.com",
-                    "123123123",
-                    "addres",
-                    "password",
-                    new ArrayList<>());
-            clientRepository.save(newClient);
-        }
-        testClientId =
-                clientRepository.findClientByEmail("test@gmail.com").get().getId();
-
         LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setEmail("anesic3119rn+banka2backend+admin@raf.rs");
-        loginRequest.setPassword("admin");
+        loginRequest.setEmail("powerless@gmail.com");
+        loginRequest.setPassword("powerless");
         String userJsonBody = mapper.writeValueAsString(loginRequest);
         CommunicationDto communicationDto =
                 userCommunicationService.sendPostLike("/auth/login", userJsonBody, null, "POST");
@@ -91,85 +68,64 @@ public class BalanceIntegrationSteps extends BalanceIntegrationTestConfig {
         token = split[3];
     }
 
-    @Then("get all tekuci racun")
-    public void get_all_tekuci_racun() {
+    @Then("get all tekuci racuni without perms")
+    public void get_all_tekuci_racuni_without_perms() {
         try {
             MvcResult mvcResult = mockMvc.perform(get("/api/balance/tekuci")
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isOk())
+                    .andExpect(status().isUnauthorized())
                     .andReturn();
         } catch (Exception e) {
             fail("Get all tekuci failed");
         }
     }
 
-    @Then("get all poslovni racuni")
-    public void get_all_poslovni_racuni() {
-        try {
-            MvcResult mvcResult = mockMvc.perform(get("/api/balance/poslovni")
-                            .header("Content-Type", "application/json")
-                            .header("Access-Control-Allow-Origin", "*")
-                            .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isOk())
-                    .andReturn();
-        } catch (Exception e) {
-            fail("Get all poslovni failed");
-        }
-    }
-
-    @Then("get all tekuci devizni")
-    public void get_all_tekuci_devizni() {
+    @Then("get all devizni racuni without perms")
+    public void get_all_devizni_racuni_without_perms() {
         try {
             MvcResult mvcResult = mockMvc.perform(get("/api/balance/devizni")
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isOk())
+                    .andExpect(status().isUnauthorized())
                     .andReturn();
         } catch (Exception e) {
             fail("Get all devizni failed");
         }
     }
 
-    @Then("get all client balances")
-    public void get_all_client_balances() {
+    @Then("get all poslovni racuni without perms")
+    public void get_all_poslovni_racuni_without_perms() {
         try {
-            MvcResult mvcResult = mockMvc.perform(get("/api/balance/forClient/test@gmail.com")
+            MvcResult mvcResult = mockMvc.perform(get("/api/balance/poslovni")
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isOk())
+                    .andExpect(status().isUnauthorized())
+                    .andReturn();
+        } catch (Exception e) {
+            fail("Get all poslovni failed");
+        }
+    }
+
+    @Then("get all for client without perms")
+    public void get_all_for_client_without_perms() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(get("/api/balance/forClient/temail.com")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isNotFound())
                     .andReturn();
         } catch (Exception e) {
             fail("Get all client balances failed");
         }
     }
 
-    @Then("open tekuci racun")
-    public void open_tekuci_racun()
-            throws io.cucumber.core.internal.com.fasterxml.jackson.core.JsonProcessingException {
-        TekuciRacunDto creditRequestDto = new TekuciRacunDto(testClientId, 1L, "USD", BalanceType.STEDNI, 1, 1.0);
-        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper()
-                .writeValueAsString(creditRequestDto);
-
-        try {
-            MvcResult mvcResult = mockMvc.perform(post("/api/balance/openDevizniRacun")
-                            .contentType("application/json")
-                            .content(body)
-                            .header("Content-Type", "application/json")
-                            .header("Access-Control-Allow-Origin", "*")
-                            .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isOk())
-                    .andReturn();
-        } catch (Exception e) {
-            fail("Get tekuci failed");
-        }
-    }
-
-    @Then("open devizni racun")
-    public void open_devizni_racun()
+    @Then("open devizni witout perms")
+    public void open_devizni_witout_perms()
             throws io.cucumber.core.internal.com.fasterxml.jackson.core.JsonProcessingException {
         DevizniRacunDto creditRequestDto =
                 new DevizniRacunDto(testClientId, 1L, "USD", BalanceType.STEDNI, 1, 1.0, new ArrayList<>());
@@ -177,21 +133,21 @@ public class BalanceIntegrationSteps extends BalanceIntegrationTestConfig {
                 .writeValueAsString(creditRequestDto);
 
         try {
-            MvcResult mvcResult = mockMvc.perform(post("/api/balance/openDevizniRacun")
+            MvcResult mvcResult = mockMvc.perform(post("/api/balance/openTekuciRacun")
                             .contentType("application/json")
                             .content(body)
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isOk())
+                    .andExpect(status().isUnauthorized())
                     .andReturn();
         } catch (Exception e) {
-            fail("Get devizni failed");
+            fail("Get tekuci failed");
         }
     }
 
-    @Then("open poslovni racun")
-    public void open_poslovni_racun()
+    @Then("open poslovni witout perms")
+    public void open_poslovni_witout_perms()
             throws io.cucumber.core.internal.com.fasterxml.jackson.core.JsonProcessingException {
         PoslovniRacunDto creditRequestDto = new PoslovniRacunDto(testClientId, 1L, "USD", BussinessAccountType.KUPOVNI);
         String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper()
@@ -204,65 +160,74 @@ public class BalanceIntegrationSteps extends BalanceIntegrationTestConfig {
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-                    .andExpect(status().isOk())
+                    .andExpect(status().isUnauthorized())
                     .andReturn();
         } catch (Exception e) {
-            fail("Get poslovni failed failed");
+            fail("Get tekuci failed");
         }
     }
 
-    @Then("get devizni racun")
-    public void get_devizni_racun() {
-        List<DevizniRacun> devizni = devizniRacunRepository.findAll();
-        if (devizni.size() != 0) {
-            try {
-                MvcResult mvcResult = mockMvc.perform(
-                                get("/api/balance/devizni/" + devizni.get(0).getId())
-                                        .header("Content-Type", "application/json")
-                                        .header("Access-Control-Allow-Origin", "*")
-                                        .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
-                        .andReturn();
-            } catch (Exception e) {
-                fail("Get all devizni failed");
-            }
+    @Then("open tekuci witout perms")
+    public void open_tekuci_witout_perms()
+            throws io.cucumber.core.internal.com.fasterxml.jackson.core.JsonProcessingException {
+        TekuciRacunDto creditRequestDto = new TekuciRacunDto(testClientId, 1L, "USD", BalanceType.STEDNI, 1, 1.0);
+        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper()
+                .writeValueAsString(creditRequestDto);
+
+        try {
+            MvcResult mvcResult = mockMvc.perform(post("/api/balance/openDevizniRacun")
+                            .contentType("application/json")
+                            .content(body)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isUnauthorized())
+                    .andReturn();
+        } catch (Exception e) {
+            fail("Get tekuci failed");
         }
     }
 
-    @Then("get tekuci racun")
-    public void get_tekuci_racun() {
-        List<TekuciRacun> tekuci = tekuciRacunRepository.findAll();
-        if (tekuci.size() != 0) {
-            try {
-                MvcResult mvcResult = mockMvc.perform(
-                                get("/api/balance/tekuci/" + tekuci.get(0).getId())
-                                        .header("Content-Type", "application/json")
-                                        .header("Access-Control-Allow-Origin", "*")
-                                        .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
-                        .andReturn();
-            } catch (Exception e) {
-                e.printStackTrace();
-                fail("Get all tekuci failed");
-            }
+    @Then("get devizni without perms")
+    public void get_devizni_without_perms() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(get("/api/balance/poslovni/1")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isUnauthorized())
+                    .andReturn();
+        } catch (Exception e) {
+            fail("Get all poslovni failed");
         }
     }
 
-    @Then("get poslovni racun")
-    public void get_poslovni_racun() {
-        List<PoslovniRacun> poslovni = poslovniRacunRepository.findAll();
-        if (poslovni.size() != 0) {
-            try {
-                MvcResult mvcResult = mockMvc.perform(
-                                get("/api/balance/poslovni/" + poslovni.get(0).getId())
-                                        .header("Content-Type", "application/json")
-                                        .header("Access-Control-Allow-Origin", "*")
-                                        .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
-                        .andReturn();
-            } catch (Exception e) {
-                fail("Get all poslovni failed");
-            }
+    @Then("get poslovni without perms")
+    public void get_poslovni_without_perms() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(get("/api/balance/poslovni/1123")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isUnauthorized())
+                    .andReturn();
+        } catch (Exception e) {
+            fail("Get all poslovni failed");
+        }
+    }
+
+    @Then("get tekuci without perms")
+    public void get_tekuci_without_perms() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(get("/api/balance/tekuci/1")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isUnauthorized())
+                    .andReturn();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Get all tekuci failed");
         }
     }
 }

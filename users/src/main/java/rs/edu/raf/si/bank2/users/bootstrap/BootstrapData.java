@@ -89,6 +89,21 @@ public class BootstrapData implements CommandLineRunner {
                 .defaultDailyLimit(1000000d) // usd
                 .build();
 
+        User powerless = User.builder()
+                .email("powerless@gmail.com")
+                .firstName("powerless")
+                .lastName("powerless")
+                .password(this.passwordEncoder.encode("powerless"))
+                .jmbg(ADMIN_JMBG)
+                .phone(ADMIN_PHONE)
+                .jobPosition("test")
+                .active(true)
+                .dailyLimit(0d) // usd
+                // .defaultDailyLimit(10000D) // usd
+                .defaultDailyLimit(0d) // usd
+                .build();
+        powerless.setPermissions(new ArrayList<>());
+
         // Set admin's perms
         List<Permission> permissions = new ArrayList<>();
         permissions.add(permissionRepository
@@ -98,6 +113,7 @@ public class BootstrapData implements CommandLineRunner {
 
         // Save admin
         this.userRepository.save(admin);
+        this.userRepository.save(powerless);
         logger.info("Root admin added");
     }
 }
