@@ -35,6 +35,8 @@
             **/repositories/**,
             **/requests/**,
             **/responses/**,
+            **/UserCommunicationService.java,
+            **/UserService.java,
             **/utils/**,
             **/ServletInitializer.java,
             **/ClientApplication.java,

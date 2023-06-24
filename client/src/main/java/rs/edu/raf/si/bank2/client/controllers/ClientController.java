@@ -37,10 +37,6 @@ public class ClientController {
 
     @GetMapping
     public ResponseEntity<?> getAllClients() {
-        String signedInUserEmail = getContext().getAuthentication().getName();
-//        if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-//            return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
-//        }
         return ResponseEntity.ok(clientService.getAllClients());
     }
 
