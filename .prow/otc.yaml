@@ -45,8 +45,8 @@ presubmits:
               cd ${THIS_SERVICE}
               
               set +e
-              snyk auth 304dbe0f-2337-4a72-9540-4de8b21ceea4
-              snyk config set org=84d0a22b-934b-48fe-a5b2-7bd1bb825d94
+              snyk auth $SNYK_AUTH_TOKEN
+              snyk config set org=$SNYK_ORG_ID
               snyk code test . || echo "Security testing failed."
           securityContext:
             privileged: true
