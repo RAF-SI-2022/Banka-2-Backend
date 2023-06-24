@@ -6,6 +6,8 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+
+import io.micrometer.core.annotation.Timed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,7 @@ import rs.edu.raf.si.bank2.main.utils.OptionDateScraper;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/options")
+@Timed
 public class OptionController {
 
     private OptionService optionService;
@@ -44,17 +47,20 @@ public class OptionController {
         this.optionDateScraper = new OptionDateScraper();
     }
 
+    @Timed("controllers.option.getStockBySymbolDateString")
     @GetMapping("/{symbol}/{dateString}")
     public ResponseEntity<?> getStockBySymbol(@PathVariable String symbol, @PathVariable String dateString)
             throws ParseException {
         return ResponseEntity.ok().body(optionService.findByStockAndDate(symbol, dateString));
     }
 
+    @Timed("controllers.option.getStockBySymbol")
     @GetMapping("/{symbol}")
     public ResponseEntity<?> getStockBySymbol(@PathVariable String symbol) throws ParseException {
         return ResponseEntity.ok().body(optionService.findByStock(symbol));
     }
 
+    @Timed("controllers.option.sellOption")
     @PostMapping("/sell")
     public ResponseEntity<?> sellOption(@RequestBody OptionSellDto optionSellDto) {
 
@@ -66,6 +72,7 @@ public class OptionController {
         }
     }
 
+    @Timed("controllers.option.buyOption")
     @PostMapping("/buy")
     public ResponseEntity<?> buyOption(@RequestBody OptionBuyDto optionBuyDto) {
 
@@ -84,6 +91,7 @@ public class OptionController {
         }
     }
 
+    @Timed("controllers.option.getDates")
     @GetMapping(value = "/dates")
     public ResponseEntity<?> getDates() {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -102,6 +110,7 @@ public class OptionController {
         return ResponseEntity.ok().body(dates);
     }
 
+    @Timed("controllers.option.buyStocksByOption")
     @GetMapping("/buy-stocks/{userOptionId}")
     public ResponseEntity<?> buyStocksByOption(@PathVariable Long userOptionId) {
 
@@ -120,6 +129,7 @@ public class OptionController {
         }
     }
 
+    @Timed("controllers.option.getUserOptionsAll")
     @GetMapping("/user-options")
     public ResponseEntity<?> getUserOptions() {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -128,6 +138,7 @@ public class OptionController {
                         userService.findByEmail(signedInUserEmail).get().getId()));
     }
 
+    @Timed("controllers.option.getUserOptions")
     @GetMapping("/user-options/{stockSymbol}")
     public ResponseEntity<?> getUserOptions(@PathVariable String stockSymbol) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -136,6 +147,7 @@ public class OptionController {
                         userService.findByEmail(signedInUserEmail).get().getId(), stockSymbol));
     }
 
+    @Timed("controllers.option.sellStocksByOption")
     @PostMapping("/sell-stocks")
     public ResponseEntity<?> sellStocksByOption(@RequestBody SellStockUsingOptionDto sellStockUsingOptionDto) {
 
