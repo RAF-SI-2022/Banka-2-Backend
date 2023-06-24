@@ -18,14 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 @ExtendWith(MockitoExtension.class)
 class MailingServiceTest {
 
-    @Mock
-    CompositeMeterRegistry meterRegistry;
-
     private MailingService mailingServiceUnderTest;
 
     @BeforeEach
-    private void setUp() {
-        mailingServiceUnderTest = new MailingService(meterRegistry);
+    public void setUp() {
+        mailingServiceUnderTest = new MailingService(new CompositeMeterRegistry());
     }
 
     @Test

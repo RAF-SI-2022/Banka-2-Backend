@@ -36,7 +36,7 @@ import rs.edu.raf.si.bank2.users.utils.JwtUtil;
 public class AuthorisationServiceTest {
 
     @Mock
-    CompositeMeterRegistry meterRegistry;
+    CompositeMeterRegistry meterRegistry = new CompositeMeterRegistry();
 
     @Mock
     UserRepository userRepository;

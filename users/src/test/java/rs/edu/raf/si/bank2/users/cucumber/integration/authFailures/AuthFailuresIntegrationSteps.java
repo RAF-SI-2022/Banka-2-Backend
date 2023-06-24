@@ -21,7 +21,7 @@ import rs.edu.raf.si.bank2.users.services.interfaces.UserServiceInterface;
 public class AuthFailuresIntegrationSteps extends AuthFailuresIntegrationTestConfig {
 
     @Autowired
-    CompositeMeterRegistry meterRegistry;
+    CompositeMeterRegistry meterRegistry = new CompositeMeterRegistry();
     @Autowired
     UserServiceInterface userServiceInterface;
 

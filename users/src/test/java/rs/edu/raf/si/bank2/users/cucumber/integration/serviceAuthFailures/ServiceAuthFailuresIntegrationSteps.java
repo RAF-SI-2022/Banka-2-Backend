@@ -31,7 +31,7 @@ public class ServiceAuthFailuresIntegrationSteps extends ServiceAuthIntegrationT
     UserServiceInterface userServiceInterface;
 
     @Autowired
-    CompositeMeterRegistry meterRegistry;
+    CompositeMeterRegistry meterRegistry = new CompositeMeterRegistry();
     @Autowired
     AuthorisationServiceInterface authorisationServiceInterface;
     @Autowired

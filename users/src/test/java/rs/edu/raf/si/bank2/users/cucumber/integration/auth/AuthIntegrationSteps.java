@@ -39,7 +39,7 @@ public class AuthIntegrationSteps extends AuthIntegrationTestConfig {
     UserServiceInterface userServiceInterface;
 
     @Autowired
-    CompositeMeterRegistry meterRegistry;
+    CompositeMeterRegistry meterRegistry = new CompositeMeterRegistry();
 
     @Autowired
     PasswordEncoder passwordEncoder;
