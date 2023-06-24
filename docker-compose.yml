@@ -89,10 +89,19 @@ services:
   users:
     container_name: users
     image: harbor.k8s.elab.rs/banka-2/users
+    build:
+      context: .
+      dockerfile: ./docker/users.Dockerfile
     expose:
       - "8080"
     ports:
       - "8080:8080"
+    healthcheck:
+      test: [ "CMD", "curl", "localhost:8080" ]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 45s
     depends_on:
       mariadb:
         condition: service_healthy
@@ -100,6 +109,7 @@ services:
         condition: service_healthy
       flyway:
         condition: service_completed_successfully
+    entrypoint: [ "java", "-Dspring.profiles.active=container,test", "-jar", "app.jar" ]
     networks:
       - bank2_net
 
@@ -107,10 +117,19 @@ services:
   main:
     container_name: main
     image: harbor.k8s.elab.rs/banka-2/main
+    build:
+      context: .
+      dockerfile: ./docker/main.Dockerfile
     expose:
       - "8081"
     ports:
       - "8081:8081"
+    healthcheck:
+      test: [ "CMD", "curl", "localhost:8081" ]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 45s
     depends_on:
       mariadb:
         condition: service_healthy
@@ -120,6 +139,7 @@ services:
         condition: service_completed_successfully
       users:
         condition: service_healthy
+    entrypoint: [ "java", "-Dspring.profiles.active=container,test", "-jar", "app.jar" ]
     networks:
       - bank2_net
 
@@ -127,10 +147,19 @@ services:
   otc:
     container_name: otc
     image: harbor.k8s.elab.rs/banka-2/otc
+    build:
+      context: .
+      dockerfile: ./docker/otc.Dockerfile
     expose:
       - "8082"
     ports:
       - "8082:8082"
+    healthcheck:
+      test: [ "CMD", "curl", "localhost:8082" ]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 45s
     depends_on:
       mariadb:
         condition: service_healthy
@@ -138,17 +167,29 @@ services:
         condition: service_healthy
       flyway:
         condition: service_completed_successfully
+      users:
+        condition: service_healthy
+    entrypoint: [ "java", "-Dspring.profiles.active=container,test", "-jar", "app.jar" ]
     networks:
       - bank2_net
 
   # TODO add health check for Client
   client:
-    container_name: otc
+    container_name: client
     image: harbor.k8s.elab.rs/banka-2/client
+    build:
+      context: .
+      dockerfile: ./docker/client.Dockerfile
     expose:
       - "8083"
     ports:
       - "8083:8083"
+    healthcheck:
+      test: [ "CMD", "curl", "localhost:8083" ]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 45s
     depends_on:
       mariadb:
         condition: service_healthy
@@ -156,6 +197,9 @@ services:
         condition: service_healthy
       flyway:
         condition: service_completed_successfully
+      users:
+        condition: service_healthy
+    entrypoint: [ "java", "-Dspring.profiles.active=container,test", "-jar", "app.jar" ]
     networks:
       - bank2_net
 
