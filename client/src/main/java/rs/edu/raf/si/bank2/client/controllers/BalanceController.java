@@ -1,5 +1,6 @@
 package rs.edu.raf.si.bank2.client.controllers;
 
+import io.micrometer.core.annotation.Timed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ import static org.springframework.security.core.context.SecurityContextHolder.ge
 @RestController
 @CrossOrigin
 @RequestMapping("/api/balance")
+@Timed
 public class BalanceController {
 
     private final UserCommunicationInterface userCommunicationInterface;
@@ -41,6 +43,7 @@ public class BalanceController {
         this.poslovniRacunRepository = poslovniRacunRepository;
     }
 
+    @Timed("controllers.balance.getAllTekuciRacuni")
     @GetMapping("/tekuci")
     public ResponseEntity<?> getAllTekuciRacuni() {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -50,6 +53,7 @@ public class BalanceController {
         return ResponseEntity.ok(balanceService.getAllTekuciRacuni());
     }
 
+    @Timed("controllers.balance.getAllPoslovniRacuni")
     @GetMapping("/poslovni")
     public ResponseEntity<?> getAllPoslovniRacuni() {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -59,6 +63,7 @@ public class BalanceController {
         return ResponseEntity.ok(balanceService.getAllPoslovniRacuni());
     }
 
+    @Timed("controllers.balance.getAllDevizniRacuni")
     @GetMapping("/devizni")
     public ResponseEntity<?> getAllDevizniRacuni() {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -68,6 +73,7 @@ public class BalanceController {
         return ResponseEntity.ok().body(balanceService.getAllDevizniRacuni());
     }
 
+    @Timed("controllers.balance.getAllClientBalances")
     @GetMapping("/forClient/{email}")
     public ResponseEntity<?> getAllClientBalances(@PathVariable String email){
         Optional<Client> client = clientRepository.findClientByEmail(email);
@@ -80,6 +86,7 @@ public class BalanceController {
         return ResponseEntity.ok(allRacuni);
     }
 
+    @Timed("controllers.balance.getDevizniRacun")
     @GetMapping("/devizni/{devizniRacunId}")
     public ResponseEntity<?> getDevizniRacun(@PathVariable(name = "devizniRacunId") String id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -92,6 +99,7 @@ public class BalanceController {
         return ResponseEntity.ok(devizniRacun.get());
     }
 
+    @Timed("controllers.balance.getTekuciRacun")
     @GetMapping("/tekuci/{tekuciRacunId}")
     public ResponseEntity<?> getTekuciRacun(@PathVariable(name = "tekuciRacunId") String id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -104,6 +112,7 @@ public class BalanceController {
         return ResponseEntity.ok(tekuciRacun.get());
     }
 
+    @Timed("controllers.balance.getPoslovniRacun")
     @GetMapping("/poslovni/{poslovniRacunId}")
     public ResponseEntity<?> getPoslovniRacun(@PathVariable(name = "poslovniRacunId") String id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -118,6 +127,7 @@ public class BalanceController {
 
 
     //todo trenutno je na frontu hard code interest rade i acc maintenance
+    @Timed("controllers.balance.openDevizniRacun")
     @PostMapping("/openDevizniRacun")
     public ResponseEntity<?> openDevizniRacun(@RequestBody DevizniRacunDto devizniRacunDto) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -129,6 +139,7 @@ public class BalanceController {
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
+    @Timed("controllers.balance.openTekuciRacun")
     @PostMapping("/openTekuciRacun")
     public ResponseEntity<?> openTekuciRacun(@RequestBody TekuciRacunDto tekuciRacunDto) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -139,6 +150,7 @@ public class BalanceController {
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
+    @Timed("controllers.balance.openPoslovniRacun")
     @PostMapping("/openPoslovniRacun")
     public ResponseEntity<?> openPoslovniRacun(@RequestBody PoslovniRacunDto poslovniRacunDto) {
         String signedInUserEmail = getContext().getAuthentication().getName();

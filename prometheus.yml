@@ -24,5 +24,5 @@ scrape_configs:
     metrics_path: "/actuator/prometheus"
     static_configs:
       - targets: [
-        "main:8083"
+        "client:8083"
       ]
