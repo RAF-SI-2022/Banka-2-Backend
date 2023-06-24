@@ -2,6 +2,7 @@ package rs.edu.raf.si.bank2.otc.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.core.annotation.Timed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,7 @@ import static org.springframework.security.core.context.SecurityContextHolder.ge
 @RestController
 @CrossOrigin
 @RequestMapping("/api/otc")
+@Timed
 public class OtcController {
 
     private final OtcService otcService;
@@ -40,7 +42,7 @@ public class OtcController {
         this.userCommunicationInterface = communicationService;
     }
 
-
+    @Timed("controllers.otc.getAllContracts")
     @GetMapping
     public ResponseEntity<?> getAllContracts() {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -71,6 +73,7 @@ public class OtcController {
         } else return ResponseEntity.ok().body(otcService.getAllDraftContractsForUserId(user.getId()));
     }
 
+    @Timed("controllers.otc.byCompany.getAllContracts")
     @GetMapping("/byCompany/{companyId}")
     public ResponseEntity<?> getAllContracts(@PathVariable(name = "companyId") String companyId) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -102,6 +105,7 @@ public class OtcController {
 
     }
 
+    @Timed("controllers.otc.getContract")
     @GetMapping("/{id}")
     public ResponseEntity<?> getContract(@PathVariable(name = "id") String id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -114,6 +118,7 @@ public class OtcController {
         return ResponseEntity.ok().body(contract.get());
     }
 
+    @Timed("controllers.otc.openContract")
     @PostMapping("/open")
     public ResponseEntity<?> openContract(@RequestBody ContractDto contractDto) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -136,7 +141,7 @@ public class OtcController {
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
-
+    @Timed("controllers.otc.editContract")
     @PatchMapping("/edit")
     public ResponseEntity<?> editContract(@RequestBody ContractDto contractDto) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -148,7 +153,7 @@ public class OtcController {
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
-
+    @Timed("controllers.otc.finalizeContract")
     @PatchMapping("/finalize/{id}")
     public ResponseEntity<?> finalizeContract(@PathVariable(name = "id") String id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -160,6 +165,7 @@ public class OtcController {
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
+    @Timed("controllers.otc.deleteContract")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteContract(@PathVariable(name = "id") String id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -173,6 +179,7 @@ public class OtcController {
 
     //ISPOD SU TRANSACTION ELEMENTI
 
+    @Timed("controllers.otc.getAllElements")
     @GetMapping("/elements")
     public ResponseEntity<?> getAllElements() {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -183,6 +190,7 @@ public class OtcController {
         return ResponseEntity.ok().body(otcService.getAllElements());
     }
 
+    @Timed("controllers.otc.getElement")
     @GetMapping("/element/{id}")
     public ResponseEntity<?> getElement(@PathVariable(name = "id") String id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -196,6 +204,7 @@ public class OtcController {
         return ResponseEntity.ok().body(transactionElement.get());
     }
 
+    @Timed("controllers.otc.getElementsForContract")
     @GetMapping("contract_elements/{id}")
     public ResponseEntity<?> getElementsForContract(@PathVariable(name = "id") String contractId) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -206,6 +215,7 @@ public class OtcController {
         return ResponseEntity.ok().body(otcService.getElementsForContract(contractId));
     }
 
+    @Timed("controllers.otc.addTransactionElement")
     @PostMapping("/add_element")
     public ResponseEntity<?> addTransactionElement(@RequestBody TransactionElementDto transactionElementDto) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -217,7 +227,7 @@ public class OtcController {
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
-
+    @Timed("controllers.otc.removeTransactionElement")
     @DeleteMapping("/remove_element/{contractId}/{elementId}")
     public ResponseEntity<?> removeTransactionElement(@PathVariable(name = "contractId") String contractId, @PathVariable(name = "elementId") String elementId) {
         String signedInUserEmail = getContext().getAuthentication().getName();

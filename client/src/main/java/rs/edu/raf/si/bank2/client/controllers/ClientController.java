@@ -1,5 +1,6 @@
 package rs.edu.raf.si.bank2.client.controllers;
 
+import io.micrometer.core.annotation.Timed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ import static org.springframework.security.core.context.SecurityContextHolder.ge
 @RestController
 @CrossOrigin
 @RequestMapping("/api/client")
+@Timed
 public class ClientController {
 
     private final UserCommunicationInterface userCommunicationInterface;
@@ -35,6 +37,7 @@ public class ClientController {
         this.mailingService = mailingService;
     }
 
+    @Timed("controllers.client.getAllClients")
     @GetMapping
     public ResponseEntity<?> getAllClients() {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -44,12 +47,14 @@ public class ClientController {
         return ResponseEntity.ok(clientService.getAllClients());
     }
 
+    @Timed("controllers.client.mailFromToken")
     @GetMapping("/mailFromToken")
     public ResponseEntity<?> getClientMailFromToken(){
         String signedInUserEmail = getContext().getAuthentication().getName();
         return ResponseEntity.ok(signedInUserEmail);
     }
 
+    @Timed("controllers.client.getClient")
     @GetMapping("/{id}")
     public ResponseEntity<?> getClient(@PathVariable(name = "id") String id) {
         Optional<Client> client = clientService.getClient(id);
@@ -57,12 +62,14 @@ public class ClientController {
         return ResponseEntity.ok(client.get());
     }
 
+    @Timed("controllers.client.createClient")
     @PostMapping("/createClient")
     public ResponseEntity<?> createClient(@RequestBody ClientDto clientDto) {
         System.out.println(clientDto);
         return ResponseEntity.ok(clientService.createClient(clientDto));
     }
 
+    @Timed("controllers.client.loginClient")
     @PostMapping("/login")
     public ResponseEntity<?> loginClient(@RequestBody LoginRequest loginRequest){
         String token = clientService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
@@ -70,12 +77,14 @@ public class ClientController {
         return ResponseEntity.ok(new ClientLoginResponse(token));
     }
 
+    @Timed("controllers.client.sendTokenToMail")
     @PostMapping("/sendToken/{email}")
     public ResponseEntity<?> sendTokenToMail(@PathVariable String email){
         mailingService.sendRegistrationToken(email);//todo dodaj email
         return ResponseEntity.ok("Token sent");
     }
 
+    @Timed("controllers.client.checkToken")
     @GetMapping("/checkToken/{token}")
     public ResponseEntity<?> checkToken(@PathVariable String token){
         if (mailingService.checkIfTokenGood(token))

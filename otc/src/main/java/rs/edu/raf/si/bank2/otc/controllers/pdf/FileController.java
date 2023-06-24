@@ -1,5 +1,6 @@
 package rs.edu.raf.si.bank2.otc.controllers.pdf;
 
+import io.micrometer.core.annotation.Timed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -23,11 +24,13 @@ import java.util.List;
 @RestController
 @CrossOrigin("*")
 @RequestMapping("file")
+@Timed
 public class FileController {
 
     @Autowired
     private FileService fileService;
 
+    @Timed("controllers.pdf.file.upload")
     @PostMapping("/upload")
     public ResponseEntity<?> upload(@RequestParam("file")MultipartFile file) throws IOException {
 //        ContractElements contractElements1 = ContractElements.FINALISED;
@@ -40,6 +43,8 @@ public class FileController {
         return new ResponseEntity<>(fileService.addFile(file), HttpStatus.OK);
     }
 
+
+    @Timed("controllers.pdf.file.download")
     @GetMapping("/download/{id}")
     public ResponseEntity<ByteArrayResource> download(@PathVariable String id) throws IOException {
         LoadFile loadFile = fileService.downloadFile(id);
