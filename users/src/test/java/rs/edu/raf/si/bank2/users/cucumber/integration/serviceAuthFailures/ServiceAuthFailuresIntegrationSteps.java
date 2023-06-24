@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,16 +25,15 @@ public class ServiceAuthFailuresIntegrationSteps extends ServiceAuthIntegrationT
      * ResultActions of the last executed mock request.
      */
     ResultActions resultActions;
-
     @Autowired
     PasswordEncoder passwordEncoder;
-
     @Autowired
     UserServiceInterface userServiceInterface;
 
     @Autowired
+    CompositeMeterRegistry meterRegistry;
+    @Autowired
     AuthorisationServiceInterface authorisationServiceInterface;
-
     @Autowired
     MockMvc mockMvc;
 

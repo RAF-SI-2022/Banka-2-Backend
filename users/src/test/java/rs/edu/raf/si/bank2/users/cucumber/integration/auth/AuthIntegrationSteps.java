@@ -11,6 +11,8 @@ import io.cucumber.java.en.When;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
+
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import org.mockito.InjectMocks;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -35,6 +37,9 @@ public class AuthIntegrationSteps extends AuthIntegrationTestConfig {
 
     @Autowired
     UserServiceInterface userServiceInterface;
+
+    @Autowired
+    CompositeMeterRegistry meterRegistry;
 
     @Autowired
     PasswordEncoder passwordEncoder;
