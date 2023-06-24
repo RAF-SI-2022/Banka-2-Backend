@@ -2,18 +2,15 @@ package rs.edu.raf.si.bank2.users.services;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-import javax.mail.Transport;
-
 import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
+import javax.mail.Transport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @ExtendWith(MockitoExtension.class)
 class MailingServiceTest {

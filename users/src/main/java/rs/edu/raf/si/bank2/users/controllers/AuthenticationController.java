@@ -1,8 +1,7 @@
 package rs.edu.raf.si.bank2.users.controllers;
 
-import java.util.Optional;
-
 import io.micrometer.core.annotation.Timed;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;

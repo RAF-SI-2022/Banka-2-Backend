@@ -2,6 +2,9 @@ package rs.edu.raf.si.bank2.users.services;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
+import java.util.Calendar;
+import java.util.Optional;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,11 +19,6 @@ import rs.edu.raf.si.bank2.users.repositories.mariadb.UserRepository;
 import rs.edu.raf.si.bank2.users.services.interfaces.AuthorisationServiceInterface;
 import rs.edu.raf.si.bank2.users.services.interfaces.MailingServiceInterface;
 import rs.edu.raf.si.bank2.users.utils.JwtUtil;
-
-import java.util.Calendar;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class AuthorisationService implements AuthorisationServiceInterface {
@@ -61,8 +59,7 @@ public class AuthorisationService implements AuthorisationServiceInterface {
             PasswordResetTokenRepository passwordResetTokenRepository,
             JwtUtil jwtUtil,
             MailingServiceInterface mailingService,
-            CompositeMeterRegistry meterRegistry
-    ) {
+            CompositeMeterRegistry meterRegistry) {
         this.authenticationManager = authenticationManager;
         this.permissionRepository = permissionRepository;
         this.userRepository = userRepository;
@@ -98,7 +95,9 @@ public class AuthorisationService implements AuthorisationServiceInterface {
         }
 
         String token = jwtUtil.generateToken(email);
-        tokensCount.increment();
+        if (tokensCount != null) {
+            tokensCount.increment();
+        }
         return Optional.of(token);
     }
 
@@ -113,7 +112,9 @@ public class AuthorisationService implements AuthorisationServiceInterface {
         // TODO random enough?
         String token = UUID.randomUUID().toString();
         passwordResetTokenRepository.save(new PasswordResetToken(client, token));
-        resetPasswordCount.increment();
+        if (resetPasswordCount != null) {
+            resetPasswordCount.increment();
+        }
         mailingService.sendResetPasswordEmail(email, token);
         return true;
     }

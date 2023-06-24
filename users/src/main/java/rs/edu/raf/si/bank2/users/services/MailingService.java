@@ -1,17 +1,12 @@
 package rs.edu.raf.si.bank2.users.services;
 
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
-import io.micrometer.core.annotation.Timed;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.DistributionSummary;
-import io.micrometer.core.instrument.LongTaskTimer;
-import io.micrometer.core.instrument.Timer;
-import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +27,7 @@ public class MailingService implements MailingServiceInterface {
     private Counter sent;
 
     @Autowired
-    public MailingService(
-            CompositeMeterRegistry meterRegistry
-    ) {
+    public MailingService(CompositeMeterRegistry meterRegistry) {
         sent = meterRegistry.counter("services.mailing.sent");
     }
 

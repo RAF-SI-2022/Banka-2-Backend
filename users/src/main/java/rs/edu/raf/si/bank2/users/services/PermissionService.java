@@ -1,8 +1,7 @@
 package rs.edu.raf.si.bank2.users.services;
 
-import java.util.List;
-
 import io.micrometer.core.annotation.Timed;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.users.models.mariadb.Permission;

@@ -25,15 +25,19 @@ public class ServiceAuthFailuresIntegrationSteps extends ServiceAuthIntegrationT
      * ResultActions of the last executed mock request.
      */
     ResultActions resultActions;
+
     @Autowired
     PasswordEncoder passwordEncoder;
+
     @Autowired
     UserServiceInterface userServiceInterface;
 
     @Autowired
     CompositeMeterRegistry meterRegistry = new CompositeMeterRegistry();
+
     @Autowired
     AuthorisationServiceInterface authorisationServiceInterface;
+
     @Autowired
     MockMvc mockMvc;
 
