@@ -1,6 +1,7 @@
 package rs.edu.raf.si.bank2.client.dto;
 
 import lombok.Data;
+import rs.edu.raf.si.bank2.client.models.mongodb.enums.CreditApproval;
 
 @Data
 public class CreditRequestDto {
@@ -15,4 +16,17 @@ public class CreditRequestDto {
     private Integer dueDateInMonths;
     private String phoneNumber;
 
+
+    public CreditRequestDto(String clientEmail, Double amount, String usedFor, Double monthlyRate, Boolean clientHasJob,
+                            String jobLocation, String currentJobDuration, Integer dueDateInMonths, String phoneNumber) {
+        this.clientEmail = clientEmail;
+        this.amount = amount;
+        this.usedFor = usedFor;
+        this.monthlyRate = monthlyRate;
+        this.clientHasJob = clientHasJob;
+        this.jobLocation = jobLocation;
+        this.currentJobDuration = currentJobDuration;
+        this.dueDateInMonths = dueDateInMonths;
+        this.phoneNumber = phoneNumber;
+    }
 }

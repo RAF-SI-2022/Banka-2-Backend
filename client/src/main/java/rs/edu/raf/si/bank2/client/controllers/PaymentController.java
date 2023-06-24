@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import rs.edu.raf.si.bank2.client.dto.*;
 import rs.edu.raf.si.bank2.client.models.mongodb.PaymentReceiver;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.PaymentReceiverRepository;
+import rs.edu.raf.si.bank2.client.repositories.mongodb.PaymentRepository;
 import rs.edu.raf.si.bank2.client.services.PaymentService;
 
 import java.util.Optional;
@@ -16,11 +17,13 @@ import java.util.Optional;
 public class PaymentController {
     private final PaymentReceiverRepository paymentReceiverRepository;
     private final PaymentService paymentService;
+    private final PaymentRepository paymentRepository;
 
     @Autowired
-    public PaymentController(PaymentReceiverRepository paymentReceiverRepository, PaymentService paymentService) {
+    public PaymentController(PaymentReceiverRepository paymentReceiverRepository, PaymentService paymentService, PaymentRepository paymentRepository) {
         this.paymentReceiverRepository = paymentReceiverRepository;
         this.paymentService = paymentService;
+        this.paymentRepository = paymentRepository;
     }
 
 
@@ -28,22 +31,28 @@ public class PaymentController {
 
     @PostMapping("/makePayment")
     public ResponseEntity<?> makePayment(@RequestBody PaymentDto paymentDto) {
-        //todo validacija
         CommunicationDto communicationDto = paymentService.makePayment(paymentDto);
         return ResponseEntity.status(communicationDto.getResponseCode()).body(communicationDto.getResponseMsg());
     }
 
-//    @Deprecated
-//    @PostMapping("/transferMoney")
-//    public ResponseEntity<?> transferMoney(@RequestBody TransferDto transferDto) {
-//        //todo validacija
-//        return ResponseEntity.ok(paymentService.transferMoney(transferDto));
-//    }
+    @PostMapping("/removeMoney")
+    public ResponseEntity<?> removeMoney(@RequestBody RemoveMoneyDto removeMoneyDto){
+        return ResponseEntity.ok( paymentService.removeMoney(removeMoneyDto));
+    }
+
+    @PostMapping("/transferMoney")
+    public ResponseEntity<?> transferMoney(@RequestBody TransferDto transferDto) {
+        return ResponseEntity.ok(paymentService.transferMoney(transferDto));
+    }
 
     @PostMapping("/exchangeMoney")
     public ResponseEntity<?> exchangeMoney(@RequestBody ExchangeDto exchangeDto) {
-        //todo validacija
-        return null;
+        return ResponseEntity.ok(paymentService.exchangeMoney(exchangeDto));
+    }
+
+    @GetMapping("/payments/{email}")
+    public ResponseEntity<?> getPaymentsForClient(@PathVariable String email){
+        return ResponseEntity.ok(paymentRepository.findAllBySenderEmail(email));
     }
 
 
