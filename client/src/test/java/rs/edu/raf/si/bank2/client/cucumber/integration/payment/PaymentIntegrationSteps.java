@@ -17,6 +17,4 @@ public class PaymentIntegrationSteps extends PaymentIntegrationTestConfig {
     protected MockMvc mockMvc;
 
     protected static String token;
-
-
 }

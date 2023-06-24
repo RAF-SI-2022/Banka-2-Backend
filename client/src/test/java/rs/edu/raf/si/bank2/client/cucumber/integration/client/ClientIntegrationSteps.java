@@ -1,26 +1,23 @@
 package rs.edu.raf.si.bank2.client.cucumber.integration.client;
 
-import com.jayway.jsonpath.JsonPath;
-import io.cucumber.core.internal.com.fasterxml.jackson.core.JsonProcessingException;
-import io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import rs.edu.raf.si.bank2.client.dto.ClientDto;
-import rs.edu.raf.si.bank2.client.models.mongodb.Client;
-import rs.edu.raf.si.bank2.client.repositories.mongodb.ClientRepository;
-import rs.edu.raf.si.bank2.client.services.ClientService;
-
-import java.util.ArrayList;
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.jayway.jsonpath.JsonPath;
+import io.cucumber.core.internal.com.fasterxml.jackson.core.JsonProcessingException;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+import java.util.ArrayList;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import rs.edu.raf.si.bank2.client.models.mongodb.Client;
+import rs.edu.raf.si.bank2.client.repositories.mongodb.ClientRepository;
+import rs.edu.raf.si.bank2.client.services.ClientService;
 
 public class ClientIntegrationSteps extends ClientIntegrationTestConfig {
 
@@ -35,15 +32,20 @@ public class ClientIntegrationSteps extends ClientIntegrationTestConfig {
 
     protected static String token;
 
-
-
     @Given("test client exists in db")
     public void user_logged_in() {
         Optional<Client> testClient = clientRepository.findClientByEmail("test@gmail.com");
         if (testClient.isEmpty()) {
-            Client newClient = new Client("Test", "Testic",
-                    "b-day", "nonb", "test@gmail.com", "123123123",
-                    "addres", "password", new ArrayList<>());
+            Client newClient = new Client(
+                    "Test",
+                    "Testic",
+                    "b-day",
+                    "nonb",
+                    "test@gmail.com",
+                    "123123123",
+                    "addres",
+                    "password",
+                    new ArrayList<>());
             clientRepository.save(newClient);
         }
     }
@@ -74,11 +76,10 @@ public class ClientIntegrationSteps extends ClientIntegrationTestConfig {
     @Then("get all clients")
     public void get_all_clients() {
         try {
-            MvcResult mvcResult = mockMvc.perform(
-                            get("/api/client")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            MvcResult mvcResult = mockMvc.perform(get("/api/client")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isOk())
                     .andReturn();
         } catch (Exception e) {
@@ -89,11 +90,10 @@ public class ClientIntegrationSteps extends ClientIntegrationTestConfig {
     @Then("get mail from token")
     public void get_mail_from_token() {
         try {
-            MvcResult mvcResult = mockMvc.perform(
-                            get("/api/client/mailFromToken")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            MvcResult mvcResult = mockMvc.perform(get("/api/client/mailFromToken")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isOk())
                     .andReturn();
         } catch (Exception e) {
@@ -125,10 +125,9 @@ public class ClientIntegrationSteps extends ClientIntegrationTestConfig {
         newTestClient.ifPresent(client -> clientRepository.deleteById(client.getId()));
 
         try {
-            MvcResult mvcResult = mockMvc.perform(
-                            post("/api/client/createClient")
-                                    .contentType("application/json")
-                                    .content(
+            MvcResult mvcResult = mockMvc.perform(post("/api/client/createClient")
+                            .contentType("application/json")
+                            .content(
                                     """
                                     {
                                         "name": "new",
@@ -141,9 +140,9 @@ public class ClientIntegrationSteps extends ClientIntegrationTestConfig {
                                         "password": "new"
                                     }
                                     """)
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isOk())
                     .andReturn();
         } catch (Exception e) {
@@ -154,12 +153,11 @@ public class ClientIntegrationSteps extends ClientIntegrationTestConfig {
     @Then("sendToken")
     public void send_token() {
         try {
-            MvcResult mvcResult = mockMvc.perform(
-                            post("/api/client/sendToken/banka2backend@gmail.com")
-                                    .contentType("application/json")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            MvcResult mvcResult = mockMvc.perform(post("/api/client/sendToken/banka2backend@gmail.com")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isOk())
                     .andReturn();
         } catch (Exception e) {
@@ -170,18 +168,16 @@ public class ClientIntegrationSteps extends ClientIntegrationTestConfig {
     @Then("checkToken")
     public void check_token() {
         try {
-            MvcResult mvcResult = mockMvc.perform(
-                            get("/api/client/checkToken/1934")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            MvcResult mvcResult = mockMvc.perform(get("/api/client/checkToken/1934")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isOk())
                     .andReturn();
         } catch (Exception e) {
             fail("User failed to login");
         }
     }
-
 
     @Then("deleteTestUsers")
     public void deleteTestUsers() {
@@ -190,6 +186,4 @@ public class ClientIntegrationSteps extends ClientIntegrationTestConfig {
         Optional<Client> testClient = clientRepository.findClientByEmail("test@gmail.com");
         testClient.ifPresent(client -> clientRepository.deleteById(client.getId()));
     }
-
-
 }

@@ -6,13 +6,11 @@ import org.springframework.stereotype.Component;
 import rs.edu.raf.si.bank2.client.services.MailingService;
 import rs.edu.raf.si.bank2.client.services.PaymentService;
 
-
 @Component
 public class BootstrapData implements CommandLineRunner {
 
     private final MailingService mailingService;
     private final PaymentService paymentService;
-
 
     @Autowired
     public BootstrapData(MailingService mailingService, PaymentService paymentService) {
@@ -38,7 +36,5 @@ public class BootstrapData implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) {
-    }
-
+    public void run(String... args) {}
 }

@@ -5,7 +5,6 @@ package rs.edu.raf.si.bank2.client.services.interfaces;
  */
 public interface MailingServiceInterface {
 
-
     void sendRegistrationToken(String email);
 
     boolean checkIfTokenGood(String token);
