@@ -1,9 +1,8 @@
 package rs.edu.raf.si.bank2.main.controllers;
 
+import io.micrometer.core.annotation.Timed;
 import java.text.ParseException;
 import java.util.Optional;
-
-import io.micrometer.core.annotation.Timed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

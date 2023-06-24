@@ -1,6 +1,5 @@
 package rs.edu.raf.si.bank2.otc.controllers;
 
-
 import io.micrometer.core.annotation.Timed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +8,6 @@ import rs.edu.raf.si.bank2.otc.dto.ContactPersonDto;
 import rs.edu.raf.si.bank2.otc.models.mongodb.ContactPerson;
 import rs.edu.raf.si.bank2.otc.services.CompanyService;
 import rs.edu.raf.si.bank2.otc.services.ContactPersonService;
-
 
 @RestController
 @CrossOrigin

@@ -1,5 +1,9 @@
 package rs.edu.raf.si.bank2.otc.models.mongodb;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,11 +12,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import java.util.ArrayList;
-import java.util.Collection;
 
 @Data
 @Builder
@@ -24,14 +23,19 @@ public class Company {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
+
     private String name;
+
     @Indexed(unique = true)
     private String registrationNumber;
+
     private String taxNumber;
     private String activityCode;
     private String address;
+
     @DBRef(lazy = true)
     private Collection<ContactPerson> contactPersons;
+
     @DBRef(lazy = true)
     private Collection<CompanyBankAccount> bankAccounts;
 
@@ -45,7 +49,14 @@ public class Company {
         this.bankAccounts = new ArrayList<>();
     }
 
-    public Company(String name, String registrationNumber, String taxNumber, String activityCode, String address, Collection<ContactPerson> contactPersons, Collection<CompanyBankAccount> bankAccounts) {
+    public Company(
+            String name,
+            String registrationNumber,
+            String taxNumber,
+            String activityCode,
+            String address,
+            Collection<ContactPerson> contactPersons,
+            Collection<CompanyBankAccount> bankAccounts) {
         this.name = name;
         this.registrationNumber = registrationNumber;
         this.taxNumber = taxNumber;
@@ -53,6 +64,5 @@ public class Company {
         this.address = address;
         this.contactPersons = new ArrayList<>(contactPersons);
         this.bankAccounts = new ArrayList<>(bankAccounts);
-
     }
 }

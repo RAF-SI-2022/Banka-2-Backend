@@ -1,6 +1,11 @@
 package rs.edu.raf.si.bank2.client.controllers;
 
+import static org.springframework.security.core.context.SecurityContextHolder.getContext;
+
 import io.micrometer.core.annotation.Timed;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,12 +18,6 @@ import rs.edu.raf.si.bank2.client.repositories.mongodb.PoslovniRacunRepository;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.TekuciRacunRepository;
 import rs.edu.raf.si.bank2.client.services.BalanceService;
 import rs.edu.raf.si.bank2.client.services.interfaces.UserCommunicationInterface;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 @RestController
 @CrossOrigin
@@ -34,7 +33,13 @@ public class BalanceController {
     private final PoslovniRacunRepository poslovniRacunRepository;
 
     @Autowired
-    public BalanceController(UserCommunicationInterface userCommunicationInterface, BalanceService balanceService, ClientRepository clientRepository, DevizniRacunRepository devizniRacunRepository, TekuciRacunRepository tekuciRacunRepository, PoslovniRacunRepository poslovniRacunRepository) {
+    public BalanceController(
+            UserCommunicationInterface userCommunicationInterface,
+            BalanceService balanceService,
+            ClientRepository clientRepository,
+            DevizniRacunRepository devizniRacunRepository,
+            TekuciRacunRepository tekuciRacunRepository,
+            PoslovniRacunRepository poslovniRacunRepository) {
         this.userCommunicationInterface = userCommunicationInterface;
         this.balanceService = balanceService;
         this.clientRepository = clientRepository;
@@ -75,14 +80,17 @@ public class BalanceController {
 
     @Timed("controllers.balance.getAllClientBalances")
     @GetMapping("/forClient/{email}")
-    public ResponseEntity<?> getAllClientBalances(@PathVariable String email){
+    public ResponseEntity<?> getAllClientBalances(@PathVariable String email) {
         Optional<Client> client = clientRepository.findClientByEmail(email);
         if (client.isEmpty()) return ResponseEntity.status(404).body("Client not found");
 
         List<Racun> allRacuni = new ArrayList<>();
-        allRacuni.addAll(tekuciRacunRepository.findTekuciRacunByOwnerId(client.get().getId()));
-        allRacuni.addAll(poslovniRacunRepository.findPoslovniRacunByOwnerId(client.get().getId()));
-        allRacuni.addAll(devizniRacunRepository.findDevizniRacunByOwnerId(client.get().getId()));
+        allRacuni.addAll(
+                tekuciRacunRepository.findTekuciRacunByOwnerId(client.get().getId()));
+        allRacuni.addAll(
+                poslovniRacunRepository.findPoslovniRacunByOwnerId(client.get().getId()));
+        allRacuni.addAll(
+                devizniRacunRepository.findDevizniRacunByOwnerId(client.get().getId()));
         return ResponseEntity.ok(allRacuni);
     }
 
@@ -125,8 +133,7 @@ public class BalanceController {
         return ResponseEntity.ok(poslovniRacun.get());
     }
 
-
-    //todo trenutno je na frontu hard code interest rade i acc maintenance
+    // todo trenutno je na frontu hard code interest rade i acc maintenance
     @Timed("controllers.balance.openDevizniRacun")
     @PostMapping("/openDevizniRacun")
     public ResponseEntity<?> openDevizniRacun(@RequestBody DevizniRacunDto devizniRacunDto) {
@@ -161,5 +168,4 @@ public class BalanceController {
         CommunicationDto response = balanceService.openPoslovniRacun(poslovniRacunDto);
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
-
 }

@@ -1,13 +1,12 @@
 package rs.edu.raf.si.bank2.otc.dto;
 
+import java.util.Collection;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import rs.edu.raf.si.bank2.otc.models.mongodb.CompanyBankAccount;
 import rs.edu.raf.si.bank2.otc.models.mongodb.ContactPerson;
-
-import java.util.Collection;
 
 @Data
 @Builder

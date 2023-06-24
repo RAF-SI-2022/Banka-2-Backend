@@ -120,7 +120,7 @@ public class BalanceFailureIntegrationSteps extends BalanceFailureIntegrationTes
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-//                    .andExpect(status().is5xxServerError())
+                    //                    .andExpect(status().is5xxServerError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -143,7 +143,7 @@ public class BalanceFailureIntegrationSteps extends BalanceFailureIntegrationTes
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
-//                    .andExpect(status().is5xxServerError())
+                    //                    .andExpect(status().is5xxServerError())
                     .andReturn();
         } catch (Exception e) {
             fail(e.getMessage());

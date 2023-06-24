@@ -1,5 +1,16 @@
 package rs.edu.raf.si.bank2.otc.services;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,18 +28,6 @@ import rs.edu.raf.si.bank2.otc.repositories.mariadb.PasswordResetTokenRepository
 import rs.edu.raf.si.bank2.otc.repositories.mariadb.UserRepository;
 import rs.edu.raf.si.bank2.otc.services.interfaces.MailingServiceInterface;
 import rs.edu.raf.si.bank2.otc.utils.JwtUtil;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthorisationServiceTest {

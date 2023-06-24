@@ -12,9 +12,8 @@ import rs.edu.raf.si.bank2.otc.models.mongodb.ContractElements;
 @RequiredArgsConstructor
 public class ContractDto {
 
-      private String companyId;
-      private ContractElements contractStatus;
-      private String contractNumber;
-      private String description;
-
+    private String companyId;
+    private ContractElements contractStatus;
+    private String contractNumber;
+    private String description;
 }
