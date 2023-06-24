@@ -1,4 +1,32 @@
 presubmits:
+  - name: pull-banka-2-backend-client-snyk
+    always_run: true
+    decorate: true
+    spec:
+      containers:
+        - image: harbor.k8s.elab.rs/base-images/base:java-17-node-18-docker
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -euo pipefail
+              
+              THIS_SERVICE="client"
+
+              curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
+              chmod +x ./snyk
+              mv ./snyk /usr/local/bin/
+              
+              # Environment ready, start test
+              cd ${THIS_SERVICE}
+              
+              set +e
+              snyk auth 304dbe0f-2337-4a72-9540-4de8b21ceea4
+              snyk config set org=84d0a22b-934b-48fe-a5b2-7bd1bb825d94
+              snyk code test . || echo "Security testing failed."
+          securityContext:
+            privileged: true
+          imagePullPolicy: Always
   - name: pull-banka-2-backend-client-sonarqube
     labels:
       preset-github-ro-token: "true"
