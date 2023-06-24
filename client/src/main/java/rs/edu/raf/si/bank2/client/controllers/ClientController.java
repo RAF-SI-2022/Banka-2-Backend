@@ -52,11 +52,6 @@ public class ClientController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getClient(@PathVariable(name = "id") String id) {
-        String signedInUserEmail = getContext().getAuthentication().getName();
-        if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-            return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
-        }
-
         Optional<Client> client = clientService.getClient(id);
         if (client.isEmpty()) return ResponseEntity.status(404).body("Trazeni klijent ne postoji");
         return ResponseEntity.ok(client.get());
@@ -64,6 +59,7 @@ public class ClientController {
 
     @PostMapping("/createClient")
     public ResponseEntity<?> createClient(@RequestBody ClientDto clientDto) {
+        System.out.println(clientDto);
         return ResponseEntity.ok(clientService.createClient(clientDto));
     }
 

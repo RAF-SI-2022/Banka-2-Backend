@@ -152,7 +152,7 @@ public class BalanceService {
     public static String generateRandomNumber(int length) {
         StringBuilder sb = new StringBuilder(length);
         Random random = new Random();
-        for (int i = 0; i < length; i++) {
+        for (int i = 1; i < length; i++) {
             int digit = random.nextInt(10);
             sb.append(digit);
         }
