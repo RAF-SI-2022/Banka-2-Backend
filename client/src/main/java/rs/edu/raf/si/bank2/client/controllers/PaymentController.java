@@ -31,22 +31,23 @@ public class PaymentController {
 
     @PostMapping("/makePayment")
     public ResponseEntity<?> makePayment(@RequestBody PaymentDto paymentDto) {
-        //todo validacija
         CommunicationDto communicationDto = paymentService.makePayment(paymentDto);
         return ResponseEntity.status(communicationDto.getResponseCode()).body(communicationDto.getResponseMsg());
     }
 
-//    @Deprecated
-//    @PostMapping("/transferMoney")
-//    public ResponseEntity<?> transferMoney(@RequestBody TransferDto transferDto) {
-//        //todo validacija
-//        return ResponseEntity.ok(paymentService.transferMoney(transferDto));
-//    }
+    @PostMapping("/removeMoney")
+    public ResponseEntity<?> removeMoney(@RequestBody RemoveMoneyDto removeMoneyDto){
+        return ResponseEntity.ok( paymentService.removeMoney(removeMoneyDto));
+    }
+
+    @PostMapping("/transferMoney")
+    public ResponseEntity<?> transferMoney(@RequestBody TransferDto transferDto) {
+        return ResponseEntity.ok(paymentService.transferMoney(transferDto));
+    }
 
     @PostMapping("/exchangeMoney")
     public ResponseEntity<?> exchangeMoney(@RequestBody ExchangeDto exchangeDto) {
-        //todo validacija
-        return null;
+        return ResponseEntity.ok(paymentService.exchangeMoney(exchangeDto));
     }
 
     @GetMapping("/payments/{email}")

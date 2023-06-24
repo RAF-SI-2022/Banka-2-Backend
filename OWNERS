@@ -1,4 +1,7 @@
-# Project Manager
-@ljeremic4019rn
-# Backend Team Lead
-@andrejanesic
+approvers:
+  - ljeremic4019rn
+  - andrejanesic
+
+reviewers:
+  - ljeremic4019rn
+  - andrejanesic
