@@ -1,4 +1,26 @@
 presubmits:
+  - name: pull-banka-2-backend-client-spotless
+    always_run: true
+    decorate: true
+    spec:
+      containers:
+        - image: harbor.k8s.elab.rs/base-images/base:java-17-node-18-docker
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -euo pipefail
+              
+              THIS_SERVICE="client"
+              
+              # Environment ready, start test
+              cd ${THIS_SERVICE}
+              
+              # Check formatting
+              mvn spotless:check
+          securityContext:
+            privileged: true
+          imagePullPolicy: Always
   - name: pull-banka-2-backend-client-snyk
     always_run: true
     decorate: true
