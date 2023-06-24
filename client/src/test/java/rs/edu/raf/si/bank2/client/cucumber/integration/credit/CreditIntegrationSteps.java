@@ -17,7 +17,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import rs.edu.raf.si.bank2.client.dto.CreditDto;
 import rs.edu.raf.si.bank2.client.dto.CreditRequestDto;
-import rs.edu.raf.si.bank2.client.dto.PaymentDto;
 import rs.edu.raf.si.bank2.client.models.mongodb.Client;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.ClientRepository;
 import rs.edu.raf.si.bank2.client.services.BalanceService;
@@ -128,8 +127,7 @@ public class CreditIntegrationSteps extends CreditIntegrationTestConfig {
     @Then("get all waiting")
     public void get_all_waiting() {
         try {
-            MvcResult mvcResult = mockMvc.perform(
-                    get("/api/credit")
+            MvcResult mvcResult = mockMvc.perform(get("/api/credit")
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
@@ -149,11 +147,10 @@ public class CreditIntegrationSteps extends CreditIntegrationTestConfig {
     @Given("pay this months interest")
     public void pay_this_months_interest() {
         try {
-            MvcResult mvcResult = mockMvc.perform(
-                            post("/api/payment/pay/1613asfaew")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            MvcResult mvcResult = mockMvc.perform(post("/api/payment/pay/1613asfaew")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isNotFound())
                     .andReturn();
         } catch (Exception e) {
@@ -161,28 +158,27 @@ public class CreditIntegrationSteps extends CreditIntegrationTestConfig {
         }
     }
 
-//    private String clientEmail;
-//    private String name;
-//    private String accountRegNumber;
-//    private Double amount;
-//    private Integer ratePercentage; // stopa na iznos
-//    private Double monthlyRate; // koliko se mesecno placa
-//    private String dueDate; // do kad se otplacuje
-//    private String currency;
+    //    private String clientEmail;
+    //    private String name;
+    //    private String accountRegNumber;
+    //    private Double amount;
+    //    private Integer ratePercentage; // stopa na iznos
+    //    private Double monthlyRate; // koliko se mesecno placa
+    //    private String dueDate; // do kad se otplacuje
+    //    private String currency;
 
     @Given("approve request")
     public void approve_request() throws JsonProcessingException {
-        CreditDto creditDto = new CreditDto("asdfasf", "13212331", "name", 1.0,
-                1, 1.0, "asdfasdf", "USD");
-        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(creditDto);
+        CreditDto creditDto = new CreditDto("asdfasf", "13212331", "name", 1.0, 1, 1.0, "asdfasdf", "USD");
+        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper()
+                .writeValueAsString(creditDto);
         try {
-            MvcResult mvcResult = mockMvc.perform(
-                            post("/api/payment/approve/asflka123123")
-                                    .contentType("application/json")
-                                    .content(body)
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            MvcResult mvcResult = mockMvc.perform(post("/api/payment/approve/asflka123123")
+                            .contentType("application/json")
+                            .content(body)
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isNotFound())
                     .andReturn();
         } catch (Exception e) {
@@ -194,12 +190,10 @@ public class CreditIntegrationSteps extends CreditIntegrationTestConfig {
     @Given("deny request")
     public void deny_request() {
         try {
-            MvcResult mvcResult = mockMvc.perform(
-                            patch("/api/payment/approve/123d12d1")
-
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            MvcResult mvcResult = mockMvc.perform(patch("/api/payment/approve/123d12d1")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isNotFound())
                     .andReturn();
         } catch (Exception e) {
@@ -207,6 +201,4 @@ public class CreditIntegrationSteps extends CreditIntegrationTestConfig {
             fail("add payment receiver failed");
         }
     }
-
-
 }
