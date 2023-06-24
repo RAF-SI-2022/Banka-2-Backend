@@ -1,17 +1,18 @@
 package rs.edu.raf.si.bank2.client.cucumber.integration.client;
 
 import com.jayway.jsonpath.JsonPath;
+import io.cucumber.core.internal.com.fasterxml.jackson.core.JsonProcessingException;
+import io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import rs.edu.raf.si.bank2.client.dto.ClientDto;
 import rs.edu.raf.si.bank2.client.models.mongodb.Client;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.ClientRepository;
-import rs.edu.raf.si.bank2.client.services.BalanceService;
 import rs.edu.raf.si.bank2.client.services.ClientService;
-import rs.edu.raf.si.bank2.client.services.UserService;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -39,15 +40,16 @@ public class ClientIntegrationSteps extends ClientIntegrationTestConfig {
     @Given("test client exists in db")
     public void user_logged_in() {
         Optional<Client> testClient = clientRepository.findClientByEmail("test@gmail.com");
-        if (testClient.isEmpty()){
-            Client newClient = new Client("Test","Testic",
+        if (testClient.isEmpty()) {
+            Client newClient = new Client("Test", "Testic",
                     "b-day", "nonb", "test@gmail.com", "123123123",
                     "addres", "password", new ArrayList<>());
             clientRepository.save(newClient);
         }
     }
+
     @When("test client is logged in")
-    public void test_client_is_logged_in(){
+    public void test_client_is_logged_in() {
         try {
             MvcResult mvcResult = mockMvc.perform(
                             post("/api/client/login")
@@ -74,13 +76,120 @@ public class ClientIntegrationSteps extends ClientIntegrationTestConfig {
         try {
             MvcResult mvcResult = mockMvc.perform(
                             get("/api/client")
-                            .header("Content-Type", "application/json")
-                            .header("Access-Control-Allow-Origin", "*")
-                            .header("Authorization", "Bearer " + token))                    .andExpect(status().isOk())
+                                    .header("Content-Type", "application/json")
+                                    .header("Access-Control-Allow-Origin", "*")
+                                    .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+        } catch (Exception e) {
+            fail("Get all clients failed");
+        }
+    }
+
+    @Then("get mail from token")
+    public void get_mail_from_token() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(
+                            get("/api/client/mailFromToken")
+                                    .header("Content-Type", "application/json")
+                                    .header("Access-Control-Allow-Origin", "*")
+                                    .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+        } catch (Exception e) {
+            fail("Mail from token failed");
+        }
+    }
+
+    @Then("get user by id")
+    public void get_user_by_id() {
+        Optional<Client> testClient = clientRepository.findClientByEmail("test@gmail.com");
+        if (testClient.isEmpty()) fail("Nekako test user nije vise u bazi");
+
+        try {
+            MvcResult mvcResult = mockMvc.perform(
+                            get("/api/client/" + testClient.get().getId())
+                                    .header("Content-Type", "application/json")
+                                    .header("Access-Control-Allow-Origin", "*")
+                                    .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+        } catch (Exception e) {
+            fail("User by id failed");
+        }
+    }
+
+    @Then("create user")
+    public void create_user() throws JsonProcessingException {
+        Optional<Client> newTestClient = clientRepository.findClientByEmail("new@gmail.com");
+        newTestClient.ifPresent(client -> clientRepository.deleteById(client.getId()));
+
+        try {
+            MvcResult mvcResult = mockMvc.perform(
+                            post("/api/client/createClient")
+                                    .contentType("application/json")
+                                    .content(
+                                    """
+                                    {
+                                        "name": "new",
+                                        "lastname": "new",
+                                        "dateOfBirth": "new",
+                                        "gender": "new",
+                                        "email": "new@gmail.com",
+                                        "telephone": "+1234567890",
+                                        "address": "123 Main Street, City ABC",
+                                        "password": "new"
+                                    }
+                                    """)
+                                    .header("Content-Type", "application/json")
+                                    .header("Access-Control-Allow-Origin", "*")
+                                    .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
                     .andReturn();
         } catch (Exception e) {
             fail("User failed to login");
         }
     }
+
+    @Then("sendToken")
+    public void send_token() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(
+                            post("/api/client/sendToken/banka2backend@gmail.com")
+                                    .contentType("application/json")
+                                    .header("Content-Type", "application/json")
+                                    .header("Access-Control-Allow-Origin", "*")
+                                    .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+        } catch (Exception e) {
+            fail("User failed to login");
+        }
+    }
+
+    @Then("checkToken")
+    public void check_token() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(
+                            get("/api/client/checkToken/1934")
+                                    .header("Content-Type", "application/json")
+                                    .header("Access-Control-Allow-Origin", "*")
+                                    .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+        } catch (Exception e) {
+            fail("User failed to login");
+        }
+    }
+
+
+    @Then("deleteTestUsers")
+    public void deleteTestUsers() {
+        Optional<Client> newTestClient = clientRepository.findClientByEmail("new@gmail.com");
+        newTestClient.ifPresent(client -> clientRepository.deleteById(client.getId()));
+        Optional<Client> testClient = clientRepository.findClientByEmail("test@gmail.com");
+        testClient.ifPresent(client -> clientRepository.deleteById(client.getId()));
+    }
+
 
 }
