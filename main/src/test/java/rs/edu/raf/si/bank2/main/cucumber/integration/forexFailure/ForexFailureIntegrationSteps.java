@@ -182,7 +182,7 @@ public class ForexFailureIntegrationSteps extends ForexFailureIntegrationTestCon
         System.out.println(errorMsg);
         assertEquals(
                 "Korisnik sa email-om " + email
-                        + ", nema dovoljno novca u valuti Serbian Dinar za kupovinu 10000000 USD(United States Dollar)",
+                        + ", nema dovoljno balansa u valuti Serbian Dinar",
                 errorMsg);
     }
 
