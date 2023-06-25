@@ -1,0 +1,38 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Test Client" type="MavenRunConfiguration" factoryName="Maven" singleton="false">
+    <MavenSettings>
+      <option name="myGeneralSettings" />
+      <option name="myRunnerSettings" />
+      <option name="myRunnerParameters">
+        <MavenRunnerParameters>
+          <option name="profiles">
+            <set />
+          </option>
+          <option name="goals">
+            <list>
+              <option value="spotless:apply" />
+              <option value="clean" />
+              <option value="compile" />
+              <option value="test" />
+              <option value="-DargLine=-Dspring.profiles.active=local,test" />
+            </list>
+          </option>
+          <option name="pomFileName" />
+          <option name="profilesMap">
+            <map>
+              <entry key="local,test" value="true" />
+            </map>
+          </option>
+          <option name="resolveToWorkspace" value="false" />
+          <option name="workingDirPath" value="$PROJECT_DIR$/client" />
+        </MavenRunnerParameters>
+      </option>
+    </MavenSettings>
+    <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
+      <option name="credential" />
+      <option name="region" />
+      <option name="useCurrentConnection" value="false" />
+    </extension>
+    <method v="2" />
+  </configuration>
+</component>
