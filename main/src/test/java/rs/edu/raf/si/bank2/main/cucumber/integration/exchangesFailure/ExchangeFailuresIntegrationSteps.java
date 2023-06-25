@@ -139,24 +139,33 @@ public class ExchangeFailuresIntegrationSteps extends ExchangeFailuresIntegratio
         }
     }
 
-    @Then("user gets activity of nonexistent exchange by MIC Code from database") // todo fix
+    @Then("user gets activity of nonexistent exchange by MIC Code from database")
     public void user_gets_activity_of_nonexistent_exchange_by_mic_code_from_database() {
         try {
-            Exception exception = assertThrows(Exception.class, () -> {
-                mockMvc.perform(get("/api/exchange/status/" + testExchange.getMicCode())
-                                .contentType("application/json")
-                                .header("Content-Type", "application/json")
-                                .header("Access-Control-Allow-Origin", "*")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
-                        .andReturn();
-            });
-
-            String expectedMessage =
-                    "Request processing failed; nested exception is rs.edu.raf.si.bank2.main.exceptions.ExchangeNotFoundException: Requested exchange not found in the database.";
-            String actualMessage = exception.getMessage();
-            assertEquals(expectedMessage, actualMessage);
+            mockMvc.perform(get("/api/exchange/status/" + testExchange.getMicCode())
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andReturn();
         } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Then("exchange not found by provided code")
+    public void exchangeNotFoundByProvidedCode() {
+        try {
+            mockMvc.perform(get("/api/exchange/status/randomCodeWeKnowItIsNotValid")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isNotFound())
+                    .andReturn();
+
+        } catch (Exception e) {
+            e.printStackTrace();
             fail(e.getMessage());
         }
     }

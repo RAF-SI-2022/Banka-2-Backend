@@ -20,3 +20,8 @@ Feature: Exchange Failure service
     Given user logs in
     When user is logged in
     Then user gets activity of nonexistent exchange by MIC Code from database
+
+  Scenario: exchange not found by provided code
+    Given user logs in
+    When user is logged in
+    Then exchange not found by provided code
