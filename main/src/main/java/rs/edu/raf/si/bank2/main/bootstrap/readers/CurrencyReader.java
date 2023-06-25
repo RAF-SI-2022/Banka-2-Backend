@@ -2,16 +2,15 @@ package rs.edu.raf.si.bank2.main.bootstrap.readers;
 
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
-import rs.edu.raf.si.bank2.main.models.mariadb.Inflation;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
+import rs.edu.raf.si.bank2.main.models.mariadb.Inflation;
 
 public class CurrencyReader {
 
@@ -22,8 +21,8 @@ public class CurrencyReader {
         // TODO da li ovo treba da vrati praznu listu ili null ako neuspesno?
 
         String resPath = "/currencies/currencies.csv";
-        Optional<String> content = rs.edu.raf.si.bank2.main.bootstrap
-                .readers.CSVReader.getInstance().readCSVString(resPath);
+        Optional<String> content = rs.edu.raf.si.bank2.main.bootstrap.readers.CSVReader.getInstance()
+                .readCSVString(resPath);
         if (content.isEmpty()) {
             logger.error("Failed to load CSV " + resPath);
             // TODO da li ovde treba empty list ili null?
@@ -81,8 +80,8 @@ public class CurrencyReader {
         // TODO da li ovo treba da vrati praznu listu ili null ako neuspesno?
 
         String resPath = "/currencies/inflations.csv";
-        Optional<String> content = rs.edu.raf.si.bank2.main.bootstrap
-                .readers.CSVReader.getInstance().readCSVString(resPath);
+        Optional<String> content = rs.edu.raf.si.bank2.main.bootstrap.readers.CSVReader.getInstance()
+                .readCSVString(resPath);
         if (content.isEmpty()) {
             logger.error("Failed to load CSV " + resPath);
             // TODO da li ovde treba empty list ili null?

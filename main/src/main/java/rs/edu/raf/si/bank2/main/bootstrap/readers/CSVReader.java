@@ -1,14 +1,13 @@
 package rs.edu.raf.si.bank2.main.bootstrap.readers;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
 
 /**
  * Convenience class for reading CSV files and parsing their content.
@@ -17,8 +16,7 @@ public class CSVReader {
 
     private final Logger logger = LoggerFactory.getLogger(CommandLineRunner.class);
 
-    private CSVReader() {
-    }
+    private CSVReader() {}
 
     /**
      * Singleton instance of the class.

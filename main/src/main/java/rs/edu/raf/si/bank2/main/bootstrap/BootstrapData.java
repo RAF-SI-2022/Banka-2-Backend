@@ -1,5 +1,15 @@
 package rs.edu.raf.si.bank2.main.bootstrap;
 
+import java.io.*;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Stream;
+import javax.persistence.EntityManagerFactory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
@@ -9,21 +19,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import rs.edu.raf.si.bank2.main.bootstrap.readers.CSVReader;
 import rs.edu.raf.si.bank2.main.bootstrap.readers.CurrencyReader;
-import rs.edu.raf.si.bank2.main.models.mariadb.Currency;
 import rs.edu.raf.si.bank2.main.models.mariadb.*;
+import rs.edu.raf.si.bank2.main.models.mariadb.Currency;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
-
-import javax.persistence.EntityManagerFactory;
-import java.io.*;
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 public class BootstrapData implements CommandLineRunner {
@@ -48,8 +46,7 @@ public class BootstrapData implements CommandLineRunner {
             FutureRepository futureRepository,
             BalanceRepository balanceRepository,
             StockRepository stockRepository,
-            EntityManagerFactory entityManagerFactory
-    ) {
+            EntityManagerFactory entityManagerFactory) {
         this.currencyRepository = currencyRepository;
         this.inflationRepository = inflationRepository;
         this.exchangeRepository = exchangeRepository;
@@ -128,11 +125,11 @@ public class BootstrapData implements CommandLineRunner {
                         data[2],
                         data[3],
                         this.currencyRepository
-                                .findCurrencyByCurrencyCode(data[4])
-                                .isPresent()
+                                        .findCurrencyByCurrencyCode(data[4])
+                                        .isPresent()
                                 ? this.currencyRepository
-                                .findCurrencyByCurrencyCode(data[4])
-                                .get()
+                                        .findCurrencyByCurrencyCode(data[4])
+                                        .get()
                                 : null,
                         data[5],
                         data[6],
@@ -320,10 +317,10 @@ public class BootstrapData implements CommandLineRunner {
                             .onDate(
                                     data[5].contains(" ")
                                             ? LocalDateTime.parse(
-                                            data[5], DateTimeFormatter.ofPattern("yyyy" + "-MM-dd HH:mm:ss"))
+                                                    data[5], DateTimeFormatter.ofPattern("yyyy" + "-MM-dd HH:mm:ss"))
                                             : LocalDateTime.parse(
-                                            data[5] + " 00:00:00",
-                                            DateTimeFormatter.ofPattern("yyyy" + "-MM-dd HH:mm:ss")))
+                                                    data[5] + " 00:00:00",
+                                                    DateTimeFormatter.ofPattern("yyyy" + "-MM-dd HH:mm:ss")))
                             .stock(mergedStock)
                             .type(StockHistoryType.valueOf(data[7]))
                             .build();
@@ -338,5 +335,4 @@ public class BootstrapData implements CommandLineRunner {
             br1.close();
         }
     }
-
 }
