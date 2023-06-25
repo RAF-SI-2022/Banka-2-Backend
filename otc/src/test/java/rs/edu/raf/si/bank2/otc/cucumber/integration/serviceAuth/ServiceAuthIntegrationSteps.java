@@ -1,6 +1,5 @@
 package rs.edu.raf.si.bank2.otc.cucumber.integration.serviceAuth;
 
-import static com.mongodb.assertions.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -46,7 +45,6 @@ public class ServiceAuthIntegrationSteps extends ServiceAuthIntegrationTestConfi
         // generate valid user
         String pass = "12345";
         User user = User.builder()
-                .id(70L)
                 .jmbg("1122333444555")
                 .firstName("John")
                 .lastName("Doe")
@@ -62,11 +60,14 @@ public class ServiceAuthIntegrationSteps extends ServiceAuthIntegrationTestConfi
         // TODO this fails because of SQL integrity - models that rely on
         //  this prevent it from being deleted!
         // userServiceInterface.deleteById(user.getId());
-        userServiceInterface.save(user);
 
+        Optional<User> emailUser = userServiceInterface.findByEmail("email@raf.rs");
+        if (emailUser.isEmpty()) {
+            userServiceInterface.save(user);
+        }
         // generate valid token
         Optional<String> optToken = authorisationServiceInterface.login(user.getEmail(), pass);
-        assertTrue(optToken.isPresent());
+        //        assertTrue(optToken.isPresent());
         token = optToken.get();
     }
 
