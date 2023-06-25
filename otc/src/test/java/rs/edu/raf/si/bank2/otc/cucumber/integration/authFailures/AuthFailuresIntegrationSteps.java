@@ -8,6 +8,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.util.ArrayList;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -55,7 +56,7 @@ public class AuthFailuresIntegrationSteps extends AuthFailuresIntegrationTestCon
     @Given("user exists in database")
     public void user_exists_in_database() {
         user = User.builder()
-                .id(1L)
+                .id(0L)
                 .jmbg("1122333444555")
                 .firstName("John")
                 .lastName("Doe")
@@ -71,7 +72,10 @@ public class AuthFailuresIntegrationSteps extends AuthFailuresIntegrationTestCon
         // TODO this fails because of SQL integrity - models that rely on
         //  this prevent it from being deleted!
         // userServiceInterface.deleteById(user.getId());
-        userServiceInterface.save(user);
+        Optional<User> emailUser = userServiceInterface.findByEmail("email@raf.rs");
+        if (emailUser.isEmpty()) {
+            userServiceInterface.save(user);
+        }
     }
 
     @When("user logs in with bad credentials")
