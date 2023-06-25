@@ -15,7 +15,7 @@ import org.jsoup.select.Elements;
 public class OptionDateScraper {
 
     public List<LocalDate> scrape() {
-        String url = "https://finance.yahoo.com/quote/NVDA/options?p=NVDA&straddle=false";
+        String url = "https://finance.yahoo.com/quote/NVDA/optionns?p=NVDA&straddle=false";
         Document doc = null;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.US);
         List<LocalDate> dropDownDates = new ArrayList<>();

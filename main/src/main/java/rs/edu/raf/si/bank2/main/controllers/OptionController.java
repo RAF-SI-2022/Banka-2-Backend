@@ -5,7 +5,10 @@ import static org.springframework.security.core.context.SecurityContextHolder.ge
 import io.micrometer.core.annotation.Timed;
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,6 +39,27 @@ public class OptionController {
     private final UserService userService;
     private final OptionDateScraper optionDateScraper;
     private final UserCommunicationInterface userCommunicationInterface;
+    private List<LocalDate> safetyDates;
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.US);
+    List<String> dates = List.of(
+            "2023-06-30",
+            "2023-07-07",
+            "2023-07-14",
+            "2023-07-21",
+            "2023-07-28",
+            "2023-08-18",
+            "2023-09-15",
+            "2023-10-20",
+            "2023-11-17",
+            "2023-12-15",
+            "2024-01-19",
+            "2024-03-15",
+            "2024-06-21",
+            "2025-01-17",
+            "2025-06-20",
+            "2025-12-19"
+    );
+
 
     @Autowired
     public OptionController(
@@ -44,6 +68,13 @@ public class OptionController {
         this.optionService = optionService;
         this.userService = userService;
         this.optionDateScraper = new OptionDateScraper();
+
+        safetyDates = new ArrayList<>();
+        for (String date : dates) {
+            LocalDate localDate = LocalDate.parse(date);
+            safetyDates.add(localDate);
+        }
+
     }
 
     @Timed("controllers.option.getStockBySymbolDateString")
@@ -90,6 +121,8 @@ public class OptionController {
         }
     }
 
+
+
     @Timed("controllers.option.getDates")
     @GetMapping(value = "/dates")
     public ResponseEntity<?> getDates() {
@@ -100,11 +133,17 @@ public class OptionController {
             Optional<User> userOptional = userService.findByEmail(signedInUserEmail);
             if (userOptional.isPresent()) {
                 dates = this.optionDateScraper.scrape();
+                if (!dates.isEmpty()){
+                    safetyDates = dates;
+                }
             } else {
                 return ResponseEntity.status(400).body("Doslo je do neocekivane greske.");
             }
         } catch (UserNotFoundException | OptionNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
+        if (dates.isEmpty()){
+            dates = safetyDates;
         }
         return ResponseEntity.ok().body(dates);
     }
