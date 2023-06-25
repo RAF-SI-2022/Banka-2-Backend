@@ -109,14 +109,13 @@ public class BootstrapData implements CommandLineRunner {
         // Set up admin user
         Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
         if (adminUser.isEmpty()) {
-            System.err.println(this.userRepository.save(admin));
+            this.userRepository.save(admin);
             logger.info("Root admin added");
         }
 
         Optional<User> powerlessOptional = userRepository.findUserByEmail("powerless@gmail.com");
         if (powerlessOptional.isEmpty()) {
-            System.err.println(this.userRepository.save(admin));
-            System.err.println(this.userRepository.save(powerless));
+            this.userRepository.save(powerless);
             logger.info("Root powerless added");
         }
     }
