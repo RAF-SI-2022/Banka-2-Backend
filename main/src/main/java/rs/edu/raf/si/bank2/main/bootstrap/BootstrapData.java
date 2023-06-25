@@ -1,20 +1,5 @@
 package rs.edu.raf.si.bank2.main.bootstrap;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
-import rs.edu.raf.si.bank2.main.bootstrap.readers.CSVReader;
-import rs.edu.raf.si.bank2.main.bootstrap.readers.CurrencyReader;
-import rs.edu.raf.si.bank2.main.exceptions.CurrencyNotFoundException;
-import rs.edu.raf.si.bank2.main.models.mariadb.Currency;
-import rs.edu.raf.si.bank2.main.models.mariadb.*;
-import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
-
-import javax.persistence.EntityManagerFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -27,6 +12,20 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Stream;
+import javax.persistence.EntityManagerFactory;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+import rs.edu.raf.si.bank2.main.bootstrap.readers.CSVReader;
+import rs.edu.raf.si.bank2.main.bootstrap.readers.CurrencyReader;
+import rs.edu.raf.si.bank2.main.exceptions.CurrencyNotFoundException;
+import rs.edu.raf.si.bank2.main.models.mariadb.*;
+import rs.edu.raf.si.bank2.main.models.mariadb.Currency;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
 
 @Component
 public class BootstrapData implements CommandLineRunner {
@@ -52,7 +51,8 @@ public class BootstrapData implements CommandLineRunner {
             FutureRepository futureRepository,
             BalanceRepository balanceRepository,
             StockRepository stockRepository,
-            EntityManagerFactory entityManagerFactory, UserRepository userRepository) {
+            EntityManagerFactory entityManagerFactory,
+            UserRepository userRepository) {
         this.currencyRepository = currencyRepository;
         this.inflationRepository = inflationRepository;
         this.exchangeRepository = exchangeRepository;
@@ -91,10 +91,10 @@ public class BootstrapData implements CommandLineRunner {
         }
 
         Optional<User> adminUser = userRepository.findUserByEmail("anesic3119rn+banka2backend+admin@raf.rs");
-        if (adminUser.isPresent() && balanceRepository.findAllByUser_Id(adminUser.get().getId()).size() == 0) {
+        if (adminUser.isPresent()
+                && balanceRepository.findAllByUser_Id(adminUser.get().getId()).size() == 0) {
             addBalancesToAdmin();
         }
-
 
         logger.info("BootstrapData finished adding data!");
     }
@@ -111,7 +111,6 @@ public class BootstrapData implements CommandLineRunner {
         List<Inflation> inflationList = cs.getInflations();
         this.inflationRepository.saveAll(inflationList);
     }
-
 
     private void addBalancesToAdmin() {
         // Add initial 100_000 RSD to admin
@@ -168,11 +167,11 @@ public class BootstrapData implements CommandLineRunner {
                         data[2],
                         data[3],
                         this.currencyRepository
-                                .findCurrencyByCurrencyCode(data[4])
-                                .isPresent()
+                                        .findCurrencyByCurrencyCode(data[4])
+                                        .isPresent()
                                 ? this.currencyRepository
-                                .findCurrencyByCurrencyCode(data[4])
-                                .get()
+                                        .findCurrencyByCurrencyCode(data[4])
+                                        .get()
                                 : null,
                         data[5],
                         data[6],
@@ -360,10 +359,10 @@ public class BootstrapData implements CommandLineRunner {
                             .onDate(
                                     data[5].contains(" ")
                                             ? LocalDateTime.parse(
-                                            data[5], DateTimeFormatter.ofPattern("yyyy" + "-MM-dd HH:mm:ss"))
+                                                    data[5], DateTimeFormatter.ofPattern("yyyy" + "-MM-dd HH:mm:ss"))
                                             : LocalDateTime.parse(
-                                            data[5] + " 00:00:00",
-                                            DateTimeFormatter.ofPattern("yyyy" + "-MM-dd HH:mm:ss")))
+                                                    data[5] + " 00:00:00",
+                                                    DateTimeFormatter.ofPattern("yyyy" + "-MM-dd HH:mm:ss")))
                             .stock(mergedStock)
                             .type(StockHistoryType.valueOf(data[7]))
                             .build();
