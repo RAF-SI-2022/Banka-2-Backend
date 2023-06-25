@@ -13,9 +13,16 @@ RUN --mount=type=cache,target=/root/.m2 mvn -DfinalName=app -Dmaven.test.skip -f
 # Expose
 FROM openjdk:17-alpine
 
-WORKDIR /
+ARG COPY_SRC=false
+
 ENV HOME=/usr/app
-COPY --from=builder $HOME/target/*.jar /app.jar
+RUN mkdir -p $HOME
+WORKDIR $HOME
+
+# Copy only if source requested
+COPY --from=builder $HOME $HOME
+RUN if [ "$COPY_SRC" != "true" ]; then cd .. && rm -rf $HOME && mkdir -p $HOME && cd $HOME; fi
+COPY --from=builder $HOME/target/*.jar $HOME/app.jar
 
 # Add curl for health check
 RUN apk --no-cache --update add curl
