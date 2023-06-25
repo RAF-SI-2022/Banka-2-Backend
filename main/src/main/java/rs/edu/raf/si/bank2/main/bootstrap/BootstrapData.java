@@ -1,6 +1,9 @@
 package rs.edu.raf.si.bank2.main.bootstrap;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -19,6 +22,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import rs.edu.raf.si.bank2.main.bootstrap.readers.CSVReader;
 import rs.edu.raf.si.bank2.main.bootstrap.readers.CurrencyReader;
+import rs.edu.raf.si.bank2.main.exceptions.CurrencyNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.*;
 import rs.edu.raf.si.bank2.main.models.mariadb.Currency;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
@@ -37,6 +41,7 @@ public class BootstrapData implements CommandLineRunner {
     private final BalanceRepository balanceRepository;
     private final StockRepository stockRepository;
     private final EntityManagerFactory entityManagerFactory;
+    private final UserRepository userRepository;
 
     @Autowired
     public BootstrapData(
@@ -46,7 +51,8 @@ public class BootstrapData implements CommandLineRunner {
             FutureRepository futureRepository,
             BalanceRepository balanceRepository,
             StockRepository stockRepository,
-            EntityManagerFactory entityManagerFactory) {
+            EntityManagerFactory entityManagerFactory,
+            UserRepository userRepository) {
         this.currencyRepository = currencyRepository;
         this.inflationRepository = inflationRepository;
         this.exchangeRepository = exchangeRepository;
@@ -54,6 +60,7 @@ public class BootstrapData implements CommandLineRunner {
         this.balanceRepository = balanceRepository;
         this.stockRepository = stockRepository;
         this.entityManagerFactory = entityManagerFactory;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -83,6 +90,12 @@ public class BootstrapData implements CommandLineRunner {
             logger.info("Added stocks");
         }
 
+        Optional<User> adminUser = userRepository.findUserByEmail("anesic3119rn+banka2backend+admin@raf.rs");
+        if (adminUser.isPresent()
+                && balanceRepository.findAllByUser_Id(adminUser.get().getId()).size() == 0) {
+            addBalancesToAdmin();
+        }
+
         logger.info("BootstrapData finished adding data!");
     }
 
@@ -97,6 +110,35 @@ public class BootstrapData implements CommandLineRunner {
         this.currencyRepository.saveAll(currencyList);
         List<Inflation> inflationList = cs.getInflations();
         this.inflationRepository.saveAll(inflationList);
+    }
+
+    private void addBalancesToAdmin() {
+        // Add initial 100_000 RSD to admin
+        Optional<User> adminUser = userRepository.findUserByEmail("anesic3119rn+banka2backend+admin@raf.rs");
+        User admin = adminUser.get();
+        Balance balance1 = this.getInitialAdminBalance(admin, "RSD");
+        Balance balance2 = this.getInitialAdminBalance(admin, "USD");
+        List<Balance> balances = new ArrayList<>();
+        balances.add(balance1);
+        balances.add(balance2);
+        admin.setBalances(balances);
+        this.userRepository.save(admin);
+        this.balanceRepository.save(balance1);
+        this.balanceRepository.save(balance2);
+    }
+
+    private Balance getInitialAdminBalance(User admin, String currency) {
+        Balance balance = new Balance();
+        balance.setUser(admin);
+        Optional<rs.edu.raf.si.bank2.main.models.mariadb.Currency> curr =
+                this.currencyRepository.findCurrencyByCurrencyCode(currency);
+        if (curr.isEmpty()) throw new CurrencyNotFoundException(currency);
+        balance.setCurrency(curr.get());
+        balance.setAmount(100000f);
+        balance.setFree(100000f);
+        balance.setReserved(0f);
+        balance.setType(BalanceType.CASH);
+        return balance;
     }
 
     /**

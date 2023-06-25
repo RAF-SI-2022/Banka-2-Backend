@@ -525,7 +525,7 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                             .content(
                                     """
                                                   {
-                                                      "password": "testPass"
+                                                      "password": "admin"
                                                   }
                                                 """)
                             .header("Content-Type", "application/json")
@@ -611,5 +611,11 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                 + "> not found.";
         String actualMessage = exception.getMessage();
         assertEquals(expectedMessage, actualMessage);
+    }
+
+    @Given("delete users")
+    public void delete_users() {
+        Optional<User> user = userService.findByEmail("testUser@gmail.com");
+        user.ifPresent(value -> userService.deleteById(value.getId()));
     }
 }

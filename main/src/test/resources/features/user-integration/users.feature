@@ -63,8 +63,7 @@ Feature: User service
     When user is logged in
     Then user changes his password
 
-#  Scenario: Deleting user
-#    Given privileged user logged in
-#    When deleting user from database
-#    Then user no longer in database
+  Scenario: Deleting user
+    Given delete users
+
 
