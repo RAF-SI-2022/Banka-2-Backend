@@ -57,9 +57,7 @@ public class OptionController {
             "2024-06-21",
             "2025-01-17",
             "2025-06-20",
-            "2025-12-19"
-    );
-
+            "2025-12-19");
 
     @Autowired
     public OptionController(
@@ -74,7 +72,6 @@ public class OptionController {
             LocalDate localDate = LocalDate.parse(date);
             safetyDates.add(localDate);
         }
-
     }
 
     @Timed("controllers.option.getStockBySymbolDateString")
@@ -121,8 +118,6 @@ public class OptionController {
         }
     }
 
-
-
     @Timed("controllers.option.getDates")
     @GetMapping(value = "/dates")
     public ResponseEntity<?> getDates() {
@@ -133,7 +128,7 @@ public class OptionController {
             Optional<User> userOptional = userService.findByEmail(signedInUserEmail);
             if (userOptional.isPresent()) {
                 dates = this.optionDateScraper.scrape();
-                if (!dates.isEmpty()){
+                if (!dates.isEmpty()) {
                     safetyDates = dates;
                 }
             } else {
@@ -142,7 +137,7 @@ public class OptionController {
         } catch (UserNotFoundException | OptionNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
-        if (dates.isEmpty()){
+        if (dates.isEmpty()) {
             dates = safetyDates;
         }
         return ResponseEntity.ok().body(dates);

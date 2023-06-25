@@ -33,7 +33,8 @@ public class ReserveController {
             BalanceRepository balanceRepository,
             UserRepository userRepository,
             StockRepository stockRepository,
-            OptionRepository optionRepository, CurrencyRepository currencyRepository) {
+            OptionRepository optionRepository,
+            CurrencyRepository currencyRepository) {
         this.userOptionRepository = userOptionRepository;
         this.userStocksRepository = userStocksRepository;
         this.futureRepository = futureRepository;
@@ -79,8 +80,7 @@ public class ReserveController {
 
         System.err.println(reserveDto);
 
-        Optional<UserStock> userStock =
-                userStocksRepository.findUserStockById(reserveDto.getHartijaId());
+        Optional<UserStock> userStock = userStocksRepository.findUserStockById(reserveDto.getHartijaId());
 
         if (userStock.isEmpty()) return ResponseEntity.status(404).body("Stock nije pronadjen");
         if (userStock.get().getAmount() < reserveDto.getAmount())
@@ -144,7 +144,8 @@ public class ReserveController {
         // todo trenutno hard code na USD
 
         Optional<Currency> usd = currencyRepository.findCurrencyByCurrencyCode("USD");
-        Optional<Balance> userBalance = balanceRepository.findBalanceByUserIdAndCurrencyId(reserveDto.getUserId(), usd.get().getId());
+        Optional<Balance> userBalance = balanceRepository.findBalanceByUserIdAndCurrencyId(
+                reserveDto.getUserId(), usd.get().getId());
         // !!! NIJE HARTIJA NEGO CURRENCY ID !!!
         if (userBalance.isEmpty()) return ResponseEntity.status(404).body("Balans nije pronadjen");
 
@@ -165,8 +166,8 @@ public class ReserveController {
         // todo trenutno hard code na USD
 
         Optional<Currency> usd = currencyRepository.findCurrencyByCurrencyCode("USD");
-        Optional<Balance> userBalance =
-                balanceRepository.findBalanceByUserIdAndCurrencyId(reserveDto.getUserId(), usd.get().getId());
+        Optional<Balance> userBalance = balanceRepository.findBalanceByUserIdAndCurrencyId(
+                reserveDto.getUserId(), usd.get().getId());
         // !!! NIJE HARTIJA NEGO CURRENCY ID !!!
         if (userBalance.isEmpty()) return ResponseEntity.status(404).body("Balans nije pronadjen");
 

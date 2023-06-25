@@ -46,7 +46,7 @@ public class ServiceAuthIntegrationSteps extends ServiceAuthIntegrationTestConfi
         // generate valid user
         String pass = "12345";
         User user = User.builder()
-                .id(1L)
+                .id(70L)
                 .jmbg("1122333444555")
                 .firstName("John")
                 .lastName("Doe")
