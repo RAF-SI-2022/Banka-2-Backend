@@ -1,8 +1,11 @@
 package rs.edu.raf.si.bank2.otc.controllers;
 
+import static org.springframework.security.core.context.SecurityContextHolder.getContext;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.annotation.Timed;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,10 +21,6 @@ import rs.edu.raf.si.bank2.otc.models.mongodb.TransactionElement;
 import rs.edu.raf.si.bank2.otc.services.OtcService;
 import rs.edu.raf.si.bank2.otc.services.UserCommunicationService;
 import rs.edu.raf.si.bank2.otc.services.interfaces.UserCommunicationInterface;
-
-import java.util.Optional;
-
-import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 /**
  * Controller for validating tokens from other services.
@@ -61,10 +60,10 @@ public class OtcController {
             }
         } else return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
 
-//        System.err.println(user);
+        //        System.err.println(user);
 
         Permission permission = user.getPermissions().get(0);
-        if (permission.getPermissionName() == PermissionName.ADMIN_USER){
+        if (permission.getPermissionName() == PermissionName.ADMIN_USER) {
             return ResponseEntity.ok().body(otcService.getAllDraftContracts());
         }
 
@@ -92,17 +91,16 @@ public class OtcController {
             }
         } else return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
 
-//        System.err.println(user);
+        //        System.err.println(user);
 
         Permission permission = user.getPermissions().get(0);
-        if (permission.getPermissionName() == PermissionName.ADMIN_USER){
+        if (permission.getPermissionName() == PermissionName.ADMIN_USER) {
             return ResponseEntity.ok().body(otcService.getAllContractsByCompanyId(companyId));
         }
 
         if (user.getPermissions().size() > 1) {
             return ResponseEntity.ok().body(otcService.getAllContractsByCompanyId(companyId));
         } else return ResponseEntity.ok().body(otcService.getAllContractsForUserIdAndCompany(user.getId(), companyId));
-
     }
 
     @Timed("controllers.otc.getContract")
@@ -177,7 +175,7 @@ public class OtcController {
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
-    //ISPOD SU TRANSACTION ELEMENTI
+    // ISPOD SU TRANSACTION ELEMENTI
 
     @Timed("controllers.otc.getAllElements")
     @GetMapping("/elements")
@@ -199,8 +197,7 @@ public class OtcController {
         }
 
         Optional<TransactionElement> transactionElement = otcService.getElementById(id);
-        if (transactionElement.isEmpty())
-            return ResponseEntity.status(404).body("Ne postoji element u bazi");
+        if (transactionElement.isEmpty()) return ResponseEntity.status(404).body("Ne postoji element u bazi");
         return ResponseEntity.ok().body(transactionElement.get());
     }
 
@@ -229,7 +226,8 @@ public class OtcController {
 
     @Timed("controllers.otc.removeTransactionElement")
     @DeleteMapping("/remove_element/{contractId}/{elementId}")
-    public ResponseEntity<?> removeTransactionElement(@PathVariable(name = "contractId") String contractId, @PathVariable(name = "elementId") String elementId) {
+    public ResponseEntity<?> removeTransactionElement(
+            @PathVariable(name = "contractId") String contractId, @PathVariable(name = "elementId") String elementId) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
@@ -238,5 +236,4 @@ public class OtcController {
         OtcResponseDto response = otcService.removeTransactionElement(contractId, elementId);
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
-
 }

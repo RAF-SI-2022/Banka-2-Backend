@@ -1,6 +1,10 @@
 package rs.edu.raf.si.bank2.otc.services;
 
-
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.otc.dto.CommunicationDto;
@@ -12,12 +16,6 @@ import rs.edu.raf.si.bank2.otc.repositories.mongodb.CompanyRepository;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.ContactRepository;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.TransactionElementRepository;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 @Service
 public class OtcService {
 
@@ -27,7 +25,11 @@ public class OtcService {
     private final TransactionElementRepository transactionElementRepository;
 
     @Autowired
-    public OtcService(ContactRepository contactRepository, CompanyRepository companyRepository, ReservedService reservedService, TransactionElementRepository transactionElementRepository) {
+    public OtcService(
+            ContactRepository contactRepository,
+            CompanyRepository companyRepository,
+            ReservedService reservedService,
+            TransactionElementRepository transactionElementRepository) {
         this.contactRepository = contactRepository;
         this.companyRepository = companyRepository;
         this.reservedService = reservedService;
@@ -38,7 +40,6 @@ public class OtcService {
         return contactRepository.findById(id);
     }
 
-
     public List<Contract> getAllContracts() {
         return contactRepository.findAll();
     }
@@ -46,7 +47,6 @@ public class OtcService {
     public List<Contract> getAllDraftContracts() {
         return contactRepository.findAllByContractStatus("DRAFT");
     }
-
 
     public List<Contract> getAllContractsForUserId(Long userId) {
         return contactRepository.findByUserId(userId);
@@ -137,16 +137,17 @@ public class OtcService {
             return new OtcResponseDto(500, "Ugovor se ne moze promeniti");
         }
 
-        //kontaktira main service, i skloni resurse (rezervise) tj pemesti ih u transElBazu
-        //ili
-        //kontaktira main service i rezervise pare za zeljenu hartiju
+        // kontaktira main service, i skloni resurse (rezervise) tj pemesti ih u transElBazu
+        // ili
+        // kontaktira main service i rezervise pare za zeljenu hartiju
         CommunicationDto response = reservedService.sendReservation(transactionElementDto);
 
-        //ako je true znaci da je prosla rezervacija, nastavi sa cuvanjem
+        // ako je true znaci da je prosla rezervacija, nastavi sa cuvanjem
         if (response.getResponseCode() != 200) return new OtcResponseDto(500, response.getResponseMsg());
 
-        //ako sve prodje napravi element i sacuvaj ga u bazicu
-        TransactionElement transactionElement = new TransactionElement();//nemamo contract id jer ih contract sve suva u sebi
+        // ako sve prodje napravi element i sacuvaj ga u bazicu
+        TransactionElement transactionElement =
+                new TransactionElement(); // nemamo contract id jer ih contract sve suva u sebi
         transactionElement.setBuyOrSell(transactionElementDto.getBuyOrSell());
         transactionElement.setTransactionElement(transactionElementDto.getTransactionElement());
         transactionElement.setBalance(transactionElementDto.getBalance());
@@ -155,19 +156,16 @@ public class OtcService {
         transactionElement.setPriceOfOneElement(transactionElementDto.getPriceOfOneElement());
         transactionElement.setUserId(transactionElementDto.getUserId());
         transactionElement.setMariaDbId(transactionElementDto.getMariaDbId());
-        //sacuvamo podatke o hartiji da ga mozemo vratiti/dodati posle//todo remove
+        // sacuvamo podatke o hartiji da ga mozemo vratiti/dodati posle//todo remove
 
-        if (transactionElementDto.getBuyOrSell() == ContractElements.SELL){
+        if (transactionElementDto.getBuyOrSell() == ContractElements.SELL) {
             System.err.println(response.getResponseMsg());
             if (transactionElementDto.getTransactionElement() == TransactionElements.FUTURE)
                 transactionElement.setFutureStorageField(response.getResponseMsg());
             else transactionElement.setFutureStorageField("");
-        }
-        else if (transactionElementDto.getBuyOrSell() == ContractElements.BUY){
+        } else if (transactionElementDto.getBuyOrSell() == ContractElements.BUY) {
             transactionElement.setFutureStorageField(transactionElementDto.getFutureStorageField());
         }
-
-
 
         transactionElementRepository.save(transactionElement);
         contract.get().getTransactionElements().add(transactionElement);
@@ -198,7 +196,6 @@ public class OtcService {
         return new OtcResponseDto(200, "Rezervacija uspesno sklonjena");
     }
 
-
     public OtcResponseDto deleteContract(String id) {
         Optional<Contract> contract = contactRepository.findById(id);
 
@@ -207,7 +204,7 @@ public class OtcService {
             return new OtcResponseDto(404, "Ugovor nije u bazi");
         }
 
-        for (TransactionElement te : contract.get().getTransactionElements()){//sklonimo sve rezervacije koje imamo
+        for (TransactionElement te : contract.get().getTransactionElements()) { // sklonimo sve rezervacije koje imamo
             this.removeTransactionElement(contract.get().getId(), te.getId());
         }
 
@@ -223,13 +220,15 @@ public class OtcService {
             return new OtcResponseDto(404, "Ugovor nije u bazi");
         }
 
-        //todo obradi sve sto treba
+        // todo obradi sve sto treba
 
-        List<TransactionElement> contractElements = new ArrayList<>(contract.get().getTransactionElements());
+        List<TransactionElement> contractElements =
+                new ArrayList<>(contract.get().getTransactionElements());
 
-        for (TransactionElement tl: contractElements){
+        for (TransactionElement tl : contractElements) {
             CommunicationDto communicationDto = reservedService.finalizeElement(tl);
-            if (communicationDto.getResponseCode() != 200) return new OtcResponseDto(communicationDto.getResponseCode(), communicationDto.getResponseMsg());
+            if (communicationDto.getResponseCode() != 200)
+                return new OtcResponseDto(communicationDto.getResponseCode(), communicationDto.getResponseMsg());
         }
 
         contract.get().setContractStatus(ContractElements.FINALISED);
@@ -237,6 +236,4 @@ public class OtcService {
 
         return new OtcResponseDto(200, "Ugovor uspesno kompletiran");
     }
-
-
 }

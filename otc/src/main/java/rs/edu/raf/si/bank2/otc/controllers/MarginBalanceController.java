@@ -1,14 +1,13 @@
 package rs.edu.raf.si.bank2.otc.controllers;
 
 import io.micrometer.core.annotation.Timed;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.edu.raf.si.bank2.otc.models.mongodb.MarginBalance;
 import rs.edu.raf.si.bank2.otc.services.MarginBalanceService;
-
-import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -50,7 +49,8 @@ public class MarginBalanceController {
 
     @Timed("controllers.marginBalance.updateMarginBalance")
     @PutMapping("/{id}")
-    public ResponseEntity<MarginBalance> updateMarginBalance(@PathVariable String id, @RequestBody MarginBalance updatedMarginBalance) {
+    public ResponseEntity<MarginBalance> updateMarginBalance(
+            @PathVariable String id, @RequestBody MarginBalance updatedMarginBalance) {
         MarginBalance existingMarginBalance = marginBalanceService.getMarginBalanceById(id);
         if (existingMarginBalance != null) {
             updatedMarginBalance.setId(existingMarginBalance.getId());

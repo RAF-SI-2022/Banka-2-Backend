@@ -1,11 +1,13 @@
 package rs.edu.raf.si.bank2.client.controllers;
 
+import static org.springframework.security.core.context.SecurityContextHolder.getContext;
+
 import io.micrometer.core.annotation.Timed;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.edu.raf.si.bank2.client.dto.*;
-import rs.edu.raf.si.bank2.client.models.mariadb.PermissionName;
 import rs.edu.raf.si.bank2.client.models.mongodb.Client;
 import rs.edu.raf.si.bank2.client.requests.LoginRequest;
 import rs.edu.raf.si.bank2.client.responses.ClientLoginResponse;
@@ -13,10 +15,6 @@ import rs.edu.raf.si.bank2.client.services.ClientService;
 import rs.edu.raf.si.bank2.client.services.MailingService;
 import rs.edu.raf.si.bank2.client.services.interfaces.UserCommunicationInterface;
 import rs.edu.raf.si.bank2.client.utils.JwtUtil;
-
-import java.util.Optional;
-
-import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 @RestController
 @CrossOrigin
@@ -30,7 +28,11 @@ public class ClientController {
     private final MailingService mailingService;
 
     @Autowired
-    public ClientController(UserCommunicationInterface userCommunicationInterface, ClientService clientService, JwtUtil jwtUtil, MailingService mailingService) {
+    public ClientController(
+            UserCommunicationInterface userCommunicationInterface,
+            ClientService clientService,
+            JwtUtil jwtUtil,
+            MailingService mailingService) {
         this.userCommunicationInterface = userCommunicationInterface;
         this.clientService = clientService;
         this.jwtUtil = jwtUtil;
@@ -41,15 +43,15 @@ public class ClientController {
     @GetMapping
     public ResponseEntity<?> getAllClients() {
         String signedInUserEmail = getContext().getAuthentication().getName();
-//        if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
-//            return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
-//        }
+        //        if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
+        //            return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
+        //        }
         return ResponseEntity.ok(clientService.getAllClients());
     }
 
     @Timed("controllers.client.mailFromToken")
     @GetMapping("/mailFromToken")
-    public ResponseEntity<?> getClientMailFromToken(){
+    public ResponseEntity<?> getClientMailFromToken() {
         String signedInUserEmail = getContext().getAuthentication().getName();
         return ResponseEntity.ok(signedInUserEmail);
     }
@@ -71,7 +73,7 @@ public class ClientController {
 
     @Timed("controllers.client.loginClient")
     @PostMapping("/login")
-    public ResponseEntity<?> loginClient(@RequestBody LoginRequest loginRequest){
+    public ResponseEntity<?> loginClient(@RequestBody LoginRequest loginRequest) {
         String token = clientService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
         if (token == null) return ResponseEntity.status(403).body("Bad credentials");
         return ResponseEntity.ok(new ClientLoginResponse(token));
@@ -79,17 +81,15 @@ public class ClientController {
 
     @Timed("controllers.client.sendTokenToMail")
     @PostMapping("/sendToken/{email}")
-    public ResponseEntity<?> sendTokenToMail(@PathVariable String email){
-        mailingService.sendRegistrationToken(email);//todo dodaj email
+    public ResponseEntity<?> sendTokenToMail(@PathVariable String email) {
+        mailingService.sendRegistrationToken(email); // todo dodaj email
         return ResponseEntity.ok("Token sent");
     }
 
     @Timed("controllers.client.checkToken")
     @GetMapping("/checkToken/{token}")
-    public ResponseEntity<?> checkToken(@PathVariable String token){
-        if (mailingService.checkIfTokenGood(token))
-            return ResponseEntity.ok("Valid");
+    public ResponseEntity<?> checkToken(@PathVariable String token) {
+        if (mailingService.checkIfTokenGood(token)) return ResponseEntity.ok("Valid");
         return ResponseEntity.status(404).body("Not valid");
     }
-
 }

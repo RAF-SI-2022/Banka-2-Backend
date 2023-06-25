@@ -1,6 +1,5 @@
 package rs.edu.raf.si.bank2.otc.controllers;
 
-
 import io.micrometer.core.annotation.Timed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +34,8 @@ public class BankAccountController {
 
     @Timed("controllers.bankAccount.createBankAccount")
     @PostMapping(value = "/{companyId}")
-    public ResponseEntity<?> createBankAccount(@RequestBody CompanyBankAccountDto bankAccount, @PathVariable(name = "companyId") String companyId) {
+    public ResponseEntity<?> createBankAccount(
+            @RequestBody CompanyBankAccountDto bankAccount, @PathVariable(name = "companyId") String companyId) {
         return ResponseEntity.ok(bankAccountService.createBankAccount(companyId, bankAccount));
     }
 
@@ -47,7 +47,8 @@ public class BankAccountController {
 
     @Timed("controllers.bankAccount.deleteBankAccount")
     @DeleteMapping(value = "/{id}/{companyId}")
-    public ResponseEntity<?> deleteBankAccount(@PathVariable(name = "id") String id, @PathVariable(name = "companyId") String companyId) {
+    public ResponseEntity<?> deleteBankAccount(
+            @PathVariable(name = "id") String id, @PathVariable(name = "companyId") String companyId) {
         bankAccountService.deleteBankAccount(id, companyId);
         return ResponseEntity.noContent().build();
     }

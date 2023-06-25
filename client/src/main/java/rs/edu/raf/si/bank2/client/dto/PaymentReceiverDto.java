@@ -7,12 +7,17 @@ public class PaymentReceiverDto {
     private String savedByClientEmail;
     private String receiverName;
     private String balanceRegistrationNumber;
-    private String referenceNumber;//poziv na broj
+    private String referenceNumber; // poziv na broj
     private String paymentNumber;
     private String paymentDescription;
 
-    public PaymentReceiverDto(String savedByClientEmail, String receiverName, String balanceRegistrationNumber,
-                              String referenceNumber, String paymentNumber, String paymentDescription) {
+    public PaymentReceiverDto(
+            String savedByClientEmail,
+            String receiverName,
+            String balanceRegistrationNumber,
+            String referenceNumber,
+            String paymentNumber,
+            String paymentDescription) {
         this.savedByClientEmail = savedByClientEmail;
         this.receiverName = receiverName;
         this.balanceRegistrationNumber = balanceRegistrationNumber;
@@ -20,5 +25,4 @@ public class PaymentReceiverDto {
         this.paymentNumber = paymentNumber;
         this.paymentDescription = paymentDescription;
     }
-
 }

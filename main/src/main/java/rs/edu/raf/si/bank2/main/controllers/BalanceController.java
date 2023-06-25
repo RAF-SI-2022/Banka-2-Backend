@@ -1,8 +1,7 @@
 package rs.edu.raf.si.bank2.main.controllers;
 
-import javax.validation.Valid;
-
 import io.micrometer.core.annotation.Timed;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

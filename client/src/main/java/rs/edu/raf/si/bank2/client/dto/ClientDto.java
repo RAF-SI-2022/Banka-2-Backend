@@ -10,12 +10,12 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class ClientDto {
-      private String name;
-      private String lastname;
-      private String dateOfBirth;
-      private String gender;
-      private String email;
-      private String telephone;
-      private String address;
-      private String password;
+    private String name;
+    private String lastname;
+    private String dateOfBirth;
+    private String gender;
+    private String email;
+    private String telephone;
+    private String address;
+    private String password;
 }
