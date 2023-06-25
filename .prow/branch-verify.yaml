@@ -6,7 +6,7 @@ presubmits:
     decorate: true
     spec:
       containers:
-        - image: bitnami/git:latest
+        - image: harbor.k8s.elab.rs/base-images/base:java-17-node-18-docker
           command:
             - /bin/bash
             - -c
@@ -21,7 +21,7 @@ presubmits:
               if [[ "$branch" == "$curr_branch" ]] || \
                 [[ "$branch" == "dev" && "$curr_branch" == "sprint-"* ]] || \
                 [[ "$branch" == "main" && "$curr_branch" == "dev" ]]; then
-                echo "Merge branch $curr_branch into $branch allowed"  
+                echo "Merge branch $curr_branch into $branch allowed"
                 exit 0
               fi
               
