@@ -23,6 +23,7 @@ public class ReserveController {
     private final UserRepository userRepository;
     private final StockRepository stockRepository;
     private final OptionRepository optionRepository;
+    private final CurrencyRepository currencyRepository;
 
     @Autowired
     public ReserveController(
@@ -32,7 +33,7 @@ public class ReserveController {
             BalanceRepository balanceRepository,
             UserRepository userRepository,
             StockRepository stockRepository,
-            OptionRepository optionRepository) {
+            OptionRepository optionRepository, CurrencyRepository currencyRepository) {
         this.userOptionRepository = userOptionRepository;
         this.userStocksRepository = userStocksRepository;
         this.futureRepository = futureRepository;
@@ -40,6 +41,7 @@ public class ReserveController {
         this.userRepository = userRepository;
         this.stockRepository = stockRepository;
         this.optionRepository = optionRepository;
+        this.currencyRepository = currencyRepository;
     }
 
     @Timed("controllers.reserve.reserveUserOption")
@@ -74,8 +76,11 @@ public class ReserveController {
     @Timed("controllers.reserve.reserveUserStock")
     @PostMapping("/reserveStock")
     public ResponseEntity<?> reserveUserStock(@RequestBody ReserveDto reserveDto) {
+
+        System.err.println(reserveDto);
+
         Optional<UserStock> userStock =
-                userStocksRepository.findUserStockByUserIdAndStockId(reserveDto.getUserId(), reserveDto.getHartijaId());
+                userStocksRepository.findUserStockById(reserveDto.getHartijaId());
 
         if (userStock.isEmpty()) return ResponseEntity.status(404).body("Stock nije pronadjen");
         if (userStock.get().getAmount() < reserveDto.getAmount())
@@ -137,8 +142,9 @@ public class ReserveController {
     @PostMapping("/reserveMoney")
     public ResponseEntity<?> reserveMoney(@RequestBody ReserveDto reserveDto) {
         // todo trenutno hard code na USD
-        Optional<Balance> userBalance =
-                balanceRepository.findBalanceByUserIdAndCurrencyId(reserveDto.getUserId(), 138L);
+
+        Optional<Currency> usd = currencyRepository.findCurrencyByCurrencyCode("USD");
+        Optional<Balance> userBalance = balanceRepository.findBalanceByUserIdAndCurrencyId(reserveDto.getUserId(), usd.get().getId());
         // !!! NIJE HARTIJA NEGO CURRENCY ID !!!
         if (userBalance.isEmpty()) return ResponseEntity.status(404).body("Balans nije pronadjen");
 
@@ -157,8 +163,10 @@ public class ReserveController {
     @PostMapping("/undoReserveMoney")
     public ResponseEntity<?> undoReserveMoney(@RequestBody ReserveDto reserveDto) {
         // todo trenutno hard code na USD
+
+        Optional<Currency> usd = currencyRepository.findCurrencyByCurrencyCode("USD");
         Optional<Balance> userBalance =
-                balanceRepository.findBalanceByUserIdAndCurrencyId(reserveDto.getUserId(), 138L);
+                balanceRepository.findBalanceByUserIdAndCurrencyId(reserveDto.getUserId(), usd.get().getId());
         // !!! NIJE HARTIJA NEGO CURRENCY ID !!!
         if (userBalance.isEmpty()) return ResponseEntity.status(404).body("Balans nije pronadjen");
 
