@@ -70,6 +70,7 @@ public class PaymentService {
     public String removeMoney(RemoveMoneyDto removeMoneyDto) {
         Optional<RacunStorage> racunInfo =
                 racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(removeMoneyDto.getBalanceRegNum());
+        if (racunInfo.isEmpty()) return "racun nije nadjen";
         subtract(racunInfo.get().getType(), racunInfo.get().getBalanceRegistrationNumber(), removeMoneyDto.getAmount());
         return "Uklonjen novac";
     }

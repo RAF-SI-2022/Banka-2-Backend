@@ -87,4 +87,8 @@ public class CompanyBankAccountService {
             throw new BankAccountNotFoundException("Bank account not found with id: " + id);
         }
     }
+
+    public CompanyBankAccount save(CompanyBankAccount account) {
+        return this.bankAccountRepository.save(account);
+    }
 }
