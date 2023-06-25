@@ -2,31 +2,42 @@ package rs.edu.raf.si.bank2.main.bootstrap.readers;
 
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import javax.servlet.ServletContextListener;
-import org.springframework.util.ResourceUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
 import rs.edu.raf.si.bank2.main.models.mariadb.Inflation;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.*;
+
 public class CurrencyReader {
+
+    private final Logger logger = LoggerFactory.getLogger(CommandLineRunner.class);
     private List<Inflation> inflations = new ArrayList<>();
 
     public List<CurrencyCSV> getCurrenciesFromCsv() throws FileNotFoundException {
         // TODO da li ovo treba da vrati praznu listu ili null ako neuspesno?
 
-        String resPath = "currencies/currencies.csv";
-        URL url = ServletContextListener.class.getClassLoader().getResource(resPath);
-        if (url == null) {
-            System.err.println("Could not find resource: " + resPath);
-            return new ArrayList<>();
+        String resPath = "/currencies/currencies.csv";
+        Optional<String> content = rs.edu.raf.si.bank2.main.bootstrap
+                .readers.CSVReader.getInstance().readCSVString(resPath);
+        if (content.isEmpty()) {
+            logger.error("Failed to load CSV " + resPath);
+            // TODO da li ovde treba empty list ili null?
+            return new LinkedList<>();
         }
 
-        return new CsvToBeanBuilder<CurrencyCSV>(new FileReader(ResourceUtils.getFile(url.getPath())))
+        // TODO this should be rewritten, resources cannot be accessed as
+        //  "normal" files in a jar file. Hacky solution to get it working
+        //  with CSVReader
+
+        String inp = content.get();
+        Reader read = new StringReader(inp);
+
+        return new CsvToBeanBuilder<CurrencyCSV>(read)
                 .withType(CurrencyCSV.class)
                 .withSkipLines(1)
                 .build()
@@ -69,20 +80,23 @@ public class CurrencyReader {
 
         // TODO da li ovo treba da vrati praznu listu ili null ako neuspesno?
 
-        String resPath = "currencies/inflations.csv";
-        URL url = ServletContextListener.class.getClassLoader().getResource(resPath);
-        if (url == null) {
-            System.err.println("Could not find resource: " + resPath);
-            return result;
+        String resPath = "/currencies/inflations.csv";
+        Optional<String> content = rs.edu.raf.si.bank2.main.bootstrap
+                .readers.CSVReader.getInstance().readCSVString(resPath);
+        if (content.isEmpty()) {
+            logger.error("Failed to load CSV " + resPath);
+            // TODO da li ovde treba empty list ili null?
+            return new LinkedList<>();
         }
 
-        CSVReader csvReader;
-        try {
-            csvReader = new CSVReader(new FileReader(url.getPath()));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return result;
-        }
+        // TODO this should be rewritten, resources cannot be accessed as
+        //  "normal" files in a jar file. Hacky solution to get it working
+        //  with CSVReader
+
+        String inp = content.get();
+        Reader read = new StringReader(inp);
+
+        CSVReader csvReader = new CSVReader(read);
 
         String[] headerRow = csvReader.readNext();
         String[] dataRow;

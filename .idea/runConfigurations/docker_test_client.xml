@@ -1,0 +1,33 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="docker test client" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
+    <deployment type="dockerfile">
+      <settings>
+        <option name="imageTag" value="client" />
+        <option name="buildArgs">
+          <list>
+            <DockerEnvVarImpl>
+              <option name="name" value="COPY_SRC" />
+              <option name="value" value="true" />
+            </DockerEnvVarImpl>
+          </list>
+        </option>
+        <option name="buildKitEnabled" value="true" />
+        <option name="command" value="./mvnw clean compile test -Dspring.profiles.active=container,test -DargLine=-Dspring.profiles.active=container,test" />
+        <option name="containerName" value="client" />
+        <option name="contextFolderPath" value="." />
+        <option name="entrypoint" value="sh" />
+        <option name="portBindings">
+          <list>
+            <DockerPortBindingImpl>
+              <option name="containerPort" value="8083" />
+              <option name="hostPort" value="8083" />
+            </DockerPortBindingImpl>
+          </list>
+        </option>
+        <option name="commandLineOptions" value="--network=&quot;bank2_net&quot;" />
+        <option name="sourceFilePath" value="docker/client.Dockerfile" />
+      </settings>
+    </deployment>
+    <method v="2" />
+  </configuration>
+</component>
