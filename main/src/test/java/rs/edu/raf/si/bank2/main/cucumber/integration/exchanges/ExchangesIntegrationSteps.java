@@ -92,7 +92,7 @@ public class ExchangesIntegrationSteps extends ExchangesIntegrationTestConfig {
         }
 
         // Perform an assertion that verifies the actual result matches the expected result
-//        assertEquals(testExchange, actualExchange);
+        //        assertEquals(testExchange, actualExchange);
     }
 
     @Then("user gets all exchanges from database")
@@ -136,7 +136,7 @@ public class ExchangesIntegrationSteps extends ExchangesIntegrationTestConfig {
         }
 
         // Perform an assertion that verifies the actual result matches the expected result
-//        assertEquals(testExchange, actualExchange);
+        //        assertEquals(testExchange, actualExchange);
     }
 
     @Then("user gets activity of exchange by MIC Code from database")

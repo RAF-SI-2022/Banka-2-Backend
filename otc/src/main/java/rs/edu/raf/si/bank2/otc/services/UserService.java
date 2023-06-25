@@ -1,5 +1,8 @@
 package rs.edu.raf.si.bank2.otc.services;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,10 +15,6 @@ import rs.edu.raf.si.bank2.otc.models.mariadb.User;
 import rs.edu.raf.si.bank2.otc.repositories.mariadb.PasswordResetTokenRepository;
 import rs.edu.raf.si.bank2.otc.repositories.mariadb.UserRepository;
 import rs.edu.raf.si.bank2.otc.services.interfaces.UserServiceInterface;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService implements UserServiceInterface {

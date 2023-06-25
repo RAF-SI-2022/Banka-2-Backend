@@ -4,11 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import rs.edu.raf.si.bank2.otc.models.mongodb.CompanyBankAccount;
-import rs.edu.raf.si.bank2.otc.models.mongodb.ContactPerson;
-
-import java.util.Collection;
 
 @Data
 @Builder

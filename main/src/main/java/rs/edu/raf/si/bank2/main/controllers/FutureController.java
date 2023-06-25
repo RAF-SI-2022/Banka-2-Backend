@@ -2,6 +2,7 @@ package rs.edu.raf.si.bank2.main.controllers;
 
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
+import io.micrometer.core.annotation.Timed;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import rs.edu.raf.si.bank2.main.services.interfaces.UserCommunicationInterface;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/futures")
+@Timed
 public class FutureController {
 
     private final AuthorisationService authorisationService;
@@ -39,6 +41,7 @@ public class FutureController {
         this.userService = userService;
     }
 
+    @Timed("controllers.future.findAll")
     @GetMapping()
     public ResponseEntity<?> findAll() {
         String signedInUserEmail = getContext().getAuthentication().getName(); // todo dodaj nove perms
@@ -48,6 +51,7 @@ public class FutureController {
         return ResponseEntity.ok().body(futureService.findAll());
     }
 
+    @Timed("controllers.future.findById")
     @GetMapping(value = "/{futureId}")
     public ResponseEntity<?> findById(@PathVariable(name = "futureId") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -58,6 +62,7 @@ public class FutureController {
         return ResponseEntity.ok().body(futureService.findById(id));
     }
 
+    @Timed("controllers.future.findFuturesByName")
     @GetMapping(value = "/name/{name}")
     public ResponseEntity<?> findFuturesByName(@PathVariable(name = "name") String futureName) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -67,6 +72,7 @@ public class FutureController {
         return ResponseEntity.ok().body(futureService.findFuturesByFutureName(futureName));
     }
 
+    @Timed("controllers.future.buyFuture")
     @PostMapping(value = "/buy")
     public ResponseEntity<?> buyFuture(@RequestBody FutureRequestBuySell futureRequest) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -91,6 +97,7 @@ public class FutureController {
         return futureService.buyFuture(futureRequest, signedInUserEmail, usersBalance.getFree());
     }
 
+    @Timed("controllers.future.sellFuture")
     @PostMapping(value = "/sell")
     public ResponseEntity<?> sellFuture(@RequestBody FutureRequestBuySell futureRequest) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -108,6 +115,7 @@ public class FutureController {
         return futureService.sellFuture(futureRequest);
     }
 
+    @Timed("controllers.future.removeFromMarket")
     @PostMapping(value = "/remove/{id}")
     public ResponseEntity<?> removeFromMarket(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -124,6 +132,7 @@ public class FutureController {
         return futureService.removeFromMarket(id);
     }
 
+    @Timed("controllers.future.removeWaitingSellFutures")
     @PostMapping(value = "/remove-waiting-sell/{id}")
     public ResponseEntity<?> removeWaitingSellFutures(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -134,6 +143,7 @@ public class FutureController {
         return futureService.removeWaitingSellFuture(id);
     }
 
+    @Timed("controllers.future.removeWaitingBuyFutures")
     @PostMapping(value = "/remove-waiting-buy/{id}")
     public ResponseEntity<?> removeWaitingBuyFutures(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -144,6 +154,7 @@ public class FutureController {
         return futureService.removeWaitingBuyFuture(id);
     }
 
+    @Timed("controllers.future.getAllWaitingFuturesForUser")
     @GetMapping(value = "waiting-futures/{type}/{futureName}")
     public ResponseEntity<?> getAllWaitingFuturesForUser(
             @PathVariable(name = "type") String type, @PathVariable(name = "futureName") String futureName) {
@@ -160,6 +171,7 @@ public class FutureController {
         return ResponseEntity.status(500).body("Doslo je do neocekivane greske.");
     }
 
+    @Timed("controllers.future.findByUserId")
     @GetMapping(value = "/user/{userId}")
     public ResponseEntity<?> findByUserId(@PathVariable(name = "userId") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();

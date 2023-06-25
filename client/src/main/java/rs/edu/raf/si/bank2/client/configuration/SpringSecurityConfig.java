@@ -58,6 +58,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers("/v3/api-docs/**")
                 .permitAll()
+                .antMatchers("/actuator/**")
+                .permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
