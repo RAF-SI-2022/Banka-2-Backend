@@ -1,9 +1,15 @@
 package rs.edu.raf.si.bank2.otc.cucumber.integration.bankAccount;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.jayway.jsonpath.JsonPath;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import java.util.ArrayList;
+import java.util.Optional;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +24,6 @@ import rs.edu.raf.si.bank2.otc.services.CompanyBankAccountService;
 import rs.edu.raf.si.bank2.otc.services.CompanyService;
 import rs.edu.raf.si.bank2.otc.services.interfaces.AuthorisationServiceInterface;
 import rs.edu.raf.si.bank2.otc.services.interfaces.UserServiceInterface;
-
-import java.util.ArrayList;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class BankAccountIntegrationSteps extends BankAccountIntegrationTestConfig {
 
@@ -90,9 +89,9 @@ public class BankAccountIntegrationSteps extends BankAccountIntegrationTestConfi
     @Given("bank account exists in database")
     public void bank_account_exists_in_database() {
         Long bankAccountId = 123L;
-        try{
+        try {
             this.account = this.bankAccountService.getBankAccountById(bankAccountId.toString());
-        } catch (BankAccountNotFoundException e){
+        } catch (BankAccountNotFoundException e) {
             CompanyBankAccount account = CompanyBankAccount.builder()
                     .id(bankAccountId.toString())
                     .accountNumber("12345")
@@ -122,7 +121,7 @@ public class BankAccountIntegrationSteps extends BankAccountIntegrationTestConfi
     public void company_exists_in_db() {
         Long companyId = 112L;
         Optional<Company> companyOptional = this.companyService.getCompanyById(companyId.toString());
-        if(companyOptional.isPresent()) {
+        if (companyOptional.isPresent()) {
             this.company = companyOptional.get();
             return;
         }

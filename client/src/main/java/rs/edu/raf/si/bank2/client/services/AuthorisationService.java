@@ -1,23 +1,18 @@
 package rs.edu.raf.si.bank2.client.services;
 
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
-import rs.edu.raf.si.bank2.client.models.mariadb.PasswordResetToken;
 import rs.edu.raf.si.bank2.client.models.mariadb.Permission;
 import rs.edu.raf.si.bank2.client.models.mariadb.PermissionName;
 import rs.edu.raf.si.bank2.client.models.mariadb.User;
-import rs.edu.raf.si.bank2.client.services.interfaces.AuthorisationServiceInterface;
-import rs.edu.raf.si.bank2.client.services.interfaces.MailingServiceInterface;
-import rs.edu.raf.si.bank2.client.utils.JwtUtil;
 import rs.edu.raf.si.bank2.client.repositories.mariadb.PasswordResetTokenRepository;
 import rs.edu.raf.si.bank2.client.repositories.mariadb.PermissionRepository;
 import rs.edu.raf.si.bank2.client.repositories.mariadb.UserRepository;
-
-import java.util.Calendar;
-import java.util.Optional;
-import java.util.UUID;
+import rs.edu.raf.si.bank2.client.services.interfaces.AuthorisationServiceInterface;
+import rs.edu.raf.si.bank2.client.services.interfaces.MailingServiceInterface;
+import rs.edu.raf.si.bank2.client.utils.JwtUtil;
 
 @Service
 public class AuthorisationService implements AuthorisationServiceInterface {
@@ -60,7 +55,4 @@ public class AuthorisationService implements AuthorisationServiceInterface {
         }
         return false;
     }
-
-
-
 }

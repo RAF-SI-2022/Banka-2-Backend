@@ -1,6 +1,8 @@
 package rs.edu.raf.si.bank2.otc.services;
 
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.otc.dto.CompanyBankAccountDto;
@@ -10,10 +12,6 @@ import rs.edu.raf.si.bank2.otc.models.mongodb.Company;
 import rs.edu.raf.si.bank2.otc.models.mongodb.CompanyBankAccount;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.CompanyBankAccountRepository;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.CompanyRepository;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CompanyBankAccountService {
@@ -37,24 +35,25 @@ public class CompanyBankAccountService {
         }
     }
 
-    public List<CompanyBankAccount> getAccountsForCompany(String companyId){
+    public List<CompanyBankAccount> getAccountsForCompany(String companyId) {
         Optional<Company> companyOptional = companyRepository.findById(companyId);
-        if(companyOptional.isEmpty()) {
+        if (companyOptional.isEmpty()) {
             throw new CompanyNotFoundException("There is no company with this ID.");
         }
+
         return new ArrayList<>(companyOptional.get().getBankAccounts());
     }
 
     public CompanyBankAccount createBankAccount(String companyId, CompanyBankAccountDto accountDto) {
         Optional<Company> companyOptional = companyRepository.findById(companyId);
-        if(companyOptional.isEmpty()) {
+        if (companyOptional.isEmpty()) {
             throw new CompanyNotFoundException("There is no company with this ID.");
         }
 
         CompanyBankAccount companyBankAccount = new CompanyBankAccount();
-            companyBankAccount.setAccountNumber(accountDto.getAccountNumber());
-            companyBankAccount.setBankName(accountDto.getBankName());
-            companyBankAccount.setCurrency(accountDto.getCurrency());
+        companyBankAccount.setAccountNumber(accountDto.getAccountNumber());
+        companyBankAccount.setBankName(accountDto.getBankName());
+        companyBankAccount.setCurrency(accountDto.getCurrency());
         bankAccountRepository.save(companyBankAccount);
         companyOptional.get().getBankAccounts().add(companyBankAccount);
         companyRepository.save(companyOptional.get());
@@ -76,7 +75,7 @@ public class CompanyBankAccountService {
 
     public void deleteBankAccount(String id, String companyId) {
         Optional<Company> companyOptional = companyRepository.findById(companyId);
-        if(companyOptional.isEmpty()) {
+        if (companyOptional.isEmpty()) {
             throw new CompanyNotFoundException("There is no company with this ID.");
         }
         Optional<CompanyBankAccount> bankAccount = bankAccountRepository.findById(id);
@@ -84,11 +83,11 @@ public class CompanyBankAccountService {
             companyOptional.get().getBankAccounts().remove(bankAccount.get());
             companyRepository.save(companyOptional.get());
             bankAccountRepository.deleteById(id);
-        }
-        else {
+        } else {
             throw new BankAccountNotFoundException("Bank account not found with id: " + id);
         }
     }
+
     public CompanyBankAccount save(CompanyBankAccount account) {
         return this.bankAccountRepository.save(account);
     }

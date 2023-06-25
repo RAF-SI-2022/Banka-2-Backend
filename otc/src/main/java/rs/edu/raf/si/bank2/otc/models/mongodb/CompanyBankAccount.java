@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
@@ -15,12 +14,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document("companyBankAccount")
 public class CompanyBankAccount {
 
-
-
     @Id
     private String id;
-//    @DBRef(lazy = true)
-//    private Company company;
+    //    @DBRef(lazy = true)
+    //    private Company company;
     private String accountNumber;
     private String currency;
     private String bankName;

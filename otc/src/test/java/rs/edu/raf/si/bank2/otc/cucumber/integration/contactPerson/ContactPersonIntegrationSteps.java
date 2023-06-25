@@ -1,41 +1,46 @@
 package rs.edu.raf.si.bank2.otc.cucumber.integration.contactPerson;
 
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.jayway.jsonpath.JsonPath;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import java.util.concurrent.atomic.AtomicLong;
 import org.mockito.InjectMocks;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import rs.edu.raf.si.bank2.otc.exceptions.ContactPersonNotFoundException;
 import rs.edu.raf.si.bank2.otc.models.mongodb.ContactPerson;
-import rs.edu.raf.si.bank2.otc.repositories.mariadb.PasswordResetTokenRepository;
 import rs.edu.raf.si.bank2.otc.services.CompanyBankAccountService;
 import rs.edu.raf.si.bank2.otc.services.CompanyService;
 import rs.edu.raf.si.bank2.otc.services.ContactPersonService;
 import rs.edu.raf.si.bank2.otc.services.interfaces.AuthorisationServiceInterface;
 import rs.edu.raf.si.bank2.otc.services.interfaces.UserServiceInterface;
 
-import java.util.concurrent.atomic.AtomicLong;
+public class ContactPersonIntegrationSteps extends ContactPersonIntegrationTestConfiguration {
 
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+    /**
+     * Token for testing the validity.
+     */
+    String token;
 
-public class ContactPersonIntegrationSteps extends ContactPersonIntegrationTestConfig {
-    @Autowired
-    UserServiceInterface userServiceInterface;
+    /**
+     * ResultActions of the last executed mock request.
+     */
+    ResultActions resultActions;
 
     @Autowired
     PasswordEncoder passwordEncoder;
 
     @Autowired
-    @Spy
-    PasswordResetTokenRepository passwordResetTokenRepository;
+    UserServiceInterface userServiceInterface;
 
     @Autowired
     MockMvc mockMvc;
@@ -49,10 +54,10 @@ public class ContactPersonIntegrationSteps extends ContactPersonIntegrationTestC
 
     @Autowired
     CompanyService companyService;
-    String token;
 
     @Autowired
     ContactPersonService contactPersonService;
+
     ContactPerson contactPerson;
     AtomicLong atomicId = new AtomicLong(System.currentTimeMillis());
 
@@ -113,7 +118,7 @@ public class ContactPersonIntegrationSteps extends ContactPersonIntegrationTestC
                     .firstName("Miladin")
                     .lastName("Miladinovic")
                     .phoneNumber("0657079121")
-                    .email("miladiniski"+ atomicId.get()+"@gmail.com")
+                    .email("miladiniski" + atomicId.get() + "@gmail.com")
                     .position("Administrator")
                     .note("Note")
                     .build();
@@ -141,7 +146,8 @@ public class ContactPersonIntegrationSteps extends ContactPersonIntegrationTestC
         try {
             mockMvc.perform(post("/api/contact")
                             .contentType("application/json")
-                            .content(String.format("""
+                            .content(String.format(
+                                    """
                                 {
                                     "id": "%s",
                                     "firstName": "Ljuba",
@@ -151,7 +157,8 @@ public class ContactPersonIntegrationSteps extends ContactPersonIntegrationTestC
                                     "position": "Administrator",
                                     "note": "note"
                                 }
-                                """, this.atomicId.getAndIncrement(), "ljuba"+this.atomicId.get()+"@gmail.com"))
+                                """,
+                                    this.atomicId.getAndIncrement(), "ljuba" + this.atomicId.get() + "@gmail.com"))
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + this.token))
@@ -167,7 +174,8 @@ public class ContactPersonIntegrationSteps extends ContactPersonIntegrationTestC
         try {
             mockMvc.perform(post("/api/contact/edit")
                             .contentType("application/json")
-                            .content(String.format("""
+                            .content(String.format(
+                                    """
                                 {
                                     "id": "%s",
                                     "firstName": "Miladin",
@@ -177,7 +185,8 @@ public class ContactPersonIntegrationSteps extends ContactPersonIntegrationTestC
                                     "position": "Administrator",
                                     "note": "note"
                                 }
-                                """, this.contactPerson.getId(), "milandin"+this.contactPerson.getId()+"@gmail.com"))
+                                """,
+                                    this.contactPerson.getId(), "milandin" + this.contactPerson.getId() + "@gmail.com"))
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + this.token))

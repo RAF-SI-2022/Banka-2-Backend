@@ -1,10 +1,18 @@
 package rs.edu.raf.si.bank2.otc.cucumber.integration.company;
 
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.jayway.jsonpath.JsonPath;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import java.util.ArrayList;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +25,6 @@ import rs.edu.raf.si.bank2.otc.services.CompanyBankAccountService;
 import rs.edu.raf.si.bank2.otc.services.CompanyService;
 import rs.edu.raf.si.bank2.otc.services.interfaces.AuthorisationServiceInterface;
 import rs.edu.raf.si.bank2.otc.services.interfaces.UserServiceInterface;
-
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
-
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class CompanyIntegrationSteps extends CompanyIntegrationTestConfig {
     @Autowired
@@ -51,6 +49,7 @@ public class CompanyIntegrationSteps extends CompanyIntegrationTestConfig {
 
     @Autowired
     CompanyService companyService;
+
     Company company;
     String token;
 
@@ -105,11 +104,12 @@ public class CompanyIntegrationSteps extends CompanyIntegrationTestConfig {
             fail(e.getMessage());
         }
     }
+
     @Given("company exists in db")
     public void company_exists_in_db() {
         Long companyId = 112L;
         Optional<Company> companyOptional = this.companyService.getCompanyById(companyId.toString());
-        if(companyOptional.isPresent()) {
+        if (companyOptional.isPresent()) {
             this.company = companyOptional.get();
             return;
         }
@@ -185,6 +185,7 @@ public class CompanyIntegrationSteps extends CompanyIntegrationTestConfig {
             fail(e.getMessage());
         }
     }
+
     @Then("user gets company by tax number")
     public void userGetsCompanyByTaxNumber() {
         try {
@@ -195,8 +196,7 @@ public class CompanyIntegrationSteps extends CompanyIntegrationTestConfig {
                             .header("Authorization", "Bearer " + this.token))
                     .andExpect(status().isOk())
                     .andReturn();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             fail(e.getMessage());
         }
@@ -207,7 +207,8 @@ public class CompanyIntegrationSteps extends CompanyIntegrationTestConfig {
         try {
             mockMvc.perform(post("/api/company/create")
                             .contentType("application/json")
-                            .content(String.format("""
+                            .content(String.format(
+                                    """
                                 {
                                     "id": "%s",
                                     "name": "My new company",
@@ -216,7 +217,10 @@ public class CompanyIntegrationSteps extends CompanyIntegrationTestConfig {
                                     "activityCode": "555333",
                                     "address": "Topolska 18, soba podstanara"
                                 }
-                                """, this.registrationNumber.getAndIncrement(), this.registrationNumber.getAndIncrement(), this.taxNumber.getAndIncrement()))
+                                """,
+                                    this.registrationNumber.getAndIncrement(),
+                                    this.registrationNumber.getAndIncrement(),
+                                    this.taxNumber.getAndIncrement()))
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + this.token))
@@ -233,13 +237,15 @@ public class CompanyIntegrationSteps extends CompanyIntegrationTestConfig {
         try {
             mockMvc.perform(post("/api/company/add")
                             .contentType("application/json")
-                            .content(String.format("""
+                            .content(String.format(
+                                    """
                                 {
                                     "id": "%s",
                                     "contactPeople": [],
                                     "companyBankAccounts": []
                                 }
-                                """, companyID))
+                                """,
+                                    companyID))
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + this.token))
@@ -257,7 +263,8 @@ public class CompanyIntegrationSteps extends CompanyIntegrationTestConfig {
             String companyID = this.company.getId();
             mockMvc.perform(post("/api/company/edit")
                             .contentType("application/json")
-                            .content(String.format("""
+                            .content(String.format(
+                                    """
                                 {
                                     "id": "%s",
                                     "name": "My new company - changed name",
@@ -268,7 +275,10 @@ public class CompanyIntegrationSteps extends CompanyIntegrationTestConfig {
                                     "contactPersons" : [],
                                     "bankAccounts" : []
                                 }
-                                """, companyID, this.registrationNumber.getAndIncrement(), this.taxNumber.getAndIncrement()))
+                                """,
+                                    companyID,
+                                    this.registrationNumber.getAndIncrement(),
+                                    this.taxNumber.getAndIncrement()))
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + this.token))
