@@ -180,10 +180,7 @@ public class ForexFailureIntegrationSteps extends ForexFailureIntegrationTestCon
         }
         String errorMsg = mvcResult.getResponse().getContentAsString();
         System.out.println(errorMsg);
-        assertEquals(
-                "Korisnik sa email-om " + email
-                        + ", nema dovoljno balansa u valuti Serbian Dinar",
-                errorMsg);
+        assertEquals("Korisnik sa email-om " + email + ", nema dovoljno balansa u valuti Serbian Dinar", errorMsg);
     }
 
     // TODO Matejin test
