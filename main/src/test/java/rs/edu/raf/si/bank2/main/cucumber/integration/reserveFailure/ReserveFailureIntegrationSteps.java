@@ -1,10 +1,13 @@
 package rs.edu.raf.si.bank2.main.cucumber.integration.reserveFailure;
 
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.jayway.jsonpath.JsonPath;
 import io.cucumber.core.internal.com.fasterxml.jackson.core.JsonProcessingException;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -14,17 +17,6 @@ import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
 import rs.edu.raf.si.bank2.main.services.OptionService;
 import rs.edu.raf.si.bank2.main.services.OrderService;
 import rs.edu.raf.si.bank2.main.services.UserService;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class ReserveFailureIntegrationSteps extends ReserveFailureIntegrationTestConfig {
     @Autowired
@@ -85,7 +77,8 @@ public class ReserveFailureIntegrationSteps extends ReserveFailureIntegrationTes
     @Then("option to reserve not found")
     public void option_to_reserve_not_found() throws JsonProcessingException {
         ReserveDto reserveDto = new ReserveDto(1L, 999L, 1);
-        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(reserveDto);
+        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper()
+                .writeValueAsString(reserveDto);
 
         try {
             MvcResult mvcResult = mockMvc.perform(post("/api/reserve/reserveOption")
@@ -104,7 +97,8 @@ public class ReserveFailureIntegrationSteps extends ReserveFailureIntegrationTes
     @Then("option to undo reserve not found")
     public void option_to_undo_reserve_not_found() throws JsonProcessingException {
         ReserveDto reserveDto = new ReserveDto(1L, 999L, 1);
-        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(reserveDto);
+        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper()
+                .writeValueAsString(reserveDto);
 
         try {
             MvcResult mvcResult = mockMvc.perform(post("/api/reserve/undoReserveOption")
@@ -123,7 +117,8 @@ public class ReserveFailureIntegrationSteps extends ReserveFailureIntegrationTes
     @Then("stock to reserve not found")
     public void stock_to_reserve_not_found() throws JsonProcessingException {
         ReserveDto reserveDto = new ReserveDto(1L, 999L, 1);
-        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(reserveDto);
+        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper()
+                .writeValueAsString(reserveDto);
 
         try {
             MvcResult mvcResult = mockMvc.perform(post("/api/reserve/reserveStock")
@@ -143,7 +138,8 @@ public class ReserveFailureIntegrationSteps extends ReserveFailureIntegrationTes
     @Then("stock to undo reserve not found")
     public void stock_to_undo_reserve_not_found() throws JsonProcessingException {
         ReserveDto reserveDto = new ReserveDto(1L, 999L, 1);
-        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(reserveDto);
+        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper()
+                .writeValueAsString(reserveDto);
 
         try {
             MvcResult mvcResult = mockMvc.perform(post("/api/reserve/undoReserveStock")
@@ -162,7 +158,8 @@ public class ReserveFailureIntegrationSteps extends ReserveFailureIntegrationTes
     @Then("future to reserve not found")
     public void future_to_reserve_not_found() throws JsonProcessingException {
         ReserveDto reserveDto = new ReserveDto(1L, 999L, 1);
-        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(reserveDto);
+        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper()
+                .writeValueAsString(reserveDto);
 
         try {
             MvcResult mvcResult = mockMvc.perform(post("/api/reserve/reserveFuture")
@@ -182,7 +179,8 @@ public class ReserveFailureIntegrationSteps extends ReserveFailureIntegrationTes
     public void future_to_undo_reserve_not_found() throws JsonProcessingException {
         ReserveDto reserveDto = new ReserveDto(1L, 999L, 1);
         reserveDto.setFutureStorage("0,1,2,3,4,5,6,7,8,9");
-        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(reserveDto);
+        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper()
+                .writeValueAsString(reserveDto);
 
         try {
             MvcResult mvcResult = mockMvc.perform(post("/api/reserve/undoReserveFuture")
@@ -199,12 +197,12 @@ public class ReserveFailureIntegrationSteps extends ReserveFailureIntegrationTes
         }
     }
 
-
     @Then("balance to reserve not found")
     public void balance_to_reserve_not_found() throws JsonProcessingException {
         ReserveDto reserveDto = new ReserveDto(99L, 999L, 1);
-//        reserveDto.setFutureStorage("0,1,2,3,4,5,6,7,8,9");
-        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(reserveDto);
+        //        reserveDto.setFutureStorage("0,1,2,3,4,5,6,7,8,9");
+        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper()
+                .writeValueAsString(reserveDto);
 
         try {
             MvcResult mvcResult = mockMvc.perform(post("/api/reserve/reserveMoney")
@@ -224,7 +222,8 @@ public class ReserveFailureIntegrationSteps extends ReserveFailureIntegrationTes
     @Then("balance to undo reserve not found")
     public void balance_to_undo_reserve_not_found() throws JsonProcessingException {
         ReserveDto reserveDto = new ReserveDto(99L, 999L, 1);
-        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(reserveDto);
+        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper()
+                .writeValueAsString(reserveDto);
 
         try {
             MvcResult mvcResult = mockMvc.perform(post("/api/reserve/undoReserveMoney")
@@ -241,12 +240,11 @@ public class ReserveFailureIntegrationSteps extends ReserveFailureIntegrationTes
         }
     }
 
-
-
     @Then("while finalizing stock user not found")
     public void while_finalizing_stock_user_not_found() throws JsonProcessingException {
         ReserveDto reserveDto = new ReserveDto(99L, 999L, 1);
-        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(reserveDto);
+        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper()
+                .writeValueAsString(reserveDto);
 
         try {
             MvcResult mvcResult = mockMvc.perform(post("/api/reserve/finalizeStock")
@@ -266,7 +264,8 @@ public class ReserveFailureIntegrationSteps extends ReserveFailureIntegrationTes
     public void while_finalizing_option_user_not_found() throws JsonProcessingException {
         ReserveDto reserveDto = new ReserveDto(99L, 999L, 1);
         reserveDto.setFutureStorage("asdf,asdf,asdf");
-        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(reserveDto);
+        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper()
+                .writeValueAsString(reserveDto);
 
         try {
             MvcResult mvcResult = mockMvc.perform(post("/api/reserve/finalizeOption")
@@ -286,7 +285,8 @@ public class ReserveFailureIntegrationSteps extends ReserveFailureIntegrationTes
     public void while_finalizing_future_user_not_found() throws JsonProcessingException {
         ReserveDto reserveDto = new ReserveDto(99L, 999L, 1);
         reserveDto.setFutureStorage("asdf,asdf,asdf");
-        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(reserveDto);
+        String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper()
+                .writeValueAsString(reserveDto);
 
         try {
             MvcResult mvcResult = mockMvc.perform(post("/api/reserve/finalizeFuture")
@@ -301,5 +301,4 @@ public class ReserveFailureIntegrationSteps extends ReserveFailureIntegrationTes
             fail("balance to undo reserve not found failed");
         }
     }
-
 }

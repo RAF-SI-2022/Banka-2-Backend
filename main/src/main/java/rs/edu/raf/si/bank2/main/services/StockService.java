@@ -18,7 +18,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -113,13 +112,13 @@ public class StockService {
         //        this.stocksRetrieverFromApiWorker.start(); TODO VRATI UPDATER
     }
 
-//    @Cacheable(value = "stockALL")
+    //    @Cacheable(value = "stockALL")
     public List<Stock> getAllStocks() {
         System.out.println("Getting all stock - fist time (caching into redis)");
         return stockRepository.findAll();
     }
 
-//    @Cacheable(value = "stockID", key = "#id")
+    //    @Cacheable(value = "stockID", key = "#id")
     public Stock getStockById(Long id) throws StockNotFoundException {
         Optional<Stock> stockOptional = stockRepository.findById(id);
         System.out.println("Getting stock by id- fist time (caching into redis)");
@@ -133,7 +132,7 @@ public class StockService {
                 .orElse(null); // if found return Stock, if not, return null
     }
 
-//    @Cacheable(value = "exchangesSymbol", key = "#symbol")
+    //    @Cacheable(value = "exchangesSymbol", key = "#symbol")
     @Transactional
     public Stock getStockBySymbol(String symbol) throws StockNotFoundException, ExchangeNotFoundException {
         Optional<Stock> stockFromDB = stockRepository.findStockBySymbol(symbol);
