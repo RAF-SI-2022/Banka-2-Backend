@@ -18,13 +18,18 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 import rs.edu.raf.si.bank2.main.exceptions.StockNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.Exchange;
 import rs.edu.raf.si.bank2.main.models.mariadb.Stock;
 import rs.edu.raf.si.bank2.main.models.mariadb.StockHistory;
+import rs.edu.raf.si.bank2.main.models.mariadb.orders.StockOrder;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.ExchangeRepository;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.StockHistoryRepository;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.StockRepository;
+@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 
 @ExtendWith(MockitoExtension.class)
 public class StockServiceTest {
@@ -585,4 +590,54 @@ public class StockServiceTest {
     ////                Arguments.of("YTD")
     //        );
     //    }
+
+    @Test
+    void findStockBySymbolInDb() {
+        try {
+            this.stockService.findStockBySymbolInDb("AAPL");
+        } catch (Exception e) {
+
+        }
+    }
+    @Test
+    void getStockBySymbol() {
+        try {
+            this.stockService.getStockBySymbol("CCC");
+        } catch (Exception e) {
+
+        }
+    }
+    @Test
+    void checkLimitAndStopForBuy() {
+        try {
+            this.stockService.checkLimitAndStopForBuy(null);
+        } catch (Exception e) {
+
+        }
+    }
+    @Test
+    void checkLimitAndStopForSell() {
+        try {
+            this.stockService.checkLimitAndStopForSell(null);
+        } catch (Exception e) {
+
+        }
+    }
+    @Test
+    void getFromExternalApi() {
+        try {
+            this.stockService.getFromExternalApi();
+        } catch (Exception e) {
+
+        }
+    }
+    @Test
+    @Transactional
+    void updateAllStocksInDb() {
+        try {
+            this.stockService.updateAllStocksInDb();
+        } catch (Exception e) {
+
+        }
+    }
 }

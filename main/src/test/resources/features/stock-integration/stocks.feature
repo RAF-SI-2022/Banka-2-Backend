@@ -48,3 +48,19 @@ Feature: Stock service
   Scenario: user removes stock
     When user is logged in
     Then user removes stock
+
+  Scenario: find user-stock
+    Given user logs in
+    And there is a stock in database
+    When user is logged in
+    Then user finds user-stock
+
+  Scenario: find all user-stock
+    Then user finds all user-stocks
+
+  Scenario: remove stock from market
+    Given user logs in
+    And there is a stock in database
+    And user-stock exists in db
+    When user is logged in
+    Then remove stock from market
