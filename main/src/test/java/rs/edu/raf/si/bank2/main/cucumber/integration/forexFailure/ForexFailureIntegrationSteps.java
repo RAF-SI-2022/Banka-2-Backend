@@ -180,10 +180,7 @@ public class ForexFailureIntegrationSteps extends ForexFailureIntegrationTestCon
         }
         String errorMsg = mvcResult.getResponse().getContentAsString();
         System.out.println(errorMsg);
-        assertEquals(
-                "Korisnik sa email-om " + email
-                        + ", nema dovoljno novca u valuti Serbian Dinar za kupovinu 10000000 USD(United States Dollar)",
-                errorMsg);
+        assertEquals("Korisnik sa email-om " + email + ", nema dovoljno balansa u valuti Serbian Dinar", errorMsg);
     }
 
     // TODO Matejin test

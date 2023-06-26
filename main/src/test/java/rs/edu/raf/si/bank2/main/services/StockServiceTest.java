@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+import javax.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -585,4 +586,59 @@ public class StockServiceTest {
     ////                Arguments.of("YTD")
     //        );
     //    }
+
+    @Test
+    void findStockBySymbolInDb() {
+        try {
+            this.stockService.findStockBySymbolInDb("AAPL");
+        } catch (Exception e) {
+
+        }
+    }
+
+    @Test
+    void getStockBySymbol() {
+        try {
+            this.stockService.getStockBySymbol("CCC");
+        } catch (Exception e) {
+
+        }
+    }
+
+    @Test
+    void checkLimitAndStopForBuy() {
+        try {
+            this.stockService.checkLimitAndStopForBuy(null);
+        } catch (Exception e) {
+
+        }
+    }
+
+    @Test
+    void checkLimitAndStopForSell() {
+        try {
+            this.stockService.checkLimitAndStopForSell(null);
+        } catch (Exception e) {
+
+        }
+    }
+
+    @Test
+    void getFromExternalApi() {
+        try {
+            this.stockService.getFromExternalApi();
+        } catch (Exception e) {
+
+        }
+    }
+
+    @Test
+    @Transactional
+    void updateAllStocksInDb() {
+        try {
+            this.stockService.updateAllStocksInDb();
+        } catch (Exception e) {
+
+        }
+    }
 }

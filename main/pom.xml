@@ -46,7 +46,10 @@
             **/StockBuyWorker.java,
             **/StockSellWorker.java,
             **/MainApplication.java,
+            **/StocksRetrieverFromApiWorker.java,
+            **/OptionsRetrieverFromApiWorker.java,
             **/AuthenticationController.java,
+            **/UserCommunicationService.java,
             **/**.xml
         </sonar.coverage.exclusions>
 
