@@ -48,54 +48,6 @@ public class ReservedServiceTests {
     @InjectMocks
     private ReservedService reservedService;
 
-
-    @Test
-    void sendReservation_shouldSendReservePostForBuyCashAndReturnCommunicationDto() {
-//        // Arrange
-//        TransactionElementDto teDto = new TransactionElementDto();
-//        // Set up the values of teDto object according to your test scenario
-//
-//        ReserveDto expectedReserveDto = new ReserveDto();
-//        // Set up the expected values for the ReserveDto object based on your test scenario
-//
-//        CommunicationDto expectedCommunicationDto = new CommunicationDto();
-//        // Set up the expected values for the CommunicationDto object based on your test scenario
-//
-//        // Mock any necessary dependencies and their behaviors
-//
-//        // Act
-//        CommunicationDto result = reservedService.sendReservation(teDto);
-//
-//        // Assert
-//        // Verify the expected behavior based on the mock setup
-//
-//        // Assert the result
-//        // Verify the expected values in the result object
-//        assertEquals(expectedCommunicationDto, result);
-    }
-//    @Before
-//    public void setUp() {
-//        MockitoAnnotations.initMocks(this);
-//
-//        Properties prop = loadPropertiesFromFile("application.properties");
-//        this.value = prop.getProperty("id");
-//    }
-//    private Properties loadPropertiesFromFile(String fileName) {
-//        Properties prop = new Properties();
-//        try {
-//            ClassLoader loader = Thread.currentThread().getContextClassLoader();
-//            InputStream stream = loader.getResourceAsStream(fileName);
-//            prop.load(stream);
-//            stream.close();
-//        } catch (Exception e) {
-//            String msg = String.format("Failed to load file '%s' - %s - %s", fileName, e.getClass().getName(),
-//                    e.getMessage());
-//            Assert.fail(msg);
-//        }
-//        return prop;
-//    }
-
-
     /*
     assert Throws dodje do linije 167 u reservedService i tu se baca exception, to znaci da se sve do tu
     izvrsilo kako treba, a onda se baca exception, sto znaci da je test prosao
