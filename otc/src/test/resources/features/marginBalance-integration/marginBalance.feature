@@ -10,7 +10,7 @@ Feature: Margin balance service
   Scenario: user gets margin balance by id
     Given balances exist in database
     And user is logged in
-    Then user gets margin balance by id\
+    Then user gets margin balance by id
 
   Scenario: user creates margin balance
     Given balance doesnt exist in database

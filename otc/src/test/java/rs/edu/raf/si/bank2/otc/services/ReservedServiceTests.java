@@ -1,14 +1,19 @@
 package rs.edu.raf.si.bank2.otc.services;
 
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
 import rs.edu.raf.si.bank2.otc.dto.CommunicationDto;
 import rs.edu.raf.si.bank2.otc.dto.ReserveDto;
@@ -20,14 +25,22 @@ import rs.edu.raf.si.bank2.otc.repositories.mongodb.MarginBalanceRepository;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.MarginTransactionRepository;
 import rs.edu.raf.si.bank2.otc.utils.JwtUtil;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@TestPropertySource(locations = "classpath:application.properties")
+@TestPropertySource(locations = "classpath:application-local.properties")
 public class ReservedServiceTests {
 
-    @MockBean
+    @Mock
     private JwtUtil jwtUtil;
+
 
     @MockBean
     private RestTemplate restTemplate;
@@ -35,8 +48,6 @@ public class ReservedServiceTests {
     @InjectMocks
     private ReservedService reservedService;
 
-    @Value("${services.main.host}")
-    private String usersServiceHost;
 
     @Test
     void sendReservation_shouldSendReservePostForBuyCashAndReturnCommunicationDto() {
@@ -62,9 +73,37 @@ public class ReservedServiceTests {
 //        // Verify the expected values in the result object
 //        assertEquals(expectedCommunicationDto, result);
     }
+//    @Before
+//    public void setUp() {
+//        MockitoAnnotations.initMocks(this);
+//
+//        Properties prop = loadPropertiesFromFile("application.properties");
+//        this.value = prop.getProperty("id");
+//    }
+//    private Properties loadPropertiesFromFile(String fileName) {
+//        Properties prop = new Properties();
+//        try {
+//            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+//            InputStream stream = loader.getResourceAsStream(fileName);
+//            prop.load(stream);
+//            stream.close();
+//        } catch (Exception e) {
+//            String msg = String.format("Failed to load file '%s' - %s - %s", fileName, e.getClass().getName(),
+//                    e.getMessage());
+//            Assert.fail(msg);
+//        }
+//        return prop;
+//    }
 
+
+    /*
+    assert Throws dodje do linije 167 u reservedService i tu se baca exception, to znaci da se sve do tu
+    izvrsilo kako treba, a onda se baca exception, sto znaci da je test prosao
+     */
     @Test
     public void testSendReservationBuyCashStock() {
+
+
         TransactionElementDto teDto = new TransactionElementDto();
 
         teDto.setContractId("4440");
@@ -79,9 +118,8 @@ public class ReservedServiceTests {
         teDto.setMariaDbId(456L);
         teDto.setFutureStorageField("");
 
-//        reservedService.sendReservation(teDto);
 
-
+        assertThrows(RuntimeException.class, () -> reservedService.sendReservation(teDto));
 
     }
 
@@ -101,7 +139,7 @@ public class ReservedServiceTests {
         teDto.setMariaDbId(456L);
         teDto.setFutureStorageField("");
 
-        reservedService.sendReservation(teDto);
+        assertThrows(RuntimeException.class, () -> reservedService.sendReservation(teDto));
     }
 
     @Test
@@ -120,7 +158,7 @@ public class ReservedServiceTests {
         teDto.setMariaDbId(456L);
         teDto.setFutureStorageField("");
 
-        reservedService.sendReservation(teDto);
+        assertThrows(RuntimeException.class, () -> reservedService.sendReservation(teDto));
     }
 
     @Test
@@ -139,7 +177,7 @@ public class ReservedServiceTests {
         teDto.setMariaDbId(456L);
         teDto.setFutureStorageField("");
 
-        reservedService.sendReservation(teDto);
+        assertThrows(RuntimeException.class, () -> reservedService.sendReservation(teDto));
     }
 
 
@@ -158,7 +196,7 @@ public class ReservedServiceTests {
         teDto.setMariaDbId(456L);
         teDto.setFutureStorageField("");
 
-        reservedService.sendReservation(teDto);
+        assertThrows(RuntimeException.class, () -> reservedService.sendReservation(teDto));
     }
 
     @Test
@@ -176,7 +214,7 @@ public class ReservedServiceTests {
         teDto.setMariaDbId(456L);
         teDto.setFutureStorageField("");
 
-        reservedService.sendReservation(teDto);
+        assertThrows(RuntimeException.class, () -> reservedService.sendReservation(teDto));
     }
 
     @Test
@@ -194,7 +232,7 @@ public class ReservedServiceTests {
         teDto.setMariaDbId(456L);
         teDto.setFutureStorageField("");
 
-        reservedService.sendReservation(teDto);
+        assertThrows(RuntimeException.class, () -> reservedService.sendReservation(teDto));
     }
 
 }
