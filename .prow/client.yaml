@@ -66,8 +66,8 @@ presubmits:
             - |
               set -euo pipefail
 
-              SONAR_PROJECT_KEY="Banka-2-Backend-Client"
-              SONAR_PROJECT_NAME="Banka-2-Backend-Client"
+              SONAR_PROJECT_KEY="Banka-2-Backend-Client-2"
+              SONAR_PROJECT_NAME="Banka-2-Backend-Client-2"
               SERVICES_NAMES="users main otc"
               SERVICES_PORTS="8080 8081 8082"
               THIS_SERVICE="client"
@@ -153,8 +153,8 @@ postsubmits:
             - |
               set -euo pipefail
 
-              SONAR_PROJECT_KEY="Banka-2-Backend-Client"
-              SONAR_PROJECT_NAME="Banka-2-Backend-Client"
+              SONAR_PROJECT_KEY="Banka-2-Backend-Client-2"
+              SONAR_PROJECT_NAME="Banka-2-Backend-Client-2"
               SERVICES_NAMES="users main otc"
               SERVICES_PORTS="8080 8081 8082"
               THIS_SERVICE="client"
