@@ -18,14 +18,16 @@ presubmits:
 
               branch=$PULL_HEAD_REF
               curr_branch=$(git rev-parse --abbrev-ref HEAD)
-              if [[ "$branch" == "$curr_branch" ]] || \
-                [[ "$branch" == "dev" && "$curr_branch" == "sprint-"* ]] || \
-                [[ "$branch" == "main" && "$curr_branch" == "dev" ]]; then
-                echo "Merge branch $curr_branch into $branch allowed"
+              if [[ "$curr_branch" == "$branch" ]] || \
+                [[ "$branch" == "bugfix"* ]] \
+                [[ "$branch" == "hotfix"* ]] \
+                [[ "$curr_branch" == "dev" && "$branch" == "sprint-"* ]] || \
+                [[ "$curr_branch" == "main" && "$branch" == "dev" ]]; then
+                echo "Merge branch $branch into $curr_branch allowed"
                 exit 0
               fi
               
-              echo "Warning: merging branch $curr_branch into $branch is illegal"
+              echo "Warning: merging branch $branch into $curr_branch is illegal"
               exit 1
           securityContext:
             privileged: true
