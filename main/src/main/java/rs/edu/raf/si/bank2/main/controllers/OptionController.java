@@ -143,24 +143,24 @@ public class OptionController {
         return ResponseEntity.ok().body(dates);
     }
 
-    @Timed("controllers.option.buyStocksByOption")
-    @GetMapping("/buy-stocks/{userOptionId}")
-    public ResponseEntity<?> buyStocksByOption(@PathVariable Long userOptionId) {
-
-        String signedInUserEmail = getContext().getAuthentication().getName();
-
-        try {
-            Optional<User> userOptional = userService.findByEmail(signedInUserEmail);
-            return ResponseEntity.ok()
-                    .body(optionService.buyStockUsingOption(
-                            userOptionId, userOptional.get().getId()));
-        } catch (UserNotFoundException
-                | OptionNotFoundException
-                | StockNotFoundException
-                | TooLateToBuyOptionException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
-        }
-    }
+//    @Timed("controllers.option.buyStocksByOption")
+//    @GetMapping("/buy-stocks/{userOptionId}")
+//    public ResponseEntity<?> buyStocksByOption(@PathVariable Long userOptionId) {
+//
+//        String signedInUserEmail = getContext().getAuthentication().getName();
+//
+//        try {
+//            Optional<User> userOptional = userService.findByEmail(signedInUserEmail);
+//            return ResponseEntity.ok()
+//                    .body(optionService.buyStockUsingOption(
+//                            userOptionId, userOptional.get().getId()));
+//        } catch (UserNotFoundException
+//                | OptionNotFoundException
+//                | StockNotFoundException
+//                | TooLateToBuyOptionException e) {
+//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+//        }
+//    }
 
     @Timed("controllers.option.getUserOptionsAll")
     @GetMapping("/user-options")
@@ -180,11 +180,11 @@ public class OptionController {
                         userService.findByEmail(signedInUserEmail).get().getId(), stockSymbol));
     }
 
-    @Timed("controllers.option.sellStocksByOption")
-    @PostMapping("/sell-stocks")
-    public ResponseEntity<?> sellStocksByOption(@RequestBody SellStockUsingOptionDto sellStockUsingOptionDto) {
-
-        String signedInUserEmail = getContext().getAuthentication().getName();
+//    @Timed("controllers.option.sellStocksByOption")
+//    @PostMapping("/sell-stocks")
+//    public ResponseEntity<?> sellStocksByOption(@RequestBody SellStockUsingOptionDto sellStockUsingOptionDto) {
+//
+//        String signedInUserEmail = getContext().getAuthentication().getName();
 
         // Problem na koji sam naisao je to sto treba da se kreira UserOption, ali nemam podatak o optionId-ju
         // Moguce resenje je dozvoliti null vrednosti za optionId u UserOption modelu i migracionoj skripti
@@ -197,6 +197,6 @@ public class OptionController {
         // TooLateToBuyOptionException e){
         //            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         //        }
-        return null;
-    }
+//        return null;
+//    }
 }
