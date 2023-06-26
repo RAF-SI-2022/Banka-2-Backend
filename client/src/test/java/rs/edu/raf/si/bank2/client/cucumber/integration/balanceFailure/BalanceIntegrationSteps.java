@@ -184,21 +184,21 @@ public class BalanceIntegrationSteps extends BalanceIntegrationTestConfig {
                     .andExpect(status().isUnauthorized())
                     .andReturn();
         } catch (Exception e) {
-            fail("Get tekuci failed");
+            fail("open tekuci witout perms failed");
         }
     }
 
     @Then("get devizni without perms")
     public void get_devizni_without_perms() {
         try {
-            MvcResult mvcResult = mockMvc.perform(get("/api/balance/poslovni/1")
+            MvcResult mvcResult = mockMvc.perform(get("/api/balance/devizni/1123")
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
                     .andExpect(status().isUnauthorized())
                     .andReturn();
         } catch (Exception e) {
-            fail("Get all poslovni failed");
+            fail("get devizni without perms failed");
         }
     }
 
@@ -212,22 +212,21 @@ public class BalanceIntegrationSteps extends BalanceIntegrationTestConfig {
                     .andExpect(status().isUnauthorized())
                     .andReturn();
         } catch (Exception e) {
-            fail("Get all poslovni failed");
+            fail("get poslovni without perms failed");
         }
     }
 
     @Then("get tekuci without perms")
     public void get_tekuci_without_perms() {
         try {
-            MvcResult mvcResult = mockMvc.perform(get("/api/balance/tekuci/1")
+            MvcResult mvcResult = mockMvc.perform(get("/api/balance/tekuci/1123")
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
                     .andExpect(status().isUnauthorized())
                     .andReturn();
         } catch (Exception e) {
-            e.printStackTrace();
-            fail("Get all tekuci failed");
+            fail("get tekuci without perms failed");
         }
     }
 }
