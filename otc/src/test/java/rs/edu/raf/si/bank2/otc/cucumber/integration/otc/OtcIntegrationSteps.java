@@ -1,8 +1,7 @@
 package rs.edu.raf.si.bank2.otc.cucumber.integration.otc;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,13 +20,17 @@ import rs.edu.raf.si.bank2.otc.models.mariadb.User;
 import rs.edu.raf.si.bank2.otc.models.mongodb.Company;
 import rs.edu.raf.si.bank2.otc.models.mongodb.Contract;
 import rs.edu.raf.si.bank2.otc.models.mongodb.ContractElements;
+import rs.edu.raf.si.bank2.otc.models.mongodb.TransactionElement;
 import rs.edu.raf.si.bank2.otc.repositories.mariadb.PasswordResetTokenRepository;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.CompanyRepository;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.ContactRepository;
+import rs.edu.raf.si.bank2.otc.repositories.mongodb.TransactionElementRepository;
 import rs.edu.raf.si.bank2.otc.requests.LoginRequest;
 import rs.edu.raf.si.bank2.otc.services.UserCommunicationService;
 import rs.edu.raf.si.bank2.otc.services.interfaces.AuthorisationServiceInterface;
 import rs.edu.raf.si.bank2.otc.services.interfaces.UserServiceInterface;
+
+import java.util.Arrays;
 
 public class OtcIntegrationSteps extends OtcIntegrationTestConfig {
 
@@ -69,9 +72,13 @@ public class OtcIntegrationSteps extends OtcIntegrationTestConfig {
     @Autowired
     CompanyRepository companyRepository;
 
+    @Autowired
+    TransactionElementRepository transactionElementRepository;
+
     ObjectMapper mapper = new ObjectMapper();
     protected static String token;
 
+    String elementId = "501";
     String companyId = "500";
     String contractId = "500";
 
@@ -110,17 +117,18 @@ public class OtcIntegrationSteps extends OtcIntegrationTestConfig {
         Contract contract1 = Contract.builder()
                 .id(contractId)
                 .contractStatus(ContractElements.BUY)
-                .contractNumber("1231321")
+                .contractNumber("300")
                 .companyId(companyId)
+                .transactionElements(Arrays.asList(TransactionElement.builder().id("502").build(), TransactionElement.builder().id("503").build()))
                 .build();
         Contract contract2 = Contract.builder()
                 .contractStatus(ContractElements.BUY)
-                .contractNumber("1231321")
+                .contractNumber("300")
                 .companyId(companyId)
                 .build();
         Contract contract3 = Contract.builder()
                 .contractStatus(ContractElements.BUY)
-                .contractNumber("1231321")
+                .contractNumber("300")
                 .build();
 
         companyRepository.save(company);
@@ -184,7 +192,7 @@ public class OtcIntegrationSteps extends OtcIntegrationTestConfig {
     @Then("user opens contract")
     public void user_opens_contract() throws Exception {
 
-        result = mockMvc.perform(post("/open")
+        result = mockMvc.perform(post("/api/otc/open")
                         .contentType("application/json")
                         .content(
                                 """
@@ -198,13 +206,188 @@ public class OtcIntegrationSteps extends OtcIntegrationTestConfig {
                         .header("Content-Type", "application/json")
                         .header("Access-Control-Allow-Origin", "*")
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isOk())
                 .andReturn();
 
-        //        JSONObject actualJson = new JSONObject(result.getResponse().getContentAsString());
-        //
-        //        assertNotNull(actualJson, "Json is not null");
+                String response = result.getResponse().getContentAsString();
 
-        assertNotNull(result, "Json is not null");
+                assertEquals(response, "Ugovor je uspesno otvoren");
+
+//        assertNotNull(result, "Json is not null");
+    }
+    @Then("user edits contract")
+    public void user_edits_contract() throws Exception {
+        result = mockMvc.perform(patch("/api/otc/edit")
+                        .contentType("application/json")
+                        .content(
+                                """
+                                        {
+                                          "companyId": "500",
+                                          "contractStatus": "DRAFT",
+                                          "contractNumber": "300",
+                                          "description": "edited description"
+                                        }
+                                         """)
+                        .header("Content-Type", "application/json")
+                        .header("Access-Control-Allow-Origin", "*")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk()) //isOk()
+                .andReturn();
+
+        String response = result.getResponse().getContentAsString();
+
+        assertEquals(response, "Ugovor je uspesno promenjen");
+
+//        assertNotNull(result, "Json is not null");
+    }
+
+    @Then("user finalizes contract by id")
+    public void user_finalizes_contract_by_id() throws Exception {
+
+        result = mockMvc.perform(patch("/api/otc/finalize/" + contractId)
+                        .header("Content-Type", "application/json")
+                        .header("Access-Control-Allow-Origin", "*")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk()) //isOk
+                .andReturn();
+
+        String response = result.getResponse().getContentAsString();
+
+        assertEquals(response, "Ugovor uspesno kompletiran");
+
+//        assertNotNull(result, "Json is not null");
+    }
+
+    @Then("user deletes contract by id")
+    public void user_deletes_contract_by_id() throws Exception {
+
+        result = mockMvc.perform(delete("/api/otc/delete/" + contractId)
+                        .header("Content-Type", "application/json")
+                        .header("Access-Control-Allow-Origin", "*")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk()) //isOk
+                .andReturn();
+
+        String response = result.getResponse().getContentAsString();
+
+        assertEquals(response, "Ugovor uspesno izbrisan");
+
+//        assertNotNull(result, "Json is not null");
+    }
+
+    @When("elements exist in database")
+    public void elements_exist_in_database() {
+
+        TransactionElement transactionElement1 = TransactionElement.builder().id("501").build();
+        TransactionElement transactionElement2 = TransactionElement.builder().build();
+        TransactionElement transactionElement3 = TransactionElement.builder().build();
+
+        transactionElementRepository.save(transactionElement1);
+        transactionElementRepository.save(transactionElement2);
+        transactionElementRepository.save(transactionElement3);
+    }
+    @Then("user gets all elements")
+    public void user_gets_all_elements() throws Exception {
+
+        result = mockMvc.perform(get("/api/otc/elements").contentType("application/json")
+                        .header("Content-Type", "application/json")
+                        .header("Access-Control-Allow-Origin", "*")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk()) //isOk()
+                .andReturn();
+
+        JSONArray actualJson = new JSONArray(result.getResponse().getContentAsString());
+
+        assertNotNull(actualJson, "Json is not null");
+
+//        assertNotNull(result, "Json is not null");
+
+    }
+
+    @Then("user gets element by id")
+    public void user_gets_element_by_id() throws Exception {
+
+        result = mockMvc.perform(get("/api/otc/element/" + elementId).contentType("application/json")
+                        .header("Content-Type", "application/json")
+                        .header("Access-Control-Allow-Origin", "*")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk()) //isOk()
+                .andReturn();
+
+        JSONObject actualJson = new JSONObject(result.getResponse().getContentAsString());
+
+        assertNotNull(actualJson, "Json is not null");
+
+//        assertNotNull(result, "Json is not null");
+
+    }
+
+    @Then("user gets elements for contract")
+    public void user_gets_elements_for_contract() throws Exception {
+
+        result = mockMvc.perform(get("/api/otc/contract_elements/" + contractId).contentType("application/json")
+                        .header("Content-Type", "application/json")
+                        .header("Access-Control-Allow-Origin", "*")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk()) //isOk()
+                .andReturn();
+
+        JSONArray actualJson = new JSONArray(result.getResponse().getContentAsString());
+
+        assertNotNull(actualJson, "Json is not null");
+
+//        assertNotNull(result, "Json is not null");
+    }
+
+    @Then("user adds element to contract")
+    public void user_adds_element_to_contract() throws Exception {
+
+        result = mockMvc.perform(post("/api/otc/add_element")
+                        .contentType("application/json")
+                        .content(
+                                """
+                                        {
+                                          "contractId": "500",
+                                          "elementId": "504",
+                                          "buyOrSell": "DRAFT",
+                                          "transactionElement": "STOCK",
+                                          "balance": "DRAFT",
+                                          "currency": "string",
+                                          "amount": 0,
+                                          "priceOfOneElement": 0,
+                                          "userId": 0,
+                                          "mariaDbId": 0,
+                                          "futureStorageField": "string"
+                                        }
+                                         """)
+                        .header("Content-Type", "application/json")
+                        .header("Access-Control-Allow-Origin", "*")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk()) //isOk()
+                .andReturn();
+
+        JSONObject actualJson = new JSONObject(result.getResponse().getContentAsString());
+
+        assertNotNull(actualJson, "Json is not null");
+
+//        assertNotNull(result, "Json is not null");
+    }
+
+    @Then("user deletes element from contract")
+    public void user_deletes_element_from_contract() throws Exception {
+
+        result = mockMvc.perform(delete("/api/otc/remove_element/" + contractId + "/" + elementId)
+                        .header("Content-Type", "application/json")
+                        .header("Access-Control-Allow-Origin", "*")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk()) //isOk
+                .andReturn();
+
+        JSONObject actualJson = new JSONObject(result.getResponse().getContentAsString());
+
+        assertNotNull(actualJson, "Json is not null");
+
+//        assertNotNull(result, "Json is not null");
+
     }
 }

@@ -101,7 +101,8 @@ public class MarginTransactionService {
             System.out.println("TU");
             MarginBalance marginBalance = marginBalanceFromDb.get();
             updateBalance(marginBalance, marginTransaction);
-            return marginTransactionRepository.save(marginTransaction);
+            marginTransactionRepository.save(marginTransaction);
+            return marginTransaction;
         }
         return null;
     }
