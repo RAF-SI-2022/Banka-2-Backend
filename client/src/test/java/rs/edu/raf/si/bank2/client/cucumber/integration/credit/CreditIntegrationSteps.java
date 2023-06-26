@@ -1,11 +1,17 @@
 package rs.edu.raf.si.bank2.client.cucumber.integration.credit;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.jayway.jsonpath.JsonPath;
 import io.cucumber.core.internal.com.fasterxml.jackson.core.JsonProcessingException;
 import io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import java.util.ArrayList;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -18,13 +24,6 @@ import rs.edu.raf.si.bank2.client.models.mongodb.enums.BalanceType;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.ClientRepository;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.CreditRepository;
 import rs.edu.raf.si.bank2.client.services.BalanceService;
-
-import java.util.ArrayList;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class CreditIntegrationSteps extends CreditIntegrationTestConfig {
 
@@ -168,8 +167,8 @@ public class CreditIntegrationSteps extends CreditIntegrationTestConfig {
         creditRepository.save(credit);
 
         Optional<Client> testClient = clientRepository.findClientByEmail("test@gmail.com");
-        balanceService.openTekuciRacun(new TekuciRacunDto(testClient.get().getId(), 1L, "USD", BalanceType.STEDNI, 1, 1.0));
-
+        balanceService.openTekuciRacun(
+                new TekuciRacunDto(testClient.get().getId(), 1L, "USD", BalanceType.STEDNI, 1, 1.0));
     }
 
     @Then("pay this months interest")
