@@ -165,14 +165,65 @@ public class ClientIntegrationSteps extends ClientIntegrationTestConfig {
         }
     }
 
-    @Then("checkToken")
-    public void check_token() {
+
+    @Then("get nonexistent client")
+    public void get_nonexistent_client() {
         try {
-            MvcResult mvcResult = mockMvc.perform(get("/api/client/checkToken/1934")
+            MvcResult mvcResult = mockMvc.perform(
+                            get("/api/client/1231332")
+                                    .header("Content-Type", "application/json")
+                                    .header("Access-Control-Allow-Origin", "*")
+                                    .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isNotFound())
+                    .andReturn();
+        } catch (Exception e) {
+            fail("Nonexistent client by id failed");
+        }
+    }
+
+    @Then("bad login credentials")
+    public void bad_login_credentials() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(
+                            post("/api/client/login")
+                                    .contentType("application/json")
+                                    .content(
+                                            """
+                                                    {
+                                                      "email": "mmmm@gmail.com",
+                                                      "password": "mmmm"
+                                                    }
+                                                    """))
+                    .andExpect(status().is4xxClientError())
+                    .andReturn();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("User failed to login");
+        }
+    }
+
+    @Then("checkToken is valid")
+    public void check_token_is_valid() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(get("/api/client/checkToken/1358")
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
                     .andExpect(status().isOk())
+                    .andReturn();
+        } catch (Exception e) {
+            fail("User failed to login");
+        }
+    }
+
+    @Then("checkToken is not valid")
+    public void check_token_is_not_valid() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(get("/api/client/checkToken/1111")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isNotFound())
                     .andReturn();
         } catch (Exception e) {
             fail("User failed to login");
@@ -186,4 +237,6 @@ public class ClientIntegrationSteps extends ClientIntegrationTestConfig {
         Optional<Client> testClient = clientRepository.findClientByEmail("test@gmail.com");
         testClient.ifPresent(client -> clientRepository.deleteById(client.getId()));
     }
+
+
 }
