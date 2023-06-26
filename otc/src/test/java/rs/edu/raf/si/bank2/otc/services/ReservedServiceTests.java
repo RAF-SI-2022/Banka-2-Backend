@@ -1,36 +1,20 @@
 package rs.edu.raf.si.bank2.otc.services;
 
-import org.junit.Assert;
-import org.junit.Before;
+import static org.junit.Assert.assertThrows;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
-import rs.edu.raf.si.bank2.otc.dto.CommunicationDto;
-import rs.edu.raf.si.bank2.otc.dto.ReserveDto;
 import rs.edu.raf.si.bank2.otc.dto.TransactionElementDto;
 import rs.edu.raf.si.bank2.otc.models.mongodb.ContractElements;
-import rs.edu.raf.si.bank2.otc.models.mongodb.TransactionElement;
 import rs.edu.raf.si.bank2.otc.models.mongodb.TransactionElements;
-import rs.edu.raf.si.bank2.otc.repositories.mongodb.MarginBalanceRepository;
-import rs.edu.raf.si.bank2.otc.repositories.mongodb.MarginTransactionRepository;
 import rs.edu.raf.si.bank2.otc.utils.JwtUtil;
-
-import java.io.InputStream;
-import java.util.Properties;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
@@ -40,7 +24,6 @@ public class ReservedServiceTests {
 
     @Mock
     private JwtUtil jwtUtil;
-
 
     @MockBean
     private RestTemplate restTemplate;
@@ -54,7 +37,6 @@ public class ReservedServiceTests {
      */
     @Test
     public void testSendReservationBuyCashStock() {
-
 
         TransactionElementDto teDto = new TransactionElementDto();
 
@@ -70,9 +52,7 @@ public class ReservedServiceTests {
         teDto.setMariaDbId(456L);
         teDto.setFutureStorageField("");
 
-
         assertThrows(RuntimeException.class, () -> reservedService.sendReservation(teDto));
-
     }
 
     @Test
@@ -132,7 +112,6 @@ public class ReservedServiceTests {
         assertThrows(RuntimeException.class, () -> reservedService.sendReservation(teDto));
     }
 
-
     @Test
     public void testSendReservationSellStock() {
         TransactionElementDto teDto = new TransactionElementDto();
@@ -186,5 +165,4 @@ public class ReservedServiceTests {
 
         assertThrows(RuntimeException.class, () -> reservedService.sendReservation(teDto));
     }
-
 }
