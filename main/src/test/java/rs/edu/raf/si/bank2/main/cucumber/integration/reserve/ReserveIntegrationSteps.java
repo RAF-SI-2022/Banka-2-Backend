@@ -5,20 +5,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -27,7 +22,6 @@ import rs.edu.raf.si.bank2.main.models.mariadb.orders.*;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
 import rs.edu.raf.si.bank2.main.services.OptionService;
 import rs.edu.raf.si.bank2.main.services.OrderService;
-import rs.edu.raf.si.bank2.main.services.StockService;
 import rs.edu.raf.si.bank2.main.services.UserService;
 
 public class ReserveIntegrationSteps extends ReserveIntegrationTestConfig {
@@ -54,8 +48,10 @@ public class ReserveIntegrationSteps extends ReserveIntegrationTestConfig {
 
     @Autowired
     private CurrencyRepository currencyRepository;
+
     @Autowired
     private ExchangeRepository exchangeRepository;
+
     private Stock stock;
     private Option option;
     private UserOption userOption;
@@ -140,44 +136,46 @@ public class ReserveIntegrationSteps extends ReserveIntegrationTestConfig {
             this.userOption = this.userOptionRepository.save(this.userOption);
         }
     }
+
     @Given("stock exists in db")
     public void stockExistsInDb() {
-       Optional<Stock> optionalStock = this.stockRepository.findById(111L);
-       if(optionalStock.isPresent()) {
-           this.stock = optionalStock.get();
-       } else {
-           Exchange exchange = null;
-           List<Exchange> exchangeList = this.exchangeRepository.findAll();
-           if(exchangeList.size() == 0) {
-               Currency currency = null;
-               List<Currency> currencyList = this.currencyRepository.findAll();
-               if(currencyList.size() == 0) {
-                   currency = Currency.builder()
-                           .id(1L)
-                           .currencyName("United States Dollar")
-                           .currencyCode("USD")
-                           .currencySymbol("$")
-                           .polity("United States")
-                           .inflations(new ArrayList<>())
-                           .build();
-                   currency = this.currencyRepository.save(currency);
-               } else {
-                   currency = currencyList.get(0);
-               }
-               exchange = new Exchange("New York exchange", "NYEM", "11122223333", "United States", currency, "1", "9:00", "17:00");
-           } else {
-               exchange = exchangeList.get(0);
-           }
-           this.stock = Stock.builder()
-                .id(111L)
-                .symbol("AAPL")
-                .companyName("Test company")
-                .outstandingShares(41L)
-                .dividendYield(new BigDecimal(23))
-                .exchange(exchange)
-                .build();
-           this.stock = this.stockRepository.save(this.stock);
-       }
+        Optional<Stock> optionalStock = this.stockRepository.findById(111L);
+        if (optionalStock.isPresent()) {
+            this.stock = optionalStock.get();
+        } else {
+            Exchange exchange = null;
+            List<Exchange> exchangeList = this.exchangeRepository.findAll();
+            if (exchangeList.size() == 0) {
+                Currency currency = null;
+                List<Currency> currencyList = this.currencyRepository.findAll();
+                if (currencyList.size() == 0) {
+                    currency = Currency.builder()
+                            .id(1L)
+                            .currencyName("United States Dollar")
+                            .currencyCode("USD")
+                            .currencySymbol("$")
+                            .polity("United States")
+                            .inflations(new ArrayList<>())
+                            .build();
+                    currency = this.currencyRepository.save(currency);
+                } else {
+                    currency = currencyList.get(0);
+                }
+                exchange = new Exchange(
+                        "New York exchange", "NYEM", "11122223333", "United States", currency, "1", "9:00", "17:00");
+            } else {
+                exchange = exchangeList.get(0);
+            }
+            this.stock = Stock.builder()
+                    .id(111L)
+                    .symbol("AAPL")
+                    .companyName("Test company")
+                    .outstandingShares(41L)
+                    .dividendYield(new BigDecimal(23))
+                    .exchange(exchange)
+                    .build();
+            this.stock = this.stockRepository.save(this.stock);
+        }
     }
 
     @Then("user reserves user-option")
