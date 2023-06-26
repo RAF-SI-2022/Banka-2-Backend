@@ -178,4 +178,65 @@ public class OrderIntegrationSteps extends OrderIntegrationTestConfig {
         }
         this.orderService.removeOrder(testOrder);
     }
+
+    @Then("user gets value of order")
+    public void userGetsValueOfOrder() {
+        try {
+            mockMvc.perform(get("/api/orders/value/"
+                            + this.userService
+                            .findByEmail("anesic3119rn+banka2backend+admin@raf.rs")
+                            .get()
+                            .getId())
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Then("user gets trade type of order")
+    public void userGetsTradeTypeOfOrder() {
+        try {
+            mockMvc.perform(get("/api/orders/tradeType/"
+                            + this.userService
+                            .findByEmail("anesic3119rn+banka2backend+admin@raf.rs")
+                            .get()
+                            .getId())
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+
+    }
+
+    @Then("user gets type of order")
+    public void userGetsTypeOfOrder() {
+        try {
+            mockMvc.perform(get("/api/orders/orderType/"
+                            + this.userService
+                            .findByEmail("anesic3119rn+banka2backend+admin@raf.rs")
+                            .get()
+                            .getId())
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
 }
