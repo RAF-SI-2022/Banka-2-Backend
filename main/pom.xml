@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -18,14 +19,17 @@
 
     <properties>
         <java.version>17</java.version>
-        <exec.mainClass>rs.edu.raf.si.bank2.main.MainApplication</exec.mainClass>
+        <exec.mainClass>rs.edu.raf.si.bank2.main.MainApplication
+        </exec.mainClass>
         <version.spotless>2.35.0</version.spotless>
 
         <!-- JaCoCo/ SonarQube config -->
         <jacoco.version>0.8.8</jacoco.version>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-        <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/../target/jacoco.exec</sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${project.basedir}/../target/jacoco.exec
+        </sonar.coverage.jacoco.xmlReportPaths>
         <sonar.language>java</sonar.language>
         <sonar.coverage.exclusions>
             **/bootstrap/**,
@@ -224,6 +228,15 @@
         </dependency>
 
 
+        <!-- =========== Monitoring =========== -->
+
+
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+
+
         <!-- =========== Misc =========== -->
 
 
@@ -336,7 +349,7 @@
                         </includes>
 
                         <!-- Enforce standard import order -->
-                        <importOrder />
+                        <importOrder/>
 
                         <!-- Better than Google formatter -->
                         <palantirJavaFormat>
@@ -347,6 +360,16 @@
                 </configuration>
             </plugin>
         </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.*</include>
+                </includes>
+            </resource>
+        </resources>
+
     </build>
 
     <profiles>

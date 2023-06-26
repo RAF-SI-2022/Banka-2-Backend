@@ -67,13 +67,6 @@ public class BootstrapData implements CommandLineRunner {
             logger.info("Permission " + pn + "added");
         }
 
-        // Set up admin user
-        Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
-        if (adminUser.isPresent()) {
-            logger.info("Root admin already added");
-            return;
-        }
-
         // Build root user object
         User admin = User.builder()
                 .email(ADMIN_EMAIL)
@@ -89,6 +82,21 @@ public class BootstrapData implements CommandLineRunner {
                 .defaultDailyLimit(1000000d) // usd
                 .build();
 
+        User powerless = User.builder()
+                .email("powerless@gmail.com")
+                .firstName("powerless")
+                .lastName("powerless")
+                .password(this.passwordEncoder.encode("powerless"))
+                .jmbg(ADMIN_JMBG)
+                .phone(ADMIN_PHONE)
+                .jobPosition("test")
+                .active(true)
+                .dailyLimit(0d) // usd
+                // .defaultDailyLimit(10000D) // usd
+                .defaultDailyLimit(0d) // usd
+                .build();
+        powerless.setPermissions(new ArrayList<>());
+
         // Set admin's perms
         List<Permission> permissions = new ArrayList<>();
         permissions.add(permissionRepository
@@ -97,7 +105,18 @@ public class BootstrapData implements CommandLineRunner {
         admin.setPermissions(permissions);
 
         // Save admin
-        this.userRepository.save(admin);
-        logger.info("Root admin added");
+
+        // Set up admin user
+        Optional<User> adminUser = userRepository.findUserByEmail(ADMIN_EMAIL);
+        if (adminUser.isEmpty()) {
+            this.userRepository.save(admin);
+            logger.info("Root admin added");
+        }
+
+        Optional<User> powerlessOptional = userRepository.findUserByEmail("powerless@gmail.com");
+        if (powerlessOptional.isEmpty()) {
+            this.userRepository.save(powerless);
+            logger.info("Root powerless added");
+        }
     }
 }

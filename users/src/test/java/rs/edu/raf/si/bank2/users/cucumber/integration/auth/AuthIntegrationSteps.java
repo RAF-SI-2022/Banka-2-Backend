@@ -8,6 +8,7 @@ import com.jayway.jsonpath.JsonPath;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,6 +36,9 @@ public class AuthIntegrationSteps extends AuthIntegrationTestConfig {
 
     @Autowired
     UserServiceInterface userServiceInterface;
+
+    @Autowired
+    CompositeMeterRegistry meterRegistry = new CompositeMeterRegistry();
 
     @Autowired
     PasswordEncoder passwordEncoder;

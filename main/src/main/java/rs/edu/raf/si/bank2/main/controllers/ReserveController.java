@@ -1,5 +1,6 @@
 package rs.edu.raf.si.bank2.main.controllers;
 
+import io.micrometer.core.annotation.Timed;
 import java.time.LocalDate;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/reserve")
+@Timed
 public class ReserveController {
 
     private final UserOptionRepository userOptionRepository;
@@ -21,6 +23,7 @@ public class ReserveController {
     private final UserRepository userRepository;
     private final StockRepository stockRepository;
     private final OptionRepository optionRepository;
+    private final CurrencyRepository currencyRepository;
 
     @Autowired
     public ReserveController(
@@ -30,7 +33,8 @@ public class ReserveController {
             BalanceRepository balanceRepository,
             UserRepository userRepository,
             StockRepository stockRepository,
-            OptionRepository optionRepository) {
+            OptionRepository optionRepository,
+            CurrencyRepository currencyRepository) {
         this.userOptionRepository = userOptionRepository;
         this.userStocksRepository = userStocksRepository;
         this.futureRepository = futureRepository;
@@ -38,8 +42,10 @@ public class ReserveController {
         this.userRepository = userRepository;
         this.stockRepository = stockRepository;
         this.optionRepository = optionRepository;
+        this.currencyRepository = currencyRepository;
     }
 
+    @Timed("controllers.reserve.reserveUserOption")
     @PostMapping("/reserveOption")
     public ResponseEntity<?> reserveUserOption(@RequestBody ReserveDto reserveDto) {
         Optional<UserOption> userOption =
@@ -55,6 +61,7 @@ public class ReserveController {
         return ResponseEntity.ok("Opcije su rezervisane");
     }
 
+    @Timed("controllers.reserve.undoReserveUserOption")
     @PostMapping("/undoReserveOption")
     public ResponseEntity<?> undoReserveUserOption(@RequestBody ReserveDto reserveDto) {
         Optional<UserOption> userOption =
@@ -67,10 +74,13 @@ public class ReserveController {
         return ResponseEntity.ok("Opcije su dodate");
     }
 
+    @Timed("controllers.reserve.reserveUserStock")
     @PostMapping("/reserveStock")
     public ResponseEntity<?> reserveUserStock(@RequestBody ReserveDto reserveDto) {
-        Optional<UserStock> userStock =
-                userStocksRepository.findUserStockByUserIdAndStockId(reserveDto.getUserId(), reserveDto.getHartijaId());
+
+        System.err.println(reserveDto);
+
+        Optional<UserStock> userStock = userStocksRepository.findUserStockById(reserveDto.getHartijaId());
 
         if (userStock.isEmpty()) return ResponseEntity.status(404).body("Stock nije pronadjen");
         if (userStock.get().getAmount() < reserveDto.getAmount())
@@ -82,6 +92,7 @@ public class ReserveController {
         return ResponseEntity.ok("Stockovi su rezervisani");
     }
 
+    @Timed("controllers.reserve.undoReserveUserStock")
     @PostMapping("/undoReserveStock")
     public ResponseEntity<?> undoReserveUserStock(@RequestBody ReserveDto reserveDto) {
         Optional<UserStock> userStock =
@@ -94,6 +105,7 @@ public class ReserveController {
         return ResponseEntity.ok("Stockovi su dodati");
     }
 
+    @Timed("controllers.reserve.reserveFutureStock")
     @PostMapping("/reserveFuture")
     public ResponseEntity<?> reserveFutureStock(@RequestBody ReserveDto reserveDto) {
         Optional<Future> userFuture =
@@ -105,6 +117,7 @@ public class ReserveController {
         return ResponseEntity.ok(saveString);
     }
 
+    @Timed("controllers.reserve.undoReserveFutureStock")
     @PostMapping("/undoReserveFuture")
     public ResponseEntity<?> undoReserveFutureStock(@RequestBody ReserveDto reserveDto) {
         String[] data = reserveDto.getFutureStorage().split(",");
@@ -125,11 +138,14 @@ public class ReserveController {
         return ResponseEntity.ok(futureRepository.save(future));
     }
 
+    @Timed("controllers.reserve.reserveMoney")
     @PostMapping("/reserveMoney")
     public ResponseEntity<?> reserveMoney(@RequestBody ReserveDto reserveDto) {
         // todo trenutno hard code na USD
-        Optional<Balance> userBalance =
-                balanceRepository.findBalanceByUserIdAndCurrencyId(reserveDto.getUserId(), 138L);
+
+        Optional<Currency> usd = currencyRepository.findCurrencyByCurrencyCode("USD");
+        Optional<Balance> userBalance = balanceRepository.findBalanceByUserIdAndCurrencyId(
+                reserveDto.getUserId(), usd.get().getId());
         // !!! NIJE HARTIJA NEGO CURRENCY ID !!!
         if (userBalance.isEmpty()) return ResponseEntity.status(404).body("Balans nije pronadjen");
 
@@ -144,11 +160,14 @@ public class ReserveController {
         return ResponseEntity.ok("Novac uspesno rezervisan");
     }
 
+    @Timed("controllers.reserve.undoReserveMoney")
     @PostMapping("/undoReserveMoney")
     public ResponseEntity<?> undoReserveMoney(@RequestBody ReserveDto reserveDto) {
         // todo trenutno hard code na USD
-        Optional<Balance> userBalance =
-                balanceRepository.findBalanceByUserIdAndCurrencyId(reserveDto.getUserId(), 138L);
+
+        Optional<Currency> usd = currencyRepository.findCurrencyByCurrencyCode("USD");
+        Optional<Balance> userBalance = balanceRepository.findBalanceByUserIdAndCurrencyId(
+                reserveDto.getUserId(), usd.get().getId());
         // !!! NIJE HARTIJA NEGO CURRENCY ID !!!
         if (userBalance.isEmpty()) return ResponseEntity.status(404).body("Balans nije pronadjen");
 
@@ -160,6 +179,7 @@ public class ReserveController {
         return ResponseEntity.ok("Novac uspesno dodat");
     }
 
+    @Timed("controllers.reserve.finalizeStockBuy")
     @PostMapping("finalizeStock")
     public ResponseEntity<?> finalizeStockBuy(@RequestBody ReserveDto reserveDto) {
         Optional<UserStock> userStock =
@@ -185,6 +205,7 @@ public class ReserveController {
         return ResponseEntity.ok("Stockovi su dodati");
     }
 
+    @Timed("controllers.reserve.finalizeOptionBuy")
     @PostMapping("finalizeOption")
     public ResponseEntity<?> finalizeOptionBuy(@RequestBody ReserveDto reserveDto) {
 
@@ -212,6 +233,7 @@ public class ReserveController {
         return ResponseEntity.ok("Stockovi su dodati");
     }
 
+    @Timed("controllers.reserve.finalizeFutureStock")
     @PostMapping("/finalizeFuture")
     public ResponseEntity<?> finalizeFutureStock(@RequestBody ReserveDto reserveDto) {
         String[] data = reserveDto.getFutureStorage().split(",");

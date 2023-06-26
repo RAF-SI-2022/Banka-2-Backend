@@ -472,13 +472,13 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
         }
     }
 
-        @Then("user updates his profile")
-        public void user_updates_his_profile() {
-            try {
-                mockMvc.perform(put("/api/users/edit-profile/" + testUser.get().getId())
-                                .contentType("application/json")
-                                .content(
-                                        """
+    @Then("user updates his profile")
+    public void user_updates_his_profile() {
+        try {
+            mockMvc.perform(put("/api/users/edit-profile/" + testUser.get().getId())
+                            .contentType("application/json")
+                            .content(
+                                    """
                                                   {
                                                     "email": "testUser@gmail.com",
                                                     "firstName": "UserEditedName",
@@ -486,60 +486,60 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                                                     "phone": "666666666"
                                                   }
                                                 """)
-                                .header("Content-Type", "application/json")
-                                .header("Access-Control-Allow-Origin", "*")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
-                        .andReturn();
-                String editedName =
-                        userService.findById(testUser.get().getId()).get().getFirstName();
-                System.out.println(editedName);
-                assertEquals(editedName, "UserEditedName");
-            } catch (Exception e) {
-                fail(e.getMessage());
-            }
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+            String editedName =
+                    userService.findById(testUser.get().getId()).get().getFirstName();
+            System.out.println(editedName);
+            assertEquals(editedName, "UserEditedName");
+        } catch (Exception e) {
+            fail(e.getMessage());
         }
+    }
 
-//     Test findUserByEmail
-        @Then("get user by his email")
-        public void get_user_by_his_email() {
-            try {
-                mockMvc.perform(get("/api/users/email")
-                                .contentType("application/json")
-                                .header("Content-Type", "application/json")
-                                .header("Access-Control-Allow-Origin", "*")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
-                        .andReturn();
-            } catch (Exception e) {
-                fail(e.getMessage());
-            }
+    //     Test findUserByEmail
+    @Then("get user by his email")
+    public void get_user_by_his_email() {
+        try {
+            mockMvc.perform(get("/api/users/email")
+                            .contentType("application/json")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+        } catch (Exception e) {
+            fail(e.getMessage());
         }
+    }
 
-//     Test user changes his password
-        @Then("user changes his password")
-        public void user_changes_his_password() {
-            try {
-                mockMvc.perform(put("/api/users/password/" + testUser.get().getId())
-                                .contentType("application/json")
-                                .content(
-                                        """
+    //     Test user changes his password
+    @Then("user changes his password")
+    public void user_changes_his_password() {
+        try {
+            mockMvc.perform(put("/api/users/password/" + testUser.get().getId())
+                            .contentType("application/json")
+                            .content(
+                                    """
                                                   {
-                                                      "password": "testPass"
+                                                      "password": "admin"
                                                   }
                                                 """)
-                                .header("Content-Type", "application/json")
-                                .header("Access-Control-Allow-Origin", "*")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
-                        .andReturn();
-                String oldPass = testUser.get().getPassword();
-                String newPass = userService.findById(testUser.get().getId()).get().getPassword();
-                assertNotEquals(oldPass, newPass);
-            } catch (Exception e) {
-                fail(e.getMessage());
-            }
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn();
+            String oldPass = testUser.get().getPassword();
+            String newPass = userService.findById(testUser.get().getId()).get().getPassword();
+            assertNotEquals(oldPass, newPass);
+        } catch (Exception e) {
+            fail(e.getMessage());
         }
+    }
 
     // Testing deleting user
     @Given("privileged user logged in")
@@ -611,5 +611,11 @@ public class UsersIntegrationSteps extends UsersIntegrationTestConfig {
                 + "> not found.";
         String actualMessage = exception.getMessage();
         assertEquals(expectedMessage, actualMessage);
+    }
+
+    @Given("delete users")
+    public void delete_users() {
+        Optional<User> user = userService.findByEmail("testUser@gmail.com");
+        user.ifPresent(value -> userService.deleteById(value.getId()));
     }
 }

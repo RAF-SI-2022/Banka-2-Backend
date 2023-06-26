@@ -1,6 +1,8 @@
 package rs.edu.raf.si.bank2.otc.services;
 
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.otc.dto.ContactsBankAccountsDto;
@@ -13,11 +15,6 @@ import rs.edu.raf.si.bank2.otc.models.mongodb.CompanyBankAccount;
 import rs.edu.raf.si.bank2.otc.models.mongodb.ContactPerson;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.CompanyRepository;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 @Service
 public class CompanyService {
 
@@ -29,20 +26,21 @@ public class CompanyService {
     }
 
     public Company createCompany(Company company) {
-        if(company.getId() != null) {
+        if (company.getId() != null) {
             throw new CompanyIdProvidedException("ID can't be manually set.");
         }
 
-//        Company companyDbEntry = Company.builder().name(company.getName()).address(company.getAddress()).
-//                registrationNumber(company.getRegistrationNumber()).taxNumber(company.getTaxNumber()).
-//                activityCode(company.getActivityCode()).contactPersons(company.getContactPersons()).bankAccounts(company.getBankAccounts()).build();
+        //        Company companyDbEntry = Company.builder().name(company.getName()).address(company.getAddress()).
+        //                registrationNumber(company.getRegistrationNumber()).taxNumber(company.getTaxNumber()).
+        //
+        // activityCode(company.getActivityCode()).contactPersons(company.getContactPersons()).bankAccounts(company.getBankAccounts()).build();
 
         return companyRepository.save(company);
     }
 
-    public Company addContactsAndBankAccounts(ContactsBankAccountsDto contactsBankAccountsDto){
+    public Company addContactsAndBankAccounts(ContactsBankAccountsDto contactsBankAccountsDto) {
         Optional<Company> companyOptional = companyRepository.findById(contactsBankAccountsDto.getId());
-        if(companyOptional.isEmpty()) {
+        if (companyOptional.isEmpty()) {
             throw new CompanyNotFoundException("There is no company with this ID.");
         }
         Company company = companyOptional.get();
@@ -55,12 +53,12 @@ public class CompanyService {
     }
 
     public Company updateCompany(EditCompanyDto editCompanyDto) {
-        if(editCompanyDto.getId() == null) {
+        if (editCompanyDto.getId() == null) {
             throw new CompanyIdNotProvidedException("Id must be present for you to edit the company.");
         }
 
         Optional<Company> companyOptional = companyRepository.findById(editCompanyDto.getId());
-        if(companyOptional.isEmpty()) {
+        if (companyOptional.isEmpty()) {
             throw new CompanyNotFoundException("There is no company with this ID.");
         }
 
@@ -85,16 +83,15 @@ public class CompanyService {
 
     public Company getCompanyByName(String name) {
         Optional<Company> companyRet = companyRepository.findCompanyByName(name);
-        if(companyRet.isEmpty()){
+        if (companyRet.isEmpty()) {
             throw new CompanyNotFoundException("There is no company with this name.");
         }
         return companyRet.get();
-
     }
 
     public Company getCompanyByRegistrationNumber(String registrationNumber) {
         Optional<Company> companyRet = companyRepository.findCompanyByRegistrationNumber(registrationNumber);
-        if(companyRet.isEmpty()){
+        if (companyRet.isEmpty()) {
             throw new CompanyNotFoundException("There is no company with this registration number.");
         }
         return companyRet.get();
@@ -102,9 +99,17 @@ public class CompanyService {
 
     public Company getCompanyByTaxNumber(String taxNo) {
         Optional<Company> companyRet = companyRepository.findCompanyByTaxNumber(taxNo);
-        if(companyRet.isEmpty()){
+        if (companyRet.isEmpty()) {
             throw new CompanyNotFoundException("There is no company with this tax number.");
         }
         return companyRet.get();
+    }
+
+    public Company save(Company company) {
+        return this.companyRepository.save(company);
+    }
+
+    public void delete(Company company) {
+        this.companyRepository.delete(company);
     }
 }

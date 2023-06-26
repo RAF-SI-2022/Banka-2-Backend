@@ -1,7 +1,11 @@
 package rs.edu.raf.si.bank2.otc.controllers;
 
+import static org.springframework.security.core.context.SecurityContextHolder.getContext;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.core.annotation.Timed;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,16 +22,13 @@ import rs.edu.raf.si.bank2.otc.services.OtcService;
 import rs.edu.raf.si.bank2.otc.services.UserCommunicationService;
 import rs.edu.raf.si.bank2.otc.services.interfaces.UserCommunicationInterface;
 
-import java.util.Optional;
-
-import static org.springframework.security.core.context.SecurityContextHolder.getContext;
-
 /**
  * Controller for validating tokens from other services.
  */
 @RestController
 @CrossOrigin
 @RequestMapping("/api/otc")
+@Timed
 public class OtcController {
 
     private final OtcService otcService;
@@ -40,7 +41,7 @@ public class OtcController {
         this.userCommunicationInterface = communicationService;
     }
 
-
+    @Timed("controllers.otc.getAllContracts")
     @GetMapping
     public ResponseEntity<?> getAllContracts() {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -59,10 +60,10 @@ public class OtcController {
             }
         } else return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
 
-//        System.err.println(user);
+        //        System.err.println(user);
 
         Permission permission = user.getPermissions().get(0);
-        if (permission.getPermissionName() == PermissionName.ADMIN_USER){
+        if (permission.getPermissionName() == PermissionName.ADMIN_USER) {
             return ResponseEntity.ok().body(otcService.getAllDraftContracts());
         }
 
@@ -71,6 +72,7 @@ public class OtcController {
         } else return ResponseEntity.ok().body(otcService.getAllDraftContractsForUserId(user.getId()));
     }
 
+    @Timed("controllers.otc.byCompany.getAllContracts")
     @GetMapping("/byCompany/{companyId}")
     public ResponseEntity<?> getAllContracts(@PathVariable(name = "companyId") String companyId) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -89,19 +91,19 @@ public class OtcController {
             }
         } else return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
 
-//        System.err.println(user);
+        //        System.err.println(user);
 
         Permission permission = user.getPermissions().get(0);
-        if (permission.getPermissionName() == PermissionName.ADMIN_USER){
+        if (permission.getPermissionName() == PermissionName.ADMIN_USER) {
             return ResponseEntity.ok().body(otcService.getAllContractsByCompanyId(companyId));
         }
 
         if (user.getPermissions().size() > 1) {
             return ResponseEntity.ok().body(otcService.getAllContractsByCompanyId(companyId));
         } else return ResponseEntity.ok().body(otcService.getAllContractsForUserIdAndCompany(user.getId(), companyId));
-
     }
 
+    @Timed("controllers.otc.getContract")
     @GetMapping("/{id}")
     public ResponseEntity<?> getContract(@PathVariable(name = "id") String id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -114,6 +116,7 @@ public class OtcController {
         return ResponseEntity.ok().body(contract.get());
     }
 
+    @Timed("controllers.otc.openContract")
     @PostMapping("/open")
     public ResponseEntity<?> openContract(@RequestBody ContractDto contractDto) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -136,7 +139,7 @@ public class OtcController {
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
-
+    @Timed("controllers.otc.editContract")
     @PatchMapping("/edit")
     public ResponseEntity<?> editContract(@RequestBody ContractDto contractDto) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -148,7 +151,7 @@ public class OtcController {
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
-
+    @Timed("controllers.otc.finalizeContract")
     @PatchMapping("/finalize/{id}")
     public ResponseEntity<?> finalizeContract(@PathVariable(name = "id") String id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -160,6 +163,7 @@ public class OtcController {
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
+    @Timed("controllers.otc.deleteContract")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteContract(@PathVariable(name = "id") String id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -171,8 +175,9 @@ public class OtcController {
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
-    //ISPOD SU TRANSACTION ELEMENTI
+    // ISPOD SU TRANSACTION ELEMENTI
 
+    @Timed("controllers.otc.getAllElements")
     @GetMapping("/elements")
     public ResponseEntity<?> getAllElements() {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -183,6 +188,7 @@ public class OtcController {
         return ResponseEntity.ok().body(otcService.getAllElements());
     }
 
+    @Timed("controllers.otc.getElement")
     @GetMapping("/element/{id}")
     public ResponseEntity<?> getElement(@PathVariable(name = "id") String id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -191,11 +197,11 @@ public class OtcController {
         }
 
         Optional<TransactionElement> transactionElement = otcService.getElementById(id);
-        if (transactionElement.isEmpty())
-            return ResponseEntity.status(404).body("Ne postoji element u bazi");
+        if (transactionElement.isEmpty()) return ResponseEntity.status(404).body("Ne postoji element u bazi");
         return ResponseEntity.ok().body(transactionElement.get());
     }
 
+    @Timed("controllers.otc.getElementsForContract")
     @GetMapping("contract_elements/{id}")
     public ResponseEntity<?> getElementsForContract(@PathVariable(name = "id") String contractId) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -206,6 +212,7 @@ public class OtcController {
         return ResponseEntity.ok().body(otcService.getElementsForContract(contractId));
     }
 
+    @Timed("controllers.otc.addTransactionElement")
     @PostMapping("/add_element")
     public ResponseEntity<?> addTransactionElement(@RequestBody TransactionElementDto transactionElementDto) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -217,9 +224,10 @@ public class OtcController {
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 
-
+    @Timed("controllers.otc.removeTransactionElement")
     @DeleteMapping("/remove_element/{contractId}/{elementId}")
-    public ResponseEntity<?> removeTransactionElement(@PathVariable(name = "contractId") String contractId, @PathVariable(name = "elementId") String elementId) {
+    public ResponseEntity<?> removeTransactionElement(
+            @PathVariable(name = "contractId") String contractId, @PathVariable(name = "elementId") String elementId) {
         String signedInUserEmail = getContext().getAuthentication().getName();
         if (!userCommunicationInterface.isAuthorised(PermissionName.READ_USERS, signedInUserEmail)) {
             return ResponseEntity.status(401).body("Nemate dozvolu pristupa.");
@@ -228,5 +236,4 @@ public class OtcController {
         OtcResponseDto response = otcService.removeTransactionElement(contractId, elementId);
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
-
 }

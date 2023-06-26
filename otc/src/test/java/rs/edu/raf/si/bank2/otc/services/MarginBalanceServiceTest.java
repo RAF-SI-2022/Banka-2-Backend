@@ -1,5 +1,11 @@
 package rs.edu.raf.si.bank2.otc.services;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,23 +17,16 @@ import rs.edu.raf.si.bank2.otc.models.mongodb.MarginBalance;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.MarginBalanceRepository;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.MarginTransactionRepository;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 public class MarginBalanceServiceTest {
     @Mock
     private MarginBalanceRepository marginBalanceRepository;
+
     @Mock
     private MarginTransactionRepository marginTransactionRepository;
 
     @InjectMocks
     private MarginBalanceService marginBalanceService;
-
 
     @Test
     void testGetAllMarginBalances() {
@@ -52,8 +51,7 @@ public class MarginBalanceServiceTest {
                         .loanedResources(1000.0)
                         .maintenanceMargin(300.0)
                         .marginCall(true)
-                        .build()
-        );
+                        .build());
         when(marginBalanceRepository.findAll()).thenReturn(expectedMarginBalances);
 
         // Act
@@ -172,5 +170,4 @@ public class MarginBalanceServiceTest {
         // Assert
         verify(marginBalanceRepository, times(1)).delete(marginBalanceToDelete);
     }
-
 }

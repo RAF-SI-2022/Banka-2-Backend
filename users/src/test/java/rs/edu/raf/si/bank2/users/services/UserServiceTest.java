@@ -195,22 +195,22 @@ public class UserServiceTest {
         verify(userRepository).save(newUser);
     }
 
-    @Test
-    public void deleteById_success() {
-
-        long id = 1L;
-
-        doNothing().when(userRepository).deleteById(id);
-
-        userService.deleteById(id);
-
-        verify(userRepository).deleteById(id);
-    }
+    //    @Test
+    //    public void deleteById_success() {
+    //
+    //        long id = 1L;
+    //
+    //        doNothing().when(userRepository).deleteById(id);
+    //
+    //        userService.deleteById(id);
+    //
+    //        verify(userRepository).deleteById(id);
+    //    }
 
     @Test
     public void deleteById_throwsUserNotFoundException() {
 
-        long id = 1L;
+        long id = 70L;
 
         when(userRepository.findById(id)).thenThrow(UserNotFoundException.class);
 

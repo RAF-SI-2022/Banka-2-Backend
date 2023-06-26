@@ -1,5 +1,6 @@
 package rs.edu.raf.si.bank2.users.controllers;
 
+import io.micrometer.core.annotation.Timed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/serviceAuth")
+@Timed
 public class ServiceAuthController {
 
     @Autowired
@@ -30,6 +32,7 @@ public class ServiceAuthController {
      *
      * @return 200 if valid, error otherwise.
      */
+    @Timed("controllers.serviceAuth.validate")
     @PostMapping("/validate")
     public ResponseEntity<?> validate() {
         return ResponseEntity.ok().body("Token valid");

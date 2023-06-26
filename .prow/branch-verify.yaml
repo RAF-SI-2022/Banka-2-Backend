@@ -1,0 +1,34 @@
+presubmits:
+  - name: pull-banka-2-backend-branch-verify
+    labels:
+      preset-github-ro-token: "true"
+    always_run: true
+    decorate: true
+    spec:
+      containers:
+        - image: harbor.k8s.elab.rs/base-images/base:java-17-node-18-docker
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -euo pipefail
+
+              head_ref=$(curl -L --silent -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GITHUB_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/repos/RAF-SI-2022/"$REPO_NAME"/pulls/"$PULL_NUMBER" | jq -r .head.ref)
+              export PULL_HEAD_REF="$head_ref"
+
+              branch=$PULL_HEAD_REF
+              curr_branch=$(git rev-parse --abbrev-ref HEAD)
+              if [[ "$curr_branch" == "$branch" ]] || \
+                [[ "$branch" == "bugfix"* ]] || \
+                [[ "$branch" == "hotfix"* ]] || \
+                [[ "$curr_branch" == "dev" && "$branch" == "sprint-"* ]] || \
+                [[ "$curr_branch" == "main" && "$branch" == "dev" ]]; then
+                echo "Merge branch $branch into $curr_branch allowed"
+                exit 0
+              fi
+              
+              echo "Warning: merging branch $branch into $curr_branch is illegal"
+              exit 1
+          securityContext:
+            privileged: true
+          imagePullPolicy: Always

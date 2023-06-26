@@ -1,12 +1,16 @@
 package rs.edu.raf.si.bank2.otc.services;
 
-import org.apache.commons.collections.bag.AbstractBagDecorator;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.verification.VerificationMode;
 import rs.edu.raf.si.bank2.otc.dto.CompanyBankAccountDto;
 import rs.edu.raf.si.bank2.otc.exceptions.BankAccountNotFoundException;
 import rs.edu.raf.si.bank2.otc.exceptions.CompanyNotFoundException;
@@ -14,13 +18,6 @@ import rs.edu.raf.si.bank2.otc.models.mongodb.Company;
 import rs.edu.raf.si.bank2.otc.models.mongodb.CompanyBankAccount;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.CompanyBankAccountRepository;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.CompanyRepository;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CompanyBankAccountServiceTest {
@@ -98,7 +95,8 @@ public class CompanyBankAccountServiceTest {
 
         Company mockCompany = Company.builder().bankAccounts(new ArrayList<>()).build();
         when(companyRepository.findById(companyId)).thenReturn(Optional.of(mockCompany));
-        when(bankAccountRepository.save(any(CompanyBankAccount.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(bankAccountRepository.save(any(CompanyBankAccount.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
 
         CompanyBankAccount result = bankAccountService.createBankAccount(companyId, accountDto);
 
@@ -132,7 +130,8 @@ public class CompanyBankAccountServiceTest {
 
         CompanyBankAccount mockBankAccount = new CompanyBankAccount();
         when(bankAccountRepository.findById(bankAccountId)).thenReturn(Optional.of(mockBankAccount));
-        when(bankAccountRepository.save(any(CompanyBankAccount.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(bankAccountRepository.save(any(CompanyBankAccount.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
 
         CompanyBankAccount result = bankAccountService.updateBankAccount(bankAccountDto);
 
@@ -158,7 +157,7 @@ public class CompanyBankAccountServiceTest {
     public void testDeleteBankAccount_ValidData() {
         String bankAccountId = "1";
         String companyId = "1";
-        Company mockCompany =Company.builder().bankAccounts(new ArrayList<>()).build();
+        Company mockCompany = Company.builder().bankAccounts(new ArrayList<>()).build();
         CompanyBankAccount mockBankAccount = new CompanyBankAccount();
         mockCompany.getBankAccounts().add(mockBankAccount);
         when(companyRepository.findById(companyId)).thenReturn(Optional.of(mockCompany));
@@ -179,7 +178,8 @@ public class CompanyBankAccountServiceTest {
         String companyId = "1";
         when(companyRepository.findById(companyId)).thenReturn(Optional.empty());
 
-        assertThrows(CompanyNotFoundException.class, () -> bankAccountService.deleteBankAccount(bankAccountId, companyId));
+        assertThrows(
+                CompanyNotFoundException.class, () -> bankAccountService.deleteBankAccount(bankAccountId, companyId));
         verify(companyRepository, times(1)).findById(companyId);
         verify(bankAccountRepository, never()).findById(bankAccountId);
         verify(bankAccountRepository, never()).deleteById(bankAccountId);
@@ -193,7 +193,9 @@ public class CompanyBankAccountServiceTest {
         when(companyRepository.findById(companyId)).thenReturn(Optional.of(mockCompany));
         when(bankAccountRepository.findById(bankAccountId)).thenReturn(Optional.empty());
 
-        assertThrows(BankAccountNotFoundException.class, () -> bankAccountService.deleteBankAccount(bankAccountId, companyId));
+        assertThrows(
+                BankAccountNotFoundException.class,
+                () -> bankAccountService.deleteBankAccount(bankAccountId, companyId));
         verify(companyRepository, times(1)).findById(companyId);
         verify(bankAccountRepository, times(1)).findById(bankAccountId);
         verify(companyRepository, never()).save(any(Company.class));
