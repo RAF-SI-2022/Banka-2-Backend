@@ -222,9 +222,9 @@ public class CreditIntegrationSteps extends CreditIntegrationTestConfig {
                 10.0);
         racunStorageRepository.save(new RacunStorage("111111111", Balance.TEKUCI));
         tekuciRacunRepository.save(tekuciRacun);
-//        if (tekuciRacunRepository.findById("tekuciRacunTestBalance").isEmpty()) {
-//
-//        }
+        //        if (tekuciRacunRepository.findById("tekuciRacunTestBalance").isEmpty()) {
+        //
+        //        }
     }
 
     @Then("approve request")

@@ -165,15 +165,13 @@ public class ClientIntegrationSteps extends ClientIntegrationTestConfig {
         }
     }
 
-
     @Then("get nonexistent client")
     public void get_nonexistent_client() {
         try {
-            MvcResult mvcResult = mockMvc.perform(
-                            get("/api/client/1231332")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            MvcResult mvcResult = mockMvc.perform(get("/api/client/1231332")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isNotFound())
                     .andReturn();
         } catch (Exception e) {
@@ -237,6 +235,4 @@ public class ClientIntegrationSteps extends ClientIntegrationTestConfig {
         Optional<Client> testClient = clientRepository.findClientByEmail("test@gmail.com");
         testClient.ifPresent(client -> clientRepository.deleteById(client.getId()));
     }
-
-
 }

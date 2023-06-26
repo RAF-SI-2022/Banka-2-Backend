@@ -148,9 +148,9 @@ public class BalanceIntegrationSteps extends BalanceIntegrationTestConfig {
     }
 
     @Then("open tekuci racun")
-    public void open_tekuci_racun() throws io.cucumber.core.internal.com.fasterxml.jackson.core.JsonProcessingException {
-        TekuciRacunDto creditRequestDto = new TekuciRacunDto(testClientId,
-                1L, "USD", BalanceType.STEDNI, 1, 1.0);
+    public void open_tekuci_racun()
+            throws io.cucumber.core.internal.com.fasterxml.jackson.core.JsonProcessingException {
+        TekuciRacunDto creditRequestDto = new TekuciRacunDto(testClientId, 1L, "USD", BalanceType.STEDNI, 1, 1.0);
 
         String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper()
                 .writeValueAsString(creditRequestDto);
@@ -270,11 +270,10 @@ public class BalanceIntegrationSteps extends BalanceIntegrationTestConfig {
     @Then("try to get nonexistent devizni")
     public void try_to_get_nonexistent_devizni() {
         try {
-            MvcResult mvcResult = mockMvc.perform(
-                            get("/api/balance/devizni/13212321")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            MvcResult mvcResult = mockMvc.perform(get("/api/balance/devizni/13212321")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isNotFound())
                     .andReturn();
         } catch (Exception e) {
@@ -285,11 +284,10 @@ public class BalanceIntegrationSteps extends BalanceIntegrationTestConfig {
     @Then("try to get nonexistent tekuci")
     public void try_to_get_nonexistent_tekuci() {
         try {
-            MvcResult mvcResult = mockMvc.perform(
-                            get("/api/balance/tekuci/13213123")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            MvcResult mvcResult = mockMvc.perform(get("/api/balance/tekuci/13213123")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isNotFound())
                     .andReturn();
         } catch (Exception e) {
@@ -301,11 +299,10 @@ public class BalanceIntegrationSteps extends BalanceIntegrationTestConfig {
     @Then("try to get nonexistent poslovni")
     public void try_to_get_nonexistent_poslovni() {
         try {
-            MvcResult mvcResult = mockMvc.perform(
-                            get("/api/balance/poslovni/1321312312")
-                                    .header("Content-Type", "application/json")
-                                    .header("Access-Control-Allow-Origin", "*")
-                                    .header("Authorization", "Bearer " + token))
+            MvcResult mvcResult = mockMvc.perform(get("/api/balance/poslovni/1321312312")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isNotFound())
                     .andReturn();
         } catch (Exception e) {
