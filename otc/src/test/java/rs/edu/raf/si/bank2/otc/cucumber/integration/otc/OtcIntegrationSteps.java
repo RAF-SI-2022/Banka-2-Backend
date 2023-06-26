@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import java.util.Arrays;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mockito.*;
@@ -29,8 +30,6 @@ import rs.edu.raf.si.bank2.otc.requests.LoginRequest;
 import rs.edu.raf.si.bank2.otc.services.UserCommunicationService;
 import rs.edu.raf.si.bank2.otc.services.interfaces.AuthorisationServiceInterface;
 import rs.edu.raf.si.bank2.otc.services.interfaces.UserServiceInterface;
-
-import java.util.Arrays;
 
 public class OtcIntegrationSteps extends OtcIntegrationTestConfig {
 
@@ -119,7 +118,9 @@ public class OtcIntegrationSteps extends OtcIntegrationTestConfig {
                 .contractStatus(ContractElements.BUY)
                 .contractNumber("300")
                 .companyId(companyId)
-                .transactionElements(Arrays.asList(TransactionElement.builder().id("502").build(), TransactionElement.builder().id("503").build()))
+                .transactionElements(Arrays.asList(
+                        TransactionElement.builder().id("502").build(),
+                        TransactionElement.builder().id("503").build()))
                 .build();
         Contract contract2 = Contract.builder()
                 .contractStatus(ContractElements.BUY)
@@ -209,12 +210,13 @@ public class OtcIntegrationSteps extends OtcIntegrationTestConfig {
                 .andExpect(status().isOk())
                 .andReturn();
 
-                String response = result.getResponse().getContentAsString();
+        String response = result.getResponse().getContentAsString();
 
-                assertEquals(response, "Ugovor je uspesno otvoren");
+        assertEquals(response, "Ugovor je uspesno otvoren");
 
-//        assertNotNull(result, "Json is not null");
+        //        assertNotNull(result, "Json is not null");
     }
+
     @Then("user edits contract")
     public void user_edits_contract() throws Exception {
         result = mockMvc.perform(patch("/api/otc/edit")
@@ -231,14 +233,14 @@ public class OtcIntegrationSteps extends OtcIntegrationTestConfig {
                         .header("Content-Type", "application/json")
                         .header("Access-Control-Allow-Origin", "*")
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk()) //isOk()
+                .andExpect(status().isOk()) // isOk()
                 .andReturn();
 
         String response = result.getResponse().getContentAsString();
 
         assertEquals(response, "Ugovor je uspesno promenjen");
 
-//        assertNotNull(result, "Json is not null");
+        //        assertNotNull(result, "Json is not null");
     }
 
     @Then("user finalizes contract by id")
@@ -248,14 +250,14 @@ public class OtcIntegrationSteps extends OtcIntegrationTestConfig {
                         .header("Content-Type", "application/json")
                         .header("Access-Control-Allow-Origin", "*")
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk()) //isOk
+                .andExpect(status().isOk()) // isOk
                 .andReturn();
 
         String response = result.getResponse().getContentAsString();
 
         assertEquals(response, "Ugovor uspesno kompletiran");
 
-//        assertNotNull(result, "Json is not null");
+        //        assertNotNull(result, "Json is not null");
     }
 
     @Then("user deletes contract by id")
@@ -265,20 +267,21 @@ public class OtcIntegrationSteps extends OtcIntegrationTestConfig {
                         .header("Content-Type", "application/json")
                         .header("Access-Control-Allow-Origin", "*")
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk()) //isOk
+                .andExpect(status().isOk()) // isOk
                 .andReturn();
 
         String response = result.getResponse().getContentAsString();
 
         assertEquals(response, "Ugovor uspesno izbrisan");
 
-//        assertNotNull(result, "Json is not null");
+        //        assertNotNull(result, "Json is not null");
     }
 
     @When("elements exist in database")
     public void elements_exist_in_database() {
 
-        TransactionElement transactionElement1 = TransactionElement.builder().id("501").build();
+        TransactionElement transactionElement1 =
+                TransactionElement.builder().id("501").build();
         TransactionElement transactionElement2 = TransactionElement.builder().build();
         TransactionElement transactionElement3 = TransactionElement.builder().build();
 
@@ -286,57 +289,61 @@ public class OtcIntegrationSteps extends OtcIntegrationTestConfig {
         transactionElementRepository.save(transactionElement2);
         transactionElementRepository.save(transactionElement3);
     }
+
     @Then("user gets all elements")
     public void user_gets_all_elements() throws Exception {
 
-        result = mockMvc.perform(get("/api/otc/elements").contentType("application/json")
+        result = mockMvc.perform(get("/api/otc/elements")
+                        .contentType("application/json")
                         .header("Content-Type", "application/json")
                         .header("Access-Control-Allow-Origin", "*")
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk()) //isOk()
+                .andExpect(status().isOk()) // isOk()
                 .andReturn();
 
         JSONArray actualJson = new JSONArray(result.getResponse().getContentAsString());
 
         assertNotNull(actualJson, "Json is not null");
 
-//        assertNotNull(result, "Json is not null");
+        //        assertNotNull(result, "Json is not null");
 
     }
 
     @Then("user gets element by id")
     public void user_gets_element_by_id() throws Exception {
 
-        result = mockMvc.perform(get("/api/otc/element/" + elementId).contentType("application/json")
+        result = mockMvc.perform(get("/api/otc/element/" + elementId)
+                        .contentType("application/json")
                         .header("Content-Type", "application/json")
                         .header("Access-Control-Allow-Origin", "*")
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk()) //isOk()
+                .andExpect(status().isOk()) // isOk()
                 .andReturn();
 
         JSONObject actualJson = new JSONObject(result.getResponse().getContentAsString());
 
         assertNotNull(actualJson, "Json is not null");
 
-//        assertNotNull(result, "Json is not null");
+        //        assertNotNull(result, "Json is not null");
 
     }
 
     @Then("user gets elements for contract")
     public void user_gets_elements_for_contract() throws Exception {
 
-        result = mockMvc.perform(get("/api/otc/contract_elements/" + contractId).contentType("application/json")
+        result = mockMvc.perform(get("/api/otc/contract_elements/" + contractId)
+                        .contentType("application/json")
                         .header("Content-Type", "application/json")
                         .header("Access-Control-Allow-Origin", "*")
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk()) //isOk()
+                .andExpect(status().isOk()) // isOk()
                 .andReturn();
 
         JSONArray actualJson = new JSONArray(result.getResponse().getContentAsString());
 
         assertNotNull(actualJson, "Json is not null");
 
-//        assertNotNull(result, "Json is not null");
+        //        assertNotNull(result, "Json is not null");
     }
 
     @Then("user adds element to contract")
@@ -363,14 +370,14 @@ public class OtcIntegrationSteps extends OtcIntegrationTestConfig {
                         .header("Content-Type", "application/json")
                         .header("Access-Control-Allow-Origin", "*")
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk()) //isOk()
+                .andExpect(status().isOk()) // isOk()
                 .andReturn();
 
         JSONObject actualJson = new JSONObject(result.getResponse().getContentAsString());
 
         assertNotNull(actualJson, "Json is not null");
 
-//        assertNotNull(result, "Json is not null");
+        //        assertNotNull(result, "Json is not null");
     }
 
     @Then("user deletes element from contract")
@@ -380,14 +387,14 @@ public class OtcIntegrationSteps extends OtcIntegrationTestConfig {
                         .header("Content-Type", "application/json")
                         .header("Access-Control-Allow-Origin", "*")
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk()) //isOk
+                .andExpect(status().isOk()) // isOk
                 .andReturn();
 
         JSONObject actualJson = new JSONObject(result.getResponse().getContentAsString());
 
         assertNotNull(actualJson, "Json is not null");
 
-//        assertNotNull(result, "Json is not null");
+        //        assertNotNull(result, "Json is not null");
 
     }
 }

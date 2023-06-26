@@ -1,26 +1,21 @@
 package rs.edu.raf.si.bank2.otc.cucumber.integration.marginBalanceFailures;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import rs.edu.raf.si.bank2.otc.dto.CommunicationDto;
-import rs.edu.raf.si.bank2.otc.models.mongodb.MarginBalance;
-import rs.edu.raf.si.bank2.otc.repositories.mongodb.MarginBalanceRepository;
-import rs.edu.raf.si.bank2.otc.requests.LoginRequest;
-import rs.edu.raf.si.bank2.otc.services.UserCommunicationService;
-
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class MarginBalanceFailuresIntegrationSteps extends MarginBalanceFailuresIntegrationTestConfig {
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import rs.edu.raf.si.bank2.otc.dto.CommunicationDto;
+import rs.edu.raf.si.bank2.otc.repositories.mongodb.MarginBalanceRepository;
+import rs.edu.raf.si.bank2.otc.requests.LoginRequest;
+import rs.edu.raf.si.bank2.otc.services.UserCommunicationService;
 
+public class MarginBalanceFailuresIntegrationSteps extends MarginBalanceFailuresIntegrationTestConfig {
 
     @Autowired
     MockMvc mockMvc;
@@ -60,7 +55,8 @@ public class MarginBalanceFailuresIntegrationSteps extends MarginBalanceFailures
     @Then("user fails to get margin balance by id")
     public void user_fails_to_get_margin_balance_by_id() throws Exception {
 
-        result = mockMvc.perform(get("/api/marginAccount/" + nonExistentBalanceId).contentType("application/json")
+        result = mockMvc.perform(get("/api/marginAccount/" + nonExistentBalanceId)
+                        .contentType("application/json")
                         .header("Content-Type", "application/json")
                         .header("Access-Control-Allow-Origin", "*")
                         .header("Authorization", "Bearer " + token))

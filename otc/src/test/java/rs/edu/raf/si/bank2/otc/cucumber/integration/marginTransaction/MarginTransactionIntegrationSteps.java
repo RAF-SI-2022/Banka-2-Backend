@@ -1,5 +1,9 @@
 package rs.edu.raf.si.bank2.otc.cucumber.integration.marginTransaction;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -18,20 +22,11 @@ import rs.edu.raf.si.bank2.otc.models.mariadb.User;
 import rs.edu.raf.si.bank2.otc.models.mongodb.*;
 import rs.edu.raf.si.bank2.otc.repositories.mariadb.PasswordResetTokenRepository;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.CompanyRepository;
-import rs.edu.raf.si.bank2.otc.repositories.mongodb.ContactRepository;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.MarginTransactionRepository;
-import rs.edu.raf.si.bank2.otc.repositories.mongodb.TransactionElementRepository;
 import rs.edu.raf.si.bank2.otc.requests.LoginRequest;
 import rs.edu.raf.si.bank2.otc.services.UserCommunicationService;
 import rs.edu.raf.si.bank2.otc.services.interfaces.AuthorisationServiceInterface;
 import rs.edu.raf.si.bank2.otc.services.interfaces.UserServiceInterface;
-
-import java.util.Arrays;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class MarginTransactionIntegrationSteps extends MarginTransactionIntegrationTestConfig {
 
@@ -89,16 +84,22 @@ public class MarginTransactionIntegrationSteps extends MarginTransactionIntegrat
     @Given("transactions exist in database")
     public void transactions_exist_in_database() {
 
-        MarginTransaction marginTransaction1 = MarginTransaction.builder().id(transactionId).orderType(group).userEmail(email).build();
-        MarginTransaction marginTransaction2 = MarginTransaction.builder().orderType(group).build();
+        MarginTransaction marginTransaction1 = MarginTransaction.builder()
+                .id(transactionId)
+                .orderType(group)
+                .userEmail(email)
+                .build();
+        MarginTransaction marginTransaction2 =
+                MarginTransaction.builder().orderType(group).build();
         MarginTransaction marginTransaction3 = MarginTransaction.builder().build();
 
         marginTransactionRepository.save(marginTransaction1);
         marginTransactionRepository.save(marginTransaction2);
         marginTransactionRepository.save(marginTransaction3);
     }
+
     @And("user is logged in")
-    public void user_is_logged_in(){
+    public void user_is_logged_in() {
         try {
             LoginRequest loginRequest = new LoginRequest();
             loginRequest.setEmail("anesic3119rn+banka2backend+admin@raf.rs");
@@ -115,10 +116,12 @@ public class MarginTransactionIntegrationSteps extends MarginTransactionIntegrat
         }
         assertNotNull(token);
     }
+
     @Then("user gets all transactions")
     public void user_gets_all_transactions() throws Exception {
 
-        result = mockMvc.perform(get("/api/marginTransaction").contentType("application/json")
+        result = mockMvc.perform(get("/api/marginTransaction")
+                        .contentType("application/json")
                         .header("Content-Type", "application/json")
                         .header("Access-Control-Allow-Origin", "*")
                         .header("Authorization", "Bearer " + token))
@@ -133,7 +136,8 @@ public class MarginTransactionIntegrationSteps extends MarginTransactionIntegrat
     @Then("user gets all transactions by group")
     public void user_gets_all_transactions_by_group() throws Exception {
 
-        result = mockMvc.perform(get("/api/marginTransaction/byGroup/" + group).contentType("application/json")
+        result = mockMvc.perform(get("/api/marginTransaction/byGroup/" + group)
+                        .contentType("application/json")
                         .header("Content-Type", "application/json")
                         .header("Access-Control-Allow-Origin", "*")
                         .header("Authorization", "Bearer " + token))
@@ -148,7 +152,8 @@ public class MarginTransactionIntegrationSteps extends MarginTransactionIntegrat
     @Then("user gets transaction by id")
     public void user_gets_transaction_by_id() throws Exception {
 
-        result = mockMvc.perform(get("/api/marginTransaction/" + transactionId).contentType("application/json")
+        result = mockMvc.perform(get("/api/marginTransaction/" + transactionId)
+                        .contentType("application/json")
                         .header("Content-Type", "application/json")
                         .header("Access-Control-Allow-Origin", "*")
                         .header("Authorization", "Bearer " + token))
@@ -163,7 +168,8 @@ public class MarginTransactionIntegrationSteps extends MarginTransactionIntegrat
     @Given("transaction doesnt exist in database")
     public void transaction_doesnt_exist_in_database() throws Exception {
 
-        result = mockMvc.perform(get("/api/marginTransaction/" + nonExistentTransactionId).contentType("application/json")
+        result = mockMvc.perform(get("/api/marginTransaction/" + nonExistentTransactionId)
+                        .contentType("application/json")
                         .header("Content-Type", "application/json")
                         .header("Access-Control-Allow-Origin", "*")
                         .header("Authorization", "Bearer " + token))
@@ -204,7 +210,8 @@ public class MarginTransactionIntegrationSteps extends MarginTransactionIntegrat
     @Then("margin transaction is saved in database")
     public void margin_transaction_is_saved_in_database() throws Exception {
 
-        result = mockMvc.perform(get("/api/marginTransaction/" + nonExistentTransactionId).contentType("application/json")
+        result = mockMvc.perform(get("/api/marginTransaction/" + nonExistentTransactionId)
+                        .contentType("application/json")
                         .header("Content-Type", "application/json")
                         .header("Access-Control-Allow-Origin", "*")
                         .header("Authorization", "Bearer " + token))
@@ -219,7 +226,8 @@ public class MarginTransactionIntegrationSteps extends MarginTransactionIntegrat
     @Then("user gets transaction by email")
     public void user_gets_transaction_by_email() throws Exception {
 
-        result = mockMvc.perform(get("/api/marginTransaction/email/" + email).contentType("application/json")
+        result = mockMvc.perform(get("/api/marginTransaction/email/" + email)
+                        .contentType("application/json")
                         .header("Content-Type", "application/json")
                         .header("Access-Control-Allow-Origin", "*")
                         .header("Authorization", "Bearer " + token))

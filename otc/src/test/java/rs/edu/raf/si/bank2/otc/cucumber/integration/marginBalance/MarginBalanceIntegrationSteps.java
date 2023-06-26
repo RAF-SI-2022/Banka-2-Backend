@@ -1,5 +1,9 @@
 package rs.edu.raf.si.bank2.otc.cucumber.integration.marginBalance;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -12,16 +16,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import rs.edu.raf.si.bank2.otc.dto.CommunicationDto;
 import rs.edu.raf.si.bank2.otc.models.mongodb.MarginBalance;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.MarginBalanceRepository;
-import rs.edu.raf.si.bank2.otc.repositories.mongodb.MarginTransactionRepository;
 import rs.edu.raf.si.bank2.otc.requests.LoginRequest;
 import rs.edu.raf.si.bank2.otc.services.UserCommunicationService;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 public class MarginBalanceIntegrationSteps extends MarginBalanceIntegrationTestConfig {
-
 
     @Autowired
     MockMvc mockMvc;
@@ -75,7 +73,8 @@ public class MarginBalanceIntegrationSteps extends MarginBalanceIntegrationTestC
     @Then("user gets all margin balances")
     public void user_gets_all_margin_balances() throws Exception {
 
-        result = mockMvc.perform(get("/api/marginAccount").contentType("application/json")
+        result = mockMvc.perform(get("/api/marginAccount")
+                        .contentType("application/json")
                         .header("Content-Type", "application/json")
                         .header("Access-Control-Allow-Origin", "*")
                         .header("Authorization", "Bearer " + token))
@@ -90,7 +89,8 @@ public class MarginBalanceIntegrationSteps extends MarginBalanceIntegrationTestC
     @Then("user gets margin balance by id")
     public void user_gets_margin_balance_by_id() throws Exception {
 
-        result = mockMvc.perform(get("/api/marginAccount/" + balanceId).contentType("application/json")
+        result = mockMvc.perform(get("/api/marginAccount/" + balanceId)
+                        .contentType("application/json")
                         .header("Content-Type", "application/json")
                         .header("Access-Control-Allow-Origin", "*")
                         .header("Authorization", "Bearer " + token))
@@ -105,7 +105,8 @@ public class MarginBalanceIntegrationSteps extends MarginBalanceIntegrationTestC
     @Given("balance doesnt exist in database")
     public void balance_doesnt_exist_in_database() throws Exception {
 
-        result = mockMvc.perform(get("/api/marginTransaction/" + nonExistentBalanceId).contentType("application/json")
+        result = mockMvc.perform(get("/api/marginTransaction/" + nonExistentBalanceId)
+                        .contentType("application/json")
                         .header("Content-Type", "application/json")
                         .header("Access-Control-Allow-Origin", "*")
                         .header("Authorization", "Bearer " + token))
@@ -147,7 +148,8 @@ public class MarginBalanceIntegrationSteps extends MarginBalanceIntegrationTestC
     @Then("margin balance is saved in database")
     public void margin_balance_is_saved_in_database() throws Exception {
 
-        result = mockMvc.perform(get("/api/marginAccount/" + nonExistentBalanceId).contentType("application/json")
+        result = mockMvc.perform(get("/api/marginAccount/" + nonExistentBalanceId)
+                        .contentType("application/json")
                         .header("Content-Type", "application/json")
                         .header("Access-Control-Allow-Origin", "*")
                         .header("Authorization", "Bearer " + token))
@@ -158,7 +160,6 @@ public class MarginBalanceIntegrationSteps extends MarginBalanceIntegrationTestC
 
         assertNotNull(actualJson, "Json is not null");
     }
-
 
     @Then("user updates margin balance")
     public void user_updates_margin_balance() throws Exception {
@@ -187,7 +188,6 @@ public class MarginBalanceIntegrationSteps extends MarginBalanceIntegrationTestC
 
         assertNotNull(actualJson, "Json is not null");
     }
-
 
     @Then("user deletes margin balance")
     public void user_deletes_margin_balance() throws Exception {

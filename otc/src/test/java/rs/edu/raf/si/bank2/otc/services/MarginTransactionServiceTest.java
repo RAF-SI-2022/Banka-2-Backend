@@ -159,11 +159,10 @@ public class MarginTransactionServiceTest {
         verify(marginTransactionRepository).findMarginTransactionsByUserEmail(email);
     }
 
-
     @Test
     public void testUpdateBalance_BuyTransaction() {
         // Arrange
-//        MockitoAnnotations.openMocks(this);
+        //        MockitoAnnotations.openMocks(this);
         MarginBalance marginBalance = new MarginBalance();
         marginBalance.setInvestedResources(100.0);
         marginBalance.setLoanedResources(50.0);
@@ -187,7 +186,7 @@ public class MarginTransactionServiceTest {
     @Test
     public void testUpdateBalance_SellTransaction() {
         // Arrange
-//        MockitoAnnotations.openMocks(this);
+        //        MockitoAnnotations.openMocks(this);
         MarginBalance marginBalance = new MarginBalance();
         marginBalance.setInvestedResources(100.0);
         marginBalance.setLoanedResources(50.0);
@@ -205,10 +204,11 @@ public class MarginTransactionServiceTest {
         assertEquals(5.0, marginBalance.getMaintenanceMargin());
         verify(marginBalanceRepository, times(1)).save(marginBalance);
     }
+
     @Test
     public void testMakeTransaction() {
         // Arrange
-//        MockitoAnnotations.openMocks(this);
+        //        MockitoAnnotations.openMocks(this);
         Long orderId = 60L;
         MarginTransactionDto marginTransactionDto = new MarginTransactionDto();
         marginTransactionDto.setOrderId(orderId);
@@ -218,27 +218,25 @@ public class MarginTransactionServiceTest {
         marginTransactionDto.setInitialMargin(100.0);
         marginTransactionDto.setMaintenanceMargin(50.0);
 
-        when(userCommunicationService.sendGet(
-                null, "/orders/value/" + orderId, "main"))
+        when(userCommunicationService.sendGet(null, "/orders/value/" + orderId, "main"))
                 .thenReturn(new CommunicationDto(200, "\"responseMsg\":\"" + "500"));
 
-
-        when(userCommunicationService.sendGet(
-                null, "/orders/orderType/" + orderId, "main"))
+        when(userCommunicationService.sendGet(null, "/orders/orderType/" + orderId, "main"))
                 .thenReturn(new CommunicationDto(200, "\"responseMsg\":\"" + "FOREX"));
 
-        when(userCommunicationService.sendGet(
-                null, "/orders/tradeType/" + orderId, "main"))
-                .thenReturn(new CommunicationDto(200, "\"responseMsg\":\""  + "BUY"));
+        when(userCommunicationService.sendGet(null, "/orders/tradeType/" + orderId, "main"))
+                .thenReturn(new CommunicationDto(200, "\"responseMsg\":\"" + "BUY"));
 
-
-        Optional<MarginBalance> marginBalanceFromDb = Optional.of(MarginBalance.builder().investedResources(100.0).loanedResources(400.0).maintenanceMargin(50.0).build());
-        when(marginBalanceRepository.findMarginBalanceByListingGroup(any()))
-                .thenReturn(marginBalanceFromDb);
-
+        Optional<MarginBalance> marginBalanceFromDb = Optional.of(MarginBalance.builder()
+                .investedResources(100.0)
+                .loanedResources(400.0)
+                .maintenanceMargin(50.0)
+                .build());
+        when(marginBalanceRepository.findMarginBalanceByListingGroup(any())).thenReturn(marginBalanceFromDb);
 
         // Act
-        MarginTransaction marginTransaction = marginTransactionService.makeTransaction(marginTransactionDto, "user@example.com");
+        MarginTransaction marginTransaction =
+                marginTransactionService.makeTransaction(marginTransactionDto, "user@example.com");
 
         // Assert
         assertNotNull(marginTransaction);

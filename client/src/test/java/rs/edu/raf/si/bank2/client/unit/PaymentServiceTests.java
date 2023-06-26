@@ -1,5 +1,8 @@
 package rs.edu.raf.si.bank2.client.unit;
 
+import static org.mockito.Mockito.*;
+
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,11 +18,6 @@ import rs.edu.raf.si.bank2.client.repositories.mongodb.PoslovniRacunRepository;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.TekuciRacunRepository;
 import rs.edu.raf.si.bank2.client.services.PaymentService;
 
-import java.util.Optional;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 public class PaymentServiceTests {
 
@@ -34,7 +32,6 @@ public class PaymentServiceTests {
 
     @InjectMocks
     private PaymentService paymentService;
-
 
     @Test
     void testSubtractTekuci() {
@@ -77,6 +74,7 @@ public class PaymentServiceTests {
         Assertions.assertEquals(150.0, tekuciRacun.getAvailableBalance());
         verify(tekuciRacunRepository, times(1)).save(tekuciRacun);
     }
+
     @Test
     void testSubtractDevizni() {
         // Create a sample TekuciRacun
@@ -118,6 +116,7 @@ public class PaymentServiceTests {
         Assertions.assertEquals(150.0, devizniRacun.getAvailableBalance());
         verify(devizniRacunRepository, times(1)).save(devizniRacun);
     }
+
     @Test
     void testSubtractPoslovni() {
         // Create a sample TekuciRacun

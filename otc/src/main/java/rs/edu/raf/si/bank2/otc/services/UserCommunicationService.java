@@ -109,8 +109,8 @@ public class UserCommunicationService implements UserCommunicationInterface {
             //            System.out.println("Response: " + response.toString());
             connection.disconnect();
             if (reader != null) reader.close();
-//            System.out.println("TU SMO");
-//            System.out.println("Response Code: " + responseCode);
+            //            System.out.println("TU SMO");
+            //            System.out.println("Response Code: " + responseCode);
             return new CommunicationDto(responseCode, response.toString());
         } catch (IOException e) {
             throw new RuntimeException(e);
