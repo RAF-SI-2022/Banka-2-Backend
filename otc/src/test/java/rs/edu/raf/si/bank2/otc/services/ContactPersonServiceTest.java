@@ -1,23 +1,20 @@
 package rs.edu.raf.si.bank2.otc.services;
 
-import org.junit.jupiter.api.BeforeEach;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rs.edu.raf.si.bank2.otc.dto.ContactPersonDto;
 import rs.edu.raf.si.bank2.otc.exceptions.ContactPersonNotFoundException;
 import rs.edu.raf.si.bank2.otc.models.mongodb.ContactPerson;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.ContactPersonRepository;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ContactPersonServiceTest {
@@ -134,5 +131,4 @@ public class ContactPersonServiceTest {
         verify(contactPersonRepository, times(1)).findById("1");
         verify(contactPersonRepository, never()).delete(any());
     }
-
 }

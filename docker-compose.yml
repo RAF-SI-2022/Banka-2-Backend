@@ -28,6 +28,18 @@ services:
       - mariadb:/var/lib/mysql
     networks:
       - bank2_net
+    profiles: [
+      "core",
+      "full",
+      "only-users",
+      "only-main",
+      "only-otc",
+      "only-client",
+      "except-users",
+      "except-main",
+      "except-otc",
+      "except-client",
+    ]
 
   mongodb:
     image: mongodb/mongodb-community-server:6.0-ubi8
@@ -52,6 +64,18 @@ services:
       - mongodb:/var/lib/mongodb
     networks:
       - bank2_net
+    profiles: [
+      "core",
+      "full",
+      "only-users",
+      "only-main",
+      "only-otc",
+      "only-client",
+      "except-users",
+      "except-main",
+      "except-otc",
+      "except-client",
+    ]
 
   flyway:
     image: flyway/flyway:9
@@ -68,6 +92,18 @@ services:
         condition: service_healthy
     networks:
       - bank2_net
+    profiles: [
+      "core",
+      "full",
+      "only-users",
+      "only-main",
+      "only-otc",
+      "only-client",
+      "except-users",
+      "except-main",
+      "except-otc",
+      "except-client",
+    ]
 
   redis:
     image: redis:7.0.11-alpine
@@ -81,9 +117,44 @@ services:
       - redis:/bitnami/redis/data
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
-    profiles: [ "all", "core" ]
     networks:
       - bank2_net
+    profiles: [
+      "core",
+      "full",
+      "only-users",
+      "only-main",
+      "only-otc",
+      "only-client",
+      "except-users",
+      "except-main",
+      "except-otc",
+      "except-client",
+    ]
+
+  prometheus:
+    container_name: prometheus
+    image: quay.io/prometheus/prometheus:v2.44.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+    networks:
+      - bank2_net
+    profiles: ["full"]
+
+  # Default username/password: admin/admin
+  grafana:
+    container_name: grafana
+    image: docker.io/grafana/grafana-oss:9.5.2
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana:/var/lib/grafana
+    user: 'root'
+    networks:
+      - bank2_net
+    profiles: ["full"]
 
   # TODO add health check for users
   users:
@@ -112,6 +183,13 @@ services:
     entrypoint: [ "java", "-Dspring.profiles.active=container,test", "-jar", "app.jar" ]
     networks:
       - bank2_net
+    profiles: [
+      "full",
+      "only-users",
+      "except-main",
+      "except-otc",
+      "except-client",
+    ]
 
   # TODO add health check for main
   main:
@@ -142,6 +220,13 @@ services:
     entrypoint: [ "java", "-Dspring.profiles.active=container,test", "-jar", "app.jar" ]
     networks:
       - bank2_net
+    profiles: [
+      "full",
+      "only-main",
+      "except-users",
+      "except-otc",
+      "except-client",
+    ]
 
   # TODO add health check for OTC
   otc:
@@ -172,6 +257,13 @@ services:
     entrypoint: [ "java", "-Dspring.profiles.active=container,test", "-jar", "app.jar" ]
     networks:
       - bank2_net
+    profiles: [
+      "full",
+      "only-otc",
+      "except-users",
+      "except-main",
+      "except-client",
+    ]
 
   # TODO add health check for Client
   client:
@@ -202,11 +294,19 @@ services:
     entrypoint: [ "java", "-Dspring.profiles.active=container,test", "-jar", "app.jar" ]
     networks:
       - bank2_net
+    profiles: [
+      "full",
+      "only-client",
+      "except-users",
+      "except-main",
+      "except-otc",
+    ]
 
 volumes:
   mariadb:
   mongodb:
   redis:
+  grafana:
 
 networks:
   bank2_net:

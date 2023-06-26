@@ -1,9 +1,8 @@
 package rs.edu.raf.si.bank2.otc.responses;
 
+import java.util.List;
 import lombok.Data;
 import rs.edu.raf.si.bank2.otc.models.mariadb.Permission;
-
-import java.util.List;
 
 @Data
 public class LoginResponse {

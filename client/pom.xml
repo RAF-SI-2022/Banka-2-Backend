@@ -35,11 +35,14 @@
             **/repositories/**,
             **/requests/**,
             **/responses/**,
+            **/UserCommunicationService.java,
+            **/UserService.java,
             **/utils/**,
             **/ServletInitializer.java,
             **/ClientApplication.java,
             **/SpringSecurityConfig.java,
             **/RedisTestConfiguration.java,
+            **/ServiceAuthController.java,
             **/MessageBroker.java,
             **/JwtFilter.java,
             **/AppConfig.java,
@@ -262,6 +265,15 @@
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
             <version>0.8.8</version>
+        </dependency>
+
+
+        <!-- =========== Monitoring =========== -->
+
+
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
 
 

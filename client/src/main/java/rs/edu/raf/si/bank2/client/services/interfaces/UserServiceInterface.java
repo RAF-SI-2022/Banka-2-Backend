@@ -1,11 +1,10 @@
 package rs.edu.raf.si.bank2.client.services.interfaces;
 
+import java.util.List;
+import java.util.Optional;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import rs.edu.raf.si.bank2.client.models.mariadb.Permission;
 import rs.edu.raf.si.bank2.client.models.mariadb.User;
-
-import java.util.List;
-import java.util.Optional;
 
 public interface UserServiceInterface extends UserDetailsService {
 

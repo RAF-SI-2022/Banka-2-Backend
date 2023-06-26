@@ -2,9 +2,13 @@ package rs.edu.raf.si.bank2.main.controllers;
 
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
+import io.micrometer.core.annotation.Timed;
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,12 +32,32 @@ import rs.edu.raf.si.bank2.main.utils.OptionDateScraper;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/options")
+@Timed
 public class OptionController {
 
     private OptionService optionService;
     private final UserService userService;
     private final OptionDateScraper optionDateScraper;
     private final UserCommunicationInterface userCommunicationInterface;
+    private List<LocalDate> safetyDates;
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.US);
+    List<String> dates = List.of(
+            "2023-06-30",
+            "2023-07-07",
+            "2023-07-14",
+            "2023-07-21",
+            "2023-07-28",
+            "2023-08-18",
+            "2023-09-15",
+            "2023-10-20",
+            "2023-11-17",
+            "2023-12-15",
+            "2024-01-19",
+            "2024-03-15",
+            "2024-06-21",
+            "2025-01-17",
+            "2025-06-20",
+            "2025-12-19");
 
     @Autowired
     public OptionController(
@@ -42,19 +66,28 @@ public class OptionController {
         this.optionService = optionService;
         this.userService = userService;
         this.optionDateScraper = new OptionDateScraper();
+
+        safetyDates = new ArrayList<>();
+        for (String date : dates) {
+            LocalDate localDate = LocalDate.parse(date);
+            safetyDates.add(localDate);
+        }
     }
 
+    @Timed("controllers.option.getStockBySymbolDateString")
     @GetMapping("/{symbol}/{dateString}")
     public ResponseEntity<?> getStockBySymbol(@PathVariable String symbol, @PathVariable String dateString)
             throws ParseException {
         return ResponseEntity.ok().body(optionService.findByStockAndDate(symbol, dateString));
     }
 
+    @Timed("controllers.option.getStockBySymbol")
     @GetMapping("/{symbol}")
     public ResponseEntity<?> getStockBySymbol(@PathVariable String symbol) throws ParseException {
         return ResponseEntity.ok().body(optionService.findByStock(symbol));
     }
 
+    @Timed("controllers.option.sellOption")
     @PostMapping("/sell")
     public ResponseEntity<?> sellOption(@RequestBody OptionSellDto optionSellDto) {
 
@@ -66,6 +99,7 @@ public class OptionController {
         }
     }
 
+    @Timed("controllers.option.buyOption")
     @PostMapping("/buy")
     public ResponseEntity<?> buyOption(@RequestBody OptionBuyDto optionBuyDto) {
 
@@ -84,6 +118,7 @@ public class OptionController {
         }
     }
 
+    @Timed("controllers.option.getDates")
     @GetMapping(value = "/dates")
     public ResponseEntity<?> getDates() {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -93,15 +128,22 @@ public class OptionController {
             Optional<User> userOptional = userService.findByEmail(signedInUserEmail);
             if (userOptional.isPresent()) {
                 dates = this.optionDateScraper.scrape();
+                if (!dates.isEmpty()) {
+                    safetyDates = dates;
+                }
             } else {
                 return ResponseEntity.status(400).body("Doslo je do neocekivane greske.");
             }
         } catch (UserNotFoundException | OptionNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
+        if (dates.isEmpty()) {
+            dates = safetyDates;
+        }
         return ResponseEntity.ok().body(dates);
     }
 
+    @Timed("controllers.option.buyStocksByOption")
     @GetMapping("/buy-stocks/{userOptionId}")
     public ResponseEntity<?> buyStocksByOption(@PathVariable Long userOptionId) {
 
@@ -120,6 +162,7 @@ public class OptionController {
         }
     }
 
+    @Timed("controllers.option.getUserOptionsAll")
     @GetMapping("/user-options")
     public ResponseEntity<?> getUserOptions() {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -128,6 +171,7 @@ public class OptionController {
                         userService.findByEmail(signedInUserEmail).get().getId()));
     }
 
+    @Timed("controllers.option.getUserOptions")
     @GetMapping("/user-options/{stockSymbol}")
     public ResponseEntity<?> getUserOptions(@PathVariable String stockSymbol) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -136,6 +180,7 @@ public class OptionController {
                         userService.findByEmail(signedInUserEmail).get().getId(), stockSymbol));
     }
 
+    @Timed("controllers.option.sellStocksByOption")
     @PostMapping("/sell-stocks")
     public ResponseEntity<?> sellStocksByOption(@RequestBody SellStockUsingOptionDto sellStockUsingOptionDto) {
 
