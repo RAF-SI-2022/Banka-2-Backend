@@ -48,7 +48,7 @@ public class CreditController {
     @Timed("controllers.credit.getAllPayedInterests")
     @GetMapping("/interests/{creditId}")
     public ResponseEntity<?> getAllPayedInterests(@PathVariable String creditId) {
-        return ResponseEntity.ok(payedInterestRepository.findAll());
+        return ResponseEntity.ok(payedInterestRepository.findAllByCreditId(creditId));
     }
 
     // requests
