@@ -51,12 +51,13 @@ public class CreditService {
     public CommunicationDto payOffOneMonthsInterest(String creditId) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         Optional<Credit> credit = creditRepository.findById(creditId);
+        if (credit.isEmpty()) return new CommunicationDto(404, "Kredit nije nadjen");
         double monthlyRate = credit.get().getMonthlyRate();
 
         increaseOrDecreaseUserBalance(monthlyRate, credit.get().getAccountRegNumber(), true);
         credit.get().setRemainingAmount(credit.get().getRemainingAmount() - monthlyRate);
         creditRepository.save(credit.get());
-        payedInterestRepository.save(new PayedInterest("Kamanta", creditId, dtf.format(LocalDate.now()), monthlyRate));
+        payedInterestRepository.save(new PayedInterest("Kamata", creditId, dtf.format(LocalDate.now()), monthlyRate));
 
         return new CommunicationDto(200, "Mesecna kamata je placena");
     }
@@ -109,7 +110,6 @@ public class CreditService {
         Optional<RacunStorage> racunInfo =
                 racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(racunRegNum);
         if (racunInfo.isEmpty()) System.err.println("NIJE GA NASAO");
-        ;
 
         double amountToChange = amount;
         if (decrease) amountToChange = -amount;
