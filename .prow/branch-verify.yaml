@@ -19,8 +19,8 @@ presubmits:
               branch=$PULL_HEAD_REF
               curr_branch=$(git rev-parse --abbrev-ref HEAD)
               if [[ "$curr_branch" == "$branch" ]] || \
-                [[ "$branch" == "bugfix"* ]] \
-                [[ "$branch" == "hotfix"* ]] \
+                [[ "$branch" == "bugfix"* ]] || \
+                [[ "$branch" == "hotfix"* ]] || \
                 [[ "$curr_branch" == "dev" && "$branch" == "sprint-"* ]] || \
                 [[ "$curr_branch" == "main" && "$branch" == "dev" ]]; then
                 echo "Merge branch $branch into $curr_branch allowed"
