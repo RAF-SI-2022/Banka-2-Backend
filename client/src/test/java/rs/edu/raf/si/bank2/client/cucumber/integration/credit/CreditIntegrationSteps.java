@@ -1,25 +1,30 @@
 package rs.edu.raf.si.bank2.client.cucumber.integration.credit;
 
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.jayway.jsonpath.JsonPath;
 import io.cucumber.core.internal.com.fasterxml.jackson.core.JsonProcessingException;
 import io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import java.util.ArrayList;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import rs.edu.raf.si.bank2.client.dto.CreditDto;
 import rs.edu.raf.si.bank2.client.dto.CreditRequestDto;
+import rs.edu.raf.si.bank2.client.dto.TekuciRacunDto;
 import rs.edu.raf.si.bank2.client.models.mongodb.Client;
+import rs.edu.raf.si.bank2.client.models.mongodb.Credit;
+import rs.edu.raf.si.bank2.client.models.mongodb.enums.BalanceType;
 import rs.edu.raf.si.bank2.client.repositories.mongodb.ClientRepository;
+import rs.edu.raf.si.bank2.client.repositories.mongodb.CreditRepository;
 import rs.edu.raf.si.bank2.client.services.BalanceService;
+
+import java.util.ArrayList;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class CreditIntegrationSteps extends CreditIntegrationTestConfig {
 
@@ -28,6 +33,9 @@ public class CreditIntegrationSteps extends CreditIntegrationTestConfig {
 
     @Autowired
     private ClientRepository clientRepository;
+
+    @Autowired
+    protected CreditRepository creditRepository;
 
     @Autowired
     protected MockMvc mockMvc;
@@ -144,36 +152,48 @@ public class CreditIntegrationSteps extends CreditIntegrationTestConfig {
         testClient.ifPresent(client -> clientRepository.deleteById(client.getId()));
     }
 
-    @Given("pay this months interest")
+    @Given("there is a credit")
+    public void there_is_a_credit() {
+        Credit credit = new Credit(
+                "test@gmail.com",
+                "test",
+                "test",
+                1000.0,
+                1000.0,
+                1,
+                10.0, // todo porveri dal je ok
+                "test",
+                "test",
+                "test");
+        creditRepository.save(credit);
+
+        Optional<Client> testClient = clientRepository.findClientByEmail("test@gmail.com");
+        balanceService.openTekuciRacun(new TekuciRacunDto(testClient.get().getId(), 1L, "USD", BalanceType.STEDNI, 1, 1.0));
+
+    }
+
+    @Then("pay this months interest")
     public void pay_this_months_interest() {
         try {
-            MvcResult mvcResult = mockMvc.perform(post("/api/payment/pay/1613asfaew")
+            MvcResult mvcResult = mockMvc.perform(post("/api/credit/pay/12312f1f1121")
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
                     .andExpect(status().isNotFound())
                     .andReturn();
         } catch (Exception e) {
-            fail("Get all waiting failed");
+            e.printStackTrace();
+            fail("pay this months interes failed");
         }
     }
 
-    //    private String clientEmail;
-    //    private String name;
-    //    private String accountRegNumber;
-    //    private Double amount;
-    //    private Integer ratePercentage; // stopa na iznos
-    //    private Double monthlyRate; // koliko se mesecno placa
-    //    private String dueDate; // do kad se otplacuje
-    //    private String currency;
-
-    @Given("approve request")
+    @Then("approve request")
     public void approve_request() throws JsonProcessingException {
         CreditDto creditDto = new CreditDto("asdfasf", "13212331", "name", 1.0, 1, 1.0, "asdfasdf", "USD");
         String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper()
                 .writeValueAsString(creditDto);
         try {
-            MvcResult mvcResult = mockMvc.perform(post("/api/payment/approve/asflka123123")
+            MvcResult mvcResult = mockMvc.perform(post("/api/credit/approve/asflka123123")
                             .contentType("application/json")
                             .content(body)
                             .header("Content-Type", "application/json")
@@ -187,10 +207,10 @@ public class CreditIntegrationSteps extends CreditIntegrationTestConfig {
         }
     }
 
-    @Given("deny request")
+    @Then("deny request")
     public void deny_request() {
         try {
-            MvcResult mvcResult = mockMvc.perform(patch("/api/payment/approve/123d12d1")
+            MvcResult mvcResult = mockMvc.perform(patch("/api/credit/deny/f3121121")
                             .header("Content-Type", "application/json")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Authorization", "Bearer " + token))
