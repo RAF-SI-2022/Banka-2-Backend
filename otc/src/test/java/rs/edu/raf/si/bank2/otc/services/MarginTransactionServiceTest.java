@@ -10,7 +10,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import rs.edu.raf.si.bank2.otc.dto.CommunicationDto;
+import rs.edu.raf.si.bank2.otc.dto.MarginTransactionDto;
+import rs.edu.raf.si.bank2.otc.models.mongodb.AccountType;
+import rs.edu.raf.si.bank2.otc.models.mongodb.MarginBalance;
 import rs.edu.raf.si.bank2.otc.models.mongodb.MarginTransaction;
+import rs.edu.raf.si.bank2.otc.models.mongodb.TransactionType;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.MarginBalanceRepository;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.MarginTransactionRepository;
 
@@ -152,5 +157,105 @@ public class MarginTransactionServiceTest {
         assertTrue(resultMarginTransactions.contains(marginTransaction2));
 
         verify(marginTransactionRepository).findMarginTransactionsByUserEmail(email);
+    }
+
+
+    @Test
+    public void testUpdateBalance_BuyTransaction() {
+        // Arrange
+//        MockitoAnnotations.openMocks(this);
+        MarginBalance marginBalance = new MarginBalance();
+        marginBalance.setInvestedResources(100.0);
+        marginBalance.setLoanedResources(50.0);
+        marginBalance.setMaintenanceMargin(10.0);
+        MarginTransaction marginTransaction = new MarginTransaction();
+        marginTransaction.setTransactionType(TransactionType.BUY);
+        marginTransaction.setInitialMargin(20.0);
+        marginTransaction.setLoanValue(30.0);
+        marginTransaction.setMaintenanceMargin(5.0);
+
+        // Act
+        marginTransactionService.updateBalance(marginBalance, marginTransaction);
+
+        // Assert
+        assertEquals(80.0, marginBalance.getInvestedResources());
+        assertEquals(80.0, marginBalance.getLoanedResources());
+        assertEquals(15.0, marginBalance.getMaintenanceMargin());
+        verify(marginBalanceRepository, times(1)).save(marginBalance);
+    }
+
+    @Test
+    public void testUpdateBalance_SellTransaction() {
+        // Arrange
+//        MockitoAnnotations.openMocks(this);
+        MarginBalance marginBalance = new MarginBalance();
+        marginBalance.setInvestedResources(100.0);
+        marginBalance.setLoanedResources(50.0);
+        marginBalance.setMaintenanceMargin(10.0);
+        MarginTransaction marginTransaction = new MarginTransaction();
+        marginTransaction.setTransactionType(TransactionType.SELL);
+        marginTransaction.setInitialMargin(20.0);
+        marginTransaction.setMaintenanceMargin(5.0);
+
+        // Act
+        marginTransactionService.updateBalance(marginBalance, marginTransaction);
+
+        // Assert
+        assertEquals(120.0, marginBalance.getInvestedResources());
+        assertEquals(5.0, marginBalance.getMaintenanceMargin());
+        verify(marginBalanceRepository, times(1)).save(marginBalance);
+    }
+    @Test
+    public void testMakeTransaction() {
+        // Arrange
+//        MockitoAnnotations.openMocks(this);
+        Long orderId = 60L;
+        MarginTransactionDto marginTransactionDto = new MarginTransactionDto();
+        marginTransactionDto.setOrderId(orderId);
+        marginTransactionDto.setAccountType(AccountType.MARGIN);
+        marginTransactionDto.setTransactionComment("comment");
+        marginTransactionDto.setTransactionType(TransactionType.BUY);
+        marginTransactionDto.setInitialMargin(100.0);
+        marginTransactionDto.setMaintenanceMargin(50.0);
+
+        when(userCommunicationService.sendGet(
+                null, "/orders/value/" + orderId, "main"))
+                .thenReturn(new CommunicationDto(200, "\"responseMsg\":\"" + "500"));
+
+
+        when(userCommunicationService.sendGet(
+                null, "/orders/orderType/" + orderId, "main"))
+                .thenReturn(new CommunicationDto(200, "\"responseMsg\":\"" + "FOREX"));
+
+        when(userCommunicationService.sendGet(
+                null, "/orders/tradeType/" + orderId, "main"))
+                .thenReturn(new CommunicationDto(200, "\"responseMsg\":\""  + "BUY"));
+
+
+        Optional<MarginBalance> marginBalanceFromDb = Optional.of(MarginBalance.builder().investedResources(100.0).loanedResources(400.0).maintenanceMargin(50.0).build());
+        when(marginBalanceRepository.findMarginBalanceByListingGroup(any()))
+                .thenReturn(marginBalanceFromDb);
+
+
+        // Act
+        MarginTransaction marginTransaction = marginTransactionService.makeTransaction(marginTransactionDto, "user@example.com");
+
+        // Assert
+        assertNotNull(marginTransaction);
+        assertEquals(AccountType.MARGIN, marginTransaction.getAccountType());
+        assertEquals(60L, marginTransaction.getOrderId());
+        assertEquals("user@example.com", marginTransaction.getUserEmail());
+        assertEquals("comment", marginTransaction.getTransactionComment());
+        assertEquals("USD", marginTransaction.getCurrencyCode());
+        assertEquals(TransactionType.BUY, marginTransaction.getTransactionType());
+        assertEquals(100.0, marginTransaction.getInitialMargin());
+        assertEquals(400.0, marginTransaction.getLoanValue());
+        assertEquals(50.0, marginTransaction.getMaintenanceMargin());
+        assertEquals(20.0, marginTransaction.getInterest());
+        assertEquals("FOREX", marginTransaction.getOrderType());
+
+        verify(userCommunicationService, times(4)).sendGet(any(), any(), any());
+        verify(marginBalanceRepository, times(1)).findMarginBalanceByListingGroup(any());
+        verify(marginTransactionRepository, times(1)).save(marginTransaction);
     }
 }
