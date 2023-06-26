@@ -1,6 +1,5 @@
 package rs.edu.raf.si.bank2.main.controllers;
 
-import io.micrometer.core.annotation.Timed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +12,6 @@ import rs.edu.raf.si.bank2.main.services.interfaces.UserCommunicationInterface;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/currencies")
-@Timed
 public class CurrencyController {
     private final CurrencyService currencyService;
     private final InflationService inflationService;
@@ -29,13 +27,11 @@ public class CurrencyController {
         this.inflationService = inflationService;
     }
 
-    @Timed("controllers.balance.findAll")
     @GetMapping()
     public ResponseEntity<?> findAll() {
         return ResponseEntity.ok(this.currencyService.findAll());
     }
 
-    @Timed("controllers.balance.findById")
     @GetMapping(value = "/{id}")
     public ResponseEntity<?> findById(@PathVariable(name = "id") Long id) {
         try {
@@ -45,7 +41,6 @@ public class CurrencyController {
         }
     }
 
-    @Timed("controllers.balance.findByCurrencyCode")
     @GetMapping(value = "/code/{code}")
     public ResponseEntity<?> findByCurrencyCode(@PathVariable(name = "code") String currencyCode) {
         try {
@@ -55,13 +50,11 @@ public class CurrencyController {
         }
     }
 
-    @Timed("controllers.balance.findInflationByCurrencyId")
     @GetMapping(value = "/{id}/inflation")
     public ResponseEntity<?> findInflationByCurrencyId(@PathVariable(name = "id") Long id) {
         return ResponseEntity.ok(this.inflationService.findAllByCurrencyId(id));
     }
 
-    @Timed("controllers.balance.findInflationByCurrencyIdAndYear")
     @GetMapping(value = "/{id}/inflation/{year}")
     public ResponseEntity<?> findInflationByCurrencyIdAndYear(
             @PathVariable(name = "id") Long id, @PathVariable(name = "year") Integer year) {
@@ -69,7 +62,6 @@ public class CurrencyController {
     }
 
     // todo addInflation odkomentarisati ako bude zatrebalo :)
-    //    @Timed("controllers.balance.addInflation")
     //    @PostMapping(value = "/inflation/add")
     //    public ResponseEntity<?> addInflation(@RequestBody @Valid InflationDto inflationDto, BindingResult result) {
     //        if (result.hasErrors()) {

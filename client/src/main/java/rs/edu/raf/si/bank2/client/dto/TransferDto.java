@@ -14,4 +14,5 @@ public class TransferDto {
         this.toBalanceRegNum = toBalanceRegNum;
         this.amount = amount;
     }
+
 }

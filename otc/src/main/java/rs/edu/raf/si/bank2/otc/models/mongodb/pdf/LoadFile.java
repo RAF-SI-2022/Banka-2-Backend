@@ -7,7 +7,8 @@ public class LoadFile {
     private String fileSize;
     private byte[] file;
 
-    public LoadFile() {}
+    public LoadFile() {
+    }
 
     public String getFilename() {
         return filename;

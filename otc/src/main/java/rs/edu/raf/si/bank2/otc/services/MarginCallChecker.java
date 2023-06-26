@@ -8,6 +8,6 @@ public class MarginCallChecker {
     @Scheduled(cron = "0 0 12 * * ?") // Runs every day at 12:00 PM
     public void runCronJob() {
 
-        System.out.println("Running cron job..."); // todo enable-uj cron job da zapravo radi
+        System.out.println("Running cron job...");//todo enable-uj cron job da zapravo radi
     }
 }

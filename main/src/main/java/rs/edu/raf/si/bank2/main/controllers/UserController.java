@@ -2,7 +2,6 @@ package rs.edu.raf.si.bank2.main.controllers;
 
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
-import io.micrometer.core.annotation.Timed;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +26,6 @@ import rs.edu.raf.si.bank2.main.services.interfaces.UserCommunicationInterface;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/users")
-@Timed
 public class UserController {
     private final UserService userService;
     private final PermissionService permissionService;
@@ -55,7 +53,6 @@ public class UserController {
         this.userCommunicationInterface = communicationService;
     }
 
-    @Timed("controllers.user.getAllPermissions")
     @GetMapping(value = "/permissions")
     public ResponseEntity<?> getAllPermissions() {
         String signedInUserEmail = getContext().getAuthentication().getName(); // todo ovo kopiraj svuda
@@ -65,7 +62,6 @@ public class UserController {
         return ResponseEntity.ok(this.permissionService.findAll());
     }
 
-    @Timed("controllers.user.getAllUserPermissions")
     @GetMapping(value = "/permissions/{id}")
     public ResponseEntity<?> getAllUserPermissions(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -79,7 +75,6 @@ public class UserController {
         return ResponseEntity.ok(userOptional.get().getPermissions());
     }
 
-    @Timed("controllers.user.findAll")
     @GetMapping()
     public ResponseEntity<?> findAll() {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -89,7 +84,6 @@ public class UserController {
         return ResponseEntity.ok().body(userService.findAll());
     }
 
-    @Timed("controllers.user.findById")
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -99,7 +93,6 @@ public class UserController {
         return ResponseEntity.ok().body(userService.findById(id));
     }
 
-    @Timed("controllers.user.createUser")
     @PostMapping(
             value = "/register",
             consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -181,7 +174,6 @@ public class UserController {
         this.balanceService.save(balance2);
     }
 
-    @Timed("controllers.user.findByEmail")
     @GetMapping("/email")
     public ResponseEntity<?> findByEmail() {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -191,7 +183,6 @@ public class UserController {
         return ResponseEntity.ok().body(userService.findByEmail(signedInUserEmail));
     }
 
-    @Timed("controllers.user.deleteById")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteById(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -206,7 +197,6 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @Timed("controllers.user.reactivateUser")
     @PostMapping("/reactivate/{id}")
     public ResponseEntity<?> reactivateUser(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -228,7 +218,6 @@ public class UserController {
         return ResponseEntity.ok().body(this.userService.save(user));
     }
 
-    @Timed("controllers.user.deactivateUser")
     @PostMapping("/deactivate/{id}")
     public ResponseEntity<?> deactivateUser(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -249,7 +238,6 @@ public class UserController {
         return ResponseEntity.ok().body(this.userService.save(user));
     }
 
-    @Timed("controllers.user.updateProfile")
     @PutMapping("/edit-profile/{id}")
     public ResponseEntity<?> updateProfile(@PathVariable(name = "id") Long id, @RequestBody UpdateProfileRequest user) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -284,7 +272,6 @@ public class UserController {
         return ResponseEntity.ok().body(userService.save(updatedUser.get()));
     }
 
-    @Timed("controllers.user.changePassword")
     @PutMapping("/password/{id}")
     public ResponseEntity<?> changePassword(
             @PathVariable(name = "id") Long id, @RequestBody ChangePasswordRequest user) {
@@ -318,7 +305,6 @@ public class UserController {
         return ResponseEntity.ok().body(userService.save(updatedUser.get()));
     }
 
-    @Timed("controllers.user.updateUser")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable(name = "id") Long id, @RequestBody UpdateUserRequest user) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -355,7 +341,6 @@ public class UserController {
         return ResponseEntity.ok().body(userService.save(updatedUser.get()));
     }
 
-    @Timed("controllers.user.getUserDailyLimit")
     @GetMapping(value = "/limit")
     public ResponseEntity<?> getUserDailyLimit() {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -365,7 +350,6 @@ public class UserController {
         return ResponseEntity.ok().body(userService.getUsersDailyLimit(signedInUserEmail));
     }
 
-    @Timed("controllers.user.resetDailyLimit")
     @PatchMapping(value = "/reset-limit/{id}")
     public ResponseEntity<?> resetDailyLimit(@PathVariable(name = "id") Long id) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -381,7 +365,6 @@ public class UserController {
         }
     }
 
-    @Timed("controllers.user.changeUserDefaultDailyLimit")
     @PatchMapping(value = "change-limit/{id}/{limit}") // todo ovo ne radi
     public ResponseEntity<?> changeUserDefaultDailyLimit(
             @PathVariable(name = "id") Long id, @PathVariable(name = "limit") Double limit) {

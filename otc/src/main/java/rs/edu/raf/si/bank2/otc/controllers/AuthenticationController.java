@@ -1,6 +1,5 @@
 package rs.edu.raf.si.bank2.otc.controllers;
 
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,6 +12,8 @@ import rs.edu.raf.si.bank2.otc.responses.LoginResponse;
 import rs.edu.raf.si.bank2.otc.services.UserService;
 import rs.edu.raf.si.bank2.otc.services.interfaces.AuthorisationServiceInterface;
 import rs.edu.raf.si.bank2.otc.utils.JwtUtil;
+
+import java.util.Optional;
 
 /**
  * Controller for requests by users that are NOT logged in. Accessible by

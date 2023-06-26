@@ -2,7 +2,6 @@ package rs.edu.raf.si.bank2.users.services;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import javax.mail.Transport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,8 +17,8 @@ class MailingServiceTest {
     private MailingService mailingServiceUnderTest;
 
     @BeforeEach
-    public void setUp() {
-        mailingServiceUnderTest = new MailingService(new CompositeMeterRegistry());
+    void setUp() {
+        mailingServiceUnderTest = new MailingService();
     }
 
     @Test

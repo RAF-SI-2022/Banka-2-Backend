@@ -16,4 +16,5 @@ public class ExchangeDto {
         this.exchange = exchange;
         this.amount = amount;
     }
+
 }

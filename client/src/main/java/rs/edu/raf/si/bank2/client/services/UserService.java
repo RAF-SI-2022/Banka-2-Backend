@@ -1,18 +1,20 @@
 package rs.edu.raf.si.bank2.client.services;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import rs.edu.raf.si.bank2.client.exceptions.UserNotFoundException;
+import rs.edu.raf.si.bank2.client.models.mariadb.PasswordResetToken;
 import rs.edu.raf.si.bank2.client.models.mariadb.Permission;
 import rs.edu.raf.si.bank2.client.models.mariadb.User;
+import rs.edu.raf.si.bank2.client.services.interfaces.UserServiceInterface;
+import rs.edu.raf.si.bank2.client.exceptions.UserNotFoundException;
 import rs.edu.raf.si.bank2.client.repositories.mariadb.PasswordResetTokenRepository;
 import rs.edu.raf.si.bank2.client.repositories.mariadb.UserRepository;
-import rs.edu.raf.si.bank2.client.services.interfaces.UserServiceInterface;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService implements UserServiceInterface {
@@ -81,6 +83,7 @@ public class UserService implements UserServiceInterface {
         //      throw new UserNotFoundException(id);
         //    }
     }
+
 
     @Override
     public User changeUsersDailyLimit(String userEmail, Double limitChange) {

@@ -1,13 +1,5 @@
 package rs.edu.raf.si.bank2.otc.services;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,6 +13,15 @@ import rs.edu.raf.si.bank2.otc.models.mariadb.PasswordResetToken;
 import rs.edu.raf.si.bank2.otc.models.mariadb.User;
 import rs.edu.raf.si.bank2.otc.repositories.mariadb.PasswordResetTokenRepository;
 import rs.edu.raf.si.bank2.otc.repositories.mariadb.UserRepository;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {

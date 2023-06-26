@@ -1,8 +1,9 @@
 package rs.edu.raf.si.bank2.otc.services.interfaces;
 
-import java.io.IOException;
 import rs.edu.raf.si.bank2.otc.dto.CommunicationDto;
 import rs.edu.raf.si.bank2.otc.models.mariadb.PermissionName;
+
+import java.io.IOException;
 
 public interface UserCommunicationInterface {
 
@@ -26,9 +27,12 @@ public interface UserCommunicationInterface {
      * @throws InterruptedException
      * @deprecated
      */
+
     public CommunicationDto sendGet(String senderEmail, String urlExtension);
 
     public CommunicationDto sendPostLike(String urlExtension, String postObjectBody, String senderEmail, String method);
 
     public CommunicationDto sendDelete(String urlExtension);
+
+
 }

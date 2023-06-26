@@ -1,17 +1,18 @@
 package rs.edu.raf.si.bank2.client.services;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Random;
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.client.services.interfaces.MailingServiceInterface;
+
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.Random;
 
 @Service
 public class MailingService implements MailingServiceInterface {
@@ -24,6 +25,7 @@ public class MailingService implements MailingServiceInterface {
     @Autowired
     public MailingService() {
         this.registrationCodes = new ArrayList<>();
+
     }
 
     private void sendMail(String recipient, String subject, String content) throws MessagingException {
@@ -84,4 +86,6 @@ public class MailingService implements MailingServiceInterface {
     public List<String> getRegistrationCodes() {
         return registrationCodes;
     }
+
+
 }

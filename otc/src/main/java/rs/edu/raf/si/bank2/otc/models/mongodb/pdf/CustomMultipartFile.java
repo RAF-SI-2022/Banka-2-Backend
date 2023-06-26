@@ -1,8 +1,10 @@
 package rs.edu.raf.si.bank2.otc.models.mongodb.pdf;
 
-import java.io.*;
+import jdk.jfr.ContentType;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.*;
 
 public class CustomMultipartFile implements MultipartFile {
     private final File file;
@@ -12,12 +14,10 @@ public class CustomMultipartFile implements MultipartFile {
     public CustomMultipartFile(File file) {
         this.file = file;
     }
-
     public CustomMultipartFile(File file, String type) {
         this.file = file;
-        this.subType = type;
+        this.subType=type;
     }
-
     @Override
     public String getName() {
         return file.getName();
@@ -59,7 +59,7 @@ public class CustomMultipartFile implements MultipartFile {
     @Override
     public void transferTo(File dest) throws IOException, IllegalStateException {
         try (InputStream inputStream = new FileInputStream(file);
-                OutputStream outputStream = new FileOutputStream(dest)) {
+             OutputStream outputStream = new FileOutputStream(dest)) {
             StreamUtils.copy(inputStream, outputStream);
         }
     }

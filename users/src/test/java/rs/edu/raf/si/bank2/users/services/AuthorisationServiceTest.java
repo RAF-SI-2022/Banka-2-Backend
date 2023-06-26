@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -13,12 +11,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,9 +33,6 @@ import rs.edu.raf.si.bank2.users.utils.JwtUtil;
 public class AuthorisationServiceTest {
 
     @Mock
-    CompositeMeterRegistry meterRegistry;
-
-    @Mock
     UserRepository userRepository;
 
     @Mock
@@ -56,24 +49,6 @@ public class AuthorisationServiceTest {
 
     @InjectMocks
     AuthorisationService authorisationService;
-
-    @BeforeEach
-    public void setUp() {
-        Mockito.lenient().when(meterRegistry.counter(anyString())).thenReturn(new Counter() {
-            @Override
-            public void increment(double v) {}
-
-            @Override
-            public double count() {
-                return 0;
-            }
-
-            @Override
-            public Id getId() {
-                return null;
-            }
-        });
-    }
 
     @Test
     public void isAuthorised_success() {

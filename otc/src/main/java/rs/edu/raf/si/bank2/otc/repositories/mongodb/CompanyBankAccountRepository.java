@@ -5,4 +5,6 @@ import org.springframework.stereotype.Repository;
 import rs.edu.raf.si.bank2.otc.models.mongodb.CompanyBankAccount;
 
 @Repository
-public interface CompanyBankAccountRepository extends MongoRepository<CompanyBankAccount, String> {}
+public interface CompanyBankAccountRepository extends MongoRepository<CompanyBankAccount, String> {
+
+}

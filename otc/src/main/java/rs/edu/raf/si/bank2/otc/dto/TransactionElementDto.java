@@ -14,14 +14,15 @@ import rs.edu.raf.si.bank2.otc.models.mongodb.TransactionElements;
 public class TransactionElementDto {
 
     private String contractId;
-    private String elementId; // prazno kada se pravi prvi put pravi
+    private String elementId;//prazno kada se pravi prvi put pravi
     private ContractElements buyOrSell;
-    private TransactionElements transactionElement; // STOCK || OPTION || FUTURE
-    private ContractElements balance; // cache margin
-    private String currency; // USD, RSD
+    private TransactionElements transactionElement;// STOCK || OPTION || FUTURE
+    private ContractElements balance; //cache margin
+    private String currency;// USD, RSD
     private Integer amount;
     private Double priceOfOneElement;
     private Long userId;
     private Long mariaDbId;
-    private String futureStorageField; // ako nije future bice null, sluzi da se recoveruje future nakon brisanja
+    private String futureStorageField; //ako nije future bice null, sluzi da se recoveruje future nakon brisanja
+
 }

@@ -8,19 +8,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @Builder
-// @AllArgsConstructor
+//@AllArgsConstructor
 @RequiredArgsConstructor
 @Document("contactPerson")
 public class ContactPerson {
 
-    public ContactPerson(
-            String id,
-            String firstName,
-            String lastName,
-            String phoneNumber,
-            String email,
-            String position,
-            String note) {
+    public ContactPerson(String id, String firstName, String lastName, String phoneNumber, String email, String position, String note) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -32,9 +25,9 @@ public class ContactPerson {
 
     @Id
     private String id;
-    //    @DBRef(lazy = true)
-    //    @JsonIgnore
-    //    private Company company;
+//    @DBRef(lazy = true)
+//    @JsonIgnore
+//    private Company company;
     private String firstName;
     private String lastName;
     private String phoneNumber;
