@@ -1,11 +1,5 @@
 package rs.edu.raf.si.bank2.otc.services;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,6 +12,13 @@ import rs.edu.raf.si.bank2.otc.exceptions.CompanyIdProvidedException;
 import rs.edu.raf.si.bank2.otc.exceptions.CompanyNotFoundException;
 import rs.edu.raf.si.bank2.otc.models.mongodb.Company;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.CompanyRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CompanyServiceTest {
@@ -218,8 +219,7 @@ public class CompanyServiceTest {
         Company company = new Company();
         company.setRegistrationNumber(registrationNumber);
 
-        when(companyRepository.findCompanyByRegistrationNumber(registrationNumber))
-                .thenReturn(Optional.of(company));
+        when(companyRepository.findCompanyByRegistrationNumber(registrationNumber)).thenReturn(Optional.of(company));
 
         Company result = companyService.getCompanyByRegistrationNumber(registrationNumber);
 
@@ -233,8 +233,7 @@ public class CompanyServiceTest {
     public void getCompanyByRegistrationNumber_NonexistentCompany_ThrowsException() {
         String registrationNumber = "987654321";
 
-        when(companyRepository.findCompanyByRegistrationNumber(registrationNumber))
-                .thenReturn(Optional.empty());
+        when(companyRepository.findCompanyByRegistrationNumber(registrationNumber)).thenReturn(Optional.empty());
 
         assertThrows(CompanyNotFoundException.class, () -> {
             companyService.getCompanyByRegistrationNumber(registrationNumber);

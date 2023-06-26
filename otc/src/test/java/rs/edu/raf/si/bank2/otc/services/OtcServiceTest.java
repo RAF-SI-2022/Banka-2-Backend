@@ -1,14 +1,5 @@
 package rs.edu.raf.si.bank2.otc.services;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
-
-import java.util.*;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,6 +16,16 @@ import rs.edu.raf.si.bank2.otc.models.mongodb.*;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.CompanyRepository;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.ContactRepository;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.TransactionElementRepository;
+
+import java.util.*;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class OtcServiceTest {
@@ -47,8 +48,7 @@ public class OtcServiceTest {
     @Test
     void getContract_ShouldReturnContract_WhenValidIdProvided() {
 
-        OtcService otcService =
-                new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
+        OtcService otcService = new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
         String contractId = "123";
         Contract expectedContract = new Contract();
         when(contactRepository.findById(contractId)).thenReturn(Optional.of(expectedContract));
@@ -60,8 +60,7 @@ public class OtcServiceTest {
 
     @Test
     void getAllContracts_ShouldReturnAllContracts() {
-        OtcService otcService =
-                new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
+        OtcService otcService = new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
         List<Contract> expectedContracts = new ArrayList<>();
         when(contactRepository.findAll()).thenReturn(expectedContracts);
 
@@ -73,8 +72,7 @@ public class OtcServiceTest {
     @Test
     void getAllContractsForUserId_ShouldReturnAllContractsForUserId() {
 
-        OtcService otcService =
-                new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
+        OtcService otcService = new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
         Long userId = 123L;
         List<Contract> expectedContracts = new ArrayList<>();
         when(contactRepository.findByUserId(userId)).thenReturn(expectedContracts);
@@ -86,8 +84,7 @@ public class OtcServiceTest {
 
     @Test
     void getAllElements_ShouldReturnAllElements() {
-        OtcService otcService =
-                new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
+        OtcService otcService = new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
         List<TransactionElement> expectedElements = new ArrayList<>();
         when(transactionElementRepository.findAll()).thenReturn(expectedElements);
 
@@ -98,8 +95,7 @@ public class OtcServiceTest {
 
     @Test
     void getElementById_ShouldReturnElement_WhenValidIdProvided() {
-        OtcService otcService =
-                new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
+        OtcService otcService = new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
         String elementId = "456";
         TransactionElement expectedElement = new TransactionElement();
         when(transactionElementRepository.findById(elementId)).thenReturn(Optional.of(expectedElement));
@@ -112,8 +108,7 @@ public class OtcServiceTest {
     @Test
     void getElementsForContract_ShouldReturnElementsForContract_WhenValidContractIdProvided() {
 
-        OtcService otcService =
-                new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
+        OtcService otcService = new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
         String contractId = "789";
         Contract contract = new Contract();
         contract.setTransactionElements(new ArrayList<>());
@@ -137,8 +132,7 @@ public class OtcServiceTest {
     @Test
     void openContract_ShouldReturnOtcResponseDto_WhenValidUserIdAndContractDtoProvided() {
 
-        OtcService otcService =
-                new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
+        OtcService otcService = new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
         Long userId = 123L;
         ContractDto contractDto = new ContractDto();
         Company company = new Company();
@@ -164,11 +158,11 @@ public class OtcServiceTest {
         assertEquals("Selektovana kompanija nije u bazi!", result.getResponseMsg());
     }
 
+
     @Test
     void editContract_ShouldReturnOtcResponseDto_WhenValidContractDtoProvided() {
 
-        OtcService otcService =
-                new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
+        OtcService otcService = new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
         ContractDto updatedContract = new ContractDto();
         updatedContract.setCompanyId("123");
         Contract contract = new Contract();
@@ -192,14 +186,13 @@ public class OtcServiceTest {
         assertEquals("Ugovor nije pronadjen u bazi", result.getResponseMsg());
     }
 
+
     @Test
     void addTransactionElementToContract_ShouldReturnOtcResponseDto_WhenValidTransactionElementDtoProvided() {
 
-        OtcService otcService =
-                new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
+        OtcService otcService = new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
         TransactionElementDto transactionElementDto = new TransactionElementDto();
-        Contract contract =
-                Contract.builder().transactionElements(new ArrayList<>()).build();
+        Contract contract = Contract.builder().transactionElements(new ArrayList<>()).build();
         contract.setId("123");
         when(contactRepository.findById(transactionElementDto.getContractId())).thenReturn(Optional.of(contract));
         when(reservedService.sendReservation(transactionElementDto)).thenReturn(new CommunicationDto(200, "Success"));
@@ -227,8 +220,7 @@ public class OtcServiceTest {
     @Test
     void addTransactionElementToContract_ShouldReturnOtcResponseDtoWithErrorMessage_WhenContractStatusIsFinalised() {
 
-        Contract contract =
-                Contract.builder().contractStatus(ContractElements.FINALISED).build();
+        Contract contract = Contract.builder().contractStatus(ContractElements.FINALISED).build();
 
         TransactionElementDto transactionElementDto = new TransactionElementDto();
 
@@ -241,10 +233,9 @@ public class OtcServiceTest {
     }
 
     @Test
-    void addTransactionElementToContract_ShouldReturnOtcResponseDtoWithErrorMessage_WhenResponseCodeIsNot200() {
+    void addTransactionElementToContract_ShouldReturnOtcResponseDtoWithErrorMessage_WhenResponseCodeIsNot200 () {
 
-        Contract contract =
-                Contract.builder().contractStatus(ContractElements.BUY).build();
+        Contract contract = Contract.builder().contractStatus(ContractElements.BUY).build();
 
         TransactionElementDto transactionElementDto = new TransactionElementDto();
 
@@ -259,18 +250,11 @@ public class OtcServiceTest {
 
     @ParameterizedTest
     @MethodSource("addTransactionElementToContract")
-    void addTransactionElementToContract_ShouldReturnOtcResponseDto_success(
-            ContractElements contractElement, TransactionElements transactionElements) {
+    void addTransactionElementToContract_ShouldReturnOtcResponseDto_success(ContractElements contractElement, TransactionElements transactionElements) {
 
-        Contract contract = Contract.builder()
-                .transactionElements(new ArrayList<>())
-                .contractStatus(contractElement)
-                .build();
+        Contract contract = Contract.builder().transactionElements(new ArrayList<>()).contractStatus(contractElement).build();
 
-        TransactionElementDto transactionElementDto = TransactionElementDto.builder()
-                .buyOrSell(contractElement)
-                .transactionElement(transactionElements)
-                .build();
+        TransactionElementDto transactionElementDto = TransactionElementDto.builder().buyOrSell(contractElement).transactionElement(transactionElements).build();
 
         when(contactRepository.findById(any())).thenReturn(Optional.ofNullable(contract));
 
@@ -287,14 +271,14 @@ public class OtcServiceTest {
                 Arguments.of(ContractElements.BUY, TransactionElements.FUTURE),
                 Arguments.of(ContractElements.BUY, TransactionElements.STOCK),
                 Arguments.of(ContractElements.SELL, TransactionElements.FUTURE),
-                Arguments.of(ContractElements.SELL, TransactionElements.STOCK));
+                Arguments.of(ContractElements.SELL, TransactionElements.STOCK)
+        );
     }
 
     @Test
     void removeTransactionElement_ShouldReturnOtcResponseDto_WhenValidContractIdAndTransactionElementIdProvided() {
 
-        OtcService otcService =
-                new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
+        OtcService otcService = new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
         String contractId = "123";
         String transactionElementId = "456";
         TransactionElement transactionElement = new TransactionElement();
@@ -357,11 +341,9 @@ public class OtcServiceTest {
     @Test
     void deleteContract_ShouldReturnOtcResponseDto_WhenValidContractIdProvided() {
 
-        OtcService otcService =
-                new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
+        OtcService otcService = new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
         String contractId = "123";
-        Contract contract =
-                Contract.builder().transactionElements(new ArrayList<>()).build();
+        Contract contract = Contract.builder().transactionElements(new ArrayList<>()).build();
         contract.setId(contractId);
         when(contactRepository.findById(contractId)).thenReturn(Optional.of(contract));
 
@@ -384,8 +366,7 @@ public class OtcServiceTest {
 
     @Test
     void deleteContract_ShouldReturnOtcResponseDto_WhenRemovingTransactionElements() {
-        OtcService otcService =
-                new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
+        OtcService otcService = new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
         String contractId = "123";
         TransactionElement te1 = TransactionElement.builder().id("1").build();
         TransactionElement te2 = TransactionElement.builder().id("2").build();
@@ -394,10 +375,7 @@ public class OtcServiceTest {
         transactionElementList.add(te1);
         transactionElementList.add(te2);
 
-        Contract contract = Contract.builder()
-                .transactionElements(transactionElementList)
-                .id(contractId)
-                .build();
+        Contract contract = Contract.builder().transactionElements(transactionElementList).id(contractId).build();
         when(contactRepository.findById(contractId)).thenReturn(Optional.of(contract));
         when(transactionElementRepository.findById(te1.getId())).thenReturn(Optional.of(te1));
         when(contactRepository.findById(contractId)).thenReturn(Optional.of(contract));
@@ -409,8 +387,7 @@ public class OtcServiceTest {
     @Test
     void closeContract_ShouldReturnOtcResponseDto_WhenValidContractIdProvided() {
 
-        OtcService otcService =
-                new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
+        OtcService otcService = new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
         String contractId = "123";
 
         List<TransactionElement> transactionElements = new ArrayList<>();
@@ -419,8 +396,7 @@ public class OtcServiceTest {
         transactionElements.add(te1);
         transactionElements.add(te2);
 
-        Contract contract =
-                Contract.builder().transactionElements(transactionElements).build();
+        Contract contract = Contract.builder().transactionElements(transactionElements).build();
         contract.setId(contractId);
 
         CommunicationDto communicationDto = new CommunicationDto(200, any());
@@ -438,8 +414,7 @@ public class OtcServiceTest {
     @Test
     void closeContract_ShouldReturnOtcResponseDto_WhenInvalidStatusIsReturnedInCommunicationDto() {
 
-        OtcService otcService =
-                new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
+        OtcService otcService = new OtcService(contactRepository, companyRepository, reservedService, transactionElementRepository);
         String contractId = "123";
 
         List<TransactionElement> transactionElements = new ArrayList<>();
@@ -448,8 +423,7 @@ public class OtcServiceTest {
         transactionElements.add(te1);
         transactionElements.add(te2);
 
-        Contract contract =
-                Contract.builder().transactionElements(transactionElements).build();
+        Contract contract = Contract.builder().transactionElements(transactionElements).build();
         contract.setId(contractId);
 
         CommunicationDto communicationDto = new CommunicationDto(201, any());

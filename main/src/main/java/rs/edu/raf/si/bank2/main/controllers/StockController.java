@@ -2,7 +2,6 @@ package rs.edu.raf.si.bank2.main.controllers;
 
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
-import io.micrometer.core.annotation.Timed;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +19,6 @@ import rs.edu.raf.si.bank2.main.services.interfaces.UserCommunicationInterface;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/stock")
-@Timed
 public class StockController {
 
     private StockService stockService;
@@ -43,13 +41,11 @@ public class StockController {
         this.userStockService = userStockService;
     }
 
-    @Timed("controllers.stock.getAllStocks")
     @GetMapping()
     public ResponseEntity<?> getAllStocks() {
         return ResponseEntity.ok().body(stockService.getAllStocks());
     }
 
-    @Timed("controllers.stock.getStockById")
     @GetMapping("/{id}")
     public ResponseEntity<?> getStockById(@PathVariable Long id) {
         try {
@@ -59,7 +55,6 @@ public class StockController {
         }
     }
 
-    @Timed("controllers.stock.getStockBySymbol")
     @GetMapping("/symbol/{symbol}")
     public ResponseEntity<?> getStockBySymbol(@PathVariable String symbol) {
         try {
@@ -69,7 +64,6 @@ public class StockController {
         }
     }
 
-    @Timed("controllers.stock.getStockHistoryByStockIdAndTimePeriod")
     @GetMapping("/{id}/history/{type}")
     public ResponseEntity<?> getStockHistoryByStockIdAndTimePeriod(@PathVariable Long id, @PathVariable String type) {
         try {
@@ -81,7 +75,6 @@ public class StockController {
         }
     }
 
-    @Timed("controllers.stock.buyStock")
     @PostMapping(value = "/buy")
     public ResponseEntity<?> buyStock(@RequestBody StockRequest stockRequest) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -93,7 +86,6 @@ public class StockController {
         return stockService.buyStock(stockRequest, user.get(), null, false);
     }
 
-    @Timed("controllers.stock.sellStock")
     @PostMapping(value = "/sell")
     public ResponseEntity<?> sellStock(@RequestBody StockRequest stockRequest) {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -103,7 +95,6 @@ public class StockController {
         return stockService.sellStock(stockRequest, null);
     }
 
-    @Timed("controllers.stock.getAllUserStocks")
     @GetMapping(value = "/user-stocks")
     public ResponseEntity<?> getAllUserStocks() {
         String signedInUserEmail = getContext().getAuthentication().getName();
@@ -116,7 +107,6 @@ public class StockController {
                         userService.findByEmail(signedInUserEmail).get().getId()));
     }
 
-    @Timed("controllers.stock.removeStockFromMarket")
     @PostMapping(value = "/remove/{symbol}")
     public ResponseEntity<?> removeStockFromMarket(@PathVariable String symbol) {
         String signedInUserEmail = getContext().getAuthentication().getName();

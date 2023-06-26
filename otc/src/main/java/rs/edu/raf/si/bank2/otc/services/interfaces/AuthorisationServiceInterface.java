@@ -1,7 +1,8 @@
 package rs.edu.raf.si.bank2.otc.services.interfaces;
 
-import java.util.Optional;
 import rs.edu.raf.si.bank2.otc.models.mariadb.PermissionName;
+
+import java.util.Optional;
 
 /**
  * Service for dealing with authentication-related jobs, where there is no

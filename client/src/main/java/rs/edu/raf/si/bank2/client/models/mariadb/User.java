@@ -1,17 +1,18 @@
 package rs.edu.raf.si.bank2.client.models.mariadb;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.List;
-import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+
+import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.List;
 
 @Data
 @Builder

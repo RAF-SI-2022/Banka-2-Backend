@@ -2,7 +2,6 @@ package rs.edu.raf.si.bank2.main.controllers;
 
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
-import io.micrometer.core.annotation.Timed;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +17,6 @@ import rs.edu.raf.si.bank2.main.services.interfaces.UserCommunicationInterface;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/forex")
-@Timed
 public class ForexController {
 
     private final ForexService forexService;
@@ -33,13 +31,11 @@ public class ForexController {
         this.balanceService = balanceService;
     }
 
-    @Timed("controllers.forex.getAll")
     @GetMapping
     public ResponseEntity<?> getAll() {
         return ResponseEntity.ok().body(forexService.findAll());
     }
 
-    @Timed("controllers.forex.getForexUsingFromAndToCurrency")
     @GetMapping("/{fromCurrency}/{toCurrency}")
     public Forex getForexUsingFromAndToCurrency(
             @PathVariable(name = "fromCurrency") String fromCurrency,
@@ -47,7 +43,6 @@ public class ForexController {
         return forexService.getForexForCurrencies(fromCurrency, toCurrency);
     }
 
-    @Timed("controllers.forex.buyOrSell")
     @PostMapping("/buy-sell")
     public ResponseEntity<?> buyOrSell(@RequestBody @Valid BuySellForexDto dto) {
         Forex forex = forexService.getForexForCurrencies(dto.getFromCurrencyCode(), dto.getToCurrencyCode());

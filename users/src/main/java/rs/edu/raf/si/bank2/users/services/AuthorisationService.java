@@ -1,7 +1,5 @@
 package rs.edu.raf.si.bank2.users.services;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import java.util.Calendar;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,27 +28,6 @@ public class AuthorisationService implements AuthorisationServiceInterface {
     private final JwtUtil jwtUtil;
     private final MailingServiceInterface mailingService;
 
-    /**
-     * Monitoring. Counts the number of JWT tokens generated.
-     */
-    private Counter tokensCount;
-
-    /**
-     * Monitoring. Counts the number of reset password tokens generated.
-     */
-    private Counter resetPasswordCount;
-
-    /**
-     * Default constructor.
-     *
-     * @param authenticationManager
-     * @param permissionRepository
-     * @param userRepository
-     * @param passwordResetTokenRepository
-     * @param jwtUtil
-     * @param mailingService
-     * @param meterRegistry
-     */
     @Autowired
     public AuthorisationService(
             AuthenticationManager authenticationManager,
@@ -58,16 +35,13 @@ public class AuthorisationService implements AuthorisationServiceInterface {
             UserRepository userRepository,
             PasswordResetTokenRepository passwordResetTokenRepository,
             JwtUtil jwtUtil,
-            MailingServiceInterface mailingService,
-            CompositeMeterRegistry meterRegistry) {
+            MailingServiceInterface mailingService) {
         this.authenticationManager = authenticationManager;
         this.permissionRepository = permissionRepository;
         this.userRepository = userRepository;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.jwtUtil = jwtUtil;
         this.mailingService = mailingService;
-        tokensCount = meterRegistry.counter("services.authorisation.tokens");
-        resetPasswordCount = meterRegistry.counter("services.authorisation.resetPassword");
     }
 
     @Override
@@ -95,9 +69,6 @@ public class AuthorisationService implements AuthorisationServiceInterface {
         }
 
         String token = jwtUtil.generateToken(email);
-        if (tokensCount != null) {
-            tokensCount.increment();
-        }
         return Optional.of(token);
     }
 
@@ -112,9 +83,6 @@ public class AuthorisationService implements AuthorisationServiceInterface {
         // TODO random enough?
         String token = UUID.randomUUID().toString();
         passwordResetTokenRepository.save(new PasswordResetToken(client, token));
-        if (resetPasswordCount != null) {
-            resetPasswordCount.increment();
-        }
         mailingService.sendResetPasswordEmail(email, token);
         return true;
     }

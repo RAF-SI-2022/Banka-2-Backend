@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import java.util.ArrayList;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +34,6 @@ public class ServiceAuthIntegrationSteps extends ServiceAuthIntegrationTestConfi
 
     @Autowired
     UserServiceInterface userServiceInterface;
-
-    @Autowired
-    CompositeMeterRegistry meterRegistry = new CompositeMeterRegistry();
 
     @Autowired
     AuthorisationServiceInterface authorisationServiceInterface;

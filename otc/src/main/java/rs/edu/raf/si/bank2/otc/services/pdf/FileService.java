@@ -1,5 +1,6 @@
 package rs.edu.raf.si.bank2.otc.services.pdf;
 
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -9,8 +10,6 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
 import com.mongodb.client.gridfs.model.GridFSFile;
-import java.io.*;
-import java.nio.file.Path;
 import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -28,6 +27,8 @@ import rs.edu.raf.si.bank2.otc.models.mongodb.Contract;
 import rs.edu.raf.si.bank2.otc.models.mongodb.pdf.CustomMultipartFile;
 import rs.edu.raf.si.bank2.otc.models.mongodb.pdf.LoadFile;
 
+import java.io.*;
+import java.nio.file.Path;
 @Service
 public class FileService {
 
@@ -40,7 +41,7 @@ public class FileService {
     public String createPDFFile(Contract contract) throws IOException {
         File file = new File("Contract2");
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.writeValue(file, contract);
+        objectMapper.writeValue(file,contract);
         System.out.println("The Object  was successfully written to a file");
         File file1 = new File("Proba.pdf");
         try {
@@ -60,7 +61,7 @@ public class FileService {
                 String line = reader.readLine();
                 float y = page.getMediaBox().getHeight() - 50;
                 if (line != null) {
-                    String[] splitValues = line.split(","); // Split the line by the character
+                    String[] splitValues = line.split(",");  // Split the line by the character
 
                     for (String value : splitValues) {
                         contentStream.beginText();
@@ -73,6 +74,7 @@ public class FileService {
             } catch (IOException e) {
                 System.err.println("An error occurred: " + e.getMessage());
             }
+
 
             contentStream.close();
 
@@ -89,37 +91,34 @@ public class FileService {
         MultipartFile multipartFile = new CustomMultipartFile(file1, "pdf");
         return addFile(multipartFile);
     }
-
     public String addFile(MultipartFile upload) throws IOException {
 
         DBObject metadata = new BasicDBObject();
         metadata.put("fileSize", upload.getSize());
-        Object fileID = template.store(
-                upload.getInputStream(), upload.getOriginalFilename(), upload.getContentType(), metadata);
+        Object fileID = template.store(upload.getInputStream(), upload.getOriginalFilename(), upload.getContentType(), metadata);
         return fileID.toString();
     }
 
+
     public LoadFile downloadFile(String id) throws IOException {
 
-        GridFSFile gridFSFile = template.findOne(new Query(Criteria.where("_id").is(id)));
+        GridFSFile gridFSFile = template.findOne( new Query(Criteria.where("_id").is(id)) );
 
         LoadFile loadFile = new LoadFile();
 
         if (gridFSFile != null && gridFSFile.getMetadata() != null) {
-            loadFile.setFilename(gridFSFile.getFilename());
+            loadFile.setFilename( gridFSFile.getFilename() );
 
-            loadFile.setFileType(gridFSFile.getMetadata().get("_contentType").toString());
+            loadFile.setFileType( gridFSFile.getMetadata().get("_contentType").toString() );
 
-            loadFile.setFileSize(gridFSFile.getMetadata().get("fileSize").toString());
+            loadFile.setFileSize( gridFSFile.getMetadata().get("fileSize").toString() );
 
-            loadFile.setFile(
-                    IOUtils.toByteArray(operations.getResource(gridFSFile).getInputStream()));
+            loadFile.setFile( IOUtils.toByteArray(operations.getResource(gridFSFile).getInputStream()) );
         }
         return loadFile;
     }
-
-    public void downloadFileFromMongoDB(String id) {
-        GridFSFile gridFSFile = template.findOne(new Query(Criteria.where("_id").is(id)));
+    public void downloadFileFromMongoDB(String id){
+        GridFSFile gridFSFile = template.findOne( new Query(Criteria.where("_id").is(id)) );
 
         String databaseName = "dev";
         String bucketName = "files";
@@ -132,7 +131,7 @@ public class FileService {
             MongoDatabase database = mongoClient.getDatabase(databaseName);
             GridFSBucket gridFSBucket = GridFSBuckets.create(database, bucketName);
 
-            // GridFSFile file = gridFSBucket.find(new BsonObjectId(fileId)).first();
+            //GridFSFile file = gridFSBucket.find(new BsonObjectId(fileId)).first();
             if (gridFSFile != null) {
                 Path outputPath = Path.of(outputFilePath);
                 FileOutputStream outputStream = new FileOutputStream(outputPath.toFile());

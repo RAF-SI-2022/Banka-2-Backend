@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,9 +17,6 @@ import rs.edu.raf.si.bank2.users.models.mariadb.User;
 import rs.edu.raf.si.bank2.users.services.interfaces.UserServiceInterface;
 
 public class AuthFailuresIntegrationSteps extends AuthFailuresIntegrationTestConfig {
-
-    @Autowired
-    CompositeMeterRegistry meterRegistry = new CompositeMeterRegistry();
 
     @Autowired
     UserServiceInterface userServiceInterface;

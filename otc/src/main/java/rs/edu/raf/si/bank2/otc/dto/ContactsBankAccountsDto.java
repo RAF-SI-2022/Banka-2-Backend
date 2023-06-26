@@ -1,9 +1,10 @@
 package rs.edu.raf.si.bank2.otc.dto;
 
-import java.util.Collection;
 import lombok.Data;
 import rs.edu.raf.si.bank2.otc.models.mongodb.CompanyBankAccount;
 import rs.edu.raf.si.bank2.otc.models.mongodb.ContactPerson;
+
+import java.util.Collection;
 
 @Data
 public class ContactsBankAccountsDto {

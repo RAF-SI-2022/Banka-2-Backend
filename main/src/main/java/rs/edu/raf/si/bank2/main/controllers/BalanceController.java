@@ -1,6 +1,5 @@
 package rs.edu.raf.si.bank2.main.controllers;
 
-import io.micrometer.core.annotation.Timed;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +13,6 @@ import rs.edu.raf.si.bank2.main.services.interfaces.UserCommunicationInterface;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/balances")
-@Timed
 public class BalanceController {
 
     private final BalanceService balanceService;
@@ -26,13 +24,11 @@ public class BalanceController {
         this.balanceService = balanceService;
     }
 
-    @Timed("controllers.balance.findBalancesByUserId")
     @GetMapping(value = "/{id}")
     public ResponseEntity<?> findBalancesByUserId(@PathVariable(name = "id") Long userId) {
         return ResponseEntity.ok(this.balanceService.findAllByUserId(userId));
     }
 
-    @Timed("controllers.balance.increaseBalance")
     @PostMapping(value = "/increase")
     public ResponseEntity<?> increaseBalance(@RequestBody @Valid BalanceDto dto) {
         try {
@@ -47,7 +43,6 @@ public class BalanceController {
         }
     }
 
-    @Timed("controllers.balance.decreaseBalance")
     @PostMapping(value = "/decrease")
     public ResponseEntity<?> decreaseBalance(@RequestBody @Valid BalanceDto dto) {
         try {

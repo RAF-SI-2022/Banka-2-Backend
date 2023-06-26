@@ -1,6 +1,5 @@
 package rs.edu.raf.si.bank2.users.services;
 
-import io.micrometer.core.annotation.Timed;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +16,6 @@ import rs.edu.raf.si.bank2.users.repositories.mariadb.PasswordResetTokenReposito
 import rs.edu.raf.si.bank2.users.repositories.mariadb.UserRepository;
 import rs.edu.raf.si.bank2.users.services.interfaces.UserServiceInterface;
 
-@Timed
 @Service
 public class UserService implements UserServiceInterface {
     private final UserRepository userRepository;
@@ -29,7 +27,6 @@ public class UserService implements UserServiceInterface {
         this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
-    @Timed("services.user.loadUserByUsername")
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> myUser = this.findByEmail(username);
@@ -41,25 +38,21 @@ public class UserService implements UserServiceInterface {
                 myUser.get().getEmail(), myUser.get().getPassword(), new ArrayList<>());
     }
 
-    @Timed("services.user.findByEmail")
     @Override
     public Optional<User> findByEmail(String email) {
         return userRepository.findUserByEmail(email);
     }
 
-    @Timed("services.user.findAll")
     @Override
     public List<User> findAll() {
         return userRepository.findAll();
     }
 
-    @Timed("services.user.save")
     @Override
     public User save(User user) {
         return userRepository.save(user);
     }
 
-    @Timed("services.user.getUserPermissions")
     @Override
     public List<Permission> getUserPermissions(String email) {
         List<Permission> permissions =
@@ -67,7 +60,6 @@ public class UserService implements UserServiceInterface {
         return permissions;
     }
 
-    @Timed("services.user.findById")
     @Override
     public Optional<User> findById(Long id) throws UserNotFoundException {
 
@@ -80,13 +72,11 @@ public class UserService implements UserServiceInterface {
         }
     }
 
-    @Timed("services.user.deleteById")
     @Override
     public void deleteById(Long id) throws UserNotFoundException {
         userRepository.deleteById(id);
     }
 
-    @Timed("services.user.getUserByPasswordResetToken")
     @Override
     public Optional<User> getUserByPasswordResetToken(String token) {
         Optional<PasswordResetToken> passwordResetToken =
@@ -97,7 +87,6 @@ public class UserService implements UserServiceInterface {
         else throw new PasswordResetTokenNotFoundException(token);
     }
 
-    @Timed("services.user.changePassword")
     @Override
     public void changePassword(User user, String newPassword, String passwordResetToken) {
         user.setPassword(newPassword);
@@ -123,7 +112,6 @@ public class UserService implements UserServiceInterface {
         }
     }
 
-    @Timed("services.user.changeUsersDailyLimit")
     @Override
     public User changeUsersDailyLimit(String userEmail, Double limitChange) {
         User user = findByEmail(userEmail).get();
@@ -132,7 +120,6 @@ public class UserService implements UserServiceInterface {
         return user;
     }
 
-    @Timed("services.user.getUsersDailyLimit")
     @Override
     public Double getUsersDailyLimit(String userEmail) {
         return findByEmail(userEmail).get().getDailyLimit();

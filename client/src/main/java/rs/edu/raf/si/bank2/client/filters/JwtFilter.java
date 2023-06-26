@@ -1,20 +1,23 @@
 package rs.edu.raf.si.bank2.client.filters;
 
 import io.jsonwebtoken.MalformedJwtException;
-import java.io.IOException;
-import java.util.ArrayList;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+import rs.edu.raf.si.bank2.client.utils.JwtUtil;
+import rs.edu.raf.si.bank2.client.services.interfaces.UserServiceInterface;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
-import rs.edu.raf.si.bank2.client.services.interfaces.UserServiceInterface;
-import rs.edu.raf.si.bank2.client.utils.JwtUtil;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -47,18 +50,18 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (username != null) {
 
-            // todo vrati ovaj kurac
-            //            UserDetails userDetails = this.userService.loadUserByUsername(username);
-            //            if (jwtUtil.validateToken(jwt, userDetails)) {
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                    new UsernamePasswordAuthenticationToken(username, null, new ArrayList<>());
-            usernamePasswordAuthenticationToken.setDetails(
-                    new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
-            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            //            }
+            //todo vrati ovaj kurac
+//            UserDetails userDetails = this.userService.loadUserByUsername(username);
+//            if (jwtUtil.validateToken(jwt, userDetails)) {
+                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                        new UsernamePasswordAuthenticationToken(username, null, new ArrayList<>());
+                usernamePasswordAuthenticationToken.setDetails( new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
+                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+//            }
 
         }
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
+
 }

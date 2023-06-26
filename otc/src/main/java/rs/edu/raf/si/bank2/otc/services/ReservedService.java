@@ -1,10 +1,8 @@
 package rs.edu.raf.si.bank2.otc.services;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -14,6 +12,10 @@ import rs.edu.raf.si.bank2.otc.dto.TransactionElementDto;
 import rs.edu.raf.si.bank2.otc.models.mongodb.ContractElements;
 import rs.edu.raf.si.bank2.otc.models.mongodb.TransactionElement;
 import rs.edu.raf.si.bank2.otc.utils.JwtUtil;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 @Service
 public class ReservedService {
@@ -29,29 +31,28 @@ public class ReservedService {
         this.jwtUtil = jwtUtil;
     }
 
+
     public CommunicationDto sendReservation(TransactionElementDto teDto) {
         String reserveJson;
         String url = "";
 
         ReserveDto reserveDto = new ReserveDto(teDto.getUserId(), teDto.getMariaDbId(), teDto.getAmount());
 
-        // todo HARD CODE NA USD
+        //todo HARD CODE NA USD
         if (teDto.getBuyOrSell() == ContractElements.BUY) {
             switch (teDto.getBalance()) {
                 case CASH -> {
-                    url = "/reserveMoney"; // u ovom slucaju mariaDbId je null
+                    url = "/reserveMoney"; //u ovom slucaju mariaDbId je null
                     switch (teDto.getTransactionElement()) {
-                        case STOCK -> reserveDto.setFutureStorage(
-                                teDto.getFutureStorageField()); // direktno cenu imamo sacuvanu
-                        case FUTURE -> reserveDto.setFutureStorage(
-                                teDto.getFutureStorageField().split(",")[4]);
-                        case OPTION -> reserveDto.setFutureStorage(
-                                teDto.getFutureStorageField().split(",")[6]);
+                        case STOCK ->reserveDto.setFutureStorage(teDto.getFutureStorageField());//direktno cenu imamo sacuvanu
+                        case FUTURE -> reserveDto.setFutureStorage(teDto.getFutureStorageField().split(",")[4]);
+                        case OPTION -> reserveDto.setFutureStorage(teDto.getFutureStorageField().split(",")[6]);
                     }
                 }
-                case MARGIN -> System.err.println("NIJE JOS DODATO"); // todo DODAJ ZA MARZNI RACUN
+                case MARGIN -> System.err.println("NIJE JOS DODATO"); //todo DODAJ ZA MARZNI RACUN
             }
-        } else if (teDto.getBuyOrSell() == ContractElements.SELL) {
+        }
+        else if (teDto.getBuyOrSell() == ContractElements.SELL) {
             switch (teDto.getTransactionElement()) {
                 case STOCK -> url = "/reserveStock";
                 case OPTION -> url = "/reserveOption";
@@ -73,23 +74,21 @@ public class ReservedService {
         String url = "";
         ReserveDto reserveDto = new ReserveDto(TElement.getUserId(), TElement.getMariaDbId(), TElement.getAmount());
 
-        // todo HARD CODE NA USD
+        //todo HARD CODE NA USD
         if (TElement.getBuyOrSell() == ContractElements.BUY) {
             switch (TElement.getBalance()) {
                 case CASH -> {
-                    url = "/undoReserveMoney"; // u ovom slucaju mariaDbId je null
+                    url = "/undoReserveMoney";//u ovom slucaju mariaDbId je null
                     switch (TElement.getTransactionElement()) {
-                        case STOCK -> reserveDto.setFutureStorage(
-                                TElement.getFutureStorageField()); // direktno cenu imamo sacuvanu
-                        case FUTURE -> reserveDto.setFutureStorage(
-                                TElement.getFutureStorageField().split(",")[4]);
-                        case OPTION -> reserveDto.setFutureStorage(
-                                TElement.getFutureStorageField().split(",")[6]);
+                        case STOCK -> reserveDto.setFutureStorage(TElement.getFutureStorageField());//direktno cenu imamo sacuvanu
+                        case FUTURE -> reserveDto.setFutureStorage(TElement.getFutureStorageField().split(",")[4]);
+                        case OPTION -> reserveDto.setFutureStorage(TElement.getFutureStorageField().split(",")[6]);
                     }
                 }
-                case MARGIN -> System.err.println("NIJE JOS DODATO"); // todo DODAJ ZA MARZNI RACUN
+                case MARGIN -> System.err.println("NIJE JOS DODATO"); //todo DODAJ ZA MARZNI RACUN
             }
-        } else if (TElement.getBuyOrSell() == ContractElements.SELL) {
+        }
+        else if (TElement.getBuyOrSell() == ContractElements.SELL) {
             switch (TElement.getTransactionElement()) {
                 case STOCK -> url = "/undoReserveStock";
                 case OPTION -> url = "/undoReserveOption";
@@ -115,16 +114,17 @@ public class ReservedService {
 
         ReserveDto reserveDto = new ReserveDto(TElement.getUserId(), TElement.getMariaDbId(), TElement.getAmount());
 
-        if (TElement.getBuyOrSell() == ContractElements.SELL) { // AKO JE SELL SAMO MI DODJA PARE
+        if (TElement.getBuyOrSell() == ContractElements.SELL) {//AKO JE SELL SAMO MI DODJA PARE
             switch (TElement.getBalance()) {
                 case CASH -> {
-                    url = "/undoReserveMoney"; // u ovom slucaju mariaDbId je null
+                    url = "/undoReserveMoney"; //u ovom slucaju mariaDbId je null
                     double price = TElement.getAmount() * TElement.getPriceOfOneElement();
                     reserveDto.setFutureStorage(Double.toString(price));
                 }
-                case MARGIN -> System.err.println("NIJE JOS DODATO"); // todo DODAJ ZA MARZNI RACUN
+                case MARGIN -> System.err.println("NIJE JOS DODATO"); //todo DODAJ ZA MARZNI RACUN
             }
-        } else if (TElement.getBuyOrSell() == ContractElements.BUY) { // AKO JE BUY MORAS DA MI DODAS ELEMENTE U BAZU
+        }
+        else if (TElement.getBuyOrSell() == ContractElements.BUY) {//AKO JE BUY MORAS DA MI DODAS ELEMENTE U BAZU
             switch (TElement.getTransactionElement()) {
                 case STOCK -> {
                     url = "/finalizeStock";
@@ -148,10 +148,12 @@ public class ReservedService {
         }
 
         return sendReservePost(url, reserveJson);
+
     }
 
+
     private CommunicationDto sendReservePost(String urlExtension, String postObjectBody) {
-        //        System.err.println("POSALI SMO SEND RESERVE");
+//        System.err.println("POSALI SMO SEND RESERVE");
 
         String token = jwtUtil.generateToken("anesic3119rn+banka2backend+admin@raf.rs");
         String[] hostPort = usersServiceHost.split(":");
@@ -195,4 +197,5 @@ public class ReservedService {
             throw new RuntimeException(e);
         }
     }
+
 }

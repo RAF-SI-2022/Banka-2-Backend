@@ -1,6 +1,5 @@
 package rs.edu.raf.si.bank2.users.controllers;
 
-import io.micrometer.core.annotation.Timed;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +22,6 @@ import rs.edu.raf.si.bank2.users.utils.JwtUtil;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/auth")
-@Timed
 public class AuthenticationController {
 
     private final JwtUtil jwtUtil;
@@ -55,7 +53,6 @@ public class AuthenticationController {
      * @param loginRequest request body
      * @return 200 if ok with JWT token and user permissions, 401 otherwise
      */
-    @Timed("controllers.authentication.login")
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         Optional<String> token = authorisationService.login(loginRequest.getEmail(), loginRequest.getPassword());
@@ -77,7 +74,6 @@ public class AuthenticationController {
      * @param passwordResetRequest request body
      * @return 200 if ok, 401 if bad credentials
      */
-    @Timed("controllers.authentication.resetPassword")
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody PasswordResetRequest passwordResetRequest) {
         boolean success = authorisationService.requestPasswordResetToken(passwordResetRequest.getEmail());
@@ -97,7 +93,6 @@ public class AuthenticationController {
      * @param passwordRecoveryDto request body
      * @return 200 if ok, 401 if not authorized or token expired or bad user
      */
-    @Timed("controllers.authentication.changePassword")
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody PasswordRecoveryDto passwordRecoveryDto) {
         String result = this.authorisationService.validatePasswordResetToken(passwordRecoveryDto.getToken());

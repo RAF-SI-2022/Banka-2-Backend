@@ -1,11 +1,12 @@
 package rs.edu.raf.si.bank2.client.models.mariadb;
 
+import lombok.Data;
+
+import javax.persistence.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import javax.persistence.*;
-import lombok.Data;
 
 @Data
 @Entity

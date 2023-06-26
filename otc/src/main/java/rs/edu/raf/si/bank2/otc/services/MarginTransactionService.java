@@ -1,8 +1,5 @@
 package rs.edu.raf.si.bank2.otc.services;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.otc.dto.MarginTransactionDto;
@@ -13,6 +10,10 @@ import rs.edu.raf.si.bank2.otc.models.mongodb.TransactionType;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.MarginBalanceRepository;
 import rs.edu.raf.si.bank2.otc.repositories.mongodb.MarginTransactionRepository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class MarginTransactionService {
     private final MarginBalanceRepository marginBalanceRepository;
@@ -20,10 +21,7 @@ public class MarginTransactionService {
     MarginTransactionRepository marginTransactionRepository;
 
     @Autowired
-    public MarginTransactionService(
-            MarginBalanceRepository marginBalanceRepository,
-            UserCommunicationService userCommunicationService,
-            MarginTransactionRepository marginTransactionRepository) {
+    public MarginTransactionService(MarginBalanceRepository marginBalanceRepository, UserCommunicationService userCommunicationService, MarginTransactionRepository marginTransactionRepository) {
         this.userCommunicationService = userCommunicationService;
         this.marginTransactionRepository = marginTransactionRepository;
         this.marginBalanceRepository = marginBalanceRepository;
@@ -31,16 +29,13 @@ public class MarginTransactionService {
 
     public void updateBalance(MarginBalance marginBalance, MarginTransaction marginTransaction) {
         if (marginTransaction.getTransactionType().equals(TransactionType.BUY)) {
-            marginBalance.setInvestedResources(
-                    marginBalance.getInvestedResources() - marginTransaction.getInitialMargin());
+            marginBalance.setInvestedResources(marginBalance.getInvestedResources() - marginTransaction.getInitialMargin());
             marginBalance.setLoanedResources(marginBalance.getLoanedResources() + marginTransaction.getLoanValue());
-            marginBalance.setMaintenanceMargin(
-                    marginBalance.getMaintenanceMargin() + marginTransaction.getMaintenanceMargin());
-        } else {
-            marginBalance.setInvestedResources(
-                    marginBalance.getInvestedResources() + marginTransaction.getInitialMargin());
-            marginBalance.setMaintenanceMargin(
-                    marginBalance.getMaintenanceMargin() - marginTransaction.getMaintenanceMargin());
+            marginBalance.setMaintenanceMargin(marginBalance.getMaintenanceMargin() + marginTransaction.getMaintenanceMargin());
+        }
+        else {
+            marginBalance.setInvestedResources(marginBalance.getInvestedResources() + marginTransaction.getInitialMargin());
+            marginBalance.setMaintenanceMargin(marginBalance.getMaintenanceMargin() - marginTransaction.getMaintenanceMargin());
             if (marginBalance.getInvestedResources() < 0) {
                 marginBalance.setInvestedResources(0.0);
             }
@@ -51,6 +46,7 @@ public class MarginTransactionService {
         marginBalanceRepository.save(marginBalance);
     }
 
+
     public String trim(String input) {
         String[] parts = input.split("\"responseMsg\":\"");
         String lastNumber = parts[1].split("\"")[0];
@@ -58,23 +54,15 @@ public class MarginTransactionService {
     }
 
     public MarginTransaction makeTransaction(MarginTransactionDto marginTransactionDto, String email) {
-        String response = trim(userCommunicationService
-                .sendGet(null, "/orders/value/" + marginTransactionDto.getOrderId(), "main")
-                .getResponseMsg());
+        String response = trim(userCommunicationService.sendGet(null, "/orders/value/" + marginTransactionDto.getOrderId(), "main").getResponseMsg());
         double loanVal = Double.parseDouble(response) - marginTransactionDto.getInitialMargin();
         if (loanVal < 0) {
             loanVal = 0.0;
         }
 
-        System.out.println(userCommunicationService
-                .sendGet(null, "/orders/orderType/" + marginTransactionDto.getOrderId(), "main")
-                .getResponseMsg());
-        String orderType = trim(userCommunicationService
-                .sendGet(null, "/orders/orderType/" + marginTransactionDto.getOrderId(), "main")
-                .getResponseMsg());
-        String tradeType = userCommunicationService
-                .sendGet(null, "/orders/tradeType/" + marginTransactionDto.getOrderId(), "main")
-                .getResponseMsg();
+        System.out.println(userCommunicationService.sendGet(null, "/orders/orderType/" + marginTransactionDto.getOrderId(), "main").getResponseMsg());
+        String orderType = trim(userCommunicationService.sendGet(null, "/orders/orderType/" + marginTransactionDto.getOrderId(), "main").getResponseMsg());
+        String tradeType = userCommunicationService.sendGet(null, "/orders/tradeType/" + marginTransactionDto.getOrderId(), "main").getResponseMsg();
         System.out.println(orderType);
         System.out.println(tradeType);
         MarginTransaction marginTransaction = MarginTransaction.builder()
@@ -91,12 +79,11 @@ public class MarginTransactionService {
                 .interest(orderType.equals("FOREX") ? loanVal * 0.05 : 0.0)
                 .orderType(orderType)
                 .build();
-        Optional<MarginBalance> marginBalanceFromDb =
-                marginBalanceRepository.findMarginBalanceByListingGroup(ListingGroup.valueOf(orderType));
-        //        if(tradeType != marginTransactionDto.getTransactionType().toString()){
-        //            //TODO
-        //            System.out.println("is this error?");
-        //        }
+        Optional<MarginBalance> marginBalanceFromDb = marginBalanceRepository.findMarginBalanceByListingGroup(ListingGroup.valueOf(orderType));
+//        if(tradeType != marginTransactionDto.getTransactionType().toString()){
+//            //TODO
+//            System.out.println("is this error?");
+//        }
         if (marginBalanceFromDb.isPresent()) {
             System.out.println("TU");
             MarginBalance marginBalance = marginBalanceFromDb.get();
@@ -114,13 +101,14 @@ public class MarginTransactionService {
         return null;
     }
 
-    public List<MarginTransaction> findByGroup(String orderType) {
+    public List<MarginTransaction> findByGroup(String orderType){
         return marginTransactionRepository.findMarginTransactionByOrderType(orderType);
     }
 
     public List<MarginTransaction> findAll() {
         return marginTransactionRepository.findAll();
     }
+
 
     public List<MarginTransaction> findMarginsByEmail(String email) {
         return marginTransactionRepository.findMarginTransactionsByUserEmail(email);

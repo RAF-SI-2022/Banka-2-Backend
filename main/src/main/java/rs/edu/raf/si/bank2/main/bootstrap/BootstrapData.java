@@ -141,14 +141,16 @@ public class BootstrapData implements CommandLineRunner {
                 logger.info("Adding stocks");
                 loadStocksTable();
             }
-            //            if (runTestSetup) {
-            //            addAdminForTest();//
-            //            addBalancesToAdmin();
-            //            runTestSetup = false;
-            //            }
+//            if (runTestSetup) {
+//            addAdminForTest();//
+//            addBalancesToAdmin();
+//            runTestSetup = false;
+//            }
         } else {
             this.temporaryLoad();
         }
+
+
 
         logger.info("Started!");
         System.out.println("Everything started");
@@ -530,7 +532,7 @@ public class BootstrapData implements CommandLineRunner {
         exchangeRepository.save(
                 new Exchange(2L, "Nasdaq", "NASDAQ", "XNAS", "USA", null, "America/New_York", " 09:30", " 16:00"));
 
-        //        giveAdminStocks();
+//        giveAdminStocks();
 
         // dodajemo 5 opcija
         //        optionService.getFiveMostImportantOptionsFromApi();
@@ -538,7 +540,9 @@ public class BootstrapData implements CommandLineRunner {
         // dodajemo 5 stockova
         stockService.updateAllStocksInDb();
 
-        if (balanceRepository.findAllByUser_Id(1L).size() == 0) addBalancesToAdmin();
+        if (balanceRepository.findAllByUser_Id(1L).size() == 0)
+            addBalancesToAdmin();
+
 
         // todo stock history
     }
