@@ -88,9 +88,9 @@ presubmits:
               # Start all helper services
               docker network create --driver bridge bank2_net || true
               docker compose up -d --no-recreate mariadb
-              docker compose up -d --no-recreate flyway
               docker compose up -d --no-recreate mongodb
               docker compose up -d --no-recreate redis
+              docker compose up -d --no-recreate flyway
               
               # Get hash for image version
               commit_hash=$(git rev-parse HEAD)
@@ -150,9 +150,9 @@ postsubmits:
               # Start all helper services
               docker network create --driver bridge bank2_net || true
               docker compose up -d --no-recreate mariadb
-              docker compose up -d --no-recreate flyway
               docker compose up -d --no-recreate mongodb
               docker compose up -d --no-recreate redis
+              docker compose up -d --no-recreate flyway
               
               # Get hash for image version
               commit_hash=$(git rev-parse HEAD)
