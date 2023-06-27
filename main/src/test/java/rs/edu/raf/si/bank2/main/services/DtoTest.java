@@ -1,12 +1,12 @@
 package rs.edu.raf.si.bank2.main.services;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import rs.edu.raf.si.bank2.main.dto.*;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)

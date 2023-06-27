@@ -10,14 +10,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Stream;
 import javax.persistence.*;
 import javax.transaction.Transactional;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,13 +22,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import rs.edu.raf.si.bank2.main.exceptions.OrderNotFoundException;
 import rs.edu.raf.si.bank2.main.exceptions.StockNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.*;
 import rs.edu.raf.si.bank2.main.models.mariadb.orders.*;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.*;
 import rs.edu.raf.si.bank2.main.requests.StockRequest;
-import rs.edu.raf.si.bank2.main.services.interfaces.UserCommunicationInterface;
 
 @ExtendWith(MockitoExtension.class)
 public class StockServiceTest {
@@ -639,14 +632,15 @@ public class StockServiceTest {
     @Transactional
     void updateAllStocksInDb() {
         try {
-            Currency currency  = Currency.builder()
+            Currency currency = Currency.builder()
                     .id(23L)
                     .currencyCode("USD")
                     .currencySymbol("$")
                     .polity("United States")
                     .inflations(new ArrayList<>())
                     .build();
-            Exchange exchange = new Exchange( "New York State Exchange", "NYSE", "NYSE", "United States", currency, "1", "9", "17");
+            Exchange exchange =
+                    new Exchange("New York State Exchange", "NYSE", "NYSE", "United States", currency, "1", "9", "17");
             // when(exchangeRepository.findExchangeByAcronym("NYSE")).thenReturn(Optional.of(exchange));
 
             String symbol1 = "AAPL";
@@ -691,7 +685,8 @@ public class StockServiceTest {
                     .build();
 
             UserStocksRepository userStocksRepository = Mockito.mock(UserStocksRepository.class);
-            when(userStocksRepository.findUserStockByUserIdAndStockSymbol(userId, stockSymbol)).thenReturn(Optional.of(userStock));
+            when(userStocksRepository.findUserStockByUserIdAndStockSymbol(userId, stockSymbol))
+                    .thenReturn(Optional.of(userStock));
             when(userStocksRepository.save(userStock)).thenReturn(userStock);
             this.userStockService.setUserStockRepository(userStocksRepository);
             this.userStockService.removeFromMarket(userId, stockSymbol);
@@ -699,57 +694,60 @@ public class StockServiceTest {
 
         }
     }
+
     @Test
     void buyStock() {
-         try {
-             StockRequest stockRequest = new StockRequest();
-             stockRequest.setStockSymbol("AAPL");
-             stockRequest.setAmount(1);
-             stockRequest.setLimit(5);
-             stockRequest.setStop(5);
-             stockRequest.setAllOrNone(false);
-             stockRequest.setMargin(false);
-             stockRequest.setUserId(1L);
-             stockRequest.setCurrencyCode("USD");
+        try {
+            StockRequest stockRequest = new StockRequest();
+            stockRequest.setStockSymbol("AAPL");
+            stockRequest.setAmount(1);
+            stockRequest.setLimit(5);
+            stockRequest.setStop(5);
+            stockRequest.setAllOrNone(false);
+            stockRequest.setMargin(false);
+            stockRequest.setUserId(1L);
+            stockRequest.setCurrencyCode("USD");
 
-             long id = 1L;
+            long id = 1L;
 
-             User user = User.builder()
-                     .id(id)
-                     .firstName("Darko")
-                     .lastName("Darkovic")
-                     .phone("000000000")
-                     .jmbg("000000000")
-                     .password("12345")
-                     .email("darko@gmail.com")
-                     .jobPosition("/")
-                     .build();
-             Currency currency  = Currency.builder()
-                     .id(23L)
-                     .currencyCode("USD")
-                     .currencySymbol("$")
-                     .polity("United States")
-                     .inflations(new ArrayList<>())
-                     .build();
-             Exchange exchange = new Exchange( "New York State Exchange", "NYSE", "NYSE", "United States", currency, "1", "9", "17");
-             //when(exchangeRepository.findExchangeByAcronym("NYSE")).thenReturn(Optional.of(exchange));
+            User user = User.builder()
+                    .id(id)
+                    .firstName("Darko")
+                    .lastName("Darkovic")
+                    .phone("000000000")
+                    .jmbg("000000000")
+                    .password("12345")
+                    .email("darko@gmail.com")
+                    .jobPosition("/")
+                    .build();
+            Currency currency = Currency.builder()
+                    .id(23L)
+                    .currencyCode("USD")
+                    .currencySymbol("$")
+                    .polity("United States")
+                    .inflations(new ArrayList<>())
+                    .build();
+            Exchange exchange =
+                    new Exchange("New York State Exchange", "NYSE", "NYSE", "United States", currency, "1", "9", "17");
+            // when(exchangeRepository.findExchangeByAcronym("NYSE")).thenReturn(Optional.of(exchange));
 
-             String symbol = "AAPL";
-             Stock stock = Stock.builder()
-                     .id(1L)
-                     .symbol(symbol)
-                     .companyName("test company")
-                     .outstandingShares(59L)
-                     .dividendYield(BigDecimal.ONE)
-                     .priceValue(BigDecimal.valueOf(12d))
-                     .exchange(exchange)
-                     .build();
-             when(stockRepository.findStockBySymbol(symbol)).thenReturn(Optional.of(stock));
-             this.stockService.buyStock(stockRequest, user, null, false);
-         } catch (Exception e) {
+            String symbol = "AAPL";
+            Stock stock = Stock.builder()
+                    .id(1L)
+                    .symbol(symbol)
+                    .companyName("test company")
+                    .outstandingShares(59L)
+                    .dividendYield(BigDecimal.ONE)
+                    .priceValue(BigDecimal.valueOf(12d))
+                    .exchange(exchange)
+                    .build();
+            when(stockRepository.findStockBySymbol(symbol)).thenReturn(Optional.of(stock));
+            this.stockService.buyStock(stockRequest, user, null, false);
+        } catch (Exception e) {
 
-         }
+        }
     }
+
     @Test
     void sellStock() {
         try {
@@ -775,15 +773,16 @@ public class StockServiceTest {
                     .email("darko@gmail.com")
                     .jobPosition("/")
                     .build();
-            Currency currency  = Currency.builder()
+            Currency currency = Currency.builder()
                     .id(23L)
                     .currencyCode("USD")
                     .currencySymbol("$")
                     .polity("United States")
                     .inflations(new ArrayList<>())
                     .build();
-            Exchange exchange = new Exchange( "New York State Exchange", "NYSE", "NYSE", "United States", currency, "1", "9", "17");
-            //when(exchangeRepository.findExchangeByAcronym("NYSE")).thenReturn(Optional.of(exchange));
+            Exchange exchange =
+                    new Exchange("New York State Exchange", "NYSE", "NYSE", "United States", currency, "1", "9", "17");
+            // when(exchangeRepository.findExchangeByAcronym("NYSE")).thenReturn(Optional.of(exchange));
 
             String symbol = "AAPL";
             Stock stock = Stock.builder()
@@ -807,7 +806,9 @@ public class StockServiceTest {
             // when(stockRepository.findStockBySymbol(symbol)).thenReturn(Optional.of(stock));
             UserStockService userStockService = Mockito.mock(UserStockService.class);
             OrderRepository orderRepository = Mockito.mock(OrderRepository.class);
-            when(userStockService.findUserStockByUserIdAndStockSymbol(stockRequest.getUserId(), stockRequest.getStockSymbol())).thenReturn(Optional.of(userStock));
+            when(userStockService.findUserStockByUserIdAndStockSymbol(
+                            stockRequest.getUserId(), stockRequest.getStockSymbol()))
+                    .thenReturn(Optional.of(userStock));
             this.stockService.setUserStockService(userStockService);
             this.stockService.setOrderRepository(orderRepository);
             this.stockService.sellStock(stockRequest, null);
@@ -815,6 +816,7 @@ public class StockServiceTest {
 
         }
     }
+
     @Test
     void getTimeStamp() {
         try {
@@ -823,6 +825,7 @@ public class StockServiceTest {
 
         }
     }
+
     @Test
     public void updateOrderStatus() {
         Long id = 1L;
@@ -837,7 +840,8 @@ public class StockServiceTest {
         stockRequest.setAmount(1);
         stockRequest.setCurrencyCode("USD");
 
-        StockOrder stockOrder = this.stockService.createOrder(stockRequest, 500d, null, OrderStatus.IN_PROGRESS, OrderTradeType.BUY);
+        StockOrder stockOrder =
+                this.stockService.createOrder(stockRequest, 500d, null, OrderStatus.IN_PROGRESS, OrderTradeType.BUY);
         when(orderRepository.findById(id)).thenReturn(Optional.of(stockOrder));
         this.stockService.updateOrderStatus(id, OrderStatus.COMPLETE);
     }

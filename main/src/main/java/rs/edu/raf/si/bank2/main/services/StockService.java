@@ -58,13 +58,13 @@ public class StockService {
     private final ExchangeRepository exchangeRepository;
     private final UserService userService;
     private final BalanceService balanceService;
-    private  UserStockService userStockService;
+    private UserStockService userStockService;
     private final StockSellWorker stockSellWorker;
     private final StockBuyWorker stockBuyWorker;
     private OrderRepository orderRepository;
     private final StocksRetrieverFromApiWorker stocksRetrieverFromApiWorker;
-    private static  BlockingQueue<StockOrder> stockBuyRequestsQueue = new LinkedBlockingQueue<>();
-    private static  BlockingQueue<StockOrder> stockSellRequestsQueue = new LinkedBlockingQueue<>();
+    private static BlockingQueue<StockOrder> stockBuyRequestsQueue = new LinkedBlockingQueue<>();
+    private static BlockingQueue<StockOrder> stockSellRequestsQueue = new LinkedBlockingQueue<>();
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -533,11 +533,11 @@ public class StockService {
         try {
             StockOrder order = stockOrder == null
                     ? this.createOrder(
-                    stockRequest,
-                    price.doubleValue(),
-                    userStock.get().getUser(),
-                    OrderStatus.WAITING,
-                    OrderTradeType.SELL)
+                            stockRequest,
+                            price.doubleValue(),
+                            userStock.get().getUser(),
+                            OrderStatus.WAITING,
+                            OrderTradeType.SELL)
                     : stockOrder;
             order = this.orderRepository.save(order);
             stockSellRequestsQueue.put(order);

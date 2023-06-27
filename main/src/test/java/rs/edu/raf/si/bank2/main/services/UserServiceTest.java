@@ -275,7 +275,8 @@ public class UserServiceTest {
 
         UserCommunicationInterface userCommunicationInterface = Mockito.mock(UserCommunicationInterface.class);
         userService.setUserCommunicationInterface(userCommunicationInterface);
-        String responseMsg = """
+        String responseMsg =
+                """
                 {
                   "id": 1,
                   "firstName": "Darko",
@@ -300,7 +301,6 @@ public class UserServiceTest {
         assertEquals(newPassword, user.getPassword());
         verify(passwordResetTokenRepository).deleteByToken(token);
     }
-
 
     @Test
     public void changePassword_throwsPasswordResetTokenNotFoundException() {
@@ -329,36 +329,36 @@ public class UserServiceTest {
         });
     }
 
-//        @Test
-//        public void changePassword_throwsUserNotFoundException() {
-//
-//            long id = 1L;
-//
-//            User user = User.builder()
-//                    .id(id)
-//                    .firstName("Darko")
-//                    .lastName("Darkovic")
-//                    .phone("000000000")
-//                    .jmbg("000000000")
-//                    .password("12345")
-//                    .email("darko@gmail.com")
-//                    .jobPosition("/")
-//                    .build();
-//
-//            String newPassword = "54321";
-//
-//            String token = UUID.randomUUID().toString();
-//
-//            PasswordResetToken passwordResetToken = new PasswordResetToken(user, token);
-//
-//            when(passwordResetTokenRepository.findPasswordResetTokenByToken(token))
-//                    .thenReturn(Optional.of(passwordResetToken));
-//            when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
-//
-//            assertThrows(UserNotFoundException.class, () -> {
-//                userService.changePassword(user, newPassword, token);
-//            });
-//        }
+    //        @Test
+    //        public void changePassword_throwsUserNotFoundException() {
+    //
+    //            long id = 1L;
+    //
+    //            User user = User.builder()
+    //                    .id(id)
+    //                    .firstName("Darko")
+    //                    .lastName("Darkovic")
+    //                    .phone("000000000")
+    //                    .jmbg("000000000")
+    //                    .password("12345")
+    //                    .email("darko@gmail.com")
+    //                    .jobPosition("/")
+    //                    .build();
+    //
+    //            String newPassword = "54321";
+    //
+    //            String token = UUID.randomUUID().toString();
+    //
+    //            PasswordResetToken passwordResetToken = new PasswordResetToken(user, token);
+    //
+    //            when(passwordResetTokenRepository.findPasswordResetTokenByToken(token))
+    //                    .thenReturn(Optional.of(passwordResetToken));
+    //            when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
+    //
+    //            assertThrows(UserNotFoundException.class, () -> {
+    //                userService.changePassword(user, newPassword, token);
+    //            });
+    //        }
     @Test
     public void changeUsersDailyLimit() {
         long id = 1L;
@@ -374,12 +374,12 @@ public class UserServiceTest {
                 .jobPosition("/")
                 .build();
 
-
         UserCommunicationInterface userCommunicationInterface = Mockito.mock(UserCommunicationInterface.class);
         userService.setUserCommunicationInterface(userCommunicationInterface);
 
         String email = "darko@gmail.com";
-        String responseMsg = """
+        String responseMsg =
+                """
                 {
                   "id": 1,
                   "firstName": "Darko",

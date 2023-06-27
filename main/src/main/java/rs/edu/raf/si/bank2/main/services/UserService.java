@@ -25,7 +25,7 @@ import rs.edu.raf.si.bank2.main.services.interfaces.UserServiceInterface;
 public class UserService implements UserDetailsService, UserServiceInterface {
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
-    private  UserCommunicationInterface userCommunicationInterface;
+    private UserCommunicationInterface userCommunicationInterface;
     ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
