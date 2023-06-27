@@ -1,6 +1,6 @@
-Feature: Auth service
+Feature: OTC service
 
-  Tests for authentication service
+  Tests for OTC service
 
   Scenario: user gets all contracts
     Given user logs in
@@ -17,7 +17,47 @@ Feature: Auth service
     When contracts exist in database
     Then user gets contract with specified contract id
 
-  Scenario: user gets contract by contract id
+  Scenario: user opens contract
     Given user logs in
     When contracts exist in database
     Then user opens contract
+
+  Scenario: user edits contract
+    Given user logs in
+    When contracts exist in database
+    Then user edits contract
+
+  Scenario: user finalizes contract
+    Given user logs in
+    When contracts exist in database
+    Then user finalizes contract by id
+
+  Scenario: user deletes contract
+    Given user logs in
+    When contracts exist in database
+    Then user deletes contract by id
+
+  Scenario: user gets all elements
+    Given user logs in
+    When elements exist in database
+    Then user gets all elements
+
+  Scenario: user gets element by id
+    Given user logs in
+    When elements exist in database
+    Then user gets element by id
+
+  Scenario: user gets elements for contract
+    Given user logs in
+    When elements exist in database
+    Then user gets elements for contract
+
+#  Scenario: user adds transaction element to contract
+#    Given user logs in
+#    When contracts exist in database
+#    Then user adds element to contract
+#
+#  Scenario: user removes transaction element from contract
+#    Given user logs in
+#    When contracts exist in database
+#    Then user deletes element from contract

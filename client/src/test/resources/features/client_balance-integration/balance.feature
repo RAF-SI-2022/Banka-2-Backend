@@ -12,10 +12,19 @@ Feature: Balance service
   Scenario: get all tekuci devizni
     Then get all tekuci devizni
 
+  Scenario: try to get nonexistent devizni
+    Then try to get nonexistent devizni
+
+  Scenario: try to get nonexistent tekuci
+    Then try to get nonexistent tekuci
+
+  Scenario: try to get nonexistent poslovni
+    Then try to get nonexistent poslovni
+
   Scenario:get all client balances
     Then get all client balances
 
-  Scenario:open tekuci racun
+  Scenario:open tekuci racun OVO GOVNO POGLEDAJ
     Then open tekuci racun
 
   Scenario:open devizni racun

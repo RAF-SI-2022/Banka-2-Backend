@@ -23,3 +23,21 @@ Feature: order service
     And there is order in waiting status in db
     When user logged in
     Then user Denies order
+
+  Scenario: Get value of order
+    Given user logs in
+    And there is order in waiting status in db
+    When user logged in
+    Then user gets value of order
+
+  Scenario: Get trade type of order
+    Given user logs in
+    And there is order in waiting status in db
+    When user logged in
+    Then user gets trade type of order
+
+  Scenario: Get type of order
+    Given user logs in
+    And there is order in waiting status in db
+    When user logged in
+    Then user gets type of order
