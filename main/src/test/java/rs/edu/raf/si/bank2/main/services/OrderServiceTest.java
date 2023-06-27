@@ -15,10 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import rs.edu.raf.si.bank2.main.exceptions.OrderNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.User;
-import rs.edu.raf.si.bank2.main.models.mariadb.orders.Order;
-import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderStatus;
-import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderTradeType;
-import rs.edu.raf.si.bank2.main.models.mariadb.orders.OrderType;
+import rs.edu.raf.si.bank2.main.models.mariadb.orders.*;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.OrderRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -389,4 +386,35 @@ class OrderServiceTest {
         // Verify the results
         assertEquals(expectedResult, result);
     }
+
+    //    @Test
+    //    void testStartOrderForex(){
+    //
+    //        final Order order1 = Order.builder()
+    //                .orderType(OrderType.STOCK)
+    //                .tradeType(OrderTradeType.BUY)
+    //                .status(OrderStatus.WAITING)
+    //                .symbol("stockSymbol")
+    //                .amount(0)
+    //                .price(0.0)
+    //                .user(User.builder().id(0L).email("email").build())
+    //                .build();
+    //        when(mockOrderRepository.findById(order1.getId())).thenReturn(Optional.of(order1));
+    //        Optional<Order> optionalOrder = Optional.of(order1);
+    //
+    //        when(mockBalanceService.buyOrSellCurrency(optionalOrder.get().getUser().getEmail(),
+    //                optionalOrder.get().getSymbol().split(" ")[0],
+    //                optionalOrder.get().getSymbol().split(" ")[1],
+    //                (float) optionalOrder.get().getPrice(),
+    //                optionalOrder.get().getAmount(),
+    //                (ForexOrder) optionalOrder.get(),
+    //                true)).thenReturn(true);
+    //
+    //        ResponseEntity<String> expectedResponse = ResponseEntity.status(HttpStatus.OK).body("Order executed");
+    //        ResponseEntity<String> actualResponse = (ResponseEntity<String>)
+    // orderServiceUnderTest.startOrder(order1.getId()); // Call the method that returns the ResponseEntity
+    //
+    //        assertEquals(expectedResponse.getStatusCode(), actualResponse.getStatusCode());
+    //        assertEquals(expectedResponse.getBody(), actualResponse.getBody());
+    //    }
 }

@@ -63,7 +63,7 @@ public class StockBuyWorker extends Thread {
         while (true) {
             try {
                 if (userStockService == null) {
-                    System.err.println("userStockService is null");
+                    // System.err.println("userStockService is null");
                     return;
                 }
                 StockOrder stockOrder = stockBuyRequestsQueue.take();

@@ -11,11 +11,11 @@ Feature: Forex service
     Given user logs in
     When user is logged in
     Then user doesn't have balance in currency he requested to convert from
-#
-#  Scenario: user doesn't have enough balance in currency he requested to convert from
-#    Given user logs in
-#    When user is logged in
-#    Then user doesn't have enough balance in currency he requested to convert from
+
+  Scenario: user doesn't have enough balance in currency he requested to convert from
+    Given user logs in
+    When user is logged in
+    Then user doesn't have enough balance in currency he requested to convert from
 
   Scenario: user converts from one currency to another with db without enough money
     Given user logs in

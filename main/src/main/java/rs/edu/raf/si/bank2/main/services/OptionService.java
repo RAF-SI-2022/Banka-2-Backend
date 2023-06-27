@@ -17,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rs.edu.raf.si.bank2.main.exceptions.*;
@@ -30,6 +31,7 @@ import rs.edu.raf.si.bank2.main.services.interfaces.OptionServiceInterface;
 import rs.edu.raf.si.bank2.main.services.workerThreads.OptionsRetrieverFromApiWorker;
 
 @Service
+@EnableCaching
 public class OptionService implements OptionServiceInterface {
 
     private final OptionRepository optionRepository;

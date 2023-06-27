@@ -154,6 +154,9 @@ public class ReservedService {
         //        System.err.println("POSALI SMO SEND RESERVE");
 
         String token = jwtUtil.generateToken("anesic3119rn+banka2backend+admin@raf.rs");
+        if (usersServiceHost == null) {
+            usersServiceHost = "localhost:8081"; // TODO OVO JE SAMO ZA TESTOVE
+        }
         String[] hostPort = usersServiceHost.split(":");
         BufferedReader reader;
         StringBuilder response = new StringBuilder();
