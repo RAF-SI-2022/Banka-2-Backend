@@ -11,6 +11,12 @@ Feature: Client service
     When test client is logged in
     Then get mail from token
 
+  Scenario: get nonexistent client
+    Then get nonexistent client
+
+  Scenario: bad login credentials
+    Then bad login credentials
+
   Scenario: get user by id
     When test client is logged in
     Then get user by id
@@ -23,9 +29,11 @@ Feature: Client service
     When test client is logged in
     Then sendToken
 
-  Scenario: checkToken
-    When test client is logged in
-    Then checkToken
+  Scenario: checkToken is valid
+    Then checkToken is valid
+
+  Scenario: checkToken is not valid
+    Then checkToken is not valid
 
     Scenario: delete useless
     Given deleteTestUsers

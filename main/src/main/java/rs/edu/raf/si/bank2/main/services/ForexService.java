@@ -13,6 +13,7 @@ import java.util.Optional;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
 import rs.edu.raf.si.bank2.main.bootstrap.BootstrapData;
 import rs.edu.raf.si.bank2.main.models.mariadb.Forex;
@@ -20,6 +21,7 @@ import rs.edu.raf.si.bank2.main.repositories.mariadb.ForexRepository;
 import rs.edu.raf.si.bank2.main.services.interfaces.ForexServiceInterface;
 
 @Service
+@EnableCaching
 public class ForexService implements ForexServiceInterface {
 
     private final ForexRepository forexRepository;

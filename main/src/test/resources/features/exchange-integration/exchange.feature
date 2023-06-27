@@ -16,9 +16,9 @@ Feature: Exchange service
     And there is an exchange record in database
     When user is logged in
     Then user gets exchange by acronym from database
-#
-#  Scenario: user gets activity of exchange by MIC Code from database
-#    Given user logs in
-#    And there is an exchange record in database
-#    When user is logged in
-#    Then user gets activity of exchange by MIC Code from database
+
+  Scenario: user gets activity of exchange by MIC Code from database
+    Given user logs in
+    And there is an exchange record in database
+    When user is logged in
+    Then user gets activity of exchange by MIC Code from database

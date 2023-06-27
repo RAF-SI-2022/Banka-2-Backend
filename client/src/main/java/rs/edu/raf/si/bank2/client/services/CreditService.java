@@ -110,7 +110,6 @@ public class CreditService {
         Optional<RacunStorage> racunInfo =
                 racunStorageRepository.findRacunStorageByBalanceRegistrationNumber(racunRegNum);
         if (racunInfo.isEmpty()) System.err.println("NIJE GA NASAO");
-        ;
 
         double amountToChange = amount;
         if (decrease) amountToChange = -amount;

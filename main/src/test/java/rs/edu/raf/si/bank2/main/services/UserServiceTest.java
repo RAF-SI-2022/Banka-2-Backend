@@ -8,12 +8,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import rs.edu.raf.si.bank2.main.dto.CommunicationDto;
 import rs.edu.raf.si.bank2.main.exceptions.PasswordResetTokenNotFoundException;
 import rs.edu.raf.si.bank2.main.models.mariadb.PasswordResetToken;
 import rs.edu.raf.si.bank2.main.models.mariadb.User;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.PasswordResetTokenRepository;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.UserRepository;
+import rs.edu.raf.si.bank2.main.services.interfaces.UserCommunicationInterface;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -247,40 +250,57 @@ public class UserServiceTest {
         });
     }
 
-    //    @Test
-    //    public void changePassword_success() {
-    //
-    //        long id = 1L;
-    //
-    //        User user = User.builder()
-    //                .id(id)
-    //                .firstName("Darko")
-    //                .lastName("Darkovic")
-    //                .phone("000000000")
-    //                .jmbg("000000000")
-    //                .password("12345")
-    //                .email("darko@gmail.com")
-    //                .jobPosition("/")
-    //                .build();
-    //
-    //        String newPassword = "54321";
-    //
-    //        String token = UUID.randomUUID().toString();
-    //        PasswordResetToken passwordResetToken = new PasswordResetToken(user, token);
-    //
-    //        when(passwordResetTokenRepository.findPasswordResetTokenByToken(token))
-    //                .thenReturn(Optional.of(passwordResetToken));
-    //        when(userRepository.findById(id)).thenReturn(Optional.of(user));
-    //
-    //        when(userRepository.save(user)).thenReturn(user);
-    //
-    //        userService.changePassword(user, newPassword, token);
-    //
-    //        assertEquals(newPassword, user.getPassword());
-    //
-    //        verify(userRepository).save(user);
-    //        verify(passwordResetTokenRepository).deleteByToken(token);
-    //    }
+    @Test
+    public void changePassword_success() {
+        long id = 1L;
+
+        User user = User.builder()
+                .id(id)
+                .firstName("Darko")
+                .lastName("Darkovic")
+                .phone("000000000")
+                .jmbg("000000000")
+                .password("12345")
+                .email("darko@gmail.com")
+                .jobPosition("/")
+                .build();
+
+        String newPassword = "54321";
+
+        String token = UUID.randomUUID().toString();
+        PasswordResetToken passwordResetToken = new PasswordResetToken(user, token);
+
+        when(passwordResetTokenRepository.findPasswordResetTokenByToken(token))
+                .thenReturn(Optional.of(passwordResetToken));
+
+        UserCommunicationInterface userCommunicationInterface = Mockito.mock(UserCommunicationInterface.class);
+        userService.setUserCommunicationInterface(userCommunicationInterface);
+        String responseMsg =
+                """
+                {
+                  "id": 1,
+                  "firstName": "Darko",
+                  "lastName": "Darkovic",
+                  "phone": "000000000",
+                  "jmbg": "000000000",
+                  "password": "12345",
+                  "email": "darko@gmail.com",
+                  "jobPosition": "/",
+                  "dailyLimit": 4000
+                }
+                """;
+        CommunicationDto dto = new CommunicationDto(200, responseMsg);
+        when(userCommunicationInterface.sendGet(null, "/findById/" + id)).thenReturn(dto);
+        try {
+            userService.changePassword(user, newPassword, token);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+
+        assertEquals(newPassword, user.getPassword());
+        verify(passwordResetTokenRepository).deleteByToken(token);
+    }
 
     @Test
     public void changePassword_throwsPasswordResetTokenNotFoundException() {
@@ -309,34 +329,71 @@ public class UserServiceTest {
         });
     }
 
-    //    @Test
-    //    public void changePassword_throwsUserNotFoundException() {
+    //        @Test
+    //        public void changePassword_throwsUserNotFoundException() {
     //
-    //        long id = 1L;
+    //            long id = 1L;
     //
-    //        User user = User.builder()
-    //                .id(id)
-    //                .firstName("Darko")
-    //                .lastName("Darkovic")
-    //                .phone("000000000")
-    //                .jmbg("000000000")
-    //                .password("12345")
-    //                .email("darko@gmail.com")
-    //                .jobPosition("/")
-    //                .build();
+    //            User user = User.builder()
+    //                    .id(id)
+    //                    .firstName("Darko")
+    //                    .lastName("Darkovic")
+    //                    .phone("000000000")
+    //                    .jmbg("000000000")
+    //                    .password("12345")
+    //                    .email("darko@gmail.com")
+    //                    .jobPosition("/")
+    //                    .build();
     //
-    //        String newPassword = "54321";
+    //            String newPassword = "54321";
     //
-    //        String token = UUID.randomUUID().toString();
+    //            String token = UUID.randomUUID().toString();
     //
-    //        PasswordResetToken passwordResetToken = new PasswordResetToken(user, token);
+    //            PasswordResetToken passwordResetToken = new PasswordResetToken(user, token);
     //
-    //        when(passwordResetTokenRepository.findPasswordResetTokenByToken(token))
-    //                .thenReturn(Optional.of(passwordResetToken));
-    //        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
+    //            when(passwordResetTokenRepository.findPasswordResetTokenByToken(token))
+    //                    .thenReturn(Optional.of(passwordResetToken));
+    //            when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
     //
-    //        assertThrows(UserNotFoundException.class, () -> {
-    //            userService.changePassword(user, newPassword, token);
-    //        });
-    //    }
+    //            assertThrows(UserNotFoundException.class, () -> {
+    //                userService.changePassword(user, newPassword, token);
+    //            });
+    //        }
+    @Test
+    public void changeUsersDailyLimit() {
+        long id = 1L;
+
+        User user = User.builder()
+                .id(id)
+                .firstName("Darko")
+                .lastName("Darkovic")
+                .phone("000000000")
+                .jmbg("000000000")
+                .password("12345")
+                .email("darko@gmail.com")
+                .jobPosition("/")
+                .build();
+
+        UserCommunicationInterface userCommunicationInterface = Mockito.mock(UserCommunicationInterface.class);
+        userService.setUserCommunicationInterface(userCommunicationInterface);
+
+        String email = "darko@gmail.com";
+        String responseMsg =
+                """
+                {
+                  "id": 1,
+                  "firstName": "Darko",
+                  "lastName": "Darkovic",
+                  "phone": "000000000",
+                  "jmbg": "000000000",
+                  "password": "12345",
+                  "email": "darko@gmail.com",
+                  "jobPosition": "/",
+                  "dailyLimit": 4000
+                }
+                """;
+        CommunicationDto dto = new CommunicationDto(200, responseMsg);
+        when(userCommunicationInterface.sendGet(email, "/findByEmail")).thenReturn(dto);
+        this.userService.changeUsersDailyLimit(user.getEmail(), 50000d);
+    }
 }

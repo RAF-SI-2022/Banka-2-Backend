@@ -180,7 +180,7 @@ public class ReserveController {
     }
 
     @Timed("controllers.reserve.finalizeStockBuy")
-    @PostMapping("finalizeStock")
+    @PostMapping("/finalizeStock")
     public ResponseEntity<?> finalizeStockBuy(@RequestBody ReserveDto reserveDto) {
         Optional<UserStock> userStock =
                 userStocksRepository.findUserStockByUserIdAndStockId(reserveDto.getUserId(), reserveDto.getHartijaId());
@@ -206,7 +206,7 @@ public class ReserveController {
     }
 
     @Timed("controllers.reserve.finalizeOptionBuy")
-    @PostMapping("finalizeOption")
+    @PostMapping("/finalizeOption")
     public ResponseEntity<?> finalizeOptionBuy(@RequestBody ReserveDto reserveDto) {
 
         String[] cut = reserveDto.getFutureStorage().split(",");

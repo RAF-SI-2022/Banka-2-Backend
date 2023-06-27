@@ -11,7 +11,7 @@ import rs.edu.raf.si.bank2.main.services.interfaces.UserStockServiceInterface;
 @Service
 public class UserStockService implements UserStockServiceInterface {
 
-    private final UserStocksRepository userStocksRepository;
+    private UserStocksRepository userStocksRepository;
 
     @Autowired
     public UserStockService(UserStocksRepository userStocksRepository) {
@@ -44,5 +44,9 @@ public class UserStockService implements UserStockServiceInterface {
         userStock.get().setAmount(userStock.get().getAmount() + userStock.get().getAmountForSale());
         userStock.get().setAmountForSale(0);
         return userStocksRepository.save(userStock.get());
+    }
+
+    public void setUserStockRepository(UserStocksRepository userStocksRepository) {
+        this.userStocksRepository = userStocksRepository;
     }
 }

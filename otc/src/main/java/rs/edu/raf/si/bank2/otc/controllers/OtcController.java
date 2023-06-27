@@ -136,6 +136,7 @@ public class OtcController {
         } else return ResponseEntity.status(userResponse.getResponseCode()).body(userResponse.getResponseMsg());
 
         OtcResponseDto response = otcService.openContract(user.getId(), contractDto);
+        System.out.println("RESPONSE " + response.getResponseMsg() + " " + response.getResponseCode());
         return ResponseEntity.status(response.getResponseCode()).body(response.getResponseMsg());
     }
 

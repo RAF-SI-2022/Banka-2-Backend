@@ -151,11 +151,12 @@ public class BalanceIntegrationSteps extends BalanceIntegrationTestConfig {
     public void open_tekuci_racun()
             throws io.cucumber.core.internal.com.fasterxml.jackson.core.JsonProcessingException {
         TekuciRacunDto creditRequestDto = new TekuciRacunDto(testClientId, 1L, "USD", BalanceType.STEDNI, 1, 1.0);
+
         String body = new io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper()
                 .writeValueAsString(creditRequestDto);
 
         try {
-            MvcResult mvcResult = mockMvc.perform(post("/api/balance/openDevizniRacun")
+            MvcResult mvcResult = mockMvc.perform(post("/api/balance/openTekuciRacun")
                             .contentType("application/json")
                             .content(body)
                             .header("Content-Type", "application/json")
@@ -263,6 +264,49 @@ public class BalanceIntegrationSteps extends BalanceIntegrationTestConfig {
             } catch (Exception e) {
                 fail("Get all poslovni failed");
             }
+        }
+    }
+
+    @Then("try to get nonexistent devizni")
+    public void try_to_get_nonexistent_devizni() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(get("/api/balance/devizni/13212321")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isNotFound())
+                    .andReturn();
+        } catch (Exception e) {
+            fail("Get all devizni failed");
+        }
+    }
+
+    @Then("try to get nonexistent tekuci")
+    public void try_to_get_nonexistent_tekuci() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(get("/api/balance/tekuci/13213123")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isNotFound())
+                    .andReturn();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Get all tekuci failed");
+        }
+    }
+
+    @Then("try to get nonexistent poslovni")
+    public void try_to_get_nonexistent_poslovni() {
+        try {
+            MvcResult mvcResult = mockMvc.perform(get("/api/balance/poslovni/1321312312")
+                            .header("Content-Type", "application/json")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isNotFound())
+                    .andReturn();
+        } catch (Exception e) {
+            fail("Get all poslovni failed");
         }
     }
 }
