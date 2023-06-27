@@ -108,7 +108,7 @@ presubmits:
               services_build_order=$(echo ${SERVICES_BUILD} | xargs)
               for service in $services_build_order
               do
-                if [[ docker pull harbor.k8s.elab.rs/banka-2/${service}:${commit_hash} ]]; then
+                if docker pull harbor.k8s.elab.rs/banka-2/${service}:${commit_hash}; then
                   echo "Image ${service}:${commit_hash} already found"
                 else
                   docker build -t harbor.k8s.elab.rs/banka-2/${service}:${commit_hash} -f ./docker/${service}.Dockerfile .
@@ -205,7 +205,7 @@ postsubmits:
               services_build_order=$(echo ${SERVICES_BUILD} | xargs)
               for service in $services_build_order
               do
-                if [[ docker pull harbor.k8s.elab.rs/banka-2/${service}:${commit_hash} ]]; then
+                if docker pull harbor.k8s.elab.rs/banka-2/${service}:${commit_hash}; then
                   echo "Image ${service}:${commit_hash} already found"
                 else
                   docker build -t harbor.k8s.elab.rs/banka-2/${service}:${commit_hash} -f ./docker/${service}.Dockerfile .
