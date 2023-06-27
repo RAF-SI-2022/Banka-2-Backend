@@ -75,7 +75,7 @@ public class PaymentService {
         return "Uklonjen novac";
     }
 
-    private void subtract(Balance type, String regNum, double amountToReduce) {
+    public void subtract(Balance type, String regNum, double amountToReduce) {
         switch (type) {
             case TEKUCI -> {
                 Optional<TekuciRacun> tekuciRacun = tekuciRacunRepository.findTekuciRacunByRegistrationNumber(regNum);
@@ -103,7 +103,7 @@ public class PaymentService {
         }
     }
 
-    private void add(Balance type, String regNum, double amountToIncrease) {
+    public void add(Balance type, String regNum, double amountToIncrease) {
         switch (type) {
             case TEKUCI -> {
                 Optional<TekuciRacun> tekuciRacun = tekuciRacunRepository.findTekuciRacunByRegistrationNumber(regNum);

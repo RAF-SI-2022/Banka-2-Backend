@@ -43,6 +43,7 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
 
     @Autowired
     protected UserService userService;
+
     private UserStock userStock;
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -301,7 +302,7 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
     @Then("user finds user-stock")
     public void userFindsUserStock() {
         Optional<UserStock> userStock = this.userStockService.findUserStockByUserIdAndStockSymbol(11111L, "AAPL");
-        if(userStock.isPresent()) {
+        if (userStock.isPresent()) {
             assertNotEquals(null, userStock.get());
         }
     }
@@ -312,11 +313,14 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
         boolean condition = userStockList.size() >= 0;
         assertTrue(condition);
     }
+
     @Given("user-stock exists in db")
     public void userStockExistsInDb() {
-        User user = this.userService.findByEmail("anesic3119rn+banka2backend+admin@raf.rs").get();
+        User user = this.userService
+                .findByEmail("anesic3119rn+banka2backend+admin@raf.rs")
+                .get();
         Optional<UserStock> userStockOptional = this.userStockService.findUserStockByUserIdAndStockSymbol(1L, "BBB");
-        if(userStockOptional.isPresent()) {
+        if (userStockOptional.isPresent()) {
             this.userStock = userStockOptional.get();
         } else {
             this.userStock = UserStock.builder()
@@ -329,13 +333,14 @@ public class StocksIntegrationSteps extends StocksIntegrationTestConfig {
             this.userStock = this.userStockService.save(userStock);
         }
     }
+
     @Then("remove stock from market")
     public void removeStockFromMarket() {
         try {
-            this.userStockService.removeFromMarket(this.userStock.getUser().getId(), this.userStock.getStock().getSymbol());
+            this.userStockService.removeFromMarket(
+                    this.userStock.getUser().getId(), this.userStock.getStock().getSymbol());
         } catch (Exception e) {
 
         }
     }
-
 }

@@ -6,6 +6,7 @@ import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import rs.edu.raf.si.bank2.main.services.workerThreads.FutureBuyWorker;
 import rs.edu.raf.si.bank2.main.services.workerThreads.FutureSellWorker;
 
 @Service
+@EnableCaching
 public class FutureService implements FutureServiceInterface {
 
     private final UserService userService;
