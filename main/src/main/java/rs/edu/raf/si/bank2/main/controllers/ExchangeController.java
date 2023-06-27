@@ -4,6 +4,7 @@ import io.micrometer.core.annotation.Timed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import rs.edu.raf.si.bank2.main.exceptions.ExchangeNotFoundException;
 import rs.edu.raf.si.bank2.main.services.AuthorisationService;
 import rs.edu.raf.si.bank2.main.services.ExchangeService;
 import rs.edu.raf.si.bank2.main.services.UserCommunicationService;
@@ -48,9 +49,9 @@ public class ExchangeController {
     @Timed("controllers.exchange.isExchangeActive")
     @GetMapping(value = "/status/{micCode}")
     public ResponseEntity<?> isExchangeActive(@PathVariable(name = "micCode") String micCode) {
-        if (exchangeService.findByMicCode(micCode) != null) {
+        try {
             return ResponseEntity.ok().body(exchangeService.isExchangeActive(micCode));
-        } else {
+        } catch (ExchangeNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }

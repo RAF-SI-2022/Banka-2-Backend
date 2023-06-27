@@ -58,13 +58,13 @@ public class StockService {
     private final ExchangeRepository exchangeRepository;
     private final UserService userService;
     private final BalanceService balanceService;
-    private final UserStockService userStockService;
+    private UserStockService userStockService;
     private final StockSellWorker stockSellWorker;
     private final StockBuyWorker stockBuyWorker;
-    private final OrderRepository orderRepository;
+    private OrderRepository orderRepository;
     private final StocksRetrieverFromApiWorker stocksRetrieverFromApiWorker;
-    private static final BlockingQueue<StockOrder> stockBuyRequestsQueue = new LinkedBlockingQueue<>();
-    private static final BlockingQueue<StockOrder> stockSellRequestsQueue = new LinkedBlockingQueue<>();
+    private static BlockingQueue<StockOrder> stockBuyRequestsQueue = new LinkedBlockingQueue<>();
+    private static BlockingQueue<StockOrder> stockSellRequestsQueue = new LinkedBlockingQueue<>();
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -470,30 +470,6 @@ public class StockService {
                 : stockOrder;
         order = this.orderRepository.save(order);
 
-        // ako je MARGIN order posalji ga na drugi service umesto da ga ovde obradjujes
-        //        if (order.isMargin()){
-        //            CommunicationDto communicationDto;
-        //            MarginTransactionDto marginTransactionDto = new MarginTransactionDto();
-        //            marginTransactionDto.setAccountType(AccountType.MARGIN);
-        //            marginTransactionDto.setOrderId(order.getId());
-        //            marginTransactionDto.setTransactionComment("Kupovina akcija");
-        //            marginTransactionDto.setCurrencyCode(order.getCurrencyCode());
-        //            marginTransactionDto.setTransactionType(TransactionType.BUY);
-        //            marginTransactionDto.setInitialMargin(price.doubleValue());
-        //            marginTransactionDto.setMaintenanceMargin(price.doubleValue() * 0.4); //za odrzavanje je 40% full
-        // cene
-        //            try {
-        //                String marginDtoJson = mapper.writeValueAsString(marginTransactionDto);
-        //                communicationDto = userCommunicationInterface.sendMarginTransaction("/makeTransaction",
-        // marginDtoJson, user.getEmail());
-        //            } catch (JsonProcessingException e) { throw new RuntimeException(e); }
-        //
-        //            if (communicationDto.getResponseCode() == 200)
-        //                this.updateOrderStatus(order.getId(), OrderStatus.COMPLETE);
-        //            return
-        // ResponseEntity.status(communicationDto.getResponseCode()).body(communicationDto.getResponseMsg());
-        //        }
-
         try {
             stockBuyRequestsQueue.put(order);
         } catch (InterruptedException e) {
@@ -509,7 +485,7 @@ public class StockService {
         return ResponseEntity.ok().body(response);
     }
 
-    private void updateOrderStatus(Long id, OrderStatus orderStatus) {
+    public void updateOrderStatus(Long id, OrderStatus orderStatus) {
         Optional<Order> order = this.orderRepository.findById(id);
 
         if (order.isPresent()) {
@@ -518,7 +494,7 @@ public class StockService {
         } else throw new OrderNotFoundException(id);
     }
 
-    private StockOrder createOrder(
+    public StockOrder createOrder(
             StockRequest request, Double price, User user, OrderStatus status, OrderTradeType orderTradeType) {
         return new StockOrder(
                 0L,
@@ -537,7 +513,7 @@ public class StockService {
                 request.getCurrencyCode());
     }
 
-    private String getTimestamp() {
+    public String getTimestamp() {
         LocalDateTime currentDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_PATTERN);
         return currentDateTime.format(formatter);
@@ -564,33 +540,9 @@ public class StockService {
                             OrderTradeType.SELL)
                     : stockOrder;
             order = this.orderRepository.save(order);
-
-            //            //ako je MARGIN order posalji ga na drugi service umesto da ga ovde obradjujes
-            //            if (order.isMargin()){//todo proveri dal radi
-            //                CommunicationDto communicationDto;
-            //                MarginTransactionDto marginTransactionDto = new MarginTransactionDto();
-            //                marginTransactionDto.setAccountType(AccountType.MARGIN);
-            //                marginTransactionDto.setOrderId(order.getId());
-            //                marginTransactionDto.setTransactionComment("Prodaja akcija");
-            //                marginTransactionDto.setCurrencyCode(order.getCurrencyCode());
-            //                marginTransactionDto.setTransactionType(TransactionType.SELL);
-            //                marginTransactionDto.setInitialMargin(price.doubleValue());
-            //                marginTransactionDto.setMaintenanceMargin(price.doubleValue() * 0.4); //za odrzavanje je
-            // 40% full cene
-            //                try {
-            //                    String marginDtoJson = mapper.writeValueAsString(marginTransactionDto);
-            //                    communicationDto =
-            // userCommunicationInterface.sendMarginTransaction("/makeTransaction", marginDtoJson,
-            // userStock.get().getUser().getEmail());
-            //                } catch (JsonProcessingException e) { throw new RuntimeException(e); }
-            //
-            //                if (communicationDto.getResponseCode() == 200)
-            //                    this.updateOrderStatus(order.getId(), OrderStatus.COMPLETE);
-            //                return
-            // ResponseEntity.status(communicationDto.getResponseCode()).body(communicationDto.getResponseMsg());
-            //            }
-
             stockSellRequestsQueue.put(order);
+        } catch (NullPointerException ex) {
+
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -672,5 +624,13 @@ public class StockService {
                 this.stockRepository.save(freshStock);
             }
         }
+    }
+
+    public void setUserStockService(UserStockService userStockService) {
+        this.userStockService = userStockService;
+    }
+
+    public void setOrderRepository(OrderRepository orderRepository) {
+        this.orderRepository = orderRepository;
     }
 }
