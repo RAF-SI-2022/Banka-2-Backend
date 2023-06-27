@@ -55,6 +55,7 @@ presubmits:
     labels:
       preset-github-ro-token: "true"
       preset-sonar-token: "true"
+      preset-harbor-robot-push: "true"
     always_run: true
     decorate: true
     spec:
@@ -69,10 +70,12 @@ presubmits:
               SONAR_PROJECT_KEY="Banka-2-Backend-Main"
               SONAR_PROJECT_NAME="Banka-2-Backend-Main"
               SERVICES_NAMES="users otc client"
+              SERVICES_BUILD="otc users client"
               SERVICES_PORTS="8080 8082 8083"
               THIS_SERVICE="main"
 
               start-docker.sh
+              docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD harbor.k8s.elab.rs
 
               head_ref=$(curl -L --silent -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GITHUB_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/repos/RAF-SI-2022/"$REPO_NAME"/pulls/"$PULL_NUMBER" | jq -r .head.ref)
               export PULL_HEAD_REF="$head_ref"
@@ -89,15 +92,36 @@ presubmits:
               # Start all helper services
               docker network create --driver bridge bank2_net || true
               docker compose up -d --no-recreate mariadb
-              docker compose up -d --no-recreate flyway
               docker compose up -d --no-recreate mongodb
               docker compose up -d --no-recreate redis
+              docker compose up -d --no-recreate flyway
               
-              # Start microservices
+              # Get hash for image version
+              commit_hash=$(git rev-parse HEAD)
+              
+              # Append image tag
               services=$(echo ${SERVICES_NAMES} | xargs)
               for service in $services
               do
-                docker compose up -d --build --no-recreate ${service} 
+                sed -i "s|harbor.k8s.elab.rs/banka-2/${service}|harbor.k8s.elab.rs/banka-2/${service}:${commit_hash}|g" docker-compose.yml
+              done
+              
+              # Try to pull microservices image or build
+              services_build_order=$(echo ${SERVICES_BUILD} | xargs)
+              for service in $services_build_order
+              do
+                if docker pull harbor.k8s.elab.rs/banka-2/${service}:${commit_hash}; then
+                  echo "Image ${service}:${commit_hash} already found"
+                else
+                  docker build -t harbor.k8s.elab.rs/banka-2/${service}:${commit_hash} -f ./docker/${service}.Dockerfile .
+                  docker push harbor.k8s.elab.rs/banka-2/${service}:${commit_hash}
+                fi
+              done
+              
+              # Start microservices
+              for service in $services
+              do
+                docker compose up -d --build --no-recreate ${service}
               done
               
               # Check all microservices available
@@ -142,6 +166,7 @@ postsubmits:
     labels:
       preset-github-ro-token: "true"
       preset-sonar-token: "true"
+      preset-harbor-robot-push: "true"
     always_run: true
     decorate: true
     spec:
@@ -156,23 +181,46 @@ postsubmits:
               SONAR_PROJECT_KEY="Banka-2-Backend-Main"
               SONAR_PROJECT_NAME="Banka-2-Backend-Main"
               SERVICES_NAMES="users otc client"
+              SERVICES_BUILD="otc users client"
               SERVICES_PORTS="8080 8082 8083"
               THIS_SERVICE="main"
 
               start-docker.sh
+              docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD harbor.k8s.elab.rs
 
               # Start all helper services
               docker network create --driver bridge bank2_net || true
               docker compose up -d --no-recreate mariadb
-              docker compose up -d --no-recreate flyway
               docker compose up -d --no-recreate mongodb
               docker compose up -d --no-recreate redis
+              docker compose up -d --no-recreate flyway
               
-              # Start microservices
+              # Get hash for image version
+              commit_hash=$(git rev-parse HEAD)
+              
+              # Append image tag
               services=$(echo ${SERVICES_NAMES} | xargs)
               for service in $services
               do
-                docker compose up -d --build --no-recreate ${service} 
+                sed -i "s|harbor.k8s.elab.rs/banka-2/${service}|harbor.k8s.elab.rs/banka-2/${service}:${commit_hash}|g" docker-compose.yml
+              done
+              
+              # Try to pull microservices image or build
+              services_build_order=$(echo ${SERVICES_BUILD} | xargs)
+              for service in $services_build_order
+              do
+                if docker pull harbor.k8s.elab.rs/banka-2/${service}:${commit_hash}; then
+                  echo "Image ${service}:${commit_hash} already found"
+                else
+                  docker build -t harbor.k8s.elab.rs/banka-2/${service}:${commit_hash} -f ./docker/${service}.Dockerfile .
+                  docker push harbor.k8s.elab.rs/banka-2/${service}:${commit_hash}
+                fi
+              done
+              
+              # Start microservices
+              for service in $services
+              do
+                docker compose up -d --build --no-recreate ${service}
               done
               
               # Check all microservices available
