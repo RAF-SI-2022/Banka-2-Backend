@@ -55,6 +55,7 @@ presubmits:
     labels:
       preset-github-ro-token: "true"
       preset-sonar-token: "true"
+      preset-harbor-robot-push: "true"
     always_run: true
     decorate: true
     spec:
@@ -129,6 +130,7 @@ postsubmits:
     labels:
       preset-github-ro-token: "true"
       preset-sonar-token: "true"
+      preset-harbor-robot-push: "true"
     always_run: true
     decorate: true
     spec:
