@@ -10,7 +10,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+import javax.persistence.*;
 import javax.transaction.Transactional;
+import javax.validation.constraints.NotNull;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,14 +21,15 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rs.edu.raf.si.bank2.main.exceptions.StockNotFoundException;
-import rs.edu.raf.si.bank2.main.models.mariadb.Exchange;
-import rs.edu.raf.si.bank2.main.models.mariadb.Stock;
-import rs.edu.raf.si.bank2.main.models.mariadb.StockHistory;
+import rs.edu.raf.si.bank2.main.models.mariadb.*;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.ExchangeRepository;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.StockHistoryRepository;
 import rs.edu.raf.si.bank2.main.repositories.mariadb.StockRepository;
+import rs.edu.raf.si.bank2.main.repositories.mariadb.UserStocksRepository;
+import rs.edu.raf.si.bank2.main.services.interfaces.UserCommunicationInterface;
 
 @ExtendWith(MockitoExtension.class)
 public class StockServiceTest {
@@ -41,6 +45,9 @@ public class StockServiceTest {
 
     @InjectMocks
     StockService stockService;
+
+    @InjectMocks
+    UserStockService userStockService;
 
     @Test
     public void getAllStocks_success() {
@@ -599,9 +606,10 @@ public class StockServiceTest {
     @Test
     void getStockBySymbol() {
         try {
+
             this.stockService.getStockBySymbol("CCC");
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -637,6 +645,30 @@ public class StockServiceTest {
     void updateAllStocksInDb() {
         try {
             this.stockService.updateAllStocksInDb();
+        } catch (Exception e) {
+
+        }
+    }
+
+    @Test
+    void removeFromMarket() {
+        try {
+            Long userId = 1L;
+            String stockSymbol = "AAPL";
+
+            UserStock userStock = UserStock.builder()
+                    .id(23L)
+                    .user(null)
+                    .stock(null)
+                    .amount(1)
+                    .amountForSale(1)
+                    .build();
+
+            UserStocksRepository userStocksRepository = Mockito.mock(UserStocksRepository.class);
+            when(userStocksRepository.findUserStockByUserIdAndStockSymbol(userId, stockSymbol)).thenReturn(Optional.of(userStock));
+            when(userStocksRepository.save(userStock)).thenReturn(userStock);
+            this.userStockService.setUserStockRepository(userStocksRepository);
+            this.userStockService.removeFromMarket(userId, stockSymbol);
         } catch (Exception e) {
 
         }

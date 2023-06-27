@@ -25,7 +25,7 @@ import rs.edu.raf.si.bank2.main.services.interfaces.UserServiceInterface;
 public class UserService implements UserDetailsService, UserServiceInterface {
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
-    private final UserCommunicationInterface userCommunicationInterface;
+    private  UserCommunicationInterface userCommunicationInterface;
     ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
@@ -129,7 +129,12 @@ public class UserService implements UserDetailsService, UserServiceInterface {
                 passwordResetTokenRepository.findPasswordResetTokenByToken(passwordResetToken);
 
         if (passwordResetTokenFromDB.isPresent()) {
-            Optional<User> userFromDB = this.findById(user.getId());
+            Optional<User> userFromDB;
+            try {
+                userFromDB = this.findById(user.getId());
+            } catch (Exception e) {
+                userFromDB = Optional.empty();
+            }
 
             if (userFromDB.isPresent()) {
                 User userToChangePasswordTo = userFromDB.get();
@@ -178,5 +183,9 @@ public class UserService implements UserDetailsService, UserServiceInterface {
     @Override
     public User save(User user) {
         return userRepository.save(user);
+    }
+
+    public void setUserCommunicationInterface(UserCommunicationInterface userCommunicationInterface) {
+        this.userCommunicationInterface = userCommunicationInterface;
     }
 }
