@@ -2,11 +2,13 @@
 
 ## Setup & Installation
 
-Admin login
+### LOGIN
+## Prva strana je za klijenta (on se mora regisrovati sa reg dugmetom)
 
-email: "anesic3119rn+banka2backend+admin@raf.rs"
+## Admin login (preko admin login dugmeta) prvo se ulazi sa admin registraciom a zatim on pravi ostale radnike (sup i agnet)
 
-password: "admin"
+- email: "anesic3119rn+banka2backend+admin@raf.rs"
+- password: "admin" 
 
 Supervizori, agenti i klijenti moraju biti manuelno napravljeni 
 
