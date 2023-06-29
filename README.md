@@ -3,7 +3,9 @@
 ## Setup & Installation
 
 Admin login
+
 email: "anesic3119rn+banka2backend+admin@raf.rs"
+
 password: "admin"
 
 Supervizori, agenti i klijenti moraju biti manuelno napravljeni 
